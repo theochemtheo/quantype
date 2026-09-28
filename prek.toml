@@ -1,0 +1,86 @@
+default_install_hook_types = ["pre-commit", "pre-push"]
+
+exclude = { glob = [".venv/**"] }
+
+[[repos]]
+repo = "builtin"
+
+[[repos.hooks]]
+id = "trailing-whitespace"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "end-of-file-fixer"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "check-toml"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "check-yaml"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "check-merge-conflict"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "detect-private-key"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "check-added-large-files"
+stages = ["pre-commit"]
+
+[[repos]]
+repo = "local"
+
+[[repos.hooks]]
+id = "prek-validate-config"
+name = "prek validate-config"
+language = "system"
+entry = "uv run prek validate-config prek.toml"
+files = "^prek\\.toml$"
+pass_filenames = false
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "ruff-check-fix"
+name = "ruff check --fix"
+language = "system"
+entry = "uv run ruff check --fix"
+files = "\\.pyi?$"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "ruff-format"
+name = "ruff format"
+language = "system"
+entry = "uv run ruff format"
+files = "\\.pyi?$"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "tombi-check"
+name = "tombi check"
+language = "system"
+entry = "uv run tombi check"
+files = "\\.toml$"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "tombi-fmt"
+name = "tombi fmt"
+language = "system"
+entry = "uv run tombi fmt"
+files = "\\.toml$"
+stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "tombi-check"
+name = "tombi check"
+language = "system"
+entry = "uv run tombi check"
+files = "\\.toml$"
+stages = ["pre-commit"]
