@@ -5,7 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "Theo Keane", email = "20931519+theochemtheo@users.noreply.github.com" }]
-dependencies = []
+dependencies = [
+  "jax>=0.11.2",
+  "numpy>=2.5.3",
+  "torch>=2.14.0",
+]
 
 [dependency-groups]
 dev = [
@@ -36,7 +40,6 @@ files = [
 strict = true
 extra_checks = true
 warn_unused_configs = true
-show_error_codes = true
 pretty = true
 
 [tool.pyrefly]
@@ -90,3 +93,13 @@ strict-equality-semantics = true
 
 [tool.ty.rules]
 all = "error"
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [
+  { index = "pytorch-cpu" },
+]
