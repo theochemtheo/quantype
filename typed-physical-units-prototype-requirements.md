@@ -72,8 +72,7 @@ For example:
 ```python
 def potential_energy(
     distance: Length[float],
-) -> Energy[float]:
-    ...
+) -> Energy[float]: ...
 ```
 
 The following should be accepted:
@@ -124,14 +123,14 @@ may be dimensionally equivalent while remaining distinct nominal quantity kinds.
 #### Acceptance criteria
 
 ```python
-def consume_pressure(x: Pressure[float]) -> None:
-    ...
+def consume_pressure(x: Pressure[float]) -> None: ...
+
 
 pressure: Pressure[float]
 energy_density: EnergyDensity[float]
 
-consume_pressure(pressure)         # accepted
-consume_pressure(energy_density)   # static error
+consume_pressure(pressure)  # accepted
+consume_pressure(energy_density)  # static error
 ```
 
 The library should retain dimensional metadata internally, but dimensional equality alone must not imply type equality.
@@ -471,8 +470,8 @@ Example:
 ```python
 def energy(
     positions: Length[jax.Array],
-) -> Energy[jax.Array]:
-    ...
+) -> Energy[jax.Array]: ...
+
 
 gradient = ujax.grad(energy)
 ```
@@ -759,8 +758,8 @@ A successful prototype should not merely produce no checker errors; all checkers
 Examples should include:
 
 ```python
-def needs_energy(x: Energy[float]) -> None:
-    ...
+def needs_energy(x: Energy[float]) -> None: ...
+
 
 needs_energy(1.0 * u.angstrom)
 ```

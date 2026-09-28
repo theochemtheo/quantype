@@ -62,14 +62,6 @@ files = "\\.pyi?$"
 stages = ["pre-commit"]
 
 [[repos.hooks]]
-id = "tombi-check"
-name = "tombi check"
-language = "system"
-entry = "uv run tombi check"
-files = "\\.toml$"
-stages = ["pre-commit"]
-
-[[repos.hooks]]
 id = "tombi-fmt"
 name = "tombi fmt"
 language = "system"
