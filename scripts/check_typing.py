@@ -11,9 +11,26 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/typing/negative/invalid.py"
 UV = shutil.which("uv")
+# A single invalid fixture needs no parallel workers (and no IPC status files).
 COMMANDS = (
-    ("mypy", "--strict", "--no-native-parser", "--cache-dir", ".mypy_cache/standard"),
-    ("mypy", "--strict", "--native-parser", "--cache-dir", ".mypy_cache/native"),
+    (
+        "mypy",
+        "--strict",
+        "--num-workers",
+        "0",
+        "--no-native-parser",
+        "--cache-dir",
+        ".mypy_cache/standard",
+    ),
+    (
+        "mypy",
+        "--strict",
+        "--num-workers",
+        "0",
+        "--native-parser",
+        "--cache-dir",
+        ".mypy_cache/native",
+    ),
     ("pyright",),
     ("pyrefly", "check"),
     ("ty", "check", "--output-format", "concise"),

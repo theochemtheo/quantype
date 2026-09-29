@@ -239,7 +239,11 @@ uv build
 expression in `tests/typing/negative`; a checker failing for unrelated reasons is
 not sufficient. Mypy checks the project with both the standard and native parsers,
 using separate caches so neither run skips parsing due to the other's results.
-The negative fixtures are checked with both parsers too. `mypy.stubtest` checks the installed runtime against the stubs;
+Parallel mypy workers create temporary `.mypy_worker.*.json` IPC files in their
+working directory, not in `--cache-dir`; `scripts/check_mypy.py` runs from
+`.mypy_cache/` so these files do not appear in the project root. The negative
+fixtures are checked with both parsers too. `mypy.stubtest` checks the installed
+runtime against the stubs;
 `tests/typing/stubtest_allowlist.txt` documents intentional differences between
 runtime classes and the kind-specific static API. Runtime tests also validate
 every named relation's dimensions.

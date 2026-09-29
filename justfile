@@ -16,8 +16,7 @@ format:
 
 typecheck:
     uv run --all-extras ty check
-    uv run --all-extras mypy --no-native-parser --cache-dir .mypy_cache/standard
-    uv run --all-extras mypy --native-parser --cache-dir .mypy_cache/native
+    uv run --all-extras scripts/check_mypy.py
     uv run --all-extras python -m mypy.stubtest quantype --allowlist tests/typing/stubtest_allowlist.txt
     uv run --all-extras pyright
     uv run --all-extras pyrefly check
