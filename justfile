@@ -16,9 +16,16 @@ format:
 
 typecheck:
     uv run --all-extras ty check
-    uv run --all-extras mypy .
-    uv run --all-extras pyright .
-    uv run --all-extras pyrefly check .
+    uv run --all-extras mypy
+    uv run --all-extras pyright
+    uv run --all-extras pyrefly check
+    uv run scripts/check_typing.py
+
+generate:
+    uv run scripts/generate.py
+
+check-generated:
+    uv run scripts/generate.py --check
 
 test:
-    uv run --all-extras pytest -n auto
+    uv run --all-extras pytest tests/runtime
