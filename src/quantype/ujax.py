@@ -20,7 +20,7 @@ except ModuleNotFoundError as exc:
     raise ModuleNotFoundError("Install quantype[jax] to use quantype.ujax") from exc
 
 from quantype import _generated
-from quantype._semantics import Semantic
+from quantype._internal._semantics import Semantic
 from quantype.core import Quantity, Unit, _wrap, result_kind
 
 # These aliases describe the intentionally dynamic backend integration boundary.

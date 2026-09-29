@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from functools import cache
 from typing import TYPE_CHECKING, Any, ClassVar, cast, override
 
-from quantype._semantics import KINDS, Kind
+from quantype._internal._semantics import KINDS, Kind
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -114,7 +114,7 @@ def canonical_unit(kind: Kind) -> Unit[Any]:
 def get_unit(name: str, *, kind: Kind | None = None) -> Unit[Any]:
     if kind is not None and kind in _UNIT_LOOKUPS:
         return _UNIT_LOOKUPS[kind](name)
-    from quantype._registry import unit_specs
+    from quantype._internal._registry import unit_specs
 
     for identifier, spec in unit_specs().items():
         if name == identifier or name in spec.aliases:

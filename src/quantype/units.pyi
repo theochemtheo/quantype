@@ -31,9 +31,9 @@ from quantype._generated import (
     Velocity,
     Volume,
 )
-from quantype._math import exp as exp
-from quantype._math import sin as sin
-from quantype._math import sqrt as sqrt
+from quantype._internal._math import exp as exp
+from quantype._internal._math import sin as sin
+from quantype._internal._math import sqrt as sqrt
 from quantype.core import Unit
 from quantype.kinds import (
     AngleKind,

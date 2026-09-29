@@ -195,14 +195,17 @@ def unit_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         if package == "quantype"
         else f"from {package}._catalogue import runtime\nget_unit = runtime.get_unit\n"
     )
-    runtime += f"from {package}._math import exp, sin, sqrt\n"
+    math_module = (
+        "quantype._internal._math" if package == "quantype" else f"{package}._math"
+    )
+    runtime += f"from {math_module} import exp, sin, sqrt\n"
     stub = (
         HEADER
         + OVERLAPS
         + "# ruff: noqa: N816, N802\nfrom typing import overload\nfrom quantype.core import Unit\n"
         + markers
     )
-    stub += f"from {package}._math import exp as exp, sin as sin, sqrt as sqrt\n"
+    stub += f"from {math_module} import exp as exp, sin as sin, sqrt as sqrt\n"
     stub += (
         f"from {package}._generated import (" + ", ".join(catalogue.quantities) + ")\n"
     )

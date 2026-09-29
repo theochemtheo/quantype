@@ -22,7 +22,7 @@ from quantype import (
     Volume,
 )
 from quantype import units as u
-from quantype._registry import POWERS, QUANTITIES, RELATIONS, UNITS
+from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS, UNITS
 from quantype.core import _wrap, dimensions, get_unit
 
 if TYPE_CHECKING:

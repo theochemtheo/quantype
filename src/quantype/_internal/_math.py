@@ -8,7 +8,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from quantype._semantics import KINDS
+from quantype._internal._semantics import KINDS
 from quantype.core import Quantity, _wrap
 
 

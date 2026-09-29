@@ -3,10 +3,10 @@ from typing import Any, Self
 import numpy as np
 import numpy.typing as npt
 
-from quantype._semantics import Semantic
-from quantype._unit import Unit as Unit
-from quantype._unit import canonical_unit as canonical_unit
-from quantype._unit import get_unit as get_unit
+from quantype._internal._semantics import Semantic
+from quantype._internal._unit import Unit as Unit
+from quantype._internal._unit import canonical_unit as canonical_unit
+from quantype._internal._unit import get_unit as get_unit
 
 __all__ = [
     "Quantity",

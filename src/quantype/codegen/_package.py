@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from quantype._registry import unit_specs
+from quantype._internal._registry import unit_specs
 
 if TYPE_CHECKING:
     from quantype.catalogue import Catalogue
@@ -23,13 +23,13 @@ def package_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
     definitions = (
         "# Generated catalogue; do not edit.\n"
         "from quantype.catalogue import Catalogue\n"
-        "from quantype._registry import QuantitySpec, UnitSpec, unit_specs\n"
-        "from quantype._runtime_catalogue import RuntimeCatalogue\n"
+        "from quantype._internal._registry import QuantitySpec, UnitSpec, unit_specs\n"
+        "from quantype._internal._runtime_catalogue import RuntimeCatalogue\n"
         f"runtime = RuntimeCatalogue(Catalogue({dict(catalogue.quantities)!r}, {{{units}}}, {dict(catalogue.relations)!r}, {dict(catalogue.powers)!r}))\n"
     )
     math_runtime = (
         "from typing import Any\nfrom quantype.core import Quantity, _wrap\n"
-        "from quantype._math import _unary\n"
+        "from quantype._internal._math import _unary\n"
         f"from {package}._catalogue import runtime\n"
     )
     math_stub = f"from {package}._generated import Area, Length, Angle, Dimensionless\n"

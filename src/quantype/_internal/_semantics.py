@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, override
 
-from quantype._registry import POWERS, QUANTITIES, RELATIONS
+from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS
 
 
 @dataclass(frozen=True, eq=False)

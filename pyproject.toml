@@ -92,12 +92,12 @@ flake8-tidy-imports = { "ban-relative-imports" = "all" }
 "scripts/check_mypy.py" = ["INP001"]
 "scripts/generate.py" = ["INP001"]
 "scripts/benchmark_constants.py" = ["INP001"]
-"src/quantype/_unit.pyi" = ["ANN401"]
+"src/quantype/_internal/_unit.pyi" = ["ANN401"]
 "scripts/check_typing.py" = ["INP001", "T201"]
 # Numerical dispatch is deliberately dynamic and backend imports stay lazy.
 "src/quantype/core.py" = ["ANN401", "PLC0415", "SLF001"]
 "src/quantype/core.pyi" = ["ANN401"]
-"src/quantype/_math.py" = ["ANN401", "PLC0415"]
+"src/quantype/_internal/_math.py" = ["ANN401", "PLC0415"]
 
 [tool.ty.environment]
 python-version = "3.12"

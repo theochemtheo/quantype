@@ -11,8 +11,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, ClassVar, Self, cast, override
 
-from quantype._semantics import KINDS, Kind, Semantic, addition, power, product
-from quantype._unit import Unit, canonical_unit, get_unit
+from quantype._internal._semantics import (
+    KINDS,
+    Kind,
+    Semantic,
+    addition,
+    power,
+    product,
+)
+from quantype._internal._unit import Unit, canonical_unit, get_unit
 
 __all__ = [
     "Quantity",
@@ -78,7 +85,7 @@ class Quantity[K, V]:
 
     @classmethod
     def __class_getitem__(cls, parameters: Any) -> GenericAlias:
-        from quantype._construction import StorageAlias
+        from quantype._internal._construction import StorageAlias
 
         return StorageAlias(cls, parameters)
 
@@ -151,7 +158,7 @@ class Quantity[K, V]:
 
     @classmethod
     def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any) -> Any:
-        from quantype._validation import pydantic_schema
+        from quantype._internal._validation import pydantic_schema
 
         return pydantic_schema(cast("Any", cls), source_type, handler)
 

@@ -4,8 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from quantype._semantics import EXPONENTS, PRODUCTS, TEMPERATURE_DIFFERENCES, Kind
-from quantype._unit import _CANONICAL_UNITS, _UNIT_LOOKUPS, Unit
+from quantype._internal._semantics import (
+    EXPONENTS,
+    PRODUCTS,
+    TEMPERATURE_DIFFERENCES,
+    Kind,
+)
+from quantype._internal._unit import _CANONICAL_UNITS, _UNIT_LOOKUPS, Unit
 
 if TYPE_CHECKING:
     from quantype.catalogue import Catalogue

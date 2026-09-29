@@ -313,12 +313,19 @@ uv build
 `just lint` runs [zizmor](https://github.com/zizmorcore/zizmor) offline against the
 GitHub Actions workflows; the pre-commit hook checks workflow changes too.
 
-`_registry.py` owns the built-in declarative catalogue. `_semantics.py` owns
-physical identities and expression algebra; `_unit.py` owns immutable conversion
-definitions. `core.py` owns quantities, `_construction.py` and `_storage.py` own
-explicit storage conversion, `serialization.py` owns wire formats, and
-`_validation.py` owns the Pydantic adapter. Generation separates catalogue
-validation, source rendering, and formatting/file output.
+The top-level `quantype` import provides quantities and `u`; `quantype.units`
+holds the unit namespaces. Use `quantype.serialization` for JSON/NPZ boundaries,
+`quantype.ujax` or `quantype.utorch` for optional autodiff, and
+`quantype.catalogue` with `quantype.codegen` for application catalogues.
+`quantype.core` and `quantype.kinds` expose the base types and structural markers
+for advanced annotations. The generated quantity classes and stubs live beside
+them because the catalogue generator uses the same package layout externally.
+
+Implementation helpers live under `quantype._internal`: `_registry.py` owns the
+built-in definitions, `_semantics.py` the algebra, `_unit.py` conversions,
+`_construction.py` and `_storage.py` storage boundaries, and `_validation.py`
+the Pydantic adapter. Generation separates catalogue validation, source rendering,
+and formatting/file output.
 
 The conformance suite checks positive `assert_type` examples and marked negative
 examples with strict mypy (both parsers), Pyright, Pyrefly, and ty. Stubtest checks

@@ -6,7 +6,7 @@ from types import GenericAlias
 from typing import TYPE_CHECKING, Any, cast
 
 if TYPE_CHECKING:
-    from quantype._unit import Unit
+    from quantype._internal._unit import Unit
     from quantype.core import Quantity
 
 # Runtime generic arguments and array backend constructors are dynamic here.
@@ -18,7 +18,7 @@ class StorageAlias(GenericAlias):
     def __call__(
         self, value: object, unit: Unit[Any] | None = None, *, dtype: object = None
     ) -> Quantity[Any, Any]:
-        from quantype._storage import convert
+        from quantype._internal._storage import convert
         from quantype.core import _wrap
 
         cls = cast("Any", self.__origin__)

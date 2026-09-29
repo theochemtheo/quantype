@@ -4,7 +4,7 @@
 # pyright: reportUnsupportedDunderAll=false
 from typing import Any, cast
 
-from quantype._math import exp, sin, sqrt
+from quantype._internal._math import exp, sin, sqrt
 from quantype.core import Unit, get_unit
 from quantype.kinds import (
     AngleKind,

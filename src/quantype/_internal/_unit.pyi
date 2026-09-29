@@ -2,7 +2,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from quantype._semantics import Kind
+from quantype._internal._semantics import Kind
 
 @dataclass(frozen=True, init=False, repr=False, match_args=False)
 class Unit[K]:

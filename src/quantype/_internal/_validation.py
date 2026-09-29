@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, cast, get_args
 import numpy as np
 from pydantic_core import core_schema
 
-from quantype._storage import convert, storage_origin
+from quantype._internal._storage import convert, storage_origin
 from quantype.serialization import parse_quantity, to_dict
 
 if TYPE_CHECKING:

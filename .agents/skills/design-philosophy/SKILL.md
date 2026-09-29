@@ -24,7 +24,7 @@ Use these principles when making design choices in this repository, not as a rea
 ## Apply this to the current prototype
 
 - Distinguish a quantity's semantic kind from its dimensions and its presentation unit. Canonical numerical storage is distinct from display/conversion; conversion does not change physical kind. Absolute temperatures and temperature differences have different valid operations.
-- Keep `src/quantype/_registry.py` the source of truth for named kinds, dimensions, canonical units, aliases, and algebra. When changing it, regenerate via `uv run just generate` and check generated outputs with `uv run just check-generated`; do not hand-edit generated code.
+- Keep `src/quantype/_internal/_registry.py` the source of truth for named kinds, dimensions, canonical units, aliases, and algebra. When changing it, regenerate via `uv run just generate` and check generated outputs with `uv run just check-generated`; do not hand-edit generated code.
 - Maintain explicit numerical and serialization boundaries (`.value`, `.magnitude(unit)`, `.to(unit)`, `from_canonical`, Pydantic parsing). Do not silently discard physical meaning via implicit array coercion or secretly move/detach backend tensors in arithmetic.
 - Keep public static semantics usable under the project's strict type checkers without plugins. Use named relationships for scientifically meaningful results; leave unlisted results honestly typed rather than widening to `Any` or inventing a meaning from dimensions alone. Shape constraints are separate from physical kinds.
 - Keep runtime operations in their narrow modules and backend adapters at their boundaries. An extension point is useful; a speculative registry, cache invalidator, factory, or orchestration framework is not.

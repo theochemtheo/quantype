@@ -12,8 +12,8 @@ from typing import TYPE_CHECKING, Any, TypeGuard, cast, get_args, get_origin
 
 import numpy as np
 
-from quantype._semantics import Kind
-from quantype._storage import backend_name, convert, host_array
+from quantype._internal._semantics import Kind
+from quantype._internal._storage import backend_name, convert, host_array
 from quantype.core import Quantity, Unit, _wrap, canonical_unit, get_unit
 
 if TYPE_CHECKING:

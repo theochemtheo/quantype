@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from quantype._registry import BASIS, QuantitySpec, UnitSpec
+from quantype._internal._registry import BASIS, QuantitySpec, UnitSpec
 
 __all__ = ["Catalogue", "QuantitySpec", "UnitSpec", "builtin_catalogue"]
 
@@ -144,7 +144,7 @@ class Catalogue:
 
 
 def builtin_catalogue() -> Catalogue:
-    from quantype._registry import (  # noqa: PLC0415
+    from quantype._internal._registry import (  # noqa: PLC0415
         POWERS,
         QUANTITIES,
         RELATIONS,
