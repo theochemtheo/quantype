@@ -36,23 +36,23 @@ floating storage rejects boolean, complex, and non-numerical magnitudes.
 
 Units describe input magnitudes, not the resulting quantity type. Construction
 converts into canonical units and defaults to canonical presentation. Shape and
-symmetry are the caller's responsibility; the old `quantype.shapes` helpers have
-been removed.
+symmetry are the caller's responsibility.
 
-The previous unit-first API remains available:
+Units can also construct quantities directly:
 
 ```python
 length = 2 * u.nm
 positions = u.angstrom(np.zeros((100, 3)))
 ```
 
-Unit-first construction preserves existing numerical storage except that Python
-integers normalize to `float`. Use `unit(array)` for reliable cross-backend
-construction; backend-left multiplication is not promised outside NumPy.
+Unit-first construction preserves the input's numerical storage where conversion
+allows it; Python integers become `float`. Use `unit(array)` for reliable
+cross-backend construction; backend-left multiplication is not promised outside
+NumPy.
 
 Hierarchical namespaces use full catalogue names, such as `u.length.nanometer`
-and `u.temperature.celsius`. Flat abbreviations remain conveniences. Where a
-flat name conflicts with a namespace, the namespace wins: use
+and `u.temperature.celsius`. Flat abbreviations such as `u.nm` are also available.
+Where a flat name conflicts with a namespace, the namespace wins: use
 `u.dimensionless.one`, `u.energy_density.energy_density`, or
 `u.energy_per_volume.energy_per_volume`.
 
@@ -135,14 +135,14 @@ import-time mutation of the public unit namespace.
 
 ## JSON and Pydantic
 
-Discrete values use an explicit physical kind:
+Serialized quantities carry an explicit physical kind:
 
 ```json
 {"kind": "Length", "magnitude": 5.0, "unit": "angstrom"}
 ```
 
-The old `value`/`units` object format is no longer accepted. Scalar strings such
-as `"5 angstrom"` remain accepted when the expected quantity kind is supplied.
+Quantity objects require exactly `kind`, `magnitude`, and `unit`. Scalar strings
+such as `"5 angstrom"` are accepted when the expected quantity kind is supplied.
 
 ```python
 from pydantic import BaseModel, TypeAdapter
@@ -254,13 +254,14 @@ hessian = ujax.hessian(harmonic)(x)
 
 Importing `ujax` registers quantities as single-leaf pytrees for JAX `jit` and
 `vmap`. Arithmetic and autodiff use the same physical algebra. Gradients are
-positive derivatives; physical force is `-gradient`. Adapters currently support
-one quantity input and scalar output, not general JVP/VJP or multi-input models.
+positive derivatives; physical force is `-gradient`. The adapters support one
+quantity input and scalar output, not general JVP/VJP or multi-input models.
 
 ## Generate an application catalogue
 
-The public generator uses the same definition model, validation, and renderers
-as the built-in API. It requires Ruff for formatting, not a type-checker plugin.
+Application catalogues use the same definition model, validation, and renderers
+as the built-in API. Generation requires Ruff for formatting, not a type-checker
+plugin.
 
 ```python
 from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
@@ -292,11 +293,10 @@ Generation includes runtime classes, stubs, units, numerical helpers, and
 optional autodiff adapters. `generate(..., check=True)` returns stale file names
 without writing; `render(...)` returns source strings without invoking tools.
 
-**This is a combined catalogue, not a patch to the installed built-ins.** Its
-`Length` is a distinct nominal type from `quantype.Length`. Independent extension
-stubs cannot add overloads to existing built-in classes, and reflected operators
-do not override their structural typing fallback. See [the refactor report](docs/refactor.md)
-for the probe results and tradeoffs. Custom storage backends remain out of scope.
+A generated catalogue is a separate, combined API, not an extension of the
+installed classes. Its `Length` is a distinct nominal type from
+`quantype.Length`; import quantities consistently from the generated package.
+Generating a package does not change `quantype`'s operator overloads.
 
 ## Development
 
@@ -317,18 +317,9 @@ The top-level `quantype` import provides quantities and `u`; `quantype.units`
 holds the unit namespaces. Use `quantype.serialization` for JSON/NPZ boundaries,
 `quantype.ujax` or `quantype.utorch` for optional autodiff, and
 `quantype.catalogue` with `quantype.codegen` for application catalogues.
-`quantype.core` and `quantype.kinds` expose the base types and structural markers
-for advanced annotations. The generated quantity classes and stubs live beside
-them because the catalogue generator uses the same package layout externally.
+`quantype.core` and `quantype.kinds` expose base types and structural markers
+for advanced annotations.
 
-Implementation helpers live under `quantype._internal`: `_registry.py` owns the
-built-in definitions, `_semantics.py` the algebra, `_unit.py` conversions,
-`_construction.py` and `_storage.py` storage boundaries, and `_validation.py`
-the Pydantic adapter. Generation separates catalogue validation, source rendering,
-and formatting/file output.
-
-The conformance suite checks positive `assert_type` examples and marked negative
-examples with strict mypy (both parsers), Pyright, Pyrefly, and ty. Stubtest checks
-runtime/stub agreement. Generated overloads narrowly suppress intentional
-structural-fallback overlaps. CI is configured to exercise core-only, JAX-only,
-Torch-only, and minimum-core-dependency environments.
+The conformance suite checks runtime behavior, positive and negative typing
+examples across mypy, Pyright, Pyrefly, and ty, and runtime/stub agreement.
+CI tests core-only, JAX-only, Torch-only, and minimum-core-dependency environments.
