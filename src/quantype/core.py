@@ -9,145 +9,107 @@ typing is confined to this dispatch boundary, not exposed as a user's result typ
 
 from __future__ import annotations
 
-from functools import cache
-from typing import Any, ClassVar, Self, cast, override
+from typing import TYPE_CHECKING, Any, ClassVar, Self, cast, override
 
-from quantype._registry import POWERS, QUANTITIES, RELATIONS, UNITS
+from quantype._semantics import KINDS, Kind, Semantic, addition, power, product
+from quantype._unit import Unit, canonical_unit, get_unit
+
+__all__ = [
+    "Quantity",
+    "Unit",
+    "canonical_unit",
+    "dimensions",
+    "get_unit",
+    "result_kind",
+]
+
+if TYPE_CHECKING:
+    from types import GenericAlias
 
 
-def result_kind(op: str, left: str, right: str) -> str:
-    """Resolve semantic algebra, never infer semantics from dimensions alone."""
-    if "Temperature" in (left, right):
-        raise TypeError("Absolute Temperature cannot participate in products or ratios")
-    known = RELATIONS.get((op, left, right))
-    if known is not None:
-        return known
+def result_kind(op: str, left: Semantic, right: Semantic) -> Semantic:
+    """Shared physical algebra for arithmetic and autodiff."""
     if op not in {"mul", "div"}:
         raise ValueError(f"Unknown physical operation {op!r}")
-    return f"{'Mul' if op == 'mul' else 'Div'}[{left},{right}]"
+    return product(cast("Any", op), left, right)
 
 
-def _expression_parts(kind: str) -> tuple[str, str, str]:
-    operator, body = kind.split("[", 1)
-    body = body[:-1]
-    depth = 0
-    for index, char in enumerate(body):
-        if char == "[":
-            depth += 1
-        elif char == "]":
-            depth -= 1
-        elif char == "," and depth == 0:
-            return operator, body[:index], body[index + 1 :]
-    raise ValueError(f"Unknown quantity kind {kind!r}")
+def dimensions(kind: str | Semantic) -> tuple[int, ...]:
+    return (KINDS[kind] if isinstance(kind, str) else kind).dimensions
 
 
-def dimensions(kind: str) -> tuple[int, ...]:
-    if kind in QUANTITIES:
-        return QUANTITIES[kind].dimensions
-    operation, left, right = _expression_parts(kind)
-    lhs = dimensions(left)
-    if operation == "Pow":
-        return tuple(exponent * int(right) for exponent in lhs)
-    rhs = dimensions(right)
-    sign = 1 if operation == "Mul" else -1
-    return tuple(a + sign * b for a, b in zip(lhs, rhs, strict=True))
+def _symbol(kind: Semantic) -> str:
+    if isinstance(kind, Kind):
+        return canonical_unit(kind).symbol
+    if isinstance(kind.right, int):
+        return f"({_symbol(kind.left)})^{kind.right}"
+    operator = "*" if kind.operation == "mul" else "/"
+    return f"({_symbol(kind.left)} {operator} {_symbol(kind.right)})"
 
 
-def _symbol(kind: str) -> str:
-    if kind in QUANTITIES:
-        return get_unit(QUANTITIES[kind].canonical_unit).symbol
-    operation, left, right = _expression_parts(kind)
-    if operation == "Pow":
-        return f"({_symbol(left)})^{right}"
-    return f"({_symbol(left)} {'*' if operation == 'Mul' else '/'} {_symbol(right)})"
+_CLASSES: dict[Kind, type[Quantity[Any, Any]]] = {}
 
 
-def _wrap(kind: str, value: Any) -> Quantity[Any, Any]:
-    # No coercion here: also used to reconstruct JAX pytrees with sentinel leaves.
-    from quantype import _generated
-
-    cls = getattr(_generated, kind, Quantity)
+def _wrap(kind: str | Semantic, value: Any) -> Quantity[Any, Any]:
+    # No coercion: JAX reconstruction also supplies sentinel leaves.
+    semantic = KINDS[kind] if isinstance(kind, str) else kind
+    cls = _CLASSES[semantic] if isinstance(semantic, Kind) else Quantity
     result = cast("Any", object.__new__(cls))
     result._value = value
-    result._kind = kind
+    result._semantic = semantic
     result._display = None
     return cast("Quantity[Any, Any]", result)
-
-
-@cache
-def get_unit(name: str) -> Unit[Any]:
-    """Look up a catalogue name or alias; never evaluate unit expressions."""
-    for identifier, spec in UNITS.items():
-        if name == identifier or name in spec.aliases:
-            return Unit(identifier, spec.kind, spec.scale, spec.offset, spec.symbol)
-    raise ValueError(f"Unknown unit {name!r}")
-
-
-class Unit[K]:
-    __array_priority__: ClassVar[int] = 10000
-
-    def __init__(
-        self,
-        name: str,
-        kind: str,
-        scale: float = 1.0,
-        offset: float = 0.0,
-        symbol: str | None = None,
-    ) -> None:
-        if scale <= 0:
-            raise ValueError("Unit scale must be positive")
-        self.name = name
-        self.kind = kind
-        self.scale = scale
-        self.offset = offset
-        self.symbol = symbol if symbol is not None else name
-
-    def __call__[V](self, value: V) -> Quantity[K, V]:
-        raw: Any = value
-        if isinstance(raw, bool):
-            raise TypeError("Boolean values are not physical magnitudes")
-        if isinstance(raw, (int, float)):
-            raw = float(raw)
-        elif not (hasattr(raw, "shape") and hasattr(raw, "dtype")):
-            raise TypeError("Use a real scalar or numerical array as a magnitude")
-        # Identity conversions must preserve tensor leaves and backend storage.
-        if self.scale != 1:
-            raw = raw * self.scale
-        if self.offset != 0:
-            raw = raw + self.offset
-        result = _wrap(self.kind, raw)
-        return cast("Quantity[K, V]", result)
-
-    def __mul__(self, value: Any) -> Quantity[K, Any]:
-        return self(value)
-
-    def __rmul__(self, value: Any) -> Quantity[K, Any]:
-        return self(value)
-
-    def __array_ufunc__(
-        self, ufunc: Any, method: str, *inputs: Any, **kwargs: Any
-    ) -> Any:
-        if ufunc.__name__ == "multiply" and method == "__call__" and not kwargs:
-            other = inputs[1] if inputs[0] is self else inputs[0]
-            return self(other)
-        return NotImplemented
-
-    @override
-    def __repr__(self) -> str:
-        return self.symbol
 
 
 class Quantity[K, V]:
     """A semantic quantity with canonical storage and an optional display unit."""
 
     _kind: str = ""
+    _semantic: Semantic
     __array_priority__: ClassVar[int] = 10000
 
-    def __init__(self, value: V) -> None:
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+        if cls.__dict__.get("_kind"):
+            if "_semantic" not in cls.__dict__:
+                cls._semantic = KINDS[cls._kind]
+            if isinstance(cls._semantic, Kind):
+                _CLASSES[cls._semantic] = cls
+
+    @classmethod
+    def __class_getitem__(cls, parameters: Any) -> GenericAlias:
+        from quantype._construction import StorageAlias
+
+        return StorageAlias(cls, parameters)
+
+    def __init__(self, value: object, unit: Unit[K], *, dtype: object = None) -> None:
+        if dtype is not None:
+            raise TypeError("dtype requires a parameterized quantity storage type")
         if not self._kind:
             raise TypeError("Construct a named quantity or use a unit")
-        self._value = value
-        self._display: str | None = None
+        self._check_unit(unit)
+        self._value = cast("V", cast("Any", unit)(value).value)
+        self._display: Unit[K] | None = None
+
+    @classmethod
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[K],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> Unit[K]:
+        if reference.semantic is not cls._semantic:
+            raise ValueError(f"Expected {cls._kind}; received {reference.kind}")
+        return Unit(
+            name,
+            reference.semantic,
+            reference.scale * scale,
+            reference.scale * offset + reference.offset,
+            symbol,
+        )
 
     @property
     def value(self) -> V:
@@ -156,25 +118,25 @@ class Quantity[K, V]:
 
     @property
     def kind(self) -> str:
-        return self._kind
+        return str(self._semantic)
 
     @property
     def dimensions(self) -> tuple[int, ...]:
-        return dimensions(self.kind)
+        return self._semantic.dimensions
 
     @classmethod
     def from_canonical[W](cls, value: W) -> Quantity[K, W]:
         if not cls._kind:
             raise TypeError("from_canonical requires a named quantity class")
-        return cast("Quantity[K, W]", _wrap(cls._kind, value))
+        return cast("Quantity[K, W]", _wrap(cls._semantic, value))
 
     @classmethod
-    def parse(cls, data: object) -> Self:
+    def parse(cls, data: object, *, units: tuple[Unit[Any], ...] = ()) -> Self:
         import numpy as np
 
-        from quantype._validation import parse_quantity
+        from quantype.serialization import parse_quantity
 
-        result = parse_quantity(cast("Any", cls), data)
+        result = parse_quantity(cast("Any", cls), data, units=cast("Any", units))
         raw: Any = result.value
         if not isinstance(raw, (float, np.ndarray)):
             raise TypeError(
@@ -184,10 +146,7 @@ class Quantity[K, V]:
         if isinstance(raw, np.ndarray):
             array = cast("Any", raw)
             if array.dtype != np.float64:
-                result = parse_quantity(
-                    cast("Any", cls),
-                    {"value": array, "units": QUANTITIES[result.kind].canonical_unit},
-                )
+                result = _wrap(cls._semantic, np.asarray(array, dtype=np.float64))
         return cast("Self", result)
 
     @classmethod
@@ -197,7 +156,7 @@ class Quantity[K, V]:
         return pydantic_schema(cast("Any", cls), source_type, handler)
 
     def _check_unit(self, unit: Unit[K]) -> None:
-        if unit.kind != self.kind:
+        if unit.semantic is not self._semantic:
             raise ValueError(
                 f"Expected {self.kind}; unit {unit.name!r} represents {unit.kind}"
             )
@@ -206,7 +165,7 @@ class Quantity[K, V]:
         if unit is None:
             if self._display is None:
                 return self.value
-            unit = cast("Unit[K]", get_unit(self._display))
+            unit = self._display
         self._check_unit(unit)
         raw: Any = self.value
         if unit.offset != 0:
@@ -217,32 +176,20 @@ class Quantity[K, V]:
 
     def to(self, unit: Unit[K]) -> Self:
         self._check_unit(unit)
-        result = _wrap(self.kind, self.value)
-        result._display = unit.name
+        result = _wrap(self._semantic, self.value)
+        result._display = unit
         return cast("Self", result)
 
     def to_dict(self, unit: Unit[K] | None = None) -> dict[str, object]:
-        from quantype._validation import serialize_quantity
+        from quantype.serialization import to_dict
 
-        return serialize_quantity(cast("Any", self), cast("Any", unit))
+        return to_dict(cast("Any", self), cast("Any", unit))
 
     def _add_sub(self, other: object, *, subtract: bool) -> Quantity[Any, Any]:
         if not isinstance(other, Quantity):
             raise TypeError(f"Expected a quantity, received {type(other).__name__}")
         rhs = cast("Quantity[Any, Any]", other)
-        left, right = self.kind, rhs.kind
-        kind = left
-        if left == "Temperature" and right == "Temperature":
-            if not subtract:
-                raise TypeError("Cannot add two absolute Temperatures")
-            kind = "TemperatureDifference"
-        elif (left == "Temperature" and right == "TemperatureDifference") or (
-            left == "TemperatureDifference" and right == "Temperature" and not subtract
-        ):
-            kind = "Temperature"
-        elif left != right:
-            operation = "subtract" if subtract else "add"
-            raise TypeError(f"Cannot {operation} {left} and {right}")
+        kind = addition(self._semantic, rhs._semantic, subtract=subtract)
         lhs: Any = self.value
         return _wrap(kind, lhs - rhs.value if subtract else lhs + rhs.value)
 
@@ -256,9 +203,9 @@ class Quantity[K, V]:
         lhs: Any = self.value
         if isinstance(other, Quantity):
             rhs = cast("Quantity[Any, Any]", other)
-            return _wrap(result_kind("mul", self.kind, rhs.kind), lhs * rhs.value)
+            return _wrap(product("mul", self._semantic, rhs._semantic), lhs * rhs.value)
         self._check_scalar(other)
-        return _wrap(self.kind, lhs * other)
+        return _wrap(self._semantic, lhs * other)
 
     def __rmul__(self, other: Any) -> Quantity[Any, Any]:
         return self * other
@@ -267,16 +214,18 @@ class Quantity[K, V]:
         lhs: Any = self.value
         if isinstance(other, Quantity):
             rhs = cast("Quantity[Any, Any]", other)
-            return _wrap(result_kind("div", self.kind, rhs.kind), lhs / rhs.value)
+            return _wrap(product("div", self._semantic, rhs._semantic), lhs / rhs.value)
         self._check_scalar(other)
-        return _wrap(self.kind, lhs / other)
+        return _wrap(self._semantic, lhs / other)
 
     def __rtruediv__(self, other: Any) -> Quantity[Any, Any]:
         self._check_scalar(other)
-        return _wrap(result_kind("div", "Dimensionless", self.kind), other / self.value)
+        return _wrap(
+            product("div", KINDS["Dimensionless"], self._semantic), other / self.value
+        )
 
     def _check_scalar(self, value: object) -> None:
-        if self.kind == "Temperature":
+        if isinstance(self._semantic, Kind) and self._semantic.affine:
             raise TypeError(
                 "Scale a TemperatureDifference, not an absolute Temperature"
             )
@@ -286,16 +235,14 @@ class Quantity[K, V]:
     def __pow__(self, exponent: object) -> Quantity[Any, Any]:
         if not isinstance(exponent, int) or isinstance(exponent, bool):
             raise TypeError("Only integer quantity powers are supported")
-        if self.kind == "Temperature":
-            raise TypeError("Absolute Temperature cannot be exponentiated")
-        kind = POWERS.get((self.kind, exponent), f"Pow[{self.kind},{exponent}]")
+        kind = power(self._semantic, exponent)
         raw: Any = self.value
         return _wrap(kind, raw**exponent)
 
     def __neg__(self) -> Self:
         self._check_scalar(-1)
         raw: Any = self.value
-        return cast("Self", _wrap(self.kind, -raw))
+        return cast("Self", _wrap(self._semantic, -raw))
 
     def __pos__(self) -> Self:
         return self
@@ -303,7 +250,7 @@ class Quantity[K, V]:
     def __abs__(self) -> Self:
         self._check_scalar(1)
         raw: Any = self.value
-        return cast("Self", _wrap(self.kind, abs(raw)))
+        return cast("Self", _wrap(self._semantic, abs(raw)))
 
     def _reduce(self, method: str, axis: int | None, *, keepdims: bool) -> Self:
         raw: Any = self.value
@@ -320,11 +267,12 @@ class Quantity[K, V]:
             import numpy as np
 
             # Preserve the storage type, including when reduction produces 0-D.
-            reduced = np.asarray(reduced)
-        return cast("Self", _wrap(self.kind, reduced))
+            if isinstance(raw, np.ndarray):
+                reduced = np.asarray(reduced)
+        return cast("Self", _wrap(self._semantic, reduced))
 
     def sum(self, axis: int | None = None, *, keepdims: bool = False) -> Self:
-        if self.kind == "Temperature":
+        if isinstance(self._semantic, Kind) and self._semantic.affine:
             raise TypeError("Cannot sum absolute Temperatures")
         return self._reduce("sum", axis, keepdims=keepdims)
 
@@ -341,5 +289,5 @@ class Quantity[K, V]:
 
     @override
     def __repr__(self) -> str:
-        symbol = get_unit(self._display).symbol if self._display else _symbol(self.kind)
+        symbol = self._display.symbol if self._display else _symbol(self._semantic)
         return f"{self.magnitude()!s} {symbol}"

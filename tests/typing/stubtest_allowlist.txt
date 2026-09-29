@@ -1,10 +1,18 @@
 # Python 3.12 generic runtime metadata is not represented by mypy's PEP 695 stubs.
 ^quantype\._generated\.[A-Za-z]+\.__type_params__$
-^quantype\.core\.(Quantity|Unit)\.__type_params__$
+^quantype\.core\.Quantity\.__type_params__$
+^quantype\._unit\.Unit\.__type_params__$
 ^quantype\.kinds\.(Div|Mul|Pow)\.__type_params__$
 
 # A type alias has no runtime tuple base class (stubtest treats it as a class).
 ^quantype\._registry\.Dimensions$
+^quantype\._semantics\.Semantic$
+
+# functools.cache exposes a variadic checker signature but preserves runtime __wrapped__.
+^quantype\._registry\.unit_specs$
+
+# Standard static generics are retained; the runtime alias adds conversion on call.
+^quantype\.core\.Quantity\.__class_getitem__$
 
 # Base-class arithmetic/NumPy methods are intentionally typed only on named
 # quantities; exposing them on Quantity would bypass the semantic overloads.
@@ -12,7 +20,7 @@
 
 # Unit calls/operators have kind-specific overloads on the generated unit types.
 # NumPy dispatch and array priority are runtime-only implementation details.
-^quantype\.core\.Unit\.(__array_priority__|__array_ufunc__|__call__|__mul__|__rmul__)$
+^quantype\._unit\.Unit\.(__array_priority__|__array_ufunc__|__call__|__mul__|__rmul__)$
 
 # The unit catalogue's stub variables use kind-specific static subclasses of
 # Unit so unit calls return named quantities; runtime instances are plain Unit.

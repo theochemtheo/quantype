@@ -1,139 +1,245 @@
-# `quantype`
+# quantype
 
-A Python 3.12+ prototype of **physical meaning in static types**, with canonical
-numerical storage for NumPy, JAX, and PyTorch. No type-checker plugins or tensor
-subclasses are required.
+Physical meaning in Python types, with canonical numerical storage. Python 3.12+
+with NumPy, SciPy, and Pydantic v2; JAX and Torch are optional extras.
 
-```python
-from typing import assert_type
-from quantype import Energy, Force, Length, u
-
-distance = 2.0 * u.angstrom
-energy = 1.0 * u.hartree
-force = energy / distance
-
-assert_type(distance, Length[float])
-assert_type(force, Force[float])
-assert_type(energy.to(u.eV), Energy[float])
-print(energy.magnitude(u.eV))  # approximately 27.2114
+```bash
+uv add quantype
+uv add 'quantype[jax]'       # JAX transformations and autodiff
+uv add 'quantype[torch]'     # Torch tensors and autograd
 ```
 
-Compatible units produce the same nominal quantity type. `Energy + Length`,
-converting length to seconds, and passing `EnergyDensity` to a function expecting
-`Pressure` are rejected statically and at runtime.
-
-## Construction, conversion, and numerical boundaries
+## Construction and storage
 
 ```python
 import numpy as np
-from quantype import u
+import numpy.typing as npt
+from typing import assert_type
+from quantype import Energy, Force, Length, u
 
-positions = u.angstrom(np.array([[1.0, 2.0, 3.0]]))
-also_positions = u.angstrom * np.zeros((100, 3))
-areas = positions**2
-lengths = u.sqrt(areas)
-total = positions.sum()
+length = Length[np.float64](2, u.length.nanometer)
+assert_type(length, Length[np.float64])
+assert length.value == 20  # canonical angstroms, stored as a NumPy float64 scalar
+
+positions = Length[npt.NDArray[np.float64]](
+    [[1, 2, 3]],
+    u.length.nanometer,
+)
+energy = Energy[np.float64](3, u.energy.electron_volt)
+assert_type(energy / length, Force[np.float64])
 ```
 
-- Use `unit(array)` as the reliable cross-backend constructor. `unit * array`
-  also works; NumPy additionally supports `array * unit`. Backend-left dispatch
-  is not promised for every backend.
-- Unit construction normalizes Python integers to `float`. Numerical arrays
-  remain owned by their backend; identity conversions do not allocate or detach.
-- `.value` explicitly exposes **canonical** numerical data.
-- `.magnitude(unit)` converts numerical data to a chosen compatible unit.
-- `.to(unit)` chooses a presentation/serialization unit without changing the
-  canonical data. `.magnitude()` uses that presentation unit, or canonical units
-  when none has been chosen. Construction defaults to canonical presentation.
-- `Energy.from_canonical(raw)` is an explicit, cheap, trusted model boundary.
-  Hidden activations need not carry physical units.
-- `sum(axis=None, keepdims=False)` and `mean(...)` preserve physical kind.
-  NumPy scalar reductions are wrapped as zero-dimensional ndarrays.
-- `u.sqrt(Area)` returns `Length`; `u.sin(Angle)` and `u.exp(Dimensionless)`
-  return `Dimensionless`. These helpers delegate to the stored backend.
-- Implicit NumPy coercion is rejected rather than silently discarding units.
+The type argument **converts storage** at construction. `np.float64` means a
+NumPy scalar; `npt.NDArray[np.float64]` means an array, including zero-dimensional
+arrays. Python `float` is also supported. Scalars reject non-scalar input; real
+floating storage rejects boolean, complex, and non-numerical magnitudes.
+
+Units describe input magnitudes, not the resulting quantity type. Construction
+converts into canonical units and defaults to canonical presentation. Shape and
+symmetry are the caller's responsibility; the old `quantype.shapes` helpers have
+been removed.
+
+The previous unit-first API remains available:
+
+```python
+length = 2 * u.nm
+positions = u.angstrom(np.zeros((100, 3)))
+```
+
+Unit-first construction preserves existing numerical storage except that Python
+integers normalize to `float`. Use `unit(array)` for reliable cross-backend
+construction; backend-left multiplication is not promised outside NumPy.
+
+Hierarchical namespaces use full catalogue names, such as `u.length.nanometer`
+and `u.temperature.celsius`. Flat abbreviations remain conveniences. Where a
+flat name conflicts with a namespace, the namespace wins: use
+`u.dimensionless.one`, `u.energy_density.energy_density`, or
+`u.energy_per_volume.energy_per_volume`.
+
+### Explicit numerical boundaries
+
+- `.value` exposes canonical numerical data.
+- `.magnitude(unit)` converts to a compatible unit.
+- `.to(unit)` selects presentation/serialization units without changing data.
+- `.magnitude()` uses the chosen presentation unit, or canonical units.
+- `Length.from_canonical(raw)` is the trusted, storage-preserving boundary. It
+  does not inspect or convert data, including when used in compiled models.
+- Implicit NumPy coercion is rejected rather than silently discarding meaning.
 
 Canonical units are angstrom, eV, fs, kelvin, Bohr magneton, atom, and electron.
-The last two are genuine independent dimensional axes. Pressure uses eV/Å³,
-force eV/Å, and force constants eV/Å².
+Atom and electron are independent dimensional axes. Conversion factors come
+from the **installed SciPy constants**, resolved once on first unit use. Importing
+`quantype` alone does not import NumPy, SciPy, Pydantic, Torch, or JAX.
 
-## Meaning, dimensions, and temperatures
+## Physical algebra
 
-The catalogue includes the recommended simulation quantities plus
-`EnergyPerVolume`, `Frequency`, `InverseTime`, `AtomCount`, and `ElectronCount`.
-Dimensional equality never chooses a semantic result: `Force / Area` is
-`Pressure`, while `Energy / Volume` is `EnergyDensity`. Their unit names are
-deliberately distinct (`eV_per_angstrom_cubed` versus
-`energy_density`).
+Kinds are nominal: `Pressure`, `EnergyDensity`, and `EnergyPerVolume` remain
+distinct despite equal dimensions. `Force / Area` yields `Pressure`;
+`Energy / Volume` yields `EnergyDensity`. Incompatible operations are rejected
+both by the supported type checkers and at runtime.
+
+Unlisted products retain structural types such as
+`Quantity[Mul[LengthKind, TimeKind], float]`, not `Any`. Runtime expressions are
+structured trees, not parsed strings. There is no arbitrary symbolic cancellation
+or inference of physical meaning from dimensions alone.
+
+Absolute temperatures are affine points:
 
 ```python
-from quantype import TemperatureDifference, u
-from typing import assert_type
+from quantype import Temperature, TemperatureDifference
 
-cold = 0 * u.celsius
-warm = 300 * u.K
-delta = warm - cold
-assert_type(delta, TemperatureDifference[float])
-restored = cold + delta
-rate = delta / (2 * u.s)
+cold = Temperature[float](0, u.temperature.celsius)
+warm = Temperature[float](300, u.temperature.kelvin)
+assert_type(warm - cold, TemperatureDifference[float])
 ```
 
-Absolute temperatures are affine points: two cannot be added, multiplied,
-scaled, or exponentiated. Differences can be scaled and divided by time.
-Absolute-temperature means are supported, but sums are rejected.
+Differences can be scaled; absolute temperatures cannot be added together,
+multiplied, scaled, or exponentiated. Means of absolute temperatures are valid;
+sums are not.
 
-Uncatalogued products and ratios retain semantic expression markers such as
-`Quantity[Mul[LengthKind, TimeKind], float]`, never `Any`. Runtime dimensional
-metadata remains available through `.dimensions` (basis order given above).
-This is not an arbitrary symbolic simplifier; see the prototype limits below.
+`sum`, `mean`, `u.sqrt(Area)`, `u.sin(Angle)`, and `u.exp(Dimensionless)` delegate
+to numerical backends. Array shape algebra and arbitrary dtype promotion are
+outside the static contract.
 
-## Pydantic and serialization
+## Define a unit without global registration
 
 ```python
-from pydantic import BaseModel
-from quantype import Force, Length, Temperature, u
+from math import sqrt
+from quantype import Temperature
+
+bleb = Temperature.define_unit(
+    "my_lab:bleb",
+    reference=u.temperature.celsius,
+    scale=sqrt(2),
+)
+point = Temperature[np.float64](1, bleb)
+assert point.magnitude(u.temperature.celsius) > 1.4
+```
+
+This definition means `kelvin = bleb * sqrt(2) + 273.15`: zero bleb is zero
+Celsius. In general, `reference_magnitude = input * scale + offset`.
+Definitions are immutable and validated once. A difference unit must be defined
+explicitly using a temperature-difference reference.
+
+A unit object can be used immediately for construction, conversion, and
+serialization. Decoding its identifier requires the definition explicitly:
+
+```python
+wire = point.to(bleb).to_dict()
+restored = Temperature.parse(wire, units=(bleb,))
+```
+
+Namespaced identifiers avoid accidental collisions. Duplicate definitions and
+shadowing built-in identifiers are rejected during decoding. There is no
+import-time mutation of the public unit namespace.
+
+## JSON and Pydantic
+
+Discrete values use an explicit physical kind:
+
+```json
+{"kind": "Length", "magnitude": 5.0, "unit": "angstrom"}
+```
+
+The old `value`/`units` object format is no longer accepted. Scalar strings such
+as `"5 angstrom"` remain accepted when the expected quantity kind is supplied.
+
+```python
+from pydantic import BaseModel, TypeAdapter
 
 
-class RelaxationConfig(BaseModel):
-    force_tolerance: Force[float]
-    max_displacement: Length[float]
-    temperature: Temperature[float]
+class Configuration(BaseModel):
+    cutoff: Length[float]
+    positions: Length[npt.NDArray[np.float64]]
 
 
-config = RelaxationConfig.model_validate(
+config = Configuration.model_validate(
     {
-        "force_tolerance": {"value": 0.01, "units": "eV / angstrom"},
-        "max_displacement": {"value": 0.1, "units": "nm"},
-        "temperature": "20 degC",
+        "cutoff": "0.5 nm",
+        "positions": {"kind": "Length", "magnitude": [[1, 2, 3]], "unit": "nm"},
     }
 )
-wire_json = config.model_dump_json()
-restored = RelaxationConfig.model_validate_json(wire_json)
+restored = Configuration.model_validate_json(config.model_dump_json())
 
-wire = config.max_displacement.to(u.nm).to_dict()
-# {"value": 0.1, "units": "nanometer"}
-length = Length.parse(wire)
+adapter = TypeAdapter(Temperature[np.float64])
+restored_point = adapter.validate_python(wire, context={"units": (bleb,)})
 ```
 
-Bare annotations such as `cutoff: Length` work at runtime; strict static code
-should specify storage. NumPy fields use `Length[numpy.typing.NDArray[np.float64]]`.
-Structured lists parse into float64 arrays. Scalar and array storage annotations
-are validated, and JSON schemas describe accepted unit names and wire values.
-Unit aliases normalize to registry names on serialization; no Python type
-machinery appears in the payload.
+Pydantic restoration converts to the annotated storage, including NumPy dtype.
+Bare quantity annotations work at runtime; strict static code should specify
+storage. `Length.parse(...)` intentionally returns scalar-or-float64-array
+storage; use a typed constructor or `TypeAdapter` for a particular target.
 
-`Length.parse` accepts wire data and scalar/NumPy quantities and honestly returns
-scalar-or-array storage. For a specific storage type, use a typed Pydantic field
-or `TypeAdapter(Length[float])`. Validation errors name the expected and received
-quantity. Serialization is an explicit host boundary: Torch values are detached
-and copied to CPU there, never inside arithmetic or differentiation.
+JSON stores values, not backend/device/dtype metadata. Serialization is an
+explicit host boundary: Torch tensors are detached and copied to CPU there,
+never inside arithmetic or differentiation.
 
-## Physically typed automatic differentiation
+## Binary arrays: NPZ and NPY
+
+NPZ archives store numerical arrays plus a versioned JSON metadata entry, with
+no pickle dependency:
+
+```python
+from quantype.serialization import load_npz, save_npz
+
+save_npz("frame.npz", positions=positions, energy=energy, record_backend=True)
+restored_positions = load_npz(
+    "frame.npz",
+    "positions",
+    Length[npt.NDArray[np.float64]],
+)
+```
+
+Arrays carry dtype and shape, including zero-dimensional and empty arrays.
+Metadata identifies each quantity's kind, unit, and array key. With
+`record_backend=True`, it also records `source_backend`, for example `"numpy"`
+or `"torch"`. That field is **provenance**, not an instruction to import a backend.
+The target type controls restoration; a Torch-produced archive can be read into
+NumPy without Torch installed. Supply `units=(bleb,)` for custom-unit decoding.
+
+```python
+with np.load("frame.npz", allow_pickle=False) as archive:
+    metadata_json = str(archive["metadata"])
+```
+
+Graphs and device placement are not serialized. Unsupported host dtypes, such as
+Torch bfloat16 through NumPy's normal conversion, are not silently approximated.
+JSON and NPZ are value-oriented formats, not bit-exact snapshots of model state;
+noncanonical unit conversion can introduce floating-point roundoff.
+
+NPY deliberately carries only numerical data. Use an explicit external unit:
+
+```python
+np.save("positions.npy", positions.magnitude(u.nm), allow_pickle=False)
+restored_positions = Length[npt.NDArray[np.float64]](
+    np.load("positions.npy", allow_pickle=False),
+    u.nm,
+)
+```
+
+## Optional numerical backends
+
+```python
+import torch
+from quantype import utorch
+
+x = Length[torch.Tensor](
+    torch.tensor([1.0, 2.0], requires_grad=True),
+    u.length.nanometer,
+    dtype=torch.float64,
+)
+energy = Energy.from_canonical((x.value**2).sum())
+gradient = utorch.grad(energy, x, create_graph=True)
+```
+
+Torch/JAX classes do not encode dtype, so constructors and `load_npz` accept an
+explicit `dtype=`. Existing Torch tensors retain their graph and device during
+conversion. JAX float64 requests require x64 support; unavailable explicit dtypes
+fail rather than silently producing a different dtype.
 
 ```python
 import jax
-import jax.numpy as jnp
-from quantype import Energy, Length, u, ujax
+from quantype import ujax
 
 
 def harmonic(x: Length[jax.Array]) -> Energy[jax.Array]:
@@ -141,110 +247,78 @@ def harmonic(x: Length[jax.Array]) -> Energy[jax.Array]:
     return 0.5 * k * (x**2).sum()
 
 
-x = u.angstrom(jnp.array([1.0, 2.0, 3.0]))
-energy = jax.jit(harmonic)(x)
-dE_dx = ujax.grad(harmonic)(x)  # Force[jax.Array], [2, 4, 6]
-hessian = ujax.hessian(harmonic)(x)  # ForceConstant[jax.Array], 2 * identity
-forces = -dE_dx
+x = Length[jax.Array]([1, 2, 3], u.length.angstrom)
+gradient = ujax.jit(ujax.grad(harmonic))(x)
+hessian = ujax.hessian(harmonic)(x)
 ```
 
-Importing `ujax` registers quantities as single-leaf pytrees. JAX `jit` and `vmap`
-then transform quantity-aware functions; only kind/display metadata is static.
-Derivative adapters unwrap canonical data and use the same division registry as
-ordinary arithmetic. Changing input units does not rescale the physical gradient.
+Importing `ujax` registers quantities as single-leaf pytrees for JAX `jit` and
+`vmap`. Arithmetic and autodiff use the same physical algebra. Gradients are
+positive derivatives; physical force is `-gradient`. Adapters currently support
+one quantity input and scalar output, not general JVP/VJP or multi-input models.
+
+## Generate an application catalogue
+
+The public generator uses the same definition model, validation, and renderers
+as the built-in API. It requires Ruff for formatting, not a type-checker plugin.
 
 ```python
-import torch
-from quantype import Energy, Length, u, utorch
+from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
+from quantype.codegen import generate
 
-
-def harmonic_torch(x: Length[torch.Tensor]) -> Energy[torch.Tensor]:
-    k = 2.0 * u.eV_per_angstrom_squared
-    return 0.5 * k * (x**2).sum()
-
-
-x = u.angstrom(torch.tensor([1.0, 2.0, 3.0], requires_grad=True))
-dE_dx = utorch.grad(harmonic_torch(x), x, create_graph=True)
+catalogue = builtin_catalogue().extend(
+    quantities={
+        "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0), "surface_tension"),
+    },
+    units={"surface_tension": UnitSpec("SurfaceTension")},
+    relations={("mul", "Pressure", "Length"): "SurfaceTension"},
+)
+generate(catalogue, "src/labquantities", package="labquantities")
 ```
 
-Gradients are **positive derivatives**. Physical force is `-grad(energy)`.
-Torch graph creation and retention options are forwarded to `torch.autograd.grad`.
-Autodiff wrappers currently support a single quantity input and scalar output.
-
-## Shapes
-
-`quantype.shapes.Vector3` and `SymmetricTensor3` are reusable, runtime-validated
-NumPy constructors, not physical kinds or ndarray subclasses:
+Then import consistently from that generated package:
 
 ```python
-import numpy as np
-from quantype import u
-from quantype.shapes import Vector3, SymmetricTensor3
+from labquantities import Length, Pressure, SurfaceTension, u
 
-position = u.angstrom(Vector3([1, 2, 3]))
-force = u.eV_per_angstrom(Vector3([0, 0, -1]))
-stress = u.eV_per_angstrom_cubed(SymmetricTensor3(np.eye(3)))
+length = Length[float](2, u.length.angstrom)
+pressure = Pressure[float](3, u.pressure.pascal)
+assert_type(length * pressure, SurfaceTension[float])
+assert_type(pressure * length, SurfaceTension[float])
 ```
 
-This small demonstrator checks shape/symmetry at construction; it does not
-promise compile-time tensor shapes or preserve shape constraints after arithmetic.
+Multiplication relations are symmetric; division relations are explicit.
+Generation includes runtime classes, stubs, units, numerical helpers, and
+optional autodiff adapters. `generate(..., check=True)` returns stale file names
+without writing; `render(...)` returns source strings without invoking tools.
 
-## Design and prototype limits
-
-`src/quantype/_registry.py` is the single source for quantity dimensions,
-canonical units, aliases, and named algebra. `scripts/generate.py` validates it
-and generates nominal classes, unit definitions, arithmetic stubs, and both
-autodiff stub sets. Runtime work lives in `core.py`; Pydantic, numerical helpers,
-and backend transformations stay in narrow modules.
-
-The generated stubs use ordinary generics and overloads. Python typing cannot
-express “any quantity except the named cases above”, so generated files narrowly
-suppress **overlapping overload** diagnostics: named cases intentionally precede
-structural fallbacks. Public results do not use `Any`. Dynamic casts are confined
-to runtime dispatch and third-party backend interfaces.
-
-Deliberate limits:
-
-- A finite physical catalogue, not a complete SI/metrology system.
-- No arbitrary unit-string evaluation, symbolic cancellation, or automatic
-  reinterpretation of dimensionally equal semantic kinds.
-- Structural results retain typing/metadata, but the initial static API does not
-  support chaining arbitrary structural expressions or serializing unnamed kinds.
-  Add a named registry relationship when an operation belongs in a scientific API.
-- No complete NumPy interception, implicit array conversion, arbitrary mixed
-  backends, tensor subclasses, general JVP/VJP, or multi-input autodiff.
-- Storage typing identifies the backend/container; arbitrary NumPy dtype
-  promotion and shape algebra are outside this prototype.
-- Array wire payloads preserve nested numerical values, not device, dtype,
-  gradients, or zero-dimensional-array versus scalar identity.
-- Pydantic validates ndarray storage, not all parametrized dtype/shape metadata.
+**This is a combined catalogue, not a patch to the installed built-ins.** Its
+`Length` is a distinct nominal type from `quantype.Length`. Independent extension
+stubs cannot add overloads to existing built-in classes, and reflected operators
+do not override their structural typing fallback. See [the refactor report](docs/refactor.md)
+for the probe results and tradeoffs. Custom storage backends remain out of scope.
 
 ## Development
 
-Use **uv and just** for dependency management and project workflows:
-
 ```bash
-uv sync
-uv run just generate         # regenerate after registry edits
-uv run just check-generated  # fail on stale generated files
-uv run just test             # runtime/conversion/schema/JAX/Torch workflows
-uv run just typecheck        # parallel mypy (both parsers), stubtest, Pyright, Pyrefly, ty + negative tests
+uv sync --all-extras
+uv run just generate
+uv run just check-generated
+uv run just test
+uv run just typecheck
 uv run just lint
-uv run just format
 uv build
 ```
 
-`tests/typing/positive` uses `assert_type`, not merely absence of errors.
-`scripts/check_typing.py` requires every checker to diagnose every marked invalid
-expression in `tests/typing/negative`; a checker failing for unrelated reasons is
-not sufficient. Mypy checks the project with both the standard and native parsers,
-using separate caches so neither run skips parsing due to the other's results.
-Parallel mypy workers create temporary `.mypy_worker.*.json` IPC files in their
-working directory, not in `--cache-dir`; `scripts/check_mypy.py` runs from
-`.mypy_cache/` so these files do not appear in the project root. The negative
-fixtures are checked with both parsers too. `mypy.stubtest` checks the installed
-runtime against the stubs;
-`tests/typing/stubtest_allowlist.txt` documents intentional differences between
-runtime classes and the kind-specific static API. Runtime tests also validate
-every named relation's dimensions.
-The scaffold's CPU Torch index and locked dependencies are retained.
+`_registry.py` owns the built-in declarative catalogue. `_semantics.py` owns
+physical identities and expression algebra; `_unit.py` owns immutable conversion
+definitions. `core.py` owns quantities, `_construction.py` and `_storage.py` own
+explicit storage conversion, `serialization.py` owns wire formats, and
+`_validation.py` owns the Pydantic adapter. Generation separates catalogue
+validation, source rendering, and formatting/file output.
+
+The conformance suite checks positive `assert_type` examples and marked negative
+examples with strict mypy (both parsers), Pyright, Pyrefly, and ty. Stubtest checks
+runtime/stub agreement. Generated overloads narrowly suppress intentional
+structural-fallback overlaps. CI is configured to exercise core-only, JAX-only,
+Torch-only, and minimum-core-dependency environments.

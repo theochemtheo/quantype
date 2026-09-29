@@ -2,7 +2,12 @@
 
 from typing import Any
 
-import torch
+try:
+    import torch
+except ModuleNotFoundError as exc:
+    if exc.name != "torch":
+        raise
+    raise ModuleNotFoundError("Install quantype[torch] to use quantype.utorch") from exc
 
 from quantype.core import (
     Quantity,
@@ -32,4 +37,4 @@ def grad(
         create_graph=create_graph,
         retain_graph=retain_graph,
     )
-    return _wrap(result_kind("div", output.kind, inputs.kind), value)
+    return _wrap(result_kind("div", output._semantic, inputs._semantic), value)  # noqa: SLF001

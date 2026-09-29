@@ -12,9 +12,30 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv sync --locked
+      - run: uv sync --locked --all-extras
       - run: uv run just check-generated
       - run: uv run just lint
       - run: uv run just typecheck
       - run: uv run just test
       - run: uv build
+
+  optional-dependencies:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        extras: ["", "--extra jax", "--extra torch"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync --locked --no-dev ${{ matrix.extras }}
+      - run: uv pip install pytest
+      - run: uv run --no-sync pytest tests/runtime
+
+  minimum-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv venv --python 3.12
+      - run: uv pip install . 'numpy==2.0.0' 'scipy==1.13.0' 'pydantic==2.0.3' pytest
+      - run: uv run --no-sync pytest tests/runtime

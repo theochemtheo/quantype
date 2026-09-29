@@ -6,11 +6,14 @@ readme = "README.md"
 requires-python = ">=3.12"
 authors = [{ name = "Theo Keane", email = "20931519+theochemtheo@users.noreply.github.com" }]
 dependencies = [
-  "jax>=0.11.2",
-  "numpy>=2.5.3",
-  "pydantic>=2.12",
-  "torch>=2.14.0",
+  "numpy>=2",
+  "pydantic>=2.0.3",
+  "scipy>=1.13",
 ]
+
+[project.optional-dependencies]
+jax = ["jax>=0.11.2"]
+torch = ["torch>=2.14.0"]
 
 [dependency-groups]
 dev = [
@@ -23,6 +26,7 @@ dev = [
   "pytest-xdist>=3.8.0",
   "ruff>=0.16.9",
   "rust-just>=1.58.0",
+  "scipy-stubs>=1.13",
   "tombi>=1.5.8",
   "ty>=0.0.84",
 ]
@@ -85,6 +89,9 @@ flake8-tidy-imports = { "ban-relative-imports" = "all" }
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "PLR2004", "INP001"]
 "scripts/check_mypy.py" = ["INP001"]
+"scripts/generate.py" = ["INP001"]
+"scripts/benchmark_constants.py" = ["INP001"]
+"src/quantype/_unit.pyi" = ["ANN401"]
 "scripts/check_typing.py" = ["INP001", "T201"]
 # Numerical dispatch is deliberately dynamic and backend imports stay lazy.
 "src/quantype/core.py" = ["ANN401", "PLC0415", "SLF001"]

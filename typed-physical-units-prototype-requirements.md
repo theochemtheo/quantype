@@ -1,5 +1,10 @@
 # Typed Physical Units Prototype — Requirements
 
+> This document records the original prototype requirements. The agreed refactor
+> in [docs/refactor.md](docs/refactor.md) supersedes its shape demonstrator,
+> constructor, dependency, extension, and serialization requirements. Current API
+> examples are in [README.md](README.md).
+
 ## Purpose
 
 Prototype a Python physical-units library for scientific and machine-learning code, with a particular focus on atomistic materials simulation.

@@ -1,6 +1,6 @@
 """Each marked line must produce a diagnostic in every supported checker."""
 
-from quantype import Energy, EnergyPerAtom, Pressure
+from quantype import Energy, EnergyPerAtom, Length, Pressure, Temperature
 from quantype import units as u
 
 
@@ -25,3 +25,6 @@ bad_temperature = (300 * u.K) + (280 * u.K)  # error
 bad_sine = u.sin(2.0 * u.angstrom)  # error
 bad_exponential = u.exp(1.0 * u.eV)  # error
 bad_root = u.sqrt(1.0 * u.eV)  # error
+bad_constructor = Length[float](2, u.energy.hartree)  # error
+bad_definition = Temperature.define_unit("bleb", reference=u.nm)  # error
+missing_unit = Length[float](2)  # error

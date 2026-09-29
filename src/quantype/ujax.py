@@ -7,18 +7,25 @@ Gradients are positive derivatives; physical forces are their explicit negation.
 
 # Internal pytree registration deliberately shares core's wrapping/metadata.
 # pyright: reportPrivateUsage=false
+# ruff: noqa: SLF001
 
 from collections.abc import Callable
 from typing import Any, Protocol, TypeGuard, cast
 
-import jax
+try:
+    import jax
+except ModuleNotFoundError as exc:
+    if exc.name != "jax":
+        raise
+    raise ModuleNotFoundError("Install quantype[jax] to use quantype.ujax") from exc
 
 from quantype import _generated
-from quantype.core import Quantity, _wrap, result_kind
+from quantype._semantics import Semantic
+from quantype.core import Quantity, Unit, _wrap, result_kind
 
 # These aliases describe the intentionally dynamic backend integration boundary.
 type _Quantity = Quantity[Any, Any]
-type _Metadata = tuple[str, str | None]
+type _Metadata = tuple[Semantic, Unit[Any] | None]
 type _RawFunction = Callable[[Any], tuple[Any, _Quantity]]
 
 
@@ -55,7 +62,7 @@ def _is_quantity_class(candidate: object) -> TypeGuard[type[_Quantity]]:
 
 
 def _flatten(quantity: _Quantity) -> tuple[tuple[Any], _Metadata]:
-    return (quantity.value,), (quantity.kind, quantity._display)  # noqa: SLF001
+    return (quantity.value,), (quantity._semantic, quantity._display)
 
 
 def _unflatten(metadata: _Metadata, leaves: tuple[Any]) -> _Quantity:
@@ -67,13 +74,17 @@ def _unflatten(metadata: _Metadata, leaves: tuple[Any]) -> _Quantity:
     return quantity
 
 
+def _register_quantity(cls: type[_Quantity]) -> None:
+    _jax.tree_util.register_pytree_node(cls, _flatten, _unflatten)
+
+
 def _register_pytrees() -> None:
     classes: set[type[_Quantity]] = {Quantity}
     for candidate in vars(_generated).values():
         if _is_quantity_class(candidate):
             classes.add(candidate)
     for cls in classes:
-        _jax.tree_util.register_pytree_node(cls, _flatten, _unflatten)
+        _register_quantity(cls)
 
 
 _register_pytrees()
@@ -94,7 +105,7 @@ def vmap[**P, T](
 def _raw_function(
     function: Callable[[_Quantity], _Quantity], argument: _Quantity
 ) -> Callable[[Any], tuple[Any, _Quantity]]:
-    metadata = (argument.kind, argument._display)  # noqa: SLF001
+    metadata = (argument._semantic, argument._display)
 
     def evaluate(value: Any) -> tuple[Any, _Quantity]:  # noqa: ANN401
         output = function(_unflatten(metadata, (value,)))
@@ -117,7 +128,7 @@ def grad(
         value, output = _jax.grad(_raw_function(function, argument), has_aux=True)(
             argument.value
         )
-        return _wrap(result_kind("div", output.kind, argument.kind), value)
+        return _wrap(result_kind("div", output._semantic, argument._semantic), value)
 
     return derivative
 
@@ -130,7 +141,7 @@ def hessian(
     def derivative(argument: _Quantity) -> _Quantity:
         first = _jax.grad(_raw_function(function, argument), has_aux=True)
         value, output = _jax.jacfwd(first, has_aux=True)(argument.value)
-        first_kind = result_kind("div", output.kind, argument.kind)
-        return _wrap(result_kind("div", first_kind, argument.kind), value)
+        first_kind = result_kind("div", output._semantic, argument._semantic)
+        return _wrap(result_kind("div", first_kind, argument._semantic), value)
 
     return derivative
