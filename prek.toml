@@ -76,3 +76,12 @@ language = "system"
 entry = "uv run tombi check"
 files = "\\.toml$"
 stages = ["pre-commit"]
+
+[[repos.hooks]]
+id = "zizmor"
+name = "zizmor"
+language = "system"
+entry = "uv run zizmor --offline ."
+files = "^\\.github/workflows/.*\\.ya?ml$"
+pass_filenames = false
+stages = ["pre-commit"]

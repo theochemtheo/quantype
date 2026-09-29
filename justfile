@@ -8,6 +8,7 @@ lint fix="":
     uv run --all-extras ruff format {{ if fix == "--fix" { "" } else { "--check" } }} .
     uv run --all-extras tombi {{ if fix == "--fix" { "fmt" } else { "check" } }} .
     uv run --all-extras prek validate-config prek.toml
+    uv run --all-extras zizmor --offline .
 
 format:
     uv run --all-extras just --fmt .

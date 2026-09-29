@@ -310,6 +310,9 @@ uv run just lint
 uv build
 ```
 
+`just lint` runs [zizmor](https://github.com/zizmorcore/zizmor) offline against the
+GitHub Actions workflows; the pre-commit hook checks workflow changes too.
+
 `_registry.py` owns the built-in declarative catalogue. `_semantics.py` owns
 physical identities and expression algebra; `_unit.py` owns immutable conversion
 definitions. `core.py` owns quantities, `_construction.py` and `_storage.py` own
