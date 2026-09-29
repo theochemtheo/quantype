@@ -67,10 +67,10 @@ def _identity[T](value: T) -> T:
 
 def test_jax_jit_and_vmap() -> None:
     x = u.angstrom(_jnp.array([[1.0, 2.0], [3.0, 4.0]]))
-    energies = _jax.jit(_jax.vmap(_jax_harmonic))(x)
+    energies = ujax.jit(ujax.vmap(_jax_harmonic))(x)
     assert type(energies) is Energy
     np.testing.assert_allclose(energies.value, [5.0, 25.0])
-    gradients = _jax.jit(_jax.vmap(ujax.grad(_jax_harmonic)))(x)
+    gradients = ujax.jit(ujax.vmap(ujax.grad(_jax_harmonic)))(x)
     assert type(gradients) is Force
     np.testing.assert_allclose(gradients.value, 2.0 * x.value)
 

@@ -228,7 +228,7 @@ uv sync
 uv run just generate         # regenerate after registry edits
 uv run just check-generated  # fail on stale generated files
 uv run just test             # runtime/conversion/schema/JAX/Torch workflows
-uv run just typecheck        # strict mypy, Pyright, Pyrefly, ty + negative tests
+uv run just typecheck        # parallel mypy (both parsers), stubtest, Pyright, Pyrefly, ty + negative tests
 uv run just lint
 uv run just format
 uv build
@@ -237,5 +237,10 @@ uv build
 `tests/typing/positive` uses `assert_type`, not merely absence of errors.
 `scripts/check_typing.py` requires every checker to diagnose every marked invalid
 expression in `tests/typing/negative`; a checker failing for unrelated reasons is
-not sufficient. Runtime tests also validate every named relation's dimensions.
+not sufficient. Mypy checks the project with both the standard and native parsers,
+using separate caches so neither run skips parsing due to the other's results.
+The negative fixtures are checked with both parsers too. `mypy.stubtest` checks the installed runtime against the stubs;
+`tests/typing/stubtest_allowlist.txt` documents intentional differences between
+runtime classes and the kind-specific static API. Runtime tests also validate
+every named relation's dimensions.
 The scaffold's CPU Torch index and locked dependencies are retained.

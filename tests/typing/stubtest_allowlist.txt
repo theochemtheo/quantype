@@ -1,0 +1,19 @@
+# Python 3.12 generic runtime metadata is not represented by mypy's PEP 695 stubs.
+^quantype\._generated\.[A-Za-z]+\.__type_params__$
+^quantype\.core\.(Quantity|Unit)\.__type_params__$
+^quantype\.kinds\.(Div|Mul|Pow)\.__type_params__$
+
+# A type alias has no runtime tuple base class (stubtest treats it as a class).
+^quantype\._registry\.Dimensions$
+
+# Base-class arithmetic/NumPy methods are intentionally typed only on named
+# quantities; exposing them on Quantity would bypass the semantic overloads.
+^quantype\.core\.Quantity\.(__abs__|__add__|__array__|__array_priority__|__array_ufunc__|__mul__|__neg__|__pos__|__pow__|__rmul__|__rtruediv__|__sub__|__truediv__|mean|sum)$
+
+# Unit calls/operators have kind-specific overloads on the generated unit types.
+# NumPy dispatch and array priority are runtime-only implementation details.
+^quantype\.core\.Unit\.(__array_priority__|__array_ufunc__|__call__|__mul__|__rmul__)$
+
+# The unit catalogue's stub variables use kind-specific static subclasses of
+# Unit so unit calls return named quantities; runtime instances are plain Unit.
+^quantype\.units\.(GPa|Ha|Hz|J|J_per_atom|K|N|Pa|Ry|THz|ampere_meter_squared|angstrom|angstrom2|angstrom3|angstrom_cubed|angstrom_per_fs|angstrom_squared|atom|atom_per_angstrom_cubed|bohr|bohr_magneton|bohr_magneton_per_angstrom_cubed|celsius|centimeter|cm|deg|degC|degree|delta_K|delta_celsius|delta_degC|delta_kelvin|dimensionless|eV|eV_per_angstrom|eV_per_angstrom_cubed|eV_per_angstrom_squared|eV_per_atom|electron|electron_per_angstrom_cubed|electron_volt|energy_density|energy_per_volume|femtosecond|frequency_per_fs|fs|gigapascal|hartree|hartree_per_atom|hartree_per_bohr|hartree_per_bohr_cubed|hertz|joule|kelvin|kelvin_per_fs|m|meV|meter|metre|millielectron_volt|mu_B|nanometer|newton|nm|one|pascal|per_fs|picosecond|ps|rad|radian|rydberg|s|second|terahertz)$

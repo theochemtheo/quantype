@@ -33,6 +33,7 @@ build-backend = "uv_build"
 
 [tool.mypy]
 python_version = "3.12"
+num_workers = 4
 files = [
   "src",
   "tests/runtime",

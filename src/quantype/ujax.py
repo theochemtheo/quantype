@@ -34,6 +34,12 @@ class _TreeUtil(Protocol):
 class _Jax(Protocol):
     tree_util: _TreeUtil
 
+    def jit[**P, T](self, fun: Callable[P, T]) -> Callable[P, T]: ...
+
+    def vmap[**P, T](
+        self, fun: Callable[P, T], in_axes: int | None = 0, out_axes: int = 0
+    ) -> Callable[P, T]: ...
+
     def grad(self, fun: _RawFunction, *, has_aux: bool) -> _RawFunction: ...
 
     def jacfwd(self, fun: _RawFunction, *, has_aux: bool) -> _RawFunction: ...
@@ -71,6 +77,18 @@ def _register_pytrees() -> None:
 
 
 _register_pytrees()
+
+
+def jit[**P, T](fun: Callable[P, T]) -> Callable[P, T]:
+    """JIT-compile a function operating on registered quantities."""
+    return _jax.jit(fun)
+
+
+def vmap[**P, T](
+    fun: Callable[P, T], in_axes: int | None = 0, out_axes: int = 0
+) -> Callable[P, T]:
+    """Vectorize a function operating on registered quantities."""
+    return _jax.vmap(fun, in_axes=in_axes, out_axes=out_axes)
 
 
 def _raw_function(

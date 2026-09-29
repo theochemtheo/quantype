@@ -247,6 +247,7 @@ def unit_outputs() -> dict[str, str]:
             alias for alias in spec.aliases if alias.isidentifier() and alias.isascii()
         )
     unit_runtime += f"\n__all__ = {sorted(exports)!r}\n"
+    unit_stub += f"\n__all__ = {sorted(exports)!r}\n"
     return {
         "src/quantype/units.py": unit_runtime,
         "src/quantype/units.pyi": unit_stub,
@@ -278,19 +279,19 @@ def adapter_outputs() -> dict[str, str]:
             if op != "div":
                 continue
             if backend == "ujax":
-                text += f"@overload\ndef grad(fun: Callable[[{input_}[Array]], {output}[Array]]) -> Callable[[{input_}[Array]], {result}[Array]]: ...\n"
+                text += f"@overload\ndef grad(function: Callable[[{input_}[Array]], {output}[Array]]) -> Callable[[{input_}[Array]], {result}[Array]]: ...\n"
             else:
                 text += f"@overload\ndef grad(output: {output}[Tensor], inputs: {input_}[Tensor], *, create_graph: bool = False, retain_graph: bool | None = None) -> {result}[Tensor]: ...\n"
         if backend == "ujax":
-            text += "@overload\ndef grad[I, O](fun: Callable[[Quantity[I, Array]], Quantity[O, Array]]) -> Callable[[Quantity[I, Array]], Quantity[Div[O, I], Array]]: ...\n"
+            text += "@overload\ndef grad[I, O](function: Callable[[Quantity[I, Array]], Quantity[O, Array]]) -> Callable[[Quantity[I, Array]], Quantity[Div[O, I], Array]]: ...\n"
         else:
             text += "@overload\ndef grad[I, O](output: Quantity[O, Tensor], inputs: Quantity[I, Tensor], *, create_graph: bool = False, retain_graph: bool | None = None) -> Quantity[Div[O, I], Tensor]: ...\n"
         if backend == "ujax":
             for (op, output, input_), result in R.items():
                 second = R.get(("div", result, input_))
                 if op == "div" and second is not None:
-                    text += f"@overload\ndef hessian(fun: Callable[[{input_}[Array]], {output}[Array]]) -> Callable[[{input_}[Array]], {second}[Array]]: ...\n"
-            text += "@overload\ndef hessian[I, O](fun: Callable[[Quantity[I, Array]], Quantity[O, Array]]) -> Callable[[Quantity[I, Array]], Quantity[Div[Div[O, I], I], Array]]: ...\n"
+                    text += f"@overload\ndef hessian(function: Callable[[{input_}[Array]], {output}[Array]]) -> Callable[[{input_}[Array]], {second}[Array]]: ...\n"
+            text += "@overload\ndef hessian[I, O](function: Callable[[Quantity[I, Array]], Quantity[O, Array]]) -> Callable[[Quantity[I, Array]], Quantity[Div[Div[O, I], I], Array]]: ...\n"
             text += "def jit[**P, T](fun: Callable[P, T]) -> Callable[P, T]: ...\n"
             text += "def vmap[**P, T](fun: Callable[P, T], in_axes: int | None = 0, out_axes: int = 0) -> Callable[P, T]: ...\n"
         adapters[f"src/quantype/{backend}.pyi"] = text

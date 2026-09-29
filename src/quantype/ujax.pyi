@@ -37,371 +37,371 @@ from quantype.kinds import Div
 # pyright: reportOverlappingOverload=false
 @overload
 def grad(
-    fun: Callable[[Time[Array]], Length[Array]],
+    function: Callable[[Time[Array]], Length[Array]],
 ) -> Callable[[Time[Array]], Velocity[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Length[Array]], Area[Array]],
+    function: Callable[[Length[Array]], Area[Array]],
 ) -> Callable[[Length[Array]], Length[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Length[Array]], Volume[Array]],
+    function: Callable[[Length[Array]], Volume[Array]],
 ) -> Callable[[Length[Array]], Area[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Area[Array]], Volume[Array]],
+    function: Callable[[Area[Array]], Volume[Array]],
 ) -> Callable[[Area[Array]], Length[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Length[Array]], Energy[Array]],
+    function: Callable[[Length[Array]], Energy[Array]],
 ) -> Callable[[Length[Array]], Force[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Area[Array]], Energy[Array]],
+    function: Callable[[Area[Array]], Energy[Array]],
 ) -> Callable[[Area[Array]], ForceConstant[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Length[Array]], Force[Array]],
+    function: Callable[[Length[Array]], Force[Array]],
 ) -> Callable[[Length[Array]], ForceConstant[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Area[Array]], Force[Array]],
+    function: Callable[[Area[Array]], Force[Array]],
 ) -> Callable[[Area[Array]], Pressure[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Volume[Array]], Energy[Array]],
+    function: Callable[[Volume[Array]], Energy[Array]],
 ) -> Callable[[Volume[Array]], EnergyDensity[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Volume[Array]], MagneticMoment[Array]],
+    function: Callable[[Volume[Array]], MagneticMoment[Array]],
 ) -> Callable[[Volume[Array]], Magnetization[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[AtomCount[Array]], Energy[Array]],
+    function: Callable[[AtomCount[Array]], Energy[Array]],
 ) -> Callable[[AtomCount[Array]], EnergyPerAtom[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Volume[Array]], AtomCount[Array]],
+    function: Callable[[Volume[Array]], AtomCount[Array]],
 ) -> Callable[[Volume[Array]], ParticleDensity[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Volume[Array]], ElectronCount[Array]],
+    function: Callable[[Volume[Array]], ElectronCount[Array]],
 ) -> Callable[[Volume[Array]], ElectronDensity[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Time[Array]], TemperatureDifference[Array]],
+    function: Callable[[Time[Array]], TemperatureDifference[Array]],
 ) -> Callable[[Time[Array]], TemperatureRate[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Time[Array]], Dimensionless[Array]],
+    function: Callable[[Time[Array]], Dimensionless[Array]],
 ) -> Callable[[Time[Array]], InverseTime[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Dimensionless[Array]],
+    function: Callable[[Dimensionless[Array]], Dimensionless[Array]],
 ) -> Callable[[Dimensionless[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Length[Array]], Length[Array]],
+    function: Callable[[Length[Array]], Length[Array]],
 ) -> Callable[[Length[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Length[Array]],
+    function: Callable[[Dimensionless[Array]], Length[Array]],
 ) -> Callable[[Dimensionless[Array]], Length[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Area[Array]], Area[Array]],
+    function: Callable[[Area[Array]], Area[Array]],
 ) -> Callable[[Area[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Area[Array]],
+    function: Callable[[Dimensionless[Array]], Area[Array]],
 ) -> Callable[[Dimensionless[Array]], Area[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Volume[Array]], Volume[Array]],
+    function: Callable[[Volume[Array]], Volume[Array]],
 ) -> Callable[[Volume[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Volume[Array]],
+    function: Callable[[Dimensionless[Array]], Volume[Array]],
 ) -> Callable[[Dimensionless[Array]], Volume[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Time[Array]], Time[Array]],
+    function: Callable[[Time[Array]], Time[Array]],
 ) -> Callable[[Time[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Time[Array]],
+    function: Callable[[Dimensionless[Array]], Time[Array]],
 ) -> Callable[[Dimensionless[Array]], Time[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Velocity[Array]], Velocity[Array]],
+    function: Callable[[Velocity[Array]], Velocity[Array]],
 ) -> Callable[[Velocity[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Velocity[Array]],
+    function: Callable[[Dimensionless[Array]], Velocity[Array]],
 ) -> Callable[[Dimensionless[Array]], Velocity[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Energy[Array]], Energy[Array]],
+    function: Callable[[Energy[Array]], Energy[Array]],
 ) -> Callable[[Energy[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Energy[Array]],
+    function: Callable[[Dimensionless[Array]], Energy[Array]],
 ) -> Callable[[Dimensionless[Array]], Energy[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[EnergyPerAtom[Array]], EnergyPerAtom[Array]],
+    function: Callable[[EnergyPerAtom[Array]], EnergyPerAtom[Array]],
 ) -> Callable[[EnergyPerAtom[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], EnergyPerAtom[Array]],
+    function: Callable[[Dimensionless[Array]], EnergyPerAtom[Array]],
 ) -> Callable[[Dimensionless[Array]], EnergyPerAtom[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Force[Array]], Force[Array]],
+    function: Callable[[Force[Array]], Force[Array]],
 ) -> Callable[[Force[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Force[Array]],
+    function: Callable[[Dimensionless[Array]], Force[Array]],
 ) -> Callable[[Dimensionless[Array]], Force[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[ForceConstant[Array]], ForceConstant[Array]],
+    function: Callable[[ForceConstant[Array]], ForceConstant[Array]],
 ) -> Callable[[ForceConstant[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], ForceConstant[Array]],
+    function: Callable[[Dimensionless[Array]], ForceConstant[Array]],
 ) -> Callable[[Dimensionless[Array]], ForceConstant[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Pressure[Array]], Pressure[Array]],
+    function: Callable[[Pressure[Array]], Pressure[Array]],
 ) -> Callable[[Pressure[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Pressure[Array]],
+    function: Callable[[Dimensionless[Array]], Pressure[Array]],
 ) -> Callable[[Dimensionless[Array]], Pressure[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[EnergyDensity[Array]], EnergyDensity[Array]],
+    function: Callable[[EnergyDensity[Array]], EnergyDensity[Array]],
 ) -> Callable[[EnergyDensity[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], EnergyDensity[Array]],
+    function: Callable[[Dimensionless[Array]], EnergyDensity[Array]],
 ) -> Callable[[Dimensionless[Array]], EnergyDensity[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[EnergyPerVolume[Array]], EnergyPerVolume[Array]],
+    function: Callable[[EnergyPerVolume[Array]], EnergyPerVolume[Array]],
 ) -> Callable[[EnergyPerVolume[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], EnergyPerVolume[Array]],
+    function: Callable[[Dimensionless[Array]], EnergyPerVolume[Array]],
 ) -> Callable[[Dimensionless[Array]], EnergyPerVolume[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[TemperatureDifference[Array]], TemperatureDifference[Array]],
+    function: Callable[[TemperatureDifference[Array]], TemperatureDifference[Array]],
 ) -> Callable[[TemperatureDifference[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], TemperatureDifference[Array]],
+    function: Callable[[Dimensionless[Array]], TemperatureDifference[Array]],
 ) -> Callable[[Dimensionless[Array]], TemperatureDifference[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[TemperatureRate[Array]], TemperatureRate[Array]],
+    function: Callable[[TemperatureRate[Array]], TemperatureRate[Array]],
 ) -> Callable[[TemperatureRate[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], TemperatureRate[Array]],
+    function: Callable[[Dimensionless[Array]], TemperatureRate[Array]],
 ) -> Callable[[Dimensionless[Array]], TemperatureRate[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[MagneticMoment[Array]], MagneticMoment[Array]],
+    function: Callable[[MagneticMoment[Array]], MagneticMoment[Array]],
 ) -> Callable[[MagneticMoment[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], MagneticMoment[Array]],
+    function: Callable[[Dimensionless[Array]], MagneticMoment[Array]],
 ) -> Callable[[Dimensionless[Array]], MagneticMoment[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Magnetization[Array]], Magnetization[Array]],
+    function: Callable[[Magnetization[Array]], Magnetization[Array]],
 ) -> Callable[[Magnetization[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Magnetization[Array]],
+    function: Callable[[Dimensionless[Array]], Magnetization[Array]],
 ) -> Callable[[Dimensionless[Array]], Magnetization[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[ParticleDensity[Array]], ParticleDensity[Array]],
+    function: Callable[[ParticleDensity[Array]], ParticleDensity[Array]],
 ) -> Callable[[ParticleDensity[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], ParticleDensity[Array]],
+    function: Callable[[Dimensionless[Array]], ParticleDensity[Array]],
 ) -> Callable[[Dimensionless[Array]], ParticleDensity[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[ElectronDensity[Array]], ElectronDensity[Array]],
+    function: Callable[[ElectronDensity[Array]], ElectronDensity[Array]],
 ) -> Callable[[ElectronDensity[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], ElectronDensity[Array]],
+    function: Callable[[Dimensionless[Array]], ElectronDensity[Array]],
 ) -> Callable[[Dimensionless[Array]], ElectronDensity[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Angle[Array]], Angle[Array]],
+    function: Callable[[Angle[Array]], Angle[Array]],
 ) -> Callable[[Angle[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Angle[Array]],
+    function: Callable[[Dimensionless[Array]], Angle[Array]],
 ) -> Callable[[Dimensionless[Array]], Angle[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Frequency[Array]], Frequency[Array]],
+    function: Callable[[Frequency[Array]], Frequency[Array]],
 ) -> Callable[[Frequency[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], Frequency[Array]],
+    function: Callable[[Dimensionless[Array]], Frequency[Array]],
 ) -> Callable[[Dimensionless[Array]], Frequency[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[InverseTime[Array]], InverseTime[Array]],
+    function: Callable[[InverseTime[Array]], InverseTime[Array]],
 ) -> Callable[[InverseTime[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], InverseTime[Array]],
+    function: Callable[[Dimensionless[Array]], InverseTime[Array]],
 ) -> Callable[[Dimensionless[Array]], InverseTime[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[AtomCount[Array]], AtomCount[Array]],
+    function: Callable[[AtomCount[Array]], AtomCount[Array]],
 ) -> Callable[[AtomCount[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], AtomCount[Array]],
+    function: Callable[[Dimensionless[Array]], AtomCount[Array]],
 ) -> Callable[[Dimensionless[Array]], AtomCount[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[ElectronCount[Array]], ElectronCount[Array]],
+    function: Callable[[ElectronCount[Array]], ElectronCount[Array]],
 ) -> Callable[[ElectronCount[Array]], Dimensionless[Array]]: ...
 @overload
 def grad(
-    fun: Callable[[Dimensionless[Array]], ElectronCount[Array]],
+    function: Callable[[Dimensionless[Array]], ElectronCount[Array]],
 ) -> Callable[[Dimensionless[Array]], ElectronCount[Array]]: ...
 @overload
 def grad[I, O](
-    fun: Callable[[Quantity[I, Array]], Quantity[O, Array]],
+    function: Callable[[Quantity[I, Array]], Quantity[O, Array]],
 ) -> Callable[[Quantity[I, Array]], Quantity[Div[O, I], Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Length[Array]], Area[Array]],
+    function: Callable[[Length[Array]], Area[Array]],
 ) -> Callable[[Length[Array]], Dimensionless[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Length[Array]], Volume[Array]],
+    function: Callable[[Length[Array]], Volume[Array]],
 ) -> Callable[[Length[Array]], Length[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Length[Array]], Energy[Array]],
+    function: Callable[[Length[Array]], Energy[Array]],
 ) -> Callable[[Length[Array]], ForceConstant[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Dimensionless[Array]],
+    function: Callable[[Dimensionless[Array]], Dimensionless[Array]],
 ) -> Callable[[Dimensionless[Array]], Dimensionless[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Length[Array]],
+    function: Callable[[Dimensionless[Array]], Length[Array]],
 ) -> Callable[[Dimensionless[Array]], Length[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Area[Array]],
+    function: Callable[[Dimensionless[Array]], Area[Array]],
 ) -> Callable[[Dimensionless[Array]], Area[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Volume[Array]],
+    function: Callable[[Dimensionless[Array]], Volume[Array]],
 ) -> Callable[[Dimensionless[Array]], Volume[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Time[Array]], Time[Array]],
+    function: Callable[[Time[Array]], Time[Array]],
 ) -> Callable[[Time[Array]], InverseTime[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Time[Array]],
+    function: Callable[[Dimensionless[Array]], Time[Array]],
 ) -> Callable[[Dimensionless[Array]], Time[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Velocity[Array]],
+    function: Callable[[Dimensionless[Array]], Velocity[Array]],
 ) -> Callable[[Dimensionless[Array]], Velocity[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Energy[Array]],
+    function: Callable[[Dimensionless[Array]], Energy[Array]],
 ) -> Callable[[Dimensionless[Array]], Energy[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], EnergyPerAtom[Array]],
+    function: Callable[[Dimensionless[Array]], EnergyPerAtom[Array]],
 ) -> Callable[[Dimensionless[Array]], EnergyPerAtom[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Force[Array]],
+    function: Callable[[Dimensionless[Array]], Force[Array]],
 ) -> Callable[[Dimensionless[Array]], Force[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], ForceConstant[Array]],
+    function: Callable[[Dimensionless[Array]], ForceConstant[Array]],
 ) -> Callable[[Dimensionless[Array]], ForceConstant[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Pressure[Array]],
+    function: Callable[[Dimensionless[Array]], Pressure[Array]],
 ) -> Callable[[Dimensionless[Array]], Pressure[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], EnergyDensity[Array]],
+    function: Callable[[Dimensionless[Array]], EnergyDensity[Array]],
 ) -> Callable[[Dimensionless[Array]], EnergyDensity[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], EnergyPerVolume[Array]],
+    function: Callable[[Dimensionless[Array]], EnergyPerVolume[Array]],
 ) -> Callable[[Dimensionless[Array]], EnergyPerVolume[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], TemperatureDifference[Array]],
+    function: Callable[[Dimensionless[Array]], TemperatureDifference[Array]],
 ) -> Callable[[Dimensionless[Array]], TemperatureDifference[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], TemperatureRate[Array]],
+    function: Callable[[Dimensionless[Array]], TemperatureRate[Array]],
 ) -> Callable[[Dimensionless[Array]], TemperatureRate[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], MagneticMoment[Array]],
+    function: Callable[[Dimensionless[Array]], MagneticMoment[Array]],
 ) -> Callable[[Dimensionless[Array]], MagneticMoment[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Magnetization[Array]],
+    function: Callable[[Dimensionless[Array]], Magnetization[Array]],
 ) -> Callable[[Dimensionless[Array]], Magnetization[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], ParticleDensity[Array]],
+    function: Callable[[Dimensionless[Array]], ParticleDensity[Array]],
 ) -> Callable[[Dimensionless[Array]], ParticleDensity[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], ElectronDensity[Array]],
+    function: Callable[[Dimensionless[Array]], ElectronDensity[Array]],
 ) -> Callable[[Dimensionless[Array]], ElectronDensity[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Angle[Array]],
+    function: Callable[[Dimensionless[Array]], Angle[Array]],
 ) -> Callable[[Dimensionless[Array]], Angle[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], Frequency[Array]],
+    function: Callable[[Dimensionless[Array]], Frequency[Array]],
 ) -> Callable[[Dimensionless[Array]], Frequency[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], InverseTime[Array]],
+    function: Callable[[Dimensionless[Array]], InverseTime[Array]],
 ) -> Callable[[Dimensionless[Array]], InverseTime[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], AtomCount[Array]],
+    function: Callable[[Dimensionless[Array]], AtomCount[Array]],
 ) -> Callable[[Dimensionless[Array]], AtomCount[Array]]: ...
 @overload
 def hessian(
-    fun: Callable[[Dimensionless[Array]], ElectronCount[Array]],
+    function: Callable[[Dimensionless[Array]], ElectronCount[Array]],
 ) -> Callable[[Dimensionless[Array]], ElectronCount[Array]]: ...
 @overload
 def hessian[I, O](
-    fun: Callable[[Quantity[I, Array]], Quantity[O, Array]],
+    function: Callable[[Quantity[I, Array]], Quantity[O, Array]],
 ) -> Callable[[Quantity[I, Array]], Quantity[Div[Div[O, I], I], Array]]: ...
 def jit[**P, T](fun: Callable[P, T]) -> Callable[P, T]: ...
 def vmap[**P, T](

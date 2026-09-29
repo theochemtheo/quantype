@@ -12,7 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / "tests/typing/negative/invalid.py"
 UV = shutil.which("uv")
 COMMANDS = (
-    ("mypy", "--strict"),
+    ("mypy", "--strict", "--no-native-parser", "--cache-dir", ".mypy_cache/standard"),
+    ("mypy", "--strict", "--native-parser", "--cache-dir", ".mypy_cache/native"),
     ("pyright",),
     ("pyrefly", "check"),
     ("ty", "check", "--output-format", "concise"),
@@ -29,6 +30,7 @@ def main() -> int:
     }
     failed = False
     for command in COMMANDS:
+        label = " ".join(command)
         result = subprocess.run(  # noqa: S603 - fixed repository commands, no shell
             [UV, "run", *command, str(FIXTURE)],
             cwd=ROOT,
@@ -43,10 +45,10 @@ def main() -> int:
         missing = expected - reported
         if result.returncode != 1 or missing:
             failed = True
-            print(f"{command[0]}: FAILED; unreported invalid lines: {sorted(missing)}")
+            print(f"{label}: FAILED; unreported invalid lines: {sorted(missing)}")
             print(result.stdout)
         else:
-            print(f"{command[0]}: rejected all {len(expected)} invalid expressions")
+            print(f"{label}: rejected all {len(expected)} invalid expressions")
     return int(failed)
 
 
