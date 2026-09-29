@@ -1,20 +1,64 @@
-"""The public generator uses the same model/rendering as the builtin catalogue."""
+"""Generate a real application project; test its contracts in isolated processes."""
 
 from __future__ import annotations
 
+import importlib.util
+import shlex
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 import pytest
 
-from quantype._registry import QuantitySpec, UnitSpec
-from quantype.catalogue import builtin_catalogue
+from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
 from quantype.codegen import generate, render
 
 if TYPE_CHECKING:
-    from pathlib import Path
+    from quantype.catalogue import Catalogue
+
+PROJECT_FIXTURE = Path(__file__).parents[1] / "fixtures" / "generated_catalogue"
+
+
+@pytest.fixture(scope="module")
+def catalogue() -> Catalogue:
+    return builtin_catalogue().extend(
+        quantities={
+            "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0), "surface_tension")
+        },
+        units={"surface_tension": UnitSpec("SurfaceTension")},
+        relations={("mul", "Pressure", "Length"): "SurfaceTension"},
+    )
+
+
+@pytest.fixture(scope="module")
+def generated_project(
+    tmp_path_factory: pytest.TempPathFactory, catalogue: Catalogue
+) -> Path:
+    if shutil.which("ruff") is None:
+        pytest.skip("Generating an application package requires Ruff")
+    project = tmp_path_factory.mktemp("generated_catalogue")
+    shutil.copytree(PROJECT_FIXTURE, project, dirs_exist_ok=True)
+    generate(catalogue, project / "labquantities", package="labquantities")
+    return project
+
+
+def _run(project: Path, *command: str) -> None:
+    result = subprocess.run(  # noqa: S603 -- fixed test/checker commands, no shell
+        command,
+        cwd=project,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, (
+        f"Command: {shlex.join(command)}\n"
+        f"Working directory: {project}\n"
+        f"Exit code: {result.returncode}\n"
+        f"stdout:\n{result.stdout}\n"
+        f"stderr:\n{result.stderr}"
+    )
 
 
 def test_invalid_catalogue_extension() -> None:
@@ -27,86 +71,83 @@ def test_invalid_catalogue_extension() -> None:
         )
 
 
-@pytest.mark.skipif(
-    any(
-        shutil.which(tool) is None
-        for tool in ("ruff", "mypy", "pyright", "pyrefly", "ty")
-    ),
-    reason="Generation conformance requires development tools",
-)
-def test_combined_generated_catalogue(tmp_path: Path) -> None:
-    catalogue = builtin_catalogue().extend(
-        quantities={
-            "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0), "surface_tension")
-        },
-        units={"surface_tension": UnitSpec("SurfaceTension")},
-        relations={("mul", "Pressure", "Length"): "SurfaceTension"},
-    )
-    package = tmp_path / "labquantities"
-    assert generate(catalogue, package, package="labquantities")
-    assert not generate(catalogue, package, package="labquantities", check=True)
+def test_rendering_is_deterministic(catalogue: Catalogue) -> None:
     assert render(catalogue, package="labquantities") == render(
         catalogue, package="labquantities"
     )
-    (tmp_path / "pyproject.toml").write_text("""[tool.pyright]
-typeCheckingMode = "strict"
-include = ["consumer.py"]
-[tool.pyrefly]
-preset = "strict"
-project-includes = ["consumer.py"]
-[tool.ty.rules]
-all = "error"
-""")
-    program = tmp_path / "consumer.py"
-    program.write_text("""from typing import assert_type
-from labquantities import Length, Pressure, SurfaceTension, u
-from quantype import Length as OriginalLength
 
-length = Length[float](2, u.length.angstrom)
-pressure = Pressure[float](3, u.pressure.pascal)
-assert_type(length * pressure, SurfaceTension[float])
-assert_type(pressure * length, SurfaceTension[float])
-assert isinstance(length * pressure, SurfaceTension)
-assert isinstance(pressure * length, SurfaceTension)
-assert not isinstance(length, OriginalLength)
-assert Length.parse(length.to_dict()).value == length.value
-assert u.sqrt(length**2).value == length.value
-cold = u.celsius(0)
-assert (u.kelvin(300) - cold).kind == "TemperatureDifference"
-""")
-    subprocess.run([sys.executable, str(program)], check=True)  # noqa: S603
-    backend_program = tmp_path / "backends.py"
-    backend_program.write_text("""import importlib.util
-from labquantities import Length, Energy, Force, ForceConstant, u
-if importlib.util.find_spec("jax"):
-    import jax
-    from labquantities import ujax
-    def energy(x):
-        return Energy.from_canonical((x.value**2).sum())
-    x = Length[jax.Array]([1, 2], u.angstrom)
-    assert isinstance(ujax.jit(ujax.grad(energy))(x), Force)
-    assert isinstance(ujax.hessian(energy)(x), ForceConstant)
-if importlib.util.find_spec("torch"):
-    import torch
-    from labquantities import utorch
-    x = Length[torch.Tensor](torch.tensor([1.0, 2.0], requires_grad=True), u.angstrom)
-    result = Energy.from_canonical((x.value**2).sum())
-    assert isinstance(utorch.grad(result, x), Force)
-""")
-    subprocess.run([sys.executable, str(backend_program)], check=True)  # noqa: S603
-    # Static verification is also reproducible without committing generated
-    # application packages. Full checker commands are exercised by this test.
-    for command in (
-        ["mypy", "--strict", "--follow-imports=silent"],
-        ["pyright"],
-        ["pyrefly", "check"],
-        ["ty", "check"],
-    ):
-        run = subprocess.run(  # noqa: S603 -- fixed checker commands
-            [*command, str(program)],
-            cwd=tmp_path,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        assert run.returncode == 0, run.stdout + run.stderr
+
+def test_generated_files_are_current(
+    generated_project: Path, catalogue: Catalogue
+) -> None:
+    assert not generate(
+        catalogue,
+        generated_project / "labquantities",
+        package="labquantities",
+        check=True,
+    )
+
+
+def test_stale_check_does_not_rewrite_files(
+    tmp_path: Path, generated_project: Path, catalogue: Catalogue
+) -> None:
+    # Modify a private copy so this test cannot affect runtime/checker consumers.
+    package = tmp_path / "labquantities"
+    shutil.copytree(generated_project / "labquantities", package)
+    stale_file = package / "units.pyi"
+    stale_source = "# Deliberately stale unit definitions.\n"
+    stale_file.write_text(stale_source)
+
+    stale = generate(catalogue, package, package="labquantities", check=True)
+
+    assert stale == ["units.pyi"]
+    assert stale_file.read_text() == stale_source
+
+
+@pytest.mark.parametrize(
+    "case",
+    [
+        "physical_algebra",
+        "serialization_roundtrip",
+        "math_preserves_catalogue",
+        "temperature_difference",
+    ],
+)
+def test_generated_runtime(generated_project: Path, case: str) -> None:
+    _run(
+        generated_project,
+        sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        f"runtime_cases.py::test_{case}",
+    )
+
+
+@pytest.mark.parametrize("backend", ["jax", "torch"])
+def test_generated_backend(generated_project: Path, backend: str) -> None:
+    if importlib.util.find_spec(backend) is None:
+        pytest.skip(f"{backend} is not installed")
+    _run(
+        generated_project,
+        sys.executable,
+        "-m",
+        "pytest",
+        "-q",
+        f"{backend}_example.py",
+    )
+
+
+@pytest.mark.parametrize(
+    "command",
+    [
+        pytest.param(("mypy", "--strict", "--follow-imports=silent"), id="mypy"),
+        pytest.param(("pyright",), id="pyright"),
+        pytest.param(("pyrefly", "check"), id="pyrefly"),
+        pytest.param(("ty", "check"), id="ty"),
+    ],
+)
+def test_generated_typing(generated_project: Path, command: tuple[str, ...]) -> None:
+    if shutil.which(command[0]) is None:
+        pytest.skip(f"{command[0]} is not installed")
+    _run(generated_project, *command, "consumer.py")

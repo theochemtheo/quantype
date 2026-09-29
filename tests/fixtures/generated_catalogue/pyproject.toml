@@ -1,0 +1,10 @@
+[tool.pyrefly]
+preset = "strict"
+project-includes = ["consumer.py"]
+
+[tool.pyright]
+typeCheckingMode = "strict"
+include = ["consumer.py"]
+
+[tool.ty.rules]
+all = "error"

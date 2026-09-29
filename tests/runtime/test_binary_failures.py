@@ -19,11 +19,14 @@ if TYPE_CHECKING:
 @pytest.mark.parametrize(
     "metadata",
     [
-        None,
-        {},
-        {"version": 2, "quantities": {}},
-        {"version": True, "quantities": {}},
-        {"version": 1, "quantities": {"q": {"kind": "Length"}}},
+        pytest.param(None, id="not-an-object"),
+        pytest.param({}, id="missing-fields"),
+        pytest.param({"version": 2, "quantities": {}}, id="unknown-version"),
+        pytest.param({"version": True, "quantities": {}}, id="boolean-version"),
+        pytest.param(
+            {"version": 1, "quantities": {"q": {"kind": "Length"}}},
+            id="incomplete-quantity",
+        ),
     ],
 )
 def test_malformed_metadata(tmp_path: Path, metadata: object) -> None:
@@ -33,12 +36,13 @@ def test_malformed_metadata(tmp_path: Path, metadata: object) -> None:
         load_npz(path, "q", Length[npt.NDArray[np.float64]])
 
 
-def test_pickle_arrays_are_rejected(tmp_path: Path) -> None:
+def test_loading_object_arrays_is_rejected(tmp_path: Path) -> None:
     path = tmp_path / "object.npz"
     metadata = {
         "version": 1,
         "quantities": {"q": {"kind": "Length", "unit": "angstrom", "array": "value"}},
     }
+    # Bypass quantype's writer to construct an archive it must refuse to load.
     np.savez(
         path,
         metadata=np.asarray(json.dumps(metadata)),
@@ -46,8 +50,13 @@ def test_pickle_arrays_are_rejected(tmp_path: Path) -> None:
     )
     with pytest.raises(ValueError, match="allow_pickle=False"):
         load_npz(path, "q", Length[npt.NDArray[np.float64]])
+
+
+def test_saving_object_arrays_is_rejected(tmp_path: Path) -> None:
+    quantity = Length.from_canonical(np.array([object()], dtype=object))
+
     with pytest.raises(ValueError, match="dtype"):
-        save_npz(path, q=Length.from_canonical(np.array([object()], dtype=object)))
+        save_npz(tmp_path / "object.npz", q=quantity)
 
 
 def test_npy_uses_an_explicit_external_unit(tmp_path: Path) -> None:
