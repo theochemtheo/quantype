@@ -4,12 +4,41 @@ version = "0.1.0"
 description = "Typed physical quantities for scientific Python and differentiable models"
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT OR Apache-2.0"
+license-files = ["LICENSE-APACHE", "LICENSE-MIT"]
 authors = [{ name = "Theo Keane", email = "20931519+theochemtheo@users.noreply.github.com" }]
+keywords = [
+  "atomistic",
+  "dimensional-analysis",
+  "jax",
+  "physical-quantities",
+  "pydantic",
+  "quantities",
+  "torch",
+  "typing",
+  "units",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Typing :: Typed",
+]
 dependencies = [
   "numpy>=2",
   "pydantic>=2.0.3",
   "scipy>=1.13",
 ]
+
+[project.urls]
+Issues = "https://github.com/theochemtheo/quantype/issues"
+Repository = "https://github.com/theochemtheo/quantype"
 
 [project.optional-dependencies]
 jax = ["jax>=0.11.2"]
@@ -116,6 +145,11 @@ strict-equality-semantics = true
 
 [tool.ty.rules]
 all = "error"
+
+[tool.uv]
+# Pinned exactly, and matched by the `version:` on every setup-uv step: the
+# lockfile is written by one uv version, so CI must not float onto another.
+required-version = "==0.12.17"
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
