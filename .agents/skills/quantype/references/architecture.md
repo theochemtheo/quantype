@@ -12,9 +12,9 @@ Paths here are relative to the repository root. `README.md` and `docs/` describe
 | Unit definitions and catalogue lookup | `src/quantype/_internal/_unit.py`; handwritten `_unit.pyi` | `test_core.py`, `test_validation.py` |
 | Unit systems, derived units, range checks | `src/quantype/_internal/_systems.py`; public `systems.py` | `test_systems.py`, `test_scenarios.py`, typing fixtures |
 | Typed constructors and backend conversion | `src/quantype/_internal/_construction.py`, `_storage.py` | `test_refactor.py`, `test_binary_failures.py` |
-| Mathematical helpers | `src/quantype/_internal/_math.py`; handwritten `_math.pyi` | `test_core.py`, `test_codegen.py` |
+| NumPy functions and dispatch | `src/quantype/_internal/_numpy.py` (unit rules, backend namespaces, `UFUNCS`/`FUNCTIONS`/Torch names); generated `numpy.py`/`numpy.pyi` per catalogue; `Quantity.__array_ufunc__`/`__array_function__`/`__torch_function__` | `test_numpy.py`, `test_scenarios_jax.py`, `test_torch.py` |
 | JSON, archive and Pydantic boundaries | `src/quantype/serialization.py`, `_internal/_validation.py` | `test_validation.py`, `test_binary_failures.py`, `test_refactor.py` |
-| Optional differentiation | `src/quantype/ujax.py`, `utorch.py`; generated adjacent stubs | `test_autodiff.py`, `test_torch.py`, `test_optional_backends.py` |
+| Optional differentiation | `src/quantype/_internal/_jax.py`, `_torch.py`, re-exported by `ujax.py`, `utorch.py`; generated adjacent stubs | `test_autodiff.py`, `test_torch.py`, `test_optional_backends.py` |
 | Application-catalogue runtime binding | `src/quantype/_internal/_runtime_catalogue.py`, `codegen/_package.py` | `test_codegen.py` and `tests/fixtures/generated_catalogue/` |
 | Public imports | `src/quantype/__init__.py` | stubtest, positive typing, runtime imports |
 
@@ -22,7 +22,7 @@ Test filenames in the table live under `tests/runtime/` unless a full path is gi
 
 ## Generated versus handwritten
 
-For the built-in package, `scripts/generate.py` uses `builtin_catalogue()` and the public generator. The renderer owns `kinds.py`, `_generated.py`, `_generated.pyi`, `units.py`, `units.pyi`, `ujax.pyi`, and `utorch.pyi`. Inspect `render(...)` for the current output set. Handwritten `core.pyi`, `_internal/_unit.pyi`, and `_internal/_math.pyi` must be maintained alongside their implementations.
+For the built-in package, `scripts/generate.py` uses `builtin_catalogue()` and the public generator. The renderer owns `kinds.py`, `_generated.py`, `_generated.pyi`, `units.py`, `units.pyi`, `numpy.py`, `numpy.pyi`, `ujax.pyi`, and `utorch.pyi`. Inspect `render(...)` for the current output set. Handwritten `core.pyi`, `constants.pyi` and `_internal/_unit.pyi` must be maintained alongside their implementations. `scripts/generate_codata.py` and `scripts/generate_docs.py` produce `_internal/_codata.py` and `docs/catalogue.md`.
 
 Adding a built-in quantity may also require a handwritten top-level export in `src/quantype/__init__.py`. Generation does not update that file for the built-in package.
 

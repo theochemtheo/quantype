@@ -202,13 +202,16 @@ system when it is not the default; `str` shows only the magnitude and unit.
 - Implicit NumPy coercion is rejected rather than silently discarding meaning.
 
 The reference units behind every conversion are those of `Atomistic`: ångström,
-eV, fs, kelvin, Bohr magneton, atom, and electron. Atom and electron are
-independent dimensional axes. Conversion factors come from **CODATA 2022** by
-default, vendored with quantype, so results never depend on another installed
-package. Importing `quantype` alone does not import NumPy, Pydantic, Torch, or
-JAX.
+eV, fs, kelvin, Bohr magneton, atom, electron, and elementary charge. Atom,
+electron, and charge are independent dimensional axes; mass is derived, as
+energy time² / length². Importing `quantype` alone does not import NumPy,
+Pydantic, Torch, or JAX.
 
-CODATA 2014 and 2018 are carried too, for matching codes that use older
+## CODATA edition
+
+Conversion factors come from **CODATA 2022** by default, vendored with
+quantype, so results never depend on another installed package. CODATA 2014 and
+2018 are carried too, for matching codes that use older
 constants. One edition applies to the whole process, including unit systems and
 generated catalogues, and it is fixed the first time a unit is used. Choose it
 beforehand with `QUANTYPE_CODATA=2018` in the environment, or in code:
@@ -330,7 +333,8 @@ comparisons require the same kind and system, statically and at runtime, and
 return backend booleans.
 
 Indexing, iteration, `.shape`, `.ndim`, `len()`, `.sum()`, `.mean()`, `.max()`,
-and `.min()` keep the kind, system, and display unit. `qnp.sqrt(Area)`,
+and `.min()` keep the kind, system, and display unit. With
+`import quantype.numpy as qnp`, `qnp.sqrt(Area)`,
 `qnp.sin(Angle)`, and `qnp.exp(Dimensionless)` keep the system. Any real number or
 numerical array multiplies and divides a quantity from either side, and the
 quantity keeps its dtype; a scalar quantity scaled by an array becomes an array.

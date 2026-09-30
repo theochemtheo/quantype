@@ -122,6 +122,7 @@ flake8-tidy-imports = { "ban-relative-imports" = "all" }
 "scripts/check_mypy.py" = ["INP001"]
 "scripts/generate.py" = ["INP001"]
 "scripts/generate_codata.py" = ["INP001"]
+"scripts/generate_docs.py" = ["INP001"]
 "scripts/benchmark_constants.py" = ["INP001"]
 "src/quantype/_internal/_unit.pyi" = ["ANN401"]
 "scripts/check_typing.py" = ["INP001", "T201"]

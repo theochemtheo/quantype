@@ -25,7 +25,7 @@ Unit-first construction always uses the default system. It preserves compatible 
 - JAX conversion must avoid host transfer of existing backend arrays. Unavailable explicit dtype requests, including float64 without x64 support, fail rather than silently returning a different dtype.
 - float16/float32 NumPy construction and `.to_system` emit `StorageRangeWarning` when converted values overflow or become subnormal. Do not add checks inside JAX/Torch traces.
 
-Arithmetic delegates to stored values' operators. `_internal/_math.py` dispatches math helpers. `core.Quantity._reduce` maps `axis`/`keepdims` to Torch's `dim`/`keepdim` (and `max`/`min` to `amax`/`amin`) and preserves NumPy array storage, as indexing does. Shape inference and arbitrary dtype promotion are outside the existing static contract.
+Arithmetic delegates to stored values' operators. `_internal/_numpy.py` holds the unit rules for `quantype.numpy` and NumPy/Torch dispatch, choosing NumPy, `jax.numpy` or a Torch adapter (NumPy's names and keywords) per operand. `core.Quantity._reduce` maps `axis`/`keepdims` to Torch's `dim`/`keepdim` (and `max`/`min` to `amax`/`amin`) and preserves NumPy array storage, as indexing does. Shape inference and arbitrary dtype promotion are outside the existing static contract.
 
 Implicit NumPy coercion, ufuncs and array-function calls on quantities reject loss of physical meaning. Expose `.value` or `.magnitude(unit)` explicitly at unsupported numerical boundaries.
 

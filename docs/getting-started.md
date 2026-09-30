@@ -265,7 +265,9 @@ it does not infer physical meaning by cancelling arbitrary dimension expressions
 
 ## Next steps
 
-- [Units, unit systems, and physical algebra](units.md)
+- [Units, unit systems, and physical algebra](units.md), including physical
+  constants and the CODATA edition
+- [Every kind and unit, and each system's units](catalogue.md)
 - [Defining unit systems and writing system-generic code](unit-systems.md)
 - [JSON, Pydantic, NPZ arrays, and NPY boundaries](serialization.md)
 - [JAX and Torch differentiation](autodiff.md)

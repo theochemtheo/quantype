@@ -26,10 +26,12 @@ typecheck:
 generate:
     uv run scripts/generate_codata.py
     uv run scripts/generate.py
+    uv run scripts/generate_docs.py
 
 check-generated:
     uv run scripts/generate_codata.py --check
     uv run scripts/generate.py --check
+    uv run scripts/generate_docs.py --check
 
 test:
     uv run --all-extras pytest tests/runtime
