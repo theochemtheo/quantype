@@ -1,11 +1,14 @@
 # Custom catalogues
 
-Application catalogues use the same definition model, validation, and renderers
-as the built-in API. Generation requires Ruff for formatting, not a type-checker
-plugin. Install it in the environment running generation (`uv add --dev ruff`
-in an application project, or `python -m pip install ruff`).
+An application catalogue adds your own kinds and relations to the built-in
+ones. quantype generates it as a package with the same API as quantype itself:
+runtime classes, stubs, units, a `numpy` module, and optionally `ujax` and
+`utorch`. No type-checker plugin is needed.
 
 ## Generate an application catalogue
+
+This declares a `SurfaceTension` kind, and says that `Pressure * Length` gives
+one:
 
 ```python notest
 from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
@@ -21,6 +24,9 @@ catalogue = builtin_catalogue().extend(
 generate(catalogue, "src/labquantities", package="labquantities")
 ```
 
+Generation formats its output with Ruff, so install Ruff where you run it
+(`uv add --dev ruff` in an application project, or `python -m pip install ruff`).
+
 A `QuantitySpec`'s dimensions are exponents over quantype's eight base axes, in
 order: length, energy, time, temperature, magnetic moment, atom, electron, and
 charge. `SurfaceTension` above is energy / length². The
@@ -31,7 +37,7 @@ For the `src/` layout above, install your application in editable mode (for exam
 `uv pip install -e .`) so Python can import `labquantities`. Alternatively, generate
 into `"labquantities"` beside a script for a standalone experiment.
 
-Then import consistently from that generated package:
+Then import everything from the generated package:
 
 ```python notest
 from typing import assert_type
@@ -45,40 +51,38 @@ assert_type(pressure * length, SurfaceTension[float])
 assert_type(qnp.sqrt(length * length), Length[float])
 ```
 
-Multiplication relations are symmetric, and each also names the divisions that
-undo it, so the catalogue above gives `SurfaceTension / Length -> Pressure`.
-Declared divisions take precedence; a division two multiplications would undo
-differently must be declared.
+Multiplication relations work in either order, and each also defines the
+divisions that undo it, so the catalogue above gives
+`SurfaceTension / Length -> Pressure`. A declared division takes precedence. If
+two multiplications would undo to different results, declare the division
+yourself.
 
-Generation includes runtime classes, stubs, units, per-kind constant classes, a
-`numpy` module typed with the catalogue's classes, and optional autodiff
-adapters (`ujax`, `utorch`). `generate(..., check=True)` returns stale file names
-without writing; `render(...)` returns source strings without invoking tools.
+`generate(..., check=True)` returns the names of stale files without writing
+anything, and `render(...)` returns the source as strings without running any
+tools.
 
-Names and aliases that collide with generated API bindings (such as `Unit` or
-`np`) are rejected, as are conflicting quantity namespaces. Quantity names also
-reserve imported typing bindings, package aliases such as `u`, and all
-generated kind-marker names (for example, `LengthKind`).
+Names and aliases that clash with names the generated package uses, such as
+`Unit` or `np`, are rejected, and so are clashing quantity namespaces. Quantity
+names also can't reuse imported typing names, package aliases such as `u`, or
+generated kind-marker names such as `LengthKind`.
 
 Built-in units in the package follow the process's CODATA edition, as
-quantype's do. Units you define are emitted with their scales and offsets as
-Python float literals, fixed at generation; NumPy-derived factors are
-supported, with binary64 rounding, and factors outside binary64's range are
-rejected.
+quantype's do. Units you define are written out as Python float literals, fixed
+when the package is generated. NumPy-derived factors work, rounded to binary64,
+and factors outside binary64's range are rejected.
 
-A generated catalogue is a separate, combined API, not an extension of the
-installed classes. Its `Length` is a distinct nominal type from
-`quantype.Length`; import quantities consistently from the generated package.
-Generating a package does not change `quantype`'s operator overloads. Generated
-structural results use the package's own `Quantity` subclass; import that class
-for structural annotations so reciprocal types retain the catalogue's
-`DimensionlessKind`. It remains a subclass of `quantype.core.Quantity`.
+A generated catalogue is a separate package that includes the built-in kinds;
+it doesn't extend quantype's own classes. Its `Length` is a different type from
+`quantype.Length`, so import all quantities from the generated package.
+quantype's own operators are unchanged. Structural results use the package's
+own `Quantity` subclass, so import that class for structural annotations, and
+reciprocals keep the catalogue's `DimensionlessKind`. It is still a subclass of
+`quantype.core.Quantity`.
 
-Generated quantities take a unit system parameter like the built-in ones:
-`Length[float, SI]` works with no extra definitions. Unit systems are defined
-over base axes, not kinds, so every kind in the catalogue has a unit in every
-system. A kind without a named catalogue unit in a system gets a
-system-qualified identifier, such as `si:SurfaceTension` (symbol `J/m^2`); see
+Generated quantities take a unit system parameter like the built-in ones, and
+`Length[float, SI]` works with no extra definitions. Systems are defined by base
+axes, so every kind in the catalogue has a unit in every system. A kind with no
+named catalogue unit in a system gets a system-qualified identifier, such as `si:SurfaceTension` (symbol `J/m^2`); see
 [unit systems](unit-systems.md#derived-units).
 
 To define a new unit for an existing physical kind instead, see

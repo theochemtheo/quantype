@@ -1,15 +1,15 @@
 # Unit systems
 
-A unit system decides what a quantity's raw numbers mean. The built-in systems
-and the rules for mixing them are described in
-[units and unit systems](units.md#unit-systems). This page shows how to define
-your own system, and how to write library code that works in any system.
+A unit system is the set of units quantities store their numbers in.
+[Units and unit systems](units.md#unit-systems) explains why quantype uses them
+and lists the built-in ones. This page covers defining your own system and
+writing library code that works in any system.
 
 ## Define a unit system
 
-Subclass `UnitSystem`, give it a `name=`, and name a base unit for each axis you
-need. Nothing is registered globally: the class is usable as soon as it is
-defined, as custom units are.
+Subclass `UnitSystem`, give it a `name=`, and set a base unit for each axis you
+need. The class is usable as soon as it is defined, and, as with custom units,
+nothing is registered globally.
 
 ```python
 from quantype import u
@@ -26,9 +26,9 @@ class Gromacs(UnitSystem, name="gromacs"):
     # electron counts are inherited from UnitSystem's defaults.
 ```
 
-A base unit can be any unit of its axis's kind, including one you define with
-`Kind.define_unit`. `overrides` lists units that replace the derived unit of
-their kind; arithmetic producing or consuming those kinds rescales.
+A base unit can be any unit of the axis's kind, including one made with
+`Kind.define_unit`. `overrides` lists units that replace the derived unit for
+their kind. Arithmetic that produces or consumes those kinds rescales.
 
 Using it looks the same as using a built-in system:
 
@@ -54,8 +54,7 @@ forces = Force[npt.NDArray[np.float32], Gromacs].from_value(raw)  # kJ/mol/nm
 in_ev_per_angstrom = forces.to_system(Atomistic)  # the explicit bridge
 ```
 
-The class is checked when it is defined, so mistakes surface at import rather
-than mid-calculation:
+The class is checked when it is defined, so mistakes show up at import:
 
 | Rule | Example error |
 | --- | --- |
@@ -66,8 +65,8 @@ than mid-calculation:
 | Every derived scale for every catalogue kind is finite and non-zero in float64. | `Huge gives Area a scale that overflows float64` |
 | `overrides` holds units of non-axis kinds, at most one per kind, without offsets. | `Gromacs overrides Length, a base axis; set its base unit instead` |
 
-A system is used as a class, never instantiated. The class name does not appear
-on the wire, so renaming the class never changes stored data; only `name=`
+A system is used as a class and never instantiated. Saved data doesn't include
+the class name, so renaming the class doesn't affect it; changing `name=`
 does.
 
 ### Derived units
@@ -78,17 +77,17 @@ Otherwise it gets a system-qualified identifier, such as `gromacs:Force` with
 symbol `kJ/mol/nm`. These appear in `repr`, and in serialized data when a value
 has no display unit.
 
-A system is defined over the base axes, not over a list of kinds. A new kind
-from a [generated catalogue](custom-catalogues.md), such as `SurfaceTension`,
-therefore gets a unit in every system automatically: `J/m^2` in SI, and
-`gromacs:SurfaceTension` in `Gromacs`.
+Because a system is defined by its base axes, a new kind from a
+[generated catalogue](custom-catalogues.md), such as `SurfaceTension`, gets a
+unit in every system automatically: `J/m^2` in SI, and `gromacs:SurfaceTension`
+in `Gromacs`.
 
 ### Decoding
 
-Decoding follows the rule quantype uses for custom units: supply the definitions
-at the boundary. `System.units` holds every unit a system defines that the
-catalogue cannot name, so one argument covers them. These lines are API
-patterns: `data` and `text` stand for your input, and the imports are as above.
+As with custom units, pass a system's definitions when decoding.
+`System.units` holds every unit the system defines that the catalogue can't
+name, so one argument covers them all. In these patterns, `data` and `text`
+stand for your input, and the imports are as above:
 
 ```python notest
 Force.parse(data, units=Gromacs.units)
@@ -97,9 +96,9 @@ load_npz("frame.npz", "forces", Force[npt.NDArray[np.float32], Gromacs])
 ```
 
 When the target type names the system, as in the last two lines, its units are
-found automatically, so `units=` is only required for untyped entry points or
-for decoding into another system. Wire data never records a system: an archive
-written in `Gromacs` decodes into `Atomistic`, `SI`, or any other system.
+found automatically. You only need `units=` for untyped entry points, or when
+decoding into another system. Saved data doesn't record a system, so an archive
+written in `Gromacs` can be read into `Atomistic`, `SI`, or any other system.
 
 ### Inheriting to vary one axis
 
@@ -114,13 +113,13 @@ class MetalFs(Metal, name="metal-fs"):
     time = u.femtosecond
 ```
 
-The system parameter is invariant, so `Length[float, MetalFs]` is **not** a
-`Length[float, Metal]`, and the runtime same-system check agrees. A subclass
-shares definitions with its parent, not storage meaning. Python users usually
-expect a subclass to be accepted where its parent is; here it is not, and mixing
-the two raises `TypeError` naming both systems.
+The system parameter is invariant, so a `Length[float, MetalFs]` can't be used
+where a `Length[float, Metal]` is expected, and the runtime check agrees. A
+subclass shares its parent's definitions but stores different numbers. This
+breaks the usual Python rule that a subclass can stand in for its parent:
+mixing the two raises a `TypeError` naming both systems.
 
-One static gap remains. mypy accepts `metal + x.to_system(MetalFs)` written
+There is one static gap. mypy accepts `metal + x.to_system(MetalFs)` written
 inline: it infers the conversion's target from the expected operand type, and
 `type[MetalFs]` is also a `type[Metal]`. Pyright, Pyrefly, and ty reject it, and
 so does mypy once the converted value is bound to a name. The runtime check
@@ -128,9 +127,9 @@ rejects the mixed operation in every case.
 
 ### Numerical range
 
-A custom system can be as risky as SI in float32. `System.check_range(dtype)`
-reports kinds whose typical atomistic magnitudes, or their squares, would
-underflow or overflow:
+A custom system can underflow float32 just as SI does.
+`System.check_range(dtype)` reports the kinds whose typical atomistic
+magnitudes, or their squares, would underflow or overflow:
 
 ```python
 import numpy as np
@@ -146,8 +145,8 @@ same check.
 
 ## Write system-generic code
 
-Library code usually should not choose a unit system for its callers. Annotate
-with a type parameter bounded by `UnitSystem`:
+Library code usually shouldn't choose a unit system for its callers. Annotate
+with a type parameter bounded by `UnitSystem` instead:
 
 ```python
 from quantype import Energy, Force, Length, u

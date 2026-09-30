@@ -1,9 +1,9 @@
 # Releasing
 
 A release is cut by pushing a version tag. The `release.yml` workflow then
-builds the wheel and sdist, publishes them to PyPI via trusted publishing, and
-creates the GitHub Release — notes taken from this version's `CHANGELOG.md`
-section, with the built artifacts attached. The tag is the only manual trigger.
+builds the wheel and sdist, publishes them to PyPI through trusted publishing,
+and creates the GitHub Release, with notes from this version's `CHANGELOG.md`
+section and the built artifacts attached. The tag is the only manual trigger.
 
 ## Steps
 
@@ -20,9 +20,9 @@ The workflow refuses a tag that does not match the version in `pyproject.toml`.
 
 ## Prerequisites
 
-PyPI trusted publishing must be configured for the `quantype` project — owner
-`theochemtheo`, repository `quantype`, workflow `release.yml`, environment
-`pypi`.
+PyPI trusted publishing must be configured for the `quantype` project with
+owner `theochemtheo`, repository `quantype`, workflow `release.yml`, and
+environment `pypi`.
 
 ## Versioning
 

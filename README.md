@@ -1,25 +1,28 @@
 # quantype
 
-Physical meaning in Python types, with the unit system in the type too.
-quantype catches invalid physical operations both statically and at runtime,
-while NumPy, JAX, and Torch do the numerical work. Units describe input and
-presentation; they do not change a quantity's physical kind or its storage.
+quantype makes physical dimensions and unit systems part of your types. mypy,
+Pyright, Pyrefly, and ty check them without a plugin, and the values underneath
+are still plain floats or NumPy, JAX, and Torch arrays.
 
-## Installation and status
+```python notest
+force = energy / length                     # Force[float]
+energy + length                             # type error, and a TypeError at runtime
+gradient = ujax.grad(potential)(positions)  # Force[jax.Array]
+```
 
-Alpha, aimed at scientific and atomistic modelling: the API may change before
-1.0. Requires Python 3.12+; NumPy and Pydantic v2 are the only core
-dependencies.
+## Install
 
 ```bash
 uv add quantype
-uv add 'quantype[jax]'       # optional JAX transformations and autodiff
-uv add 'quantype[torch]'     # optional Torch tensors and autograd
+uv add 'quantype[jax]'       # JAX transformations and autodiff
+uv add 'quantype[torch]'     # Torch tensors and autograd
 ```
 
 `python -m pip install quantype` also works in an activated virtual environment.
+quantype needs Python 3.12 or newer, and its only core dependencies are NumPy
+and Pydantic v2. It is alpha software, and the API may change before 1.0.
 
-## Construction and static physical algebra
+## Quantities and their types
 
 ```python
 from typing import assert_type
@@ -27,52 +30,61 @@ from quantype import Energy, EnergyDensity, Force, Length, Pressure, u
 
 length = Length[float](2, u.nm)
 energy = Energy[float](3, u.eV)
-assert length.value == 20.0  # raw numbers in ångströms, the default system
-assert length.magnitude() == 2.0  # presented in the unit it was given in
+assert length.magnitude() == 2.0  # in the unit it was given in
 assert f"{length:.1f}" == "2.0 nm"
 
 force = energy / length
 assert_type(force, Force[float])
 assert force.magnitude(u.eV_per_angstrom) == 0.15
-assert_type(energy / force, Length[float])  # products are undone by name
+assert_type(energy / force, Length[float])
 
-pressure = force / (length**2)
-density = energy / (length**3)
+pressure = force / length**2
+density = energy / length**3
 assert_type(pressure, Pressure[float])
-assert_type(density, EnergyDensity[float])  # same dimensions, different meaning
-assert_type(Pressure.reinterpret(density), Pressure[float])  # renamed explicitly
+assert_type(density, EnergyDensity[float])
+assert_type(Pressure.reinterpret(density), Pressure[float])
 ```
 
-The storage argument converts the input, not just its annotation. Declared
-physical relationships determine result types without a type-checker plugin;
-adding a length to an energy is rejected by type checkers and at runtime.
+`.magnitude()` gives the number in the unit you constructed with, or in any unit
+you pass it.
+
+Result types come from relations declared in the catalogue. `Force * Length` is
+`Energy`, so `Energy / Force` is `Length` and `Energy / Length` is `Force`.
+`Pressure` and `EnergyDensity` have the same dimensions but are separate kinds.
+To turn one into the other, call `reinterpret`.
 
 ## Unit systems
 
+A unit system is the set of units a quantity stores its numbers in, and it is
+the second type argument. Storing everything in one set gives `.value` a single
+meaning, keeps arithmetic free of conversions, and lets JAX compile a function
+once, whatever units its inputs were written in. The default is `Atomistic`
+(Å, eV, and fs). You can choose `SI`, `CGS`, Hartree `Atomic`, LAMMPS's `Metal`
+or `Real`, or [define your own](docs/unit-systems.md), and a type checker tracks
+which system each value uses.
+
 ```python
 from typing import assert_type
-from quantype import Area, Energy, Force, Length, Pressure, u
-from quantype.systems import SI, Metal
+from quantype import Energy, Force, Length, u
+from quantype.systems import SI, Atomistic
+
+a = Length[float](2, u.nm)
+b = Length[float](20, u.angstrom)
+assert a.value == b.value == 20.0  # Atomistic stores ångströms, whatever the input unit
+assert str(a) == "2.0 nm"  # and shows the unit it was given in
+force = (3 * u.eV) / a
+assert force.value == 0.15  # eV/Å, with no conversion in the division
 
 x = Length[float, SI](2, u.nm)
-assert x.value == 2e-9  # metres
-assert_type(Energy[float, SI](3, u.eV) / x, Force[float, SI])
-
-metal = x.to_system(Metal)  # the only bridge between systems
-assert_type(metal, Length[float, Metal])
-
-# Metal stores what LAMMPS `units metal` documents, including pressure in bar.
-stress = Force[float, Metal](1, u.eV_per_angstrom) / Area[float, Metal](
-    1, u.angstrom_squared
-)
-assert Metal.unit_for(Pressure) is u.bar
-assert round(stress.value) == 1602177  # bar
+assert x.value == 2e-9  # SI stores metres
+assert_type(Energy[float, SI](3, u.eV) / x, Force[float, SI])  # newtons
+assert (a + x.to_system(Atomistic)).magnitude(u.nm) == 4.0
 ```
 
-`Length[float]` means `Length[float, Atomistic]` (Å, eV, fs). Built-in systems
-include `SI`, `CGS`, Hartree `Atomic`, and LAMMPS's `Metal` and `Real`; you can
-[define your own](docs/unit-systems.md). Systems never mix implicitly:
-combining SI and metal quantities is a type error and a runtime `TypeError`.
+`Length[float]` is short for `Length[float, Atomistic]`. Adding an SI length to
+an `Atomistic` one is a type error and a runtime `TypeError`, so convert one of
+them with `.to_system(...)` first. `Metal` and `Real` store each kind in the
+unit LAMMPS documents for it, so a `Metal` pressure is in bar.
 
 ## NumPy, JAX, and Torch arrays
 
@@ -85,16 +97,16 @@ from quantype import Length, u
 positions = Length[npt.NDArray[np.float64]]([[0, 0, 0], [3, 4, 0]], u.nm)
 distances = qnp.linalg.norm(positions, axis=-1)  # a Length
 np.testing.assert_allclose(distances.magnitude(u.nm), [0, 5])
-assert np.linalg.norm(positions, axis=-1).max() == 5 * u.nm  # NumPy agrees
+assert distances.max() == 5 * u.nm
 ```
 
-`quantype.numpy` has NumPy's names with unit rules and works on NumPy, JAX, and
-Torch arrays; NumPy's and Torch's own functions apply the same rules. Any real
-number or array scales a quantity. For other numerical APIs, explicitly extract
-`.value` (raw numbers in the unit system) or `.magnitude(unit)`; implicit
-coercion is rejected.
+`quantype.numpy`, imported as `qnp`, has NumPy's function names with unit rules,
+and works on NumPy, JAX, and Torch arrays.
 
-## Differentiation with physical meaning
+Any plain number or array scales a quantity. To pass data to another library,
+take `.value` or `.magnitude(unit)`. `np.asarray(q)` raises.
+
+## Autodiff
 
 ```python
 import jax
@@ -113,10 +125,11 @@ assert_type(gradient, Force[jax.Array])
 force = -gradient
 ```
 
-Differentiating energy with respect to length returns a **Force**, not a bare
-array, including under JIT; further arguments such as `k` pass through. The
-negative derivative is the physical force. [Torch autograd, several inputs, and
-Hessians](docs/autodiff.md) use the same physical algebra.
+The gradient of an `Energy` with respect to a `Length` is a `Force`, under `jit`
+too. Arguments after the first, such as `k`, pass through unchanged. The
+gradient is the positive derivative, so the physical force is `-gradient`.
+[Torch autograd, several inputs, and Hessians](docs/autodiff.md) work the same
+way.
 
 ## Physical constants
 
@@ -126,14 +139,16 @@ from quantype import Energy, Temperature, constants, u
 from quantype.systems import SI
 
 thermal = constants.k_B * Temperature[float, SI](300, u.K)
-assert_type(thermal, Energy[float, SI])  # a constant adopts its operand's system
+assert_type(thermal, Energy[float, SI])
 assert repr(constants.k_B.to_system(SI)) == "Entropy(1.380649e-23 J/K, SI)"
 ```
 
-Values come from CODATA 2022 by default, vendored with quantype; CODATA 2014 and
-2018 are [one setting away](docs/units.md#codata-edition).
+Constants have no unit system of their own. They take the system of the
+quantity they combine with, so `k_B` times an SI temperature is an SI energy.
+Values are from CODATA 2022, vendored with quantype. CODATA 2014 and 2018 are
+[one setting away](docs/units.md#codata-edition).
 
-## What the catalogue covers
+## Built-in kinds
 
 | Area | Kinds |
 | --- | --- |
@@ -145,23 +160,19 @@ Values come from CODATA 2022 by default, vendored with quantype; CODATA 2014 and
 | Magnetism and counts | `MagneticMoment`, `Magnetization`, `AtomCount`, `ElectronCount`, `ParticleDensity`, `ElectronDensity`, `Dimensionless` |
 
 The [catalogue reference](docs/catalogue.md) lists every unit, the named
-products and quotients, and each system's units. Application catalogues can
-[add kinds and relations](docs/custom-catalogues.md).
+products and quotients, and each system's units. You can
+[generate your own catalogue](docs/custom-catalogues.md) with new kinds and
+relations.
 
-## Features
+## Also included
 
-- Nominal physical kinds; equal dimensions do not imply interchangeable meaning,
-  and `Kind.reinterpret(q)` renames them explicitly.
-- Unit systems in the static type, including user-defined systems and the exact
-  LAMMPS `metal` and `real` units; explicit conversion between them.
-- Display units remembered from input, so `"0.5 nm"` round-trips as `0.5 nm`.
-- Affine temperatures that still multiply (`k_B * T`), typed reductions, and
-  structural types for unnamed products.
-- System-free physical constants and vendored CODATA 2014, 2018, and 2022.
-- `quantype.numpy` for NumPy, JAX, and Torch, and NumPy/Torch dispatch.
-- JSON, Pydantic, and pickle-free NPZ serialization.
-- Local custom units and generated application catalogues, without global registration.
-- JAX and Torch autodiff that returns physical kinds and preserves graphs.
+- JSON, Pydantic, and NPZ serialization, with no pickle. Values keep the unit
+  they were given in, so a configuration's `"0.5 nm"` is saved as 0.5 nanometres.
+- Temperatures: 30 °C minus 20 °C is a `TemperatureDifference` of 10 Δ°C, and
+  `k_B * T` is an energy.
+- Unnamed products get structural types, such as
+  `Quantity[Mul[LengthKind, TimeKind], float]`, instead of `Any`.
+- Custom units, defined locally with no global registry.
 
 ## Documentation
 
@@ -181,8 +192,9 @@ quantype is dual-licensed under the [MIT](LICENSE-MIT) and
 
 ## Development
 
-From a checkout, install [uv](https://docs.astral.sh/uv/getting-started/installation/)
-and run at the repository root. `just` and type checkers are development dependencies.
+Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then
+run these from the repository root. `just` and the type checkers come with the
+development dependencies.
 
 ```bash
 uv sync --all-extras
@@ -194,5 +206,5 @@ uv run just lint
 uv build
 ```
 
-For core-only testing, use `uv sync` and `uv run pytest tests/runtime`.
-See the [development guide](docs/development.md) for hooks and CI details.
+To test the core alone, run `uv sync` and `uv run pytest tests/runtime`. The
+[development guide](docs/development.md) covers hooks and CI.

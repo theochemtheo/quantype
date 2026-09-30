@@ -1,16 +1,16 @@
 # JAX and Torch autodiff
 
-Optional backends use the same physical algebra as scalar and NumPy storage.
-Install the corresponding extra:
+JAX and Torch arrays follow the same kinds and rules as floats and NumPy
+arrays. Install the extra for your backend:
 
 ```bash
 uv add 'quantype[jax]'
 uv add 'quantype[torch]'
 ```
 
-Derivatives come back as physical kinds: an energy differentiated with respect
-to a length is a `Force`, and a second derivative a `ForceConstant`. They are
-positive derivatives; the physical force is `-gradient`.
+Derivatives come back as kinds. An energy differentiated with respect to a
+length is a `Force`, and its second derivative is a `ForceConstant`. The
+gradient is the positive derivative, so the physical force is `-gradient`.
 
 ## JAX
 
@@ -30,11 +30,11 @@ hessian = ujax.hessian(harmonic)(x, k)
 force = -ujax.grad(harmonic)(x, k)
 ```
 
-`value_and_grad` returns the energy and its gradient from one evaluation, the
-usual energy-and-forces call. `grad`, `value_and_grad`, and `hessian`
-differentiate with respect to the first argument; further arguments, such as
-model parameters, coefficients, or neighbour lists, pass through untouched and
-keep their static types. Above, `gradient` is a `Force[jax.Array]` and
+`value_and_grad` returns the energy and its gradient from one evaluation, which
+is the usual way to get energies and forces together. `grad`, `value_and_grad`,
+and `hessian` differentiate with respect to the first argument. Other
+arguments, such as model parameters or neighbour lists, pass through unchanged
+and keep their static types. Above, `gradient` is a `Force[jax.Array]` and
 `hessian` a `ForceConstant[jax.Array]`.
 
 `argnums` differentiates other arguments, or several at once:
@@ -55,19 +55,20 @@ on_x, on_y = ujax.grad(pair, argnums=(0, 1))(x, y)
 assert isinstance(on_y, Force)
 ```
 
-A tuple gives a tuple of derivatives. Types are precise for the first argument;
-other `argnums` return an untyped result.
+A tuple of `argnums` gives a tuple of derivatives. Only the derivative with
+respect to the first argument has a precise static type; the others are
+untyped.
 
-Importing `ujax` registers quantities as single-leaf pytrees for JAX `jit` and
-`vmap`. The tree metadata of a quantity is its kind and unit system; the display
-unit is not part of it. Values presented in different units therefore share one
-trace, and `lax.cond` and `lax.scan` accept them, but results come back
-presented in the system's unit. Quantities from different systems are different
-tree structures, as they are different static types.
+Importing `ujax` registers quantities as single-leaf pytrees, so `jit` and
+`vmap` accept them. The pytree records a quantity's kind and unit system, but
+not its display unit. A function compiles once whether its inputs were given in
+nm, Å, or bohr, and `lax.cond` and `lax.scan` accept branches shown in different
+units. Results come back shown in the system's unit. Quantities in different
+systems have different pytree structures, just as they have different static
+types.
 
-JAX's `jnp` functions cannot see quantities, and JAX offers no hook that would
-let them. Inside JAX code, use `quantype.numpy`, which has NumPy's names with
-unit rules and works on traced values:
+JAX's `jnp` functions can't see quantities, and JAX has no hook to change that.
+In JAX code, use `quantype.numpy`, which works on traced values:
 
 ```python
 import jax
@@ -103,22 +104,20 @@ on_x, on_y = utorch.grad(energy, [x, y])
 force = -gradient
 ```
 
-`utorch.grad` differentiates a scalar output with respect to one quantity, or a
-sequence of them, which gives a tuple. Torch differentiation requires an input
-tensor with `requires_grad=True`; constructing `Length[torch.Tensor]` from a list
-does not enable gradients. `create_graph=True` keeps derivatives differentiable
-for higher orders.
+`utorch.grad` differentiates a scalar output with respect to one quantity, or
+with respect to a sequence of them, which gives a tuple. The input tensor needs
+`requires_grad=True`: building `Length[torch.Tensor]` from a list doesn't enable
+gradients. Pass `create_graph=True` to differentiate again.
 
-`torch.cos(angle)`, `torch.linalg.vector_norm(positions)`, and the other
-functions of `quantype.numpy` apply their unit rules to quantities through
-Torch's dispatch, as NumPy's do. To extract host values explicitly, use
-`force.magnitude(u.eV_per_angstrom).detach().cpu().numpy()`. This detaches the
-graph; arithmetic does not.
+Torch's own functions, such as `torch.cos(angle)` and
+`torch.linalg.vector_norm(positions)`, apply the same unit rules as
+`quantype.numpy`. To get host values, use
+`force.magnitude(u.eV_per_angstrom).detach().cpu().numpy()`. That detaches the
+graph; arithmetic on quantities keeps it.
 
-A raw model's output can be wrapped with `from_value`, a trusted boundary: the
-caller asserts that the raw result represents, say, energy in the unit system's
-eV. A model written entirely in quantity algebra, with physical coefficients as
-above, needs no such assertion.
+To wrap a raw model's output, use `from_value`. It trusts its input:
+`Energy.from_value(raw)` asserts that `raw` is an energy in the unit system's
+units. A model written with quantities throughout, as above, doesn't need it.
 
 ## Unit systems
 
@@ -137,20 +136,20 @@ x = Length[jax.Array, SI]([0.1, 0.2], u.nm)
 force = -ujax.grad(harmonic_si)(x)  # Force[jax.Array, SI], in newtons
 ```
 
-Because quantities from different systems never mix, a function's output and
-inputs share one system, and the raw derivative is already in that system's
-coherent units. Where a system stores a kind in its own units, such as LAMMPS
-pressure in bar, the derivative is rescaled accordingly. The adapters raise
-`TypeError` for an output in another system. The static signatures are generic
-over the system, so `Length[Array, S]` to `Energy[Array, S]` differentiates to
-`Force[Array, S]`.
+A function's inputs and output are in the same system, so the raw derivative is
+already in that system's units. Where a system stores a kind in a unit of its
+own, such as pressure in bar for `Metal`, the derivative is rescaled to match.
+The adapters raise `TypeError` if the output is in a different system from the
+input. The static signatures are generic over the system: a function from
+`Length[Array, S]` to `Energy[Array, S]` differentiates to `Force[Array, S]`.
 
 ## Storage and dtype
 
-Torch/JAX classes do not encode dtype, so constructors and `load_npz` accept an
-explicit `dtype=`. Existing Torch tensors retain their graph and device during
-conversion and scaling. JAX float64 requests require x64 support; unavailable
-explicit dtypes fail rather than silently producing a different dtype.
+`torch.Tensor` and `jax.Array` don't say which dtype they hold, so constructors
+and `load_npz` take a `dtype=` argument. Torch tensors keep their graph and
+device through conversion and scaling. JAX float64 needs x64 enabled, and a
+dtype the backend can't provide raises an error instead of falling back to
+another.
 
-[Serialization](serialization.md) is an explicit host boundary and does not
-preserve graphs or device placement.
+[Serialization](serialization.md) saves values only; graphs and device placement
+are lost.

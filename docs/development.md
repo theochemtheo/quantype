@@ -3,8 +3,9 @@
 ## Setup and commands
 
 From a checkout, [install uv](https://docs.astral.sh/uv/getting-started/installation/)
-and run the following at the repository root. `just` and the type checkers are
-included in the development dependencies; no global `just` installation is needed.
+and run the following at the repository root. `just` and the type checkers
+come with the development dependencies, so you don't need to install `just`
+globally.
 
 ```bash
 git clone https://github.com/theochemtheo/quantype.git
@@ -64,8 +65,8 @@ that only run when a backend is missing are tested in-process
 
 The conformance suite checks runtime behavior, positive and negative typing
 examples across mypy, Pyright, Pyrefly, and ty, and runtime/stub agreement.
-The positive typing examples are also executed by `tests/runtime`, so stubs and
-runtime cannot drift apart silently. CI tests core-only, JAX-only, Torch-only,
+`tests/runtime` also runs the positive typing examples, which keeps the stubs
+and the runtime in step. CI tests core-only, JAX-only, Torch-only,
 and minimum-core-dependency environments.
 
 The unit-system parameter's default needs PEP 696. The stubs use
@@ -93,7 +94,7 @@ fails when it is stale.
 
 `tests/runtime/test_docs.py` runs every Python block in `README.md` and
 `docs/*.md`, each in a fresh namespace and a temporary working directory, so the
-documentation cannot drift from the library. Blocks fenced as ` ```python notest `
+documentation stays in step with the library. Blocks fenced as ` ```python notest `
 are API patterns with placeholders and are skipped; JAX and Torch examples skip
 when their backend is absent.
 

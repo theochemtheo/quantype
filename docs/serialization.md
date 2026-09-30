@@ -1,31 +1,33 @@
 # Serialization
 
-Serialization is an explicit host boundary. Values are stored, not graphs,
-device placement, or model state. Custom-unit decoding requires the unit
-definitions at the boundary; see [custom units](units.md#define-a-unit-without-global-registration).
+quantype writes quantities to JSON, Pydantic models, and NPZ archives. Only
+values are saved: autodiff graphs, device placement, and model state are lost.
+Data that uses a custom unit needs the unit's definition when it is read back;
+see [custom units](units.md#define-a-unit-without-global-registration).
 
-The wire format records a unit, never a unit system. Values are physical, and
-the target type chooses the storage system, so any JSON document or archive
-decodes into any system.
+Saved data records a unit but not a unit system. The type you decode into
+chooses the system, so any JSON document or archive can be read into any
+system.
 
 ## JSON and Pydantic
 
-Serialized quantities carry an explicit physical kind:
+A serialized quantity names its kind:
 
 ```json
 {"kind": "Length", "magnitude": 0.5, "unit": "nanometer"}
 ```
 
-`to_dict` writes the display unit: the unit the value was given in, or the one
-selected with `.to(unit)`. Without a display unit it falls back to the unit
-system's unit for the kind: a catalogue name for built-in systems, or a
+`to_dict` writes the value in its display unit: the unit it was given in, or
+the one chosen with `.to(unit)`. A value with no display unit is written in its
+system's unit for the kind. That is a catalogue name for built-in systems, or a
 system-qualified identifier such as `gromacs:Force` for
 [custom systems](unit-systems.md#decoding). A configuration's `"0.5 nm"` is
 written back as `0.5 nanometer` in every system, and `"20.1 degC"` as exactly
 `20.1 celsius`.
 
-Quantity objects require exactly `kind`, `magnitude`, and `unit`. Scalar strings
-such as `"5 angstrom"` are accepted when the expected quantity kind is supplied.
+A quantity object must have exactly `kind`, `magnitude`, and `unit`. A string
+such as `"5 angstrom"` is accepted wherever the target kind is known, as in a
+Pydantic field or `Length.parse`.
 
 ```python
 import numpy as np
@@ -48,11 +50,11 @@ config = Configuration.model_validate(
 restored = Configuration.model_validate_json(config.model_dump_json())
 ```
 
-A field's unit system comes from its annotation: `cutoff: Length[float, SI]`
-validates `"0.5 nm"` into metres. A quantity object from another system is
-rejected rather than converted; call `.to_system(...)` first.
+A field's unit system comes from its annotation, so `cutoff: Length[float, SI]`
+reads `"0.5 nm"` as metres. A quantity object from another system raises;
+convert it with `.to_system(...)` first.
 
-Custom units are supplied through validation context:
+Pass custom units through the validation context:
 
 ```python
 from math import sqrt
@@ -71,26 +73,26 @@ adapter = TypeAdapter(Temperature[np.float64])
 restored_point = adapter.validate_python(wire, context={"units": (bleb,)})
 ```
 
-Pydantic restoration converts to the annotated storage, including NumPy dtype,
-and the annotated unit system. Bare quantity annotations work at runtime; strict
-static code should specify storage. `Length.parse(...)` intentionally returns
-scalar-or-float64-array storage in the default system; `Length[float, SI].parse(...)`
-selects the system. Use a typed constructor or `TypeAdapter` for a particular
-storage target. When the target type names a custom system, that system's own
-units are found without `units=`.
+Pydantic converts to the annotated storage, including the NumPy dtype, and to
+the annotated unit system. A bare annotation such as `Length` works at runtime,
+but strict type checkers want the storage spelled out. `Length.parse(...)`
+returns a float or a float64 array in the default system, and
+`Length[float, SI].parse(...)` chooses the system. For a particular storage
+type, use a typed constructor or a `TypeAdapter`. When the target type names a
+custom system, that system's units are found without `units=`.
 
-JSON number leaves are Python floats (binary64), including values from NumPy
-`longdouble` storage. Extra precision is rounded; finite extended-range values
-that would become infinity or round to zero are rejected with `ValueError`.
-Use NPZ when dtype and extended precision must be preserved.
+JSON numbers are written as Python floats (binary64), including values from
+NumPy `longdouble` storage. Extra precision is rounded off, and a finite value
+that would become infinity or zero raises `ValueError`. Use NPZ to keep the
+dtype and extended precision.
 
-JSON does not record the backend or dtype. Torch tensors are detached and copied
-to CPU at serialization, never inside arithmetic or differentiation.
+JSON doesn't record the backend or dtype. Torch tensors are detached and copied
+to the CPU when they are serialized, and at no other time.
 
 ## Binary arrays: NPZ and NPY
 
-NPZ archives store numerical arrays plus a versioned JSON metadata entry, with
-no pickle dependency:
+An NPZ archive stores the numerical arrays and a versioned JSON metadata entry,
+and needs no pickle:
 
 ```python
 import numpy as np
@@ -113,25 +115,24 @@ with np.load("frame.npz", allow_pickle=False) as archive:
     metadata_json = str(archive["metadata"])
 ```
 
-Arrays carry dtype and shape, including zero-dimensional and empty arrays.
-Metadata identifies each quantity's kind, unit, and array key, and records the
-CODATA edition that gave the units their values (for example, `"2022"`). With
-`record_backend=True`, it also records `source_backend`, for example `"numpy"`
-or `"torch"`. That field is **provenance**, not an instruction to import a backend.
-The target type controls restoration, including its storage and unit system;
-a Torch-produced archive can be read into NumPy without Torch installed, and an
-archive written from SI quantities can be read into `Atomistic`. Restored
-quantities remember the archived unit. Supply `units=(...)` for custom-unit
-decoding.
+Arrays keep their dtype and shape, including zero-dimensional and empty arrays.
+The metadata gives each quantity's kind, unit, and array key, and the CODATA
+edition the units came from (for example, `"2022"`). With `record_backend=True`,
+it also records `source_backend`, such as `"numpy"` or `"torch"`. That field is
+only a record, and loading never imports the backend. The target type decides
+the storage and unit system, so a Torch-produced archive can be read into NumPy
+without Torch installed, and an archive written from SI quantities can be read
+into `Atomistic`. Restored quantities keep the archived unit for display. Pass
+`units=(...)` to decode custom units.
 
-Unsupported host dtypes, such as Torch bfloat16 through NumPy's normal
-conversion, are not silently approximated. JSON and NPZ store values, not
-bit-exact snapshots: unit conversion can introduce floating-point roundoff.
-Low-precision storage presented in a distant unit can lose more: float16
-ångströms written as metres are subnormal. Present such values in a nearby unit
-with `.to(...)` first.
+Dtypes NumPy can't represent, such as Torch's bfloat16, raise `TypeError`.
+JSON and NPZ store values, and unit conversion on the way can add
+floating-point round-off. Low-precision storage shown in a very different unit
+can lose more: float16 ångströms written as metres are subnormal. Switch such
+values to a nearby unit with `.to(...)` before saving.
 
-NPY deliberately carries only numerical data. Use an explicit external unit:
+An NPY file holds only numbers, so you choose the unit when saving and when
+loading:
 
 ```python
 import numpy as np

@@ -1,9 +1,8 @@
 # Getting started
 
-quantype represents physical meaning in Python types. Units describe input and
-output; arithmetic uses raw numbers in one coherent unit system, so it never
-converts. It is a prototype aimed at scientific and atomistic modelling, not a
-complete SI unit system.
+This page covers building quantities, converting them, unit systems, NumPy
+arrays, validating configuration, and temperatures. Each code block runs on its
+own: copy the whole block into a script or REPL. None of them need JAX or Torch.
 
 ## Install
 
@@ -21,9 +20,8 @@ source .venv/bin/activate  # Windows: .venv\Scripts\activate
 python -m pip install quantype
 ```
 
-Run examples with `uv run python` in a uv project, or `python` in the activated
-virtual environment. Every Python block below is independent: copy the whole
-block into a script or REPL. These examples need no optional backends.
+Run the examples with `uv run python` in a uv project, or with `python` in the
+activated virtual environment.
 
 ## Construct, calculate, convert
 
@@ -35,13 +33,13 @@ energy = Energy[float](3, u.eV)
 force = energy / length
 
 assert isinstance(force, Force)
-assert length.value == 20.0  # raw numbers are in ångströms, the default system
+assert length.value == 20.0  # stored in ångströms, the default system's unit
 assert length.magnitude() == 2.0  # shown in the unit it was given in
 assert repr(length) == "Length(2.0 nm)"
 assert force.magnitude(u.eV_per_angstrom) == 0.15
 
 shown = length.to(u.angstrom)
-assert shown.value == 20.0  # .to() changes presentation, not storage
+assert shown.value == 20.0  # .to() changes the display unit, not the stored value
 assert shown.magnitude() == 20.0
 
 wire = length.to_dict()
@@ -50,18 +48,17 @@ restored = Length.parse(wire)
 assert restored == length
 ```
 
-`2 * u.nm` is a shorter construction spelling. Use `Length[float](...)` when
-choosing storage explicitly; use `Length[np.float64](...)` for a NumPy scalar
-and `Length[npt.NDArray[np.float64]](...)` for a NumPy array. The generic argument
-converts the input into that storage. Bare `Length(...)` works at
-runtime but leaves storage unspecified to strict type checkers; prefer an explicit
-storage argument or unit-first construction. Unit-first construction accepts
-arrays, not Python lists: use a typed constructor or `u.nm(np.asarray(values))`.
+`2 * u.nm` is a shorter way to write `Length[float](2, u.nm)`. The type argument
+chooses the storage and converts the input into it: `Length[np.float64]` gives a
+NumPy scalar, and `Length[npt.NDArray[np.float64]]` a NumPy array. Bare
+`Length(...)` works at runtime, but strict type checkers can't tell what its
+storage is. Unit-first construction takes arrays but not lists; for a list, use
+a typed constructor or `u.nm(np.asarray(values))`.
 
-Use `.magnitude(unit)` when handing data to a library that expects a particular
-unit. Use `.value` when a library expects the raw numbers of the quantity's unit
-system: ångströms, eV, and femtoseconds by default. A float from either boundary
-no longer carries physical meaning.
+Pass `.magnitude(unit)` to a library that expects a particular unit, and
+`.value` to one that expects the unit system's raw numbers: ångströms, eV, and
+femtoseconds by default. Either way, you get a plain float or array with no
+unit attached.
 
 ## Choose a unit system
 
@@ -84,9 +81,9 @@ else:
     raise AssertionError("unit systems never mix")
 ```
 
-The unit system is the second type argument and defaults to `Atomistic`, so
-`Length[float]` is `Length[float, Atomistic]`. Mixing systems is a static type
-error and a runtime `TypeError`; `.to_system(...)` is the explicit bridge. See
+The unit system is the second type argument. It defaults to `Atomistic`, so
+`Length[float]` is `Length[float, Atomistic]`. Mixing systems is a type error
+and a runtime `TypeError` whose message points to `.to_system(...)`. See
 [units and unit systems](units.md#unit-systems) and
 [defining your own system](unit-systems.md).
 
@@ -111,28 +108,29 @@ np.testing.assert_array_equal(distances < 1 * u.nm, [True, False])
 assert distances.max() == 5 * u.nm
 ```
 
-`quantype.numpy`, imported as `qnp`, has NumPy's names with unit rules, and
-works on NumPy, JAX, and Torch arrays: `qnp.cos(angle)` is `Dimensionless`,
-`qnp.arccos(ratio)` an `Angle`, and `qnp.linalg.norm(positions, axis=-1)` a
-`Length`. NumPy's and Torch's own functions apply the same rules, so `np.cos(q)`
-and `np.sum(q)` work too, though their static types cannot name the result's
-kind. JAX's `jnp` functions cannot see quantities; use `qnp` in JAX code.
-Functions without a unit rule, such as FFTs, raise, as does `np.asarray(q)`:
-use `q.value` or `q.magnitude(unit)` to cross the numerical boundary explicitly.
+`quantype.numpy`, imported as `qnp`, has NumPy's function names with unit rules,
+and works on NumPy, JAX, and Torch arrays. `qnp.cos(angle)` is `Dimensionless`,
+`qnp.arccos(ratio)` is an `Angle`, and `qnp.linalg.norm(positions, axis=-1)` is
+a `Length`.
 
-Indexing, iteration, `len()`, `.shape`, `.max()`, `.min()`, and comparisons keep
-physical meaning. Ordering comparisons need the same kind and unit system and
-return backend booleans; `==` compares values, element-wise for arrays, and
-quantities of different kinds or systems are simply unequal. So do
-`q.reshape(...)`, `q.T`, `q.squeeze()`, `q.cumsum()`, and `q.std()`. For other
-array operations, operate on `.value` and rewrap with
-`Length.from_value(...)` when the result still represents lengths in the same
-system. This trusted constructor does **not** validate or convert its input.
-Shape validation remains the caller's responsibility.
+NumPy's and Torch's own functions, such as `np.cos(q)` and `np.sum(q)`, apply the
+same rules at runtime. NumPy's type stubs reject quantities, so use `qnp` in
+type-checked code. JAX's `jnp` functions can't see quantities at all, so use
+`qnp` in JAX code too. Functions with no unit rule, such as FFTs, raise, and so
+does `np.asarray(q)`. Pass `q.value` or `q.magnitude(unit)` instead.
 
-Any real number or numerical array (NumPy, JAX, or Torch) scales a quantity,
-and the quantity keeps its dtype. Builtin `sum()`, format specs, and explicit
-renaming of equal dimensions also work:
+Indexing, iteration, `len()`, `.shape`, `.max()`, `.min()`, `.reshape(...)`,
+`.T`, `.squeeze()`, `.cumsum()`, and `.std()` all keep the kind. `<` and `>` need
+the same kind and unit system, and return backend booleans. `==` compares
+values, element-wise for arrays, and quantities of different kinds or systems
+compare unequal.
+
+For any other array operation, work on `.value` and wrap the result with
+`Length.from_value(...)` if it is still a length in the same system.
+`from_value` trusts its input: it doesn't check the shape or convert anything.
+
+A plain number or a NumPy, JAX, or Torch array scales a quantity without
+changing its dtype. Builtin `sum()`, format specs, and `reinterpret` work too:
 
 ```python
 import numpy as np
@@ -146,12 +144,12 @@ assert f"{times[-1]:.2f}" == "1.50 fs"
 assert sum([1 * u.nm, 5 * u.angstrom]).magnitude(u.angstrom) == pytest.approx(15)
 
 density = (1 * u.eV) / (1 * u.angstrom_cubed)  # an EnergyDensity
-stress = Pressure.reinterpret(density)  # the same dimensions, named explicitly
+stress = Pressure.reinterpret(density)  # same dimensions, renamed
 assert stress.magnitude(u.GPa) == pytest.approx(160.2176634)
 ```
 
-`if q:` raises, because the truth of a physical value is ambiguous: compare
-explicitly, or test `q is not None`.
+`if q:` raises. Compare against a value, as in `q > 0 * u.nm`, or test
+`q is not None`.
 
 ## Validate configuration and restore typed storage
 
@@ -188,8 +186,8 @@ else:
     raise AssertionError("An energy is not a length")
 ```
 
-Which entry point should you use? These are API patterns: `data` stands for your
-input; import `TypeAdapter` from `pydantic` when using that row.
+Pick an entry point by what your input is. In the table, `data` stands for your
+input, and `TypeAdapter` comes from `pydantic`.
 
 | Input and goal | Entry point |
 | --- | --- |
@@ -200,10 +198,10 @@ input; import `TypeAdapter` from `pydantic` when using that row.
 | External data with a particular storage type | `TypeAdapter(Length[np.float32]).validate_python(data)` |
 | Several validated fields | A Pydantic `BaseModel` |
 
-`Length.parse` returns Python float or NumPy float64-array storage.
-`Length[float, SI].parse(...)` selects the unit system, but not the storage:
-use a `TypeAdapter` to select float32 storage. A JSON quantity object must have exactly `kind`,
-`magnitude`, and `unit`; a bare number does not specify an input unit.
+`Length.parse` gives a Python float or a float64 NumPy array.
+`Length[float, SI].parse(...)` chooses the unit system but not the storage; for
+float32, use a `TypeAdapter`. A JSON quantity object must have exactly `kind`,
+`magnitude`, and `unit`. Bare numbers are rejected, because they have no unit.
 
 ## Temperatures and custom units
 
@@ -232,36 +230,35 @@ typed = adapter.validate_json(adapter.dump_json(point), context=context)
 assert isclose(typed.value, point.value)
 ```
 
-Absolute temperatures are points, not differences: subtracting two gives a
-`TemperatureDifference`. Use difference units (`u.delta_celsius`,
-`u.delta_kelvin`) for differences. Adding or summing absolute temperatures is
-rejected, but their mean is valid, and they multiply like other quantities:
-`constants.k_B * warm` is an energy.
+Subtracting two absolute temperatures gives a `TemperatureDifference`, measured
+in `u.delta_celsius` or `u.delta_kelvin`. You can't add or sum absolute
+temperatures, but you can take their mean, and they multiply like other
+quantities: `constants.k_B * warm` is an energy.
 
-Custom units need no global registration. Supply definitions again when decoding:
-`units=(...)` for direct parsing, or `context={"units": (...)}` for Pydantic
-validation, including `model_validate_json`. Restored values remember the unit
-their data used. Serialization preserves physical values, not device placement
-or differentiation graphs.
+A custom unit is an ordinary object, and nothing is registered globally. To
+decode data that uses one, pass its definition again: `units=(...)` to `parse`,
+or `context={"units": (...)}` to Pydantic validation, including
+`model_validate_json`. Restored values keep the unit their data used.
+Serialization saves values; device placement and autodiff graphs are lost.
 
 ## Common errors
 
 | Symptom | What to do |
 | --- | --- |
-| `Expected Length; received Energy` | Check the input's physical kind and unit; conversion cannot turn energy into length. |
-| `Unknown unit` for a custom identifier | Supply its definition at the decoding boundary. |
-| `u.length.nm` raises `AttributeError` | Hierarchical namespaces use full names: `u.length.nanometer`. Abbreviations are flat: `u.nm`. |
-| `np.fft does not know the units of a quantity` | That function has no unit rule; pass `.value` or `.magnitude(unit)` explicitly. `quantype.numpy` lists the functions that have one. |
-| `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists are not magnitudes; convert lists with `np.asarray`. |
-| `Cannot add int and Length; give it a unit` | Only zero, so that `sum()` works, and `Dimensionless` values mix with plain numbers. |
-| `The truth value of a Length quantity is ambiguous` | Compare explicitly, such as `q > 0 * u.nm`, or test `q is not None`. |
-| An `EnergyDensity` where a `Pressure` is expected | Kinds are nominal; rename equal dimensions with `Pressure.reinterpret(q)`. |
-| `Cannot combine SI and Atomistic quantities` | Convert one operand with `.to_system(...)`; quantities from different unit systems never mix. |
-| An unnamed result cannot be serialized | Only named quantity kinds have wire units; keep the result in memory or define a combined application catalogue. |
+| `Expected Length; received Energy` | Check the input's kind and unit. An energy can't be converted to a length. |
+| `Unknown unit` for a custom identifier | Pass its definition when decoding. |
+| `u.length.nm` raises `AttributeError` | Namespaces use full names, as in `u.length.nanometer`. Abbreviations are flat, as in `u.nm`. |
+| `np.fft does not know the units of a quantity` | That function has no unit rule. Pass `.value` or `.magnitude(unit)`. `quantype.numpy` lists the functions that have one. |
+| `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists can't scale a quantity. Convert lists with `np.asarray`. |
+| `Cannot add int and Length; give it a unit` | Plain numbers can only be added to `Dimensionless` values, and zero to anything (so `sum()` works). Give the number a unit. |
+| `The truth value of a Length quantity is ambiguous` | Compare against a value, as in `q > 0 * u.nm`, or test `q is not None`. |
+| An `EnergyDensity` where a `Pressure` is expected | Rename it with `Pressure.reinterpret(q)`. |
+| `Cannot combine SI and Atomistic quantities` | Convert one operand with `.to_system(...)`. |
+| An unnamed result cannot be serialized | Only named kinds have units on the wire. Name it with `reinterpret`, or declare the kind in an [application catalogue](custom-catalogues.md). |
 
-`Pressure`, `EnergyDensity`, and `EnergyPerVolume` are different kinds even
-though their dimensions agree. Arithmetic names only declared relationships;
-it does not infer physical meaning by cancelling arbitrary dimension expressions.
+Result types come only from declared relations. quantype doesn't cancel
+dimensions to guess a kind, so a product with no declared name keeps a
+structural type such as `Quantity[Mul[LengthKind, TimeKind], float]`.
 
 ## Next steps
 
