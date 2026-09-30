@@ -98,3 +98,15 @@ def test_force_from_grad(system: type[UnitSystem]) -> None:
     np.testing.assert_allclose(
         force.magnitude(u.eV_per_angstrom), [2.0, 4.0], rtol=1e-6
     )
+
+
+def test_backend_scalars_and_traced_values_scale_quantities() -> None:
+    length = Length[jax.Array]([1.0, 2.0], u.angstrom)
+
+    def scale(factor: jax.Array, value: Length[jax.Array]) -> Length[jax.Array]:
+        return factor * value
+
+    scaled: Any = _jit(scale)(_jnp.array(3.0), length)
+    np.testing.assert_allclose(np.asarray(scaled.value, dtype=np.float64), [3, 6])
+    weighted = length * _jnp.ones(2)
+    np.testing.assert_allclose(np.asarray(weighted.value, dtype=np.float64), [1, 2])

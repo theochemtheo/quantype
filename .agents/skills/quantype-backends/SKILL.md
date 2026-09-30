@@ -18,6 +18,7 @@ Unit-first construction always uses the default system. It preserves compatible 
 ## Storage invariants
 
 - Support real floating storage. Reject boolean, complex and nonnumerical magnitudes; integer inputs may be converted to floating storage. Python/NumPy scalar targets reject nonscalar input.
+- Scaling operands go through `real_operand` (any real scalar, or a real NumPy/JAX/Torch array including tracers) and results through `keep_storage`, which keeps the quantity's storage type and dtype.
 - Distinguish NumPy floating scalars from zero-dimensional arrays. `npt.NDArray[np.float64]` remains an array even after a reduction yields a scalar-shaped result.
 - NumPy annotations encode dtype; an explicit conflicting `dtype=` fails. Torch/JAX storage classes need an explicit `dtype=` when requested, since their annotations do not encode dtype.
 - Preserve Torch device placement and graph connectivity when converting existing tensors. List construction does not automatically enable gradients.

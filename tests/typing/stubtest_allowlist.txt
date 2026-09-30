@@ -20,6 +20,11 @@
 # Standard static generics are retained; the runtime alias adds conversion on call.
 ^quantype\.core\.Quantity\.__class_getitem__$
 
+# Runtime-only: truthiness always raises, and float() converts only a scalar
+# Dimensionless quantity, whose generated class declares it; elsewhere float()
+# stays a static error.
+^quantype\.core\.Quantity\.(__bool__|__float__)$
+
 # NumPy coercion/dispatch methods intentionally reject implicit unit loss.
 ^quantype\.core\.Quantity\.(__array__|__array_function__|__array_priority__|__array_ufunc__)$
 

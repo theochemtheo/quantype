@@ -62,11 +62,23 @@ class Quantity(Generic[K, V, S]):
     @property
     def system(self) -> type[S]: ...
     @property
+    def unit(self) -> Unit[K] | None: ...
+    @property
     def shape(self) -> tuple[int, ...]: ...
     @property
     def ndim(self) -> int: ...
     @classmethod
     def from_value[W](cls, value: W) -> Quantity[K, W, S]: ...
+    @classmethod
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Quantity[K, W, T]: ...
+    @overload
+    @classmethod
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ...
+    ) -> Quantity[K, float, S]: ...
+    @overload
     @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ...
@@ -153,7 +165,15 @@ class Quantity(Generic[K, V, S]):
     ) -> Quantity[K, V, S]: ...
     @overload
     def __mul__[A, B](
-        self: _StructuralQuantity[A, B, V, S], other: float, /
+        self: _StructuralQuantity[A, B, V, S], other: _Scalar, /
+    ) -> Quantity[K, V, S]: ...
+    @overload
+    def __mul__[A, B, W: _Numerical](
+        self: _StructuralQuantity[A, B, float, S], other: W, /
+    ) -> Quantity[K, W, S]: ...
+    @overload
+    def __mul__[A, B](
+        self: _StructuralQuantity[A, B, V, S], other: _Numerical, /
     ) -> Quantity[K, V, S]: ...
     @overload
     def __mul__[A, B, L, W](
@@ -169,7 +189,15 @@ class Quantity(Generic[K, V, S]):
     ) -> Quantity[Mul[K, L], V, S]: ...
     @overload
     def __truediv__[A, B](
-        self: _StructuralQuantity[A, B, V, S], other: float, /
+        self: _StructuralQuantity[A, B, V, S], other: _Scalar, /
+    ) -> Quantity[K, V, S]: ...
+    @overload
+    def __truediv__[A, B, W: _Numerical](
+        self: _StructuralQuantity[A, B, float, S], other: W, /
+    ) -> Quantity[K, W, S]: ...
+    @overload
+    def __truediv__[A, B](
+        self: _StructuralQuantity[A, B, V, S], other: _Numerical, /
     ) -> Quantity[K, V, S]: ...
     @overload
     def __truediv__[A, B, L, W](
@@ -183,12 +211,38 @@ class Quantity(Generic[K, V, S]):
     def __truediv__[A, B, L](
         self: _StructuralQuantity[A, B, V, S], other: Quantity[L, V, S], /
     ) -> Quantity[Div[K, L], V, S]: ...
+    @overload
     def __rmul__[A, B](
-        self: _StructuralQuantity[A, B, V, S], other: float, /
+        self: _StructuralQuantity[A, B, V, S], other: _Scalar, /
     ) -> Quantity[K, V, S]: ...
+    @overload
+    def __rmul__[A, B, W: _Numerical](
+        self: _StructuralQuantity[A, B, float, S], other: W, /
+    ) -> Quantity[K, W, S]: ...
+    @overload
+    def __rmul__[A, B](
+        self: _StructuralQuantity[A, B, V, S], other: _Numerical, /
+    ) -> Quantity[K, V, S]: ...
+    @overload
     def __rtruediv__[A, B](
-        self: _StructuralQuantity[A, B, V, S], other: float, /
+        self: _StructuralQuantity[A, B, V, S], other: _Scalar, /
     ) -> Quantity[Div[DimensionlessKind, K], V, S]: ...
+    @overload
+    def __rtruediv__[A, B, W: _Numerical](
+        self: _StructuralQuantity[A, B, float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, K], W, S]: ...
+    @overload
+    def __rtruediv__[A, B](
+        self: _StructuralQuantity[A, B, V, S], other: _Numerical, /
+    ) -> Quantity[Div[DimensionlessKind, K], V, S]: ...
+    # Zero means the same in every unit, so builtin sum() works. sum() requires
+    # any int here; only zero is accepted at runtime.
+    def __radd__[A, B](
+        self: _StructuralQuantity[A, B, V, S], other: int, /
+    ) -> Quantity[K, V, S]: ...
+    def __rsub__[A, B](
+        self: _StructuralQuantity[A, B, V, S], other: int, /
+    ) -> Quantity[K, V, S]: ...
     def __pow__[A, B, N: int](
         self: _StructuralQuantity[A, B, V, S], exponent: N, /
     ) -> Quantity[Pow[K, N], V, S]: ...
@@ -202,6 +256,11 @@ class Quantity(Generic[K, V, S]):
     ) -> Quantity[K, V, S]: ...
 
 type _Scalar = float | np.floating[Any] | np.integer[Any]
+
+# A NumPy, JAX or Torch array scaling a quantity: each exports through DLPack,
+# which quantities do not, so a quantity never matches it.
+class _Numerical(Protocol):
+    def __dlpack__(self) -> object: ...
 
 # A quantity as an operand of a constant. Typing it structurally, not as
 # Quantity, spares checkers from binding Quantity's structural-only __mul__,

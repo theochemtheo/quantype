@@ -28,6 +28,7 @@ from quantype._internal._semantics import (
     power,
     product,
 )
+from quantype._internal._storage import keep_storage, real_operand
 from quantype._internal._systems import (
     Atomistic,
     UnitSystem,
@@ -234,6 +235,15 @@ class Quantity[K, V, S: UnitSystem]:
         return self._system
 
     @property
+    def unit(self) -> Unit[K] | None:
+        """The unit ``magnitude()`` and ``repr`` use; None for unnamed products."""
+        if self._display is not None:
+            return self._display
+        if isinstance(self._semantic, Kind):
+            return cast("Unit[K]", self._system.unit_for(self._semantic))
+        return None
+
+    @property
     def shape(self) -> tuple[int, ...]:
         return tuple[int, ...](getattr(self._value, "shape", ()))
 
@@ -247,6 +257,39 @@ class Quantity[K, V, S: UnitSystem]:
         if not cls._kind:
             raise TypeError("from_value requires a named quantity class")
         return cast("Quantity[K, W, Any]", _wrap(cls._semantic, value, None))
+
+    @classmethod
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Quantity[K, W, T]:
+        """The same physical value named as this kind, which must share its dimensions.
+
+        Kinds are nominal, so equal dimensions never convert implicitly: an
+        ``EnergyDensity`` is not a ``Pressure`` until reinterpreted. The unit
+        system and storage are kept. Absolute and difference temperatures are
+        points and vectors, so reinterpreting between them is refused.
+        """
+        if not cls._kind:
+            raise TypeError("reinterpret requires a named quantity class")
+        if not isinstance(quantity, Quantity):  # pyright: ignore[reportUnnecessaryIsInstance]
+            raise TypeError(f"Expected a quantity, received {type(quantity).__name__}")
+        source, target = quantity._semantic, cls._semantic
+        if source.dimensions != target.dimensions:
+            raise TypeError(
+                f"Cannot reinterpret {source} as {target}: their dimensions differ"
+            )
+        if source is not target and any(
+            isinstance(kind, Kind) and kind.affine for kind in (source, target)
+        ):
+            raise TypeError(
+                f"Cannot reinterpret {source} as {target}; subtract a reference "
+                "temperature, or add a difference to one"
+            )
+        system = quantity._system
+        scale = coherence(system, source) / coherence(system, target)
+        raw = _rescaled(quantity._value, scale)
+        display = quantity._display if source is target else None
+        return cast("Quantity[K, W, T]", _wrap(target, raw, system, display=display))
 
     @classmethod
     def parse(cls, data: object, *, units: tuple[Unit[Any], ...] = ()) -> Self:
@@ -345,21 +388,56 @@ class Quantity[K, V, S: UnitSystem]:
             ),
         )
 
-    def _add_sub(self, other: object, *, subtract: bool) -> Quantity[Any, Any, Any]:
+    def _is_dimensionless(self) -> bool:
+        semantic = self._semantic
+        return (
+            isinstance(semantic, Kind) and DIMENSIONLESS_KINDS.get(semantic) is semantic
+        )
+
+    def _plain(self, other: object) -> Quantity[Any, Any, Any] | None:
+        """A plain number or array as this Dimensionless kind, if it is one."""
+        operand = real_operand(other) if self._is_dimensionless() else None
+        if operand is None:
+            return None
+        return _wrap(self._semantic, operand, self._system)
+
+    def _add_sub(
+        self, other: object, *, subtract: bool, reflected: bool = False
+    ) -> Quantity[Any, Any, Any]:
         if not isinstance(other, Quantity):
-            raise TypeError(f"Expected a quantity, received {type(other).__name__}")
+            # Zero means the same in every unit, so builtin sum() works.
+            if type(other) is int and other == 0 and not self._is_dimensionless():
+                if not (reflected and subtract):
+                    return self
+                if isinstance(self._semantic, Kind) and self._semantic.affine:
+                    raise TypeError("Cannot subtract an absolute Temperature from 0")
+                return -self
+            plain = self._plain(other)
+            if plain is None:
+                raise TypeError(
+                    f"Cannot {'subtract' if subtract else 'add'} "
+                    f"{type(other).__name__} and {self.kind}; give it a unit"
+                )
+            other = plain
         rhs = cast("Quantity[Any, Any, Any]", other)
-        self._same_system(rhs)
-        kind = addition(self._semantic, rhs._semantic, subtract=subtract)
-        lhs: Any = self._value
-        raw = lhs - rhs._value if subtract else lhs + rhs._value
-        return _wrap(kind, raw, self._system, display=_sum_display(kind, self, rhs))
+        left, right = (rhs, self) if reflected else (self, rhs)
+        left._same_system(right)
+        kind = addition(left._semantic, right._semantic, subtract=subtract)
+        lhs: Any = left._value
+        raw = lhs - right._value if subtract else lhs + right._value
+        return _wrap(kind, raw, self._system, display=_sum_display(kind, left, right))
 
     def __add__(self, other: object) -> Quantity[Any, Any, Any]:
         return self._add_sub(other, subtract=False)
 
+    def __radd__(self, other: object) -> Quantity[Any, Any, Any]:
+        return self._add_sub(other, subtract=False, reflected=True)
+
     def __sub__(self, other: object) -> Quantity[Any, Any, Any]:
         return self._add_sub(other, subtract=True)
+
+    def __rsub__(self, other: object) -> Quantity[Any, Any, Any]:
+        return self._add_sub(other, subtract=True, reflected=True)
 
     def __mul__(self, other: Any) -> Quantity[Any, Any, Any]:
         lhs: Any = self._value
@@ -373,8 +451,7 @@ class Quantity[K, V, S: UnitSystem]:
             return _wrap(kind, _rescaled(lhs * rhs._value, scale), self._system)
         if isinstance(other, Constant):
             return NotImplemented  # the constant adopts this quantity's system
-        self._check_scalar(other)
-        return self._scaled(lhs * other)
+        return self._scaled(keep_storage(lhs, lhs * self._operand(other)))
 
     def __rmul__(self, other: Any) -> Quantity[Any, Any, Any]:
         return self * other
@@ -391,19 +468,25 @@ class Quantity[K, V, S: UnitSystem]:
             return _wrap(kind, _rescaled(lhs / rhs._value, scale), self._system)
         if isinstance(other, Constant):
             return NotImplemented  # the constant adopts this quantity's system
-        self._check_scalar(other)
-        return self._scaled(lhs / other)
+        return self._scaled(keep_storage(lhs, lhs / self._operand(other)))
 
     def __rtruediv__(self, other: Any) -> Quantity[Any, Any, Any]:
-        self._check_scalar(other)
+        operand = self._operand(other)
         numerator = dimensionless_kind(self._semantic)
         kind = product("div", numerator, self._semantic)
         scale = _product_scale(self._system, numerator, self._semantic, kind, "div")
-        return _wrap(kind, _rescaled(other / self._value, scale), self._system)
+        raw: Any = self._value
+        quotient = keep_storage(raw, operand / raw)
+        return _wrap(kind, _rescaled(quotient, scale), self._system)
 
-    def _check_scalar(self, value: object) -> None:
-        if not isinstance(value, (int, float)) or isinstance(value, bool):
-            raise TypeError("Quantity scaling requires a real scalar")
+    def _operand(self, value: object) -> Any:
+        operand = real_operand(value)
+        if operand is None:
+            raise TypeError(
+                "Quantities scale by real numbers or numerical arrays; "
+                f"received {type(value).__name__}"
+            )
+        return operand
 
     def __pow__(self, exponent: object) -> Quantity[Any, Any, Any]:
         if not isinstance(exponent, int) or isinstance(exponent, bool):
@@ -427,7 +510,10 @@ class Quantity[K, V, S: UnitSystem]:
 
     def _compare(self, other: object, compare: Callable[[Any, Any], Any]) -> Any:
         if not isinstance(other, Quantity):
-            return NotImplemented
+            plain = self._plain(other)
+            if plain is None:
+                return NotImplemented
+            other = plain
         rhs = cast("Quantity[Any, Any, Any]", other)
         self._same_system(rhs)
         if rhs._semantic != self._semantic:
@@ -436,21 +522,47 @@ class Quantity[K, V, S: UnitSystem]:
 
     @override
     def __eq__(self, other: object) -> Any:
+        """Value equality within a kind and system; otherwise simply unequal.
+
+        As with naive and aware datetimes, quantities that cannot be compared
+        are unequal, while ordering them raises.
+        """
         if not isinstance(other, Quantity):
-            return NotImplemented
+            plain = self._plain(other)
+            return (
+                NotImplemented if plain is None else self._compare(plain, operator.eq)
+            )
         rhs = cast("Quantity[Any, Any, Any]", other)
-        if rhs._semantic != self._semantic:
+        if rhs._semantic != self._semantic or rhs._system is not self._system:
             return False
         return self._compare(rhs, operator.eq)
 
     @override
     def __ne__(self, other: object) -> Any:
         if not isinstance(other, Quantity):
-            return NotImplemented
+            plain = self._plain(other)
+            return (
+                NotImplemented if plain is None else self._compare(plain, operator.ne)
+            )
         rhs = cast("Quantity[Any, Any, Any]", other)
-        if rhs._semantic != self._semantic:
+        if rhs._semantic != self._semantic or rhs._system is not self._system:
             return True
         return self._compare(rhs, operator.ne)
+
+    def __bool__(self) -> bool:
+        raise TypeError(
+            f"The truth value of a {self.kind} quantity is ambiguous; compare it "
+            "explicitly (q > 0 * u.nm), or test `q is not None`"
+        )
+
+    def __float__(self) -> float:
+        raw: Any = self._value
+        if not self._is_dimensionless() or getattr(raw, "ndim", 0) != 0:
+            raise TypeError(
+                f"Only a scalar Dimensionless quantity converts to float, not "
+                f"{self.kind}; use .value or .magnitude(unit)"
+            )
+        return float(raw)
 
     @override
     def __hash__(self) -> int:
@@ -571,14 +683,35 @@ class Quantity[K, V, S: UnitSystem]:
             ".value or .magnitude(unit) to NumPy explicitly"
         )
 
+    def _symbol(self) -> str:
+        unit = self.unit
+        symbol = (
+            unit.symbol if unit is not None else _symbol(self._semantic, self._system)
+        )
+        return "" if symbol == "1" else f" {symbol}"
+
     def _presentation(self) -> str:
-        if self._display is not None:
-            symbol = self._display.symbol
-        elif isinstance(self._semantic, Kind):
-            symbol = self._system.unit_for(self._semantic).symbol
-        else:
-            symbol = _symbol(self._semantic, self._system)
-        return f"{self.magnitude()!s} {symbol}"
+        return f"{self.magnitude()!s}{self._symbol()}"
+
+    @override
+    def __format__(self, spec: str) -> str:
+        """Apply a format spec to the magnitude: f"{q:.3f}" gives "2.000 nm"."""
+        if not spec:
+            return str(self)
+        magnitude: Any = self.magnitude()
+        try:
+            text = format(magnitude, spec)
+        except (TypeError, ValueError):
+            import numpy as np
+
+            def element(value: object) -> str:
+                return format(value, spec)
+
+            text = np.array2string(
+                np.asarray(magnitude),
+                formatter={"float_kind": element, "int_kind": element},
+            )
+        return f"{text}{self._symbol()}"
 
     @override
     def __str__(self) -> str:

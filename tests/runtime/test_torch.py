@@ -71,3 +71,12 @@ def test_torch_grad_in_another_system() -> None:
         TypeError, match="output in Atomistic with respect to an input in SI"
     ):
         untyped(Energy.from_value(x.value.sum()) * 1.0, x)
+
+
+def test_torch_tensors_scale_quantities() -> None:
+    length = Length[torch.Tensor](torch.tensor([1.0, 2.0]), u.angstrom)
+    scaled = length * torch.tensor(2.0)
+    assert torch.equal(scaled.value, torch.tensor([2.0, 4.0]))
+    # The quantity's dtype is kept, as unit conversion keeps it.
+    doubled = torch.tensor(2.0, dtype=torch.float64) * length
+    assert doubled.value.dtype == torch.float32

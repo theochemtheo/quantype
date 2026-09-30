@@ -56,9 +56,7 @@ assert_type(x_si.max(), Length[float, SI])
 assert_type(x_si < 2.0 * x_si, bool)
 assert_type(u.sqrt(x_si * x_si), Length[float, SI])
 assert_type(Length[float, SI].from_value(2.0), Length[float, SI])
-assert_type(
-    Length[float, SI].parse("2 nm"), Length[float | npt.NDArray[np.float64], SI]
-)
+assert_type(Length[float, SI].parse("2 nm"), Length[float, SI])
 point = Temperature[float, SI](20.0, u.celsius)
 assert_type(point - point, TemperatureDifference[float, SI])
 

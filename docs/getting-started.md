@@ -116,12 +116,36 @@ quantities. `np.asarray(q)` is deliberately rejected: use `q.value` or
 `q.magnitude(unit)` to cross the numerical boundary explicitly.
 
 Indexing, iteration, `len()`, `.shape`, `.max()`, `.min()`, and comparisons keep
-physical meaning. Comparisons need the same kind and unit system and return
-backend booleans; `==` compares values, element-wise for arrays. For reshaping
+physical meaning. Ordering comparisons need the same kind and unit system and
+return backend booleans; `==` compares values, element-wise for arrays, and
+quantities of different kinds or systems are simply unequal. For reshaping
 and other array operations, operate on `.value` and rewrap with
 `Length.from_value(...)` when the result still represents lengths in the same
 system. This trusted constructor does **not** validate or convert its input.
 Shape validation remains the caller's responsibility.
+
+Any real number or numerical array (NumPy, JAX, or Torch) scales a quantity,
+and the quantity keeps its dtype. Builtin `sum()`, format specs, and explicit
+renaming of equal dimensions also work:
+
+```python
+import numpy as np
+import pytest
+
+from quantype import Pressure, Time, u
+
+step = Time[float](0.5, u.fs)
+times = step * np.arange(4)
+assert f"{times[-1]:.2f}" == "1.50 fs"
+assert sum([1 * u.nm, 5 * u.angstrom]).magnitude(u.angstrom) == pytest.approx(15)
+
+density = (1 * u.eV) / (1 * u.angstrom_cubed)  # an EnergyDensity
+stress = Pressure.reinterpret(density)  # the same dimensions, named explicitly
+assert stress.magnitude(u.GPa) == pytest.approx(160.2176634)
+```
+
+`if q:` raises, because the truth of a physical value is ambiguous: compare
+explicitly, or test `q is not None`.
 
 ## Validate configuration and restore typed storage
 
@@ -222,7 +246,10 @@ or differentiation graphs.
 | `Unknown unit` for a custom identifier | Supply its definition at the decoding boundary. |
 | `u.length.nm` raises `AttributeError` | Hierarchical namespaces use full names: `u.length.nanometer`. Abbreviations are flat: `u.nm`. |
 | Implicit NumPy coercion or ufunc error | Use quantity arithmetic, `.sum()`/`.mean()`, and `u.sqrt`/`u.sin`/`u.exp`; extract magnitudes for other numerical APIs. |
-| `Quantity scaling requires a real scalar` | Use a Python real scalar. Array-valued numerical operations belong at an explicit `.value` boundary. |
+| `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists are not magnitudes; convert lists with `np.asarray`. |
+| `Cannot add int and Length; give it a unit` | Only zero, so that `sum()` works, and `Dimensionless` values mix with plain numbers. |
+| `The truth value of a Length quantity is ambiguous` | Compare explicitly, such as `q > 0 * u.nm`, or test `q is not None`. |
+| An `EnergyDensity` where a `Pressure` is expected | Kinds are nominal; rename equal dimensions with `Pressure.reinterpret(q)`. |
 | `Cannot combine SI and Atomistic quantities` | Convert one operand with `.to_system(...)`; quantities from different unit systems never mix. |
 | An unnamed result cannot be serialized | Only named quantity kinds have wire units; keep the result in memory or define a combined application catalogue. |
 

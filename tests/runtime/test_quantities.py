@@ -139,9 +139,13 @@ def test_value_equality() -> None:
     np.testing.assert_array_equal(arrays != 1 * u.nm, [False, True])
     with pytest.raises(TypeError, match="unhashable"):
         hash(arrays)
-    mixed: Any = a
+    # Like naive and aware datetimes: unequal across systems, unordered.
+    mixed: Any = a.to_system(SI)
+    assert a != mixed
+    assert (a == mixed) is False
+    assert a not in [mixed, 2 * u.nm]
     with pytest.raises(TypeError, match="Cannot combine Atomistic and SI"):
-        _ = mixed == a.to_system(SI)
+        _ = a < mixed
 
 
 def test_scalar_quantities_hash_by_value() -> None:

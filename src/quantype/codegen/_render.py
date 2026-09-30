@@ -16,6 +16,8 @@ from quantype.catalogue import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from quantype.catalogue import Catalogue
 
 # Source templates keep individual generated signatures on one line.
@@ -66,6 +68,36 @@ def binary(method: str, name: str, right: str, result: str) -> list[str]:
     ]
 
 
+def scaling(method: str, name: str, result: Callable[[str], str]) -> list[str]:
+    """Plain numbers and numerical arrays scale a quantity, keeping its kind.
+
+    A real scalar keeps the storage. Float storage scaled by an array becomes
+    that array (integer NumPy arrays promote to float64); array storage stays.
+    """
+    return [
+        f"def {method}(self, other: _Scalar, /) -> {result('V')}: ...",
+        f"def {method}(self: {name}[float, S], other: npt.NDArray[np.integer[Any]], /) -> {result('npt.NDArray[np.float64]')}: ...",
+        f"def {method}[W: _Numerical](self: {name}[float, S], other: W, /) -> {result('W')}: ...",
+        f"def {method}(self, other: _Numerical, /) -> {result('V')}: ...",
+    ]
+
+
+def suppressed_override(block: str) -> str:
+    """Suppress an overloaded override that refines a base return type.
+
+    pyrefly reports it at the first signature, which a wrapped signature leaves
+    no room to annotate, so it goes on the line above; ty at the last.
+    """
+    first = block.index("    def ")
+    text = block[:first] + "    # pyrefly: ignore[bad-override]\n" + block[first:]
+    last = text.rindex(": ...")
+    return (
+        text[:last]
+        + ": ...  # ty: ignore[invalid-method-override]"
+        + text[last + len(": ...") :]
+    )
+
+
 def method_overloads(method: str, signatures: list[str]) -> str:
     return overloads(
         [
@@ -89,7 +121,32 @@ def additive_stubs(name: str) -> str:
             signatures = binary(method, name, name, name)
             if name == "TemperatureDifference" and method == "__add__":
                 signatures += binary(method, name, "Temperature", "Temperature")
+        if name == "Dimensionless":
+            signatures += scaling(method, name, lambda storage: f"{name}[{storage}, S]")
         text += method_overloads(method, signatures)
+    # Zero means the same in every unit, so builtin sum() works. Dimensionless
+    # values take any plain number; a point subtracted from zero is meaningless.
+    for method in ("__radd__", "__rsub__"):
+        if name == "Dimensionless":
+            signatures = scaling(method, name, lambda storage: f"{name}[{storage}, S]")
+            text += overloads(signatures, overrides=True)
+        elif name != "Temperature":
+            # sum() requires any int here; only zero is accepted at runtime.
+            text += f"    @override\n    def {method}(self, other: int, /) -> {name}[V, S]: ...\n"
+    return text
+
+
+def dimensionless_stubs(name: str) -> str:
+    """Dimensionless values compare with plain numbers and convert to float."""
+    text = "    def __float__(self) -> float: ...\n"
+    for method in ("__lt__", "__le__", "__gt__", "__ge__"):
+        text += overloads(
+            [
+                f"def {method}(self: {name}[float, S], other: Quantity[{name}Kind, float, S] | _Scalar, /) -> bool: ...",
+                f"def {method}(self, other: Quantity[{name}Kind, Any, S] | _Scalar | _Numerical, /) -> Any: ...",
+            ],
+            overrides=True,
+        )
     return text
 
 
@@ -104,8 +161,8 @@ def multiplicative_stubs(name: str, catalogue: Catalogue) -> str:
         for (operation, left, right), result in relations.items():
             if operation == op and left == name:
                 signatures += binary(method, name, right, result)
+        signatures += scaling(method, name, lambda storage: f"{name}[{storage}, S]")
         signatures += [
-            f"def {method}(self, other: float, /) -> {name}[V, S]: ...",
             f"def {method}[K, W](self: {name}[float, S], other: Quantity[K, W, S], /) -> Quantity[{expression}[{name}Kind, K], W, S]: ...",
             f"def {method}[K](self, other: Quantity[K, float, S], /) -> Quantity[{expression}[{name}Kind, K], V, S]: ...",
             f"def {method}[K](self, other: Quantity[K, V, S], /) -> Quantity[{expression}[{name}Kind, K], V, S]: ...",
@@ -117,7 +174,13 @@ def multiplicative_stubs(name: str, catalogue: Catalogue) -> str:
 def quantity_methods(name: str, catalogue: Catalogue) -> str:
     text = f"    @classmethod\n    @override\n    def define_unit(cls, name: str, *, reference: Unit[{name}Kind], scale: float = 1.0, offset: float = 0.0, symbol: str | None = None) -> _units._{name}Unit: ...\n"
     text += f"    @classmethod\n    @override\n    def from_value[W](cls, value: W) -> {name}[W, S]: ...\n"
-    text += f"    @classmethod\n    @override\n    def parse(cls, data: object, *, units: tuple[Unit[Any], ...] = ()) -> {name}[float | npt.NDArray[np.float64], S]: ...\n"
+    text += f"    @classmethod\n    @override\n    def reinterpret[W, T: UnitSystem](cls, quantity: Quantity[Any, W, T]) -> {name}[W, T]: ...\n"
+    # A string holds one number; other inputs may hold arrays.
+    text += f"    @overload\n    @classmethod\n    @override\n    def parse(cls, data: str, *, units: tuple[Unit[Any], ...] = ()) -> {name}[float, S]: ...\n"
+    text += f"    @overload\n    @classmethod\n    def parse(cls, data: object, *, units: tuple[Unit[Any], ...] = ()) -> {name}[float | npt.NDArray[np.float64], S]: ...\n"
+    text += (
+        f"    @property\n    @override\n    def unit(self) -> _units._{name}Unit: ...\n"
+    )
     text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[V, T]: ...\n"
     text += additive_stubs(name)
     for method in ("__neg__", "__abs__"):
@@ -126,23 +189,20 @@ def quantity_methods(name: str, catalogue: Catalogue) -> str:
     if name != "Temperature":
         text += f"    @override\n    def sum(self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False) -> {name}[V, S]: ...\n"
     text += multiplicative_stubs(name, catalogue)
-    text += (
-        f"    @override\n    def __rmul__(self, other: float, /) -> {name}[V, S]: ...\n"
+    if name == "Dimensionless":
+        text += dimensionless_stubs(name)
+    text += overloads(
+        scaling("__rmul__", name, lambda storage: f"{name}[{storage}, S]"),
+        overrides=True,
     )
     reciprocal = catalogue.algebra.get(("div", "Dimensionless", name))
-    result = (
-        f"{reciprocal}[V, S]"
-        if reciprocal is not None
-        else f"Quantity[Div[DimensionlessKind, {name}Kind], V, S]"
-    )
-    # A named inverse refines the structural-only base return type. Ty and
-    # Pyrefly also compare these mutually exclusive self types as overrides.
-    suppression = (
-        "  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]"
-        if reciprocal is not None
-        else ""
-    )
-    text += f"    @override\n    def __rtruediv__(self, other: float, /) -> {result}: ...{suppression}\n"
+
+    def inverse(storage: str) -> str:
+        if reciprocal is not None:
+            return f"{reciprocal}[{storage}, S]"
+        return f"Quantity[Div[DimensionlessKind, {name}Kind], {storage}, S]"
+
+    text += overloads(scaling("__rtruediv__", name, inverse), overrides=True)
     powers = [
         f"def __pow__(self, exponent: Literal[{power}], /) -> {result}[V, S]: ..."
         for (kind, power), result in catalogue.powers.items()
@@ -179,9 +239,9 @@ def constant_stub(name: str, catalogue: Catalogue) -> str:
             for other in [left if reflected else right]
             if (right if reflected else left) == name
         ]
-        # A named reciprocal refines the base's structural return type, as the
-        # quantity classes' __rtruediv__ does; checkers compare it as an override.
-        suppression = ""
+        # A named reciprocal refines the base's structural return type, which
+        # checkers compare as an override.
+        reciprocal = None
         if method == "__rtruediv__":
             reciprocal = algebra.get(("div", "Dimensionless", name))
             scalar = (
@@ -189,8 +249,6 @@ def constant_stub(name: str, catalogue: Catalogue) -> str:
                 if reciprocal is not None
                 else f"Constant[Div[DimensionlessKind, {name}Kind]]"
             )
-            if reciprocal is not None:
-                suppression = "  # ty: ignore[invalid-method-override]"
         else:
             scalar = own
         pair = f"L, {name}Kind" if reflected else f"{name}Kind, L"
@@ -202,17 +260,18 @@ def constant_stub(name: str, catalogue: Catalogue) -> str:
             signatures.append(
                 f"def {method}[L](self, other: Constant[L], /) -> Constant[{expression}[{pair}]]: ..."
             )
-        # ty reports an overloaded override at its last signature; pyrefly at
-        # its first, which a wrapped signature leaves no room to annotate.
-        signatures[-1] += suppression
         block = overloads(signatures, overrides=True)
-        if suppression:
-            first = block.index("    def ")
-            block = (
-                block[:first] + "    # pyrefly: ignore[bad-override]\n" + block[first:]
-            )
-        text += block
+        text += block if reciprocal is None else suppressed_override(block)
     return text
+
+
+def structural_scaling(method: str, result: str) -> list[str]:
+    """``scaling`` for structural quantities; ``result`` formats the storage."""
+    return [
+        f"def {method}[A, B](self: _StructuralQuantity[A, B, V, S], other: _Scalar, /) -> {result.format('V')}: ...",
+        f"def {method}[A, B, W: _Numerical](self: _StructuralQuantity[A, B, float, S], other: W, /) -> {result.format('W')}: ...",
+        f"def {method}[A, B](self: _StructuralQuantity[A, B, V, S], other: _Numerical, /) -> {result.format('V')}: ...",
+    ]
 
 
 def structural_quantity_stub() -> str:
@@ -229,20 +288,29 @@ def structural_quantity_stub() -> str:
             ],
             overrides=True,
         )
+    text += "    @override\n    def __radd__[A, B](self: _StructuralQuantity[A, B, V, S], other: int, /) -> Quantity[K, V, S]: ...\n"
+    text += "    @override\n    def __rsub__[A, B](self: _StructuralQuantity[A, B, V, S], other: int, /) -> Quantity[K, V, S]: ...\n"
     for method, expression in (("__mul__", "Mul"), ("__truediv__", "Div")):
         text += overloads(
             [
-                f"def {method}[A, B](self: _StructuralQuantity[A, B, V, S], other: float, /) -> Quantity[K, V, S]: ...",
+                *structural_scaling(method, "Quantity[K, {}, S]"),
                 f"def {method}[A, B, L, W](self: _StructuralQuantity[A, B, float, S], other: Quantity[L, W, S], /) -> Quantity[{expression}[K, L], W, S]: ...",
                 f"def {method}[A, B, L](self: _StructuralQuantity[A, B, V, S], other: Quantity[L, float, S], /) -> Quantity[{expression}[K, L], V, S]: ...",
                 f"def {method}[A, B, L](self: _StructuralQuantity[A, B, V, S], other: Quantity[L, V, S], /) -> Quantity[{expression}[K, L], V, S]: ...",
             ],
             overrides=True,
         )
-    text += "    @override\n    def __rmul__[A, B](self: _StructuralQuantity[A, B, V, S], other: float, /) -> Quantity[K, V, S]: ...\n"
+    text += overloads(
+        structural_scaling("__rmul__", "Quantity[K, {}, S]"), overrides=True
+    )
     # The shared base necessarily uses the builtin marker. This refinement is
     # nominal, not a widening; each catalogue has its own structural base.
-    text += "    @override\n    def __rtruediv__[A, B](self: _StructuralQuantity[A, B, V, S], other: float, /) -> Quantity[Div[DimensionlessKind, K], V, S]: ...  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]\n"
+    text += overloads(
+        structural_scaling(
+            "__rtruediv__", "Quantity[Div[DimensionlessKind, K], {}, S]"
+        ),
+        overrides=True,
+    )
     text += "    @override\n    def __pow__[A, B, N: int](self: _StructuralQuantity[A, B, V, S], exponent: N, /) -> Quantity[Pow[K, N], V, S]: ...\n"
     for method in ("__neg__", "__abs__"):
         text += f"    @override\n    def {method}[A, B](self: _StructuralQuantity[A, B, V, S]) -> Quantity[K, V, S]: ...\n"
@@ -277,7 +345,7 @@ def quantity_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
     stub = (
         HEADER + OVERLAPS + QUANTITY_OVERRIDES + "# pyright: reportPrivateUsage=false\n"
     )
-    stub += "from typing import Any, Literal, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Constant, Unit, _Operand\n"
+    stub += "from typing import Any, Literal, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Constant, Unit, _Numerical, _Operand, _Scalar\n"
     stub += (
         "from quantype.core import Quantity\n"
         if package == "quantype"

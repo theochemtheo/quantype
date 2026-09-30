@@ -16,7 +16,7 @@ Trace failures from the consumer expression to the selected overload and its gen
 - Named result kinds for declared operations and structural `Quantity[Mul/Div/Pow[...], V, S]` results for unlisted ones, with `S` passed through unchanged.
 - Static rejection of mixed unit systems, including in functions generic over `[S: UnitSystem]`.
 - Nominal separation of kinds with equal dimensions.
-- Storage parameters: typed construction performs conversion; annotations are more than labels. Scalar/array operator overloads must preserve the existing storage contract.
+- Storage parameters: typed construction performs conversion; annotations are more than labels. Scalar/array operator overloads must preserve the existing storage contract: scaling (`scaling()` in `codegen/_render.py`) keeps storage for `_Scalar` operands, turns float storage into the operand's type for `_Numerical` arrays (anything with `__dlpack__`, which quantities lack), and keeps array storage. `__radd__` accepts `int` because `sum()` requires it; only zero works at runtime. `parse` is overloaded: a string gives float storage. A self-typed `cls` cannot type storage for a bare `Length.parse(...)` in pyright, so aliases do not select parse storage.
 - Static rejection of incompatible addition/conversion, invalid helper inputs and missing constructor units.
 
 Generic left-operand fallback can hide a custom right operand's `__rmul__`. `tests/typing/probes/extension_operators.py` documents this limitation and is not a passing conformance fixture. For a supported extension, use a combined generated catalogue instead of assuming subclass overloads alter the built-in API.

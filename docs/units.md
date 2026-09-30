@@ -163,7 +163,9 @@ The display unit is separate from storage. It decides what `.magnitude()`,
   wins), scaling, negation, `abs`, reductions, and indexing.
 - Point minus point gives the matching difference unit: `°C − °C → Δ°C`.
 - Products, ratios, and powers fall back to the system's unit for the result.
-- `.to(unit)` selects a display unit without changing the stored numbers.
+- `.to(unit)` selects a display unit without changing the stored numbers, and
+  `.unit` reports the unit in use (`None` for unnamed products).
+- Format specs apply to the magnitude: `f"{q:.3f}"` gives `2.000 nm`.
 - JAX transformations drop it: it is not part of the tree structure.
 
 ```python
@@ -229,6 +231,12 @@ Kinds are nominal: `Pressure`, `EnergyDensity`, and `EnergyPerVolume` remain
 distinct despite equal dimensions. `Force / Area` yields `Pressure`;
 `Energy / Volume` yields `EnergyDensity`. Incompatible operations are rejected
 both by the supported type checkers and at runtime.
+
+Equal dimensions never convert implicitly, but `Kind.reinterpret(q)` renames a
+quantity whose dimensions match, keeping its system and storage:
+`Pressure.reinterpret(energy / volume)` is a pressure, and
+`Length.reinterpret(expression)` names an unnamed product. Absolute and
+difference temperatures are points and vectors, so each refuses the other.
 
 Each declared product also names the divisions that undo it: because
 `Force * Length` is `Energy`, `Energy / Force` is `Length` and `Energy / Length`
@@ -314,8 +322,8 @@ assert 1 * u.nm == 10 * u.angstrom
 ```
 
 Equality compares values: it returns `bool` for scalar storage and element-wise
-results for arrays, as NumPy does. Quantities of different kinds are unequal;
-comparing across systems raises `TypeError`. Scalar quantities hash by value,
+results for arrays, as NumPy does. Quantities of different kinds or systems are
+unequal, as naive and aware datetimes are. Scalar quantities hash by value,
 consistently with `==`, so they work as dict keys and in sets; quantities with
 array storage are unhashable, like NumPy arrays. Ordering
 comparisons require the same kind and system, statically and at runtime, and
@@ -323,10 +331,16 @@ return backend booleans.
 
 Indexing, iteration, `.shape`, `.ndim`, `len()`, `.sum()`, `.mean()`, `.max()`,
 and `.min()` keep the kind, system, and display unit. `u.sqrt(Area)`,
-`u.sin(Angle)`, and `u.exp(Dimensionless)` keep the system. NumPy scalars
-multiply and divide from either side. Array shape algebra and arbitrary dtype
-promotion are outside the static contract. Use quantity reductions, not
-`np.sum(q)` or `np.mean(q)`.
+`u.sin(Angle)`, and `u.exp(Dimensionless)` keep the system. Any real number or
+numerical array multiplies and divides a quantity from either side, and the
+quantity keeps its dtype; a scalar quantity scaled by an array becomes an array.
+Array shape algebra and arbitrary dtype promotion are outside the static
+contract. Use quantity reductions, not `np.sum(q)` or `np.mean(q)`. Builtin
+`sum()` works too, because zero, alone among plain numbers, may be added to a
+quantity.
+
+`Dimensionless` values mix with plain numbers: `ratio + 1`, `ratio < 0.5`, and
+`float(ratio)` work, and they print without a unit symbol.
 
 ## Numerical range
 

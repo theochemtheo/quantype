@@ -15,7 +15,7 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype import units as _units
-from quantype.core import Constant, Quantity, Unit, _Operand
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AccelerationKind,
     ActionKind,
@@ -78,9 +78,23 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     def from_value[W](cls, value: W) -> Dimensionless[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Dimensionless[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Dimensionless[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._DimensionlessUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Dimensionless[V, T]: ...
     @overload
@@ -93,6 +107,18 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     @overload
     def __add__(self, other: Dimensionless[V, S], /) -> Dimensionless[V, S]: ...
     @overload
+    def __add__(self, other: _Scalar, /) -> Dimensionless[V, S]: ...
+    @overload
+    def __add__(
+        self: Dimensionless[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Dimensionless[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __add__[W: _Numerical](
+        self: Dimensionless[float, S], other: W, /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __add__(self, other: _Numerical, /) -> Dimensionless[V, S]: ...
+    @overload
     @override
     def __sub__[W](
         self: Dimensionless[float, S], other: Dimensionless[W, S], /
@@ -101,6 +127,44 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     def __sub__(self, other: Dimensionless[float, S], /) -> Dimensionless[V, S]: ...
     @overload
     def __sub__(self, other: Dimensionless[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __sub__(self, other: _Scalar, /) -> Dimensionless[V, S]: ...
+    @overload
+    def __sub__(
+        self: Dimensionless[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Dimensionless[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __sub__[W: _Numerical](
+        self: Dimensionless[float, S], other: W, /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __sub__(self, other: _Numerical, /) -> Dimensionless[V, S]: ...
+    @overload
+    @override
+    def __radd__(self, other: _Scalar, /) -> Dimensionless[V, S]: ...
+    @overload
+    def __radd__(
+        self: Dimensionless[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Dimensionless[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __radd__[W: _Numerical](
+        self: Dimensionless[float, S], other: W, /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __radd__(self, other: _Numerical, /) -> Dimensionless[V, S]: ...
+    @overload
+    @override
+    def __rsub__(self, other: _Scalar, /) -> Dimensionless[V, S]: ...
+    @overload
+    def __rsub__(
+        self: Dimensionless[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Dimensionless[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rsub__[W: _Numerical](
+        self: Dimensionless[float, S], other: W, /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __rsub__(self, other: _Numerical, /) -> Dimensionless[V, S]: ...
     @override
     def __neg__(self) -> Dimensionless[V, S]: ...
     @override
@@ -397,7 +461,17 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     @overload
     def __mul__(self, other: Action[V, S], /) -> Action[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Dimensionless[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Dimensionless[V, S]: ...
+    @overload
+    def __mul__(
+        self: Dimensionless[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Dimensionless[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: Dimensionless[float, S], other: W, /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Dimensionless[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Dimensionless[float, S], other: Quantity[K, W, S], /
@@ -444,7 +518,17 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     @overload
     def __truediv__(self, other: InverseTime[V, S], /) -> Time[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Dimensionless[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Dimensionless[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Dimensionless[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Dimensionless[float, S], other: W, /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Dimensionless[float, S], other: Quantity[K, W, S], /
@@ -457,10 +541,77 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[DimensionlessKind, K], V, S]: ...
+    def __float__(self) -> float: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Dimensionless[V, S]: ...
+    def __lt__(
+        self: Dimensionless[float, S],
+        other: Quantity[DimensionlessKind, float, S] | _Scalar,
+        /,
+    ) -> bool: ...
+    @overload
+    def __lt__(
+        self, other: Quantity[DimensionlessKind, Any, S] | _Scalar | _Numerical, /
+    ) -> Any: ...
+    @overload
     @override
-    def __rtruediv__(self, other: float, /) -> Dimensionless[V, S]: ...  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]
+    def __le__(
+        self: Dimensionless[float, S],
+        other: Quantity[DimensionlessKind, float, S] | _Scalar,
+        /,
+    ) -> bool: ...
+    @overload
+    def __le__(
+        self, other: Quantity[DimensionlessKind, Any, S] | _Scalar | _Numerical, /
+    ) -> Any: ...
+    @overload
+    @override
+    def __gt__(
+        self: Dimensionless[float, S],
+        other: Quantity[DimensionlessKind, float, S] | _Scalar,
+        /,
+    ) -> bool: ...
+    @overload
+    def __gt__(
+        self, other: Quantity[DimensionlessKind, Any, S] | _Scalar | _Numerical, /
+    ) -> Any: ...
+    @overload
+    @override
+    def __ge__(
+        self: Dimensionless[float, S],
+        other: Quantity[DimensionlessKind, float, S] | _Scalar,
+        /,
+    ) -> bool: ...
+    @overload
+    def __ge__(
+        self, other: Quantity[DimensionlessKind, Any, S] | _Scalar | _Numerical, /
+    ) -> Any: ...
+    @overload
+    @override
+    def __rmul__(self, other: _Scalar, /) -> Dimensionless[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Dimensionless[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Dimensionless[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Dimensionless[float, S], other: W, /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Dimensionless[V, S]: ...
+    @overload
+    @override
+    def __rtruediv__(self, other: _Scalar, /) -> Dimensionless[V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Dimensionless[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Dimensionless[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Dimensionless[float, S], other: W, /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __rtruediv__(self, other: _Numerical, /) -> Dimensionless[V, S]: ...
     @override
     def __pow__[N: int](
         self, exponent: N, /
@@ -483,9 +634,23 @@ class Length(Quantity[LengthKind, V, S]):
     def from_value[W](cls, value: W) -> Length[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Length[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Length[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Length[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._LengthUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Length[V, T]: ...
     @overload
@@ -502,6 +667,10 @@ class Length(Quantity[LengthKind, V, S]):
     def __sub__(self, other: Length[float, S], /) -> Length[V, S]: ...
     @overload
     def __sub__(self, other: Length[V, S], /) -> Length[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Length[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Length[V, S]: ...
     @override
     def __neg__(self) -> Length[V, S]: ...
     @override
@@ -562,7 +731,15 @@ class Length(Quantity[LengthKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Length[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Length[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Length[V, S]: ...
+    @overload
+    def __mul__(
+        self: Length[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Length[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Length[float, S], other: W, /) -> Length[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Length[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Length[float, S], other: Quantity[K, W, S], /
@@ -609,7 +786,17 @@ class Length(Quantity[LengthKind, V, S]):
     @overload
     def __truediv__(self, other: Time[V, S], /) -> Velocity[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Length[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Length[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Length[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Length[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Length[float, S], other: W, /
+    ) -> Length[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Length[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Length[float, S], other: Quantity[K, W, S], /
@@ -622,11 +809,35 @@ class Length(Quantity[LengthKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[LengthKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Length[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Length[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Length[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Length[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Length[float, S], other: W, /
+    ) -> Length[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Length[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, LengthKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Length[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, LengthKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Length[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, LengthKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, LengthKind], V, S]: ...
     @overload
     @override
@@ -653,9 +864,23 @@ class Area(Quantity[AreaKind, V, S]):
     def from_value[W](cls, value: W) -> Area[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Area[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Area[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Area[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._AreaUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Area[V, T]: ...
     @overload
@@ -672,6 +897,10 @@ class Area(Quantity[AreaKind, V, S]):
     def __sub__(self, other: Area[float, S], /) -> Area[V, S]: ...
     @overload
     def __sub__(self, other: Area[V, S], /) -> Area[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Area[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Area[V, S]: ...
     @override
     def __neg__(self) -> Area[V, S]: ...
     @override
@@ -704,7 +933,15 @@ class Area(Quantity[AreaKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Area[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Area[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Area[V, S]: ...
+    @overload
+    def __mul__(
+        self: Area[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Area[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Area[float, S], other: W, /) -> Area[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Area[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Area[float, S], other: Quantity[K, W, S], /
@@ -743,7 +980,15 @@ class Area(Quantity[AreaKind, V, S]):
     @overload
     def __truediv__(self, other: Length[V, S], /) -> Length[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Area[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Area[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Area[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Area[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](self: Area[float, S], other: W, /) -> Area[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Area[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Area[float, S], other: Quantity[K, W, S], /
@@ -756,11 +1001,33 @@ class Area(Quantity[AreaKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[AreaKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Area[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Area[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Area[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Area[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](self: Area[float, S], other: W, /) -> Area[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Area[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, AreaKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Area[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, AreaKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Area[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, AreaKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, AreaKind], V, S]: ...
     @override
     def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[AreaKind, N], V, S]: ...
@@ -782,9 +1049,23 @@ class Volume(Quantity[VolumeKind, V, S]):
     def from_value[W](cls, value: W) -> Volume[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Volume[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Volume[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Volume[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._VolumeUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Volume[V, T]: ...
     @overload
@@ -801,6 +1082,10 @@ class Volume(Quantity[VolumeKind, V, S]):
     def __sub__(self, other: Volume[float, S], /) -> Volume[V, S]: ...
     @overload
     def __sub__(self, other: Volume[V, S], /) -> Volume[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Volume[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Volume[V, S]: ...
     @override
     def __neg__(self) -> Volume[V, S]: ...
     @override
@@ -859,7 +1144,15 @@ class Volume(Quantity[VolumeKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Volume[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Volume[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Volume[V, S]: ...
+    @overload
+    def __mul__(
+        self: Volume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Volume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Volume[float, S], other: W, /) -> Volume[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Volume[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Volume[float, S], other: Quantity[K, W, S], /
@@ -906,7 +1199,17 @@ class Volume(Quantity[VolumeKind, V, S]):
     @overload
     def __truediv__(self, other: Length[V, S], /) -> Area[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Volume[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Volume[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Volume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Volume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Volume[float, S], other: W, /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Volume[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Volume[float, S], other: Quantity[K, W, S], /
@@ -919,11 +1222,35 @@ class Volume(Quantity[VolumeKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[VolumeKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Volume[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Volume[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Volume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Volume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Volume[float, S], other: W, /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Volume[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, VolumeKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Volume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, VolumeKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Volume[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, VolumeKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, VolumeKind], V, S]: ...
     @override
     def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[VolumeKind, N], V, S]: ...
@@ -945,9 +1272,23 @@ class Time(Quantity[TimeKind, V, S]):
     def from_value[W](cls, value: W) -> Time[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Time[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Time[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Time[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._TimeUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Time[V, T]: ...
     @overload
@@ -964,6 +1305,10 @@ class Time(Quantity[TimeKind, V, S]):
     def __sub__(self, other: Time[float, S], /) -> Time[V, S]: ...
     @overload
     def __sub__(self, other: Time[V, S], /) -> Time[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Time[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Time[V, S]: ...
     @override
     def __neg__(self) -> Time[V, S]: ...
     @override
@@ -1036,7 +1381,15 @@ class Time(Quantity[TimeKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Time[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Time[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Time[V, S]: ...
+    @overload
+    def __mul__(
+        self: Time[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Time[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Time[float, S], other: W, /) -> Time[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Time[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Time[float, S], other: Quantity[K, W, S], /
@@ -1067,7 +1420,15 @@ class Time(Quantity[TimeKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Time[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Time[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Time[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Time[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Time[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](self: Time[float, S], other: W, /) -> Time[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Time[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Time[float, S], other: Quantity[K, W, S], /
@@ -1080,10 +1441,30 @@ class Time(Quantity[TimeKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[TimeKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Time[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Time[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Time[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Time[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](self: Time[float, S], other: W, /) -> Time[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Time[V, S]: ...
+    @overload
     @override
-    def __rtruediv__(self, other: float, /) -> InverseTime[V, S]: ...  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]
+    def __rtruediv__(self, other: _Scalar, /) -> InverseTime[V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Time[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Time[float, S], other: W, /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __rtruediv__(self, other: _Numerical, /) -> InverseTime[V, S]: ...
     @override
     def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[TimeKind, N], V, S]: ...
 
@@ -1104,9 +1485,23 @@ class Velocity(Quantity[VelocityKind, V, S]):
     def from_value[W](cls, value: W) -> Velocity[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Velocity[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Velocity[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Velocity[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._VelocityUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Velocity[V, T]: ...
     @overload
@@ -1127,6 +1522,10 @@ class Velocity(Quantity[VelocityKind, V, S]):
     def __sub__(self, other: Velocity[float, S], /) -> Velocity[V, S]: ...
     @overload
     def __sub__(self, other: Velocity[V, S], /) -> Velocity[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Velocity[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Velocity[V, S]: ...
     @override
     def __neg__(self) -> Velocity[V, S]: ...
     @override
@@ -1167,7 +1566,17 @@ class Velocity(Quantity[VelocityKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Velocity[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Velocity[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Velocity[V, S]: ...
+    @overload
+    def __mul__(
+        self: Velocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Velocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: Velocity[float, S], other: W, /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Velocity[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Velocity[float, S], other: Quantity[K, W, S], /
@@ -1214,7 +1623,17 @@ class Velocity(Quantity[VelocityKind, V, S]):
     @overload
     def __truediv__(self, other: Time[V, S], /) -> Acceleration[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Velocity[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Velocity[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Velocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Velocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Velocity[float, S], other: W, /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Velocity[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Velocity[float, S], other: Quantity[K, W, S], /
@@ -1227,11 +1646,35 @@ class Velocity(Quantity[VelocityKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[VelocityKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Velocity[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Velocity[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Velocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Velocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Velocity[float, S], other: W, /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Velocity[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, VelocityKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Velocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, VelocityKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Velocity[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, VelocityKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, VelocityKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -1255,9 +1698,23 @@ class Energy(Quantity[EnergyKind, V, S]):
     def from_value[W](cls, value: W) -> Energy[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Energy[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Energy[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Energy[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._EnergyUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Energy[V, T]: ...
     @overload
@@ -1274,6 +1731,10 @@ class Energy(Quantity[EnergyKind, V, S]):
     def __sub__(self, other: Energy[float, S], /) -> Energy[V, S]: ...
     @overload
     def __sub__(self, other: Energy[V, S], /) -> Energy[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Energy[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Energy[V, S]: ...
     @override
     def __neg__(self) -> Energy[V, S]: ...
     @override
@@ -1298,7 +1759,15 @@ class Energy(Quantity[EnergyKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Energy[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Energy[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(
+        self: Energy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Energy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Energy[float, S], other: W, /) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Energy[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Energy[float, S], other: Quantity[K, W, S], /
@@ -1483,7 +1952,17 @@ class Energy(Quantity[EnergyKind, V, S]):
     @overload
     def __truediv__(self, other: InverseTime[V, S], /) -> Action[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Energy[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Energy[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Energy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Energy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Energy[float, S], other: W, /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Energy[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Energy[float, S], other: Quantity[K, W, S], /
@@ -1496,11 +1975,35 @@ class Energy(Quantity[EnergyKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[EnergyKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Energy[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Energy[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Energy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Energy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Energy[float, S], other: W, /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Energy[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, EnergyKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Energy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, EnergyKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Energy[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, EnergyKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, EnergyKind], V, S]: ...
     @override
     def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[EnergyKind, N], V, S]: ...
@@ -1522,9 +2025,23 @@ class EnergyPerAtom(Quantity[EnergyPerAtomKind, V, S]):
     def from_value[W](cls, value: W) -> EnergyPerAtom[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> EnergyPerAtom[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> EnergyPerAtom[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._EnergyPerAtomUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> EnergyPerAtom[V, T]: ...
     @overload
@@ -1545,6 +2062,10 @@ class EnergyPerAtom(Quantity[EnergyPerAtomKind, V, S]):
     def __sub__(self, other: EnergyPerAtom[float, S], /) -> EnergyPerAtom[V, S]: ...
     @overload
     def __sub__(self, other: EnergyPerAtom[V, S], /) -> EnergyPerAtom[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> EnergyPerAtom[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> EnergyPerAtom[V, S]: ...
     @override
     def __neg__(self) -> EnergyPerAtom[V, S]: ...
     @override
@@ -1571,7 +2092,17 @@ class EnergyPerAtom(Quantity[EnergyPerAtomKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> EnergyPerAtom[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> EnergyPerAtom[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __mul__(
+        self: EnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: EnergyPerAtom[float, S], other: W, /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> EnergyPerAtom[V, S]: ...
     @overload
     def __mul__[K, W](
         self: EnergyPerAtom[float, S], other: Quantity[K, W, S], /
@@ -1602,7 +2133,17 @@ class EnergyPerAtom(Quantity[EnergyPerAtomKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> EnergyPerAtom[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> EnergyPerAtom[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __truediv__(
+        self: EnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: EnergyPerAtom[float, S], other: W, /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> EnergyPerAtom[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: EnergyPerAtom[float, S], other: Quantity[K, W, S], /
@@ -1615,11 +2156,37 @@ class EnergyPerAtom(Quantity[EnergyPerAtomKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[EnergyPerAtomKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> EnergyPerAtom[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __rmul__(
+        self: EnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: EnergyPerAtom[float, S], other: W, /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> EnergyPerAtom[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, EnergyPerAtomKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: EnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, EnergyPerAtomKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: EnergyPerAtom[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, EnergyPerAtomKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, EnergyPerAtomKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -1643,9 +2210,23 @@ class Force(Quantity[ForceKind, V, S]):
     def from_value[W](cls, value: W) -> Force[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Force[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Force[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Force[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._ForceUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Force[V, T]: ...
     @overload
@@ -1662,6 +2243,10 @@ class Force(Quantity[ForceKind, V, S]):
     def __sub__(self, other: Force[float, S], /) -> Force[V, S]: ...
     @overload
     def __sub__(self, other: Force[V, S], /) -> Force[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Force[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Force[V, S]: ...
     @override
     def __neg__(self) -> Force[V, S]: ...
     @override
@@ -1692,7 +2277,15 @@ class Force(Quantity[ForceKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Force[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Force[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Force[V, S]: ...
+    @overload
+    def __mul__(
+        self: Force[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Force[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Force[float, S], other: W, /) -> Force[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Force[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Force[float, S], other: Quantity[K, W, S], /
@@ -1779,7 +2372,17 @@ class Force(Quantity[ForceKind, V, S]):
     @overload
     def __truediv__(self, other: ElectricField[V, S], /) -> Charge[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Force[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Force[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Force[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Force[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Force[float, S], other: W, /
+    ) -> Force[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Force[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Force[float, S], other: Quantity[K, W, S], /
@@ -1792,11 +2395,33 @@ class Force(Quantity[ForceKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ForceKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Force[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Force[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Force[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Force[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](self: Force[float, S], other: W, /) -> Force[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Force[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, ForceKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Force[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, ForceKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Force[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, ForceKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, ForceKind], V, S]: ...
     @override
     def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[ForceKind, N], V, S]: ...
@@ -1818,9 +2443,23 @@ class ForceConstant(Quantity[ForceConstantKind, V, S]):
     def from_value[W](cls, value: W) -> ForceConstant[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> ForceConstant[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> ForceConstant[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._ForceConstantUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> ForceConstant[V, T]: ...
     @overload
@@ -1841,6 +2480,10 @@ class ForceConstant(Quantity[ForceConstantKind, V, S]):
     def __sub__(self, other: ForceConstant[float, S], /) -> ForceConstant[V, S]: ...
     @overload
     def __sub__(self, other: ForceConstant[V, S], /) -> ForceConstant[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> ForceConstant[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> ForceConstant[V, S]: ...
     @override
     def __neg__(self) -> ForceConstant[V, S]: ...
     @override
@@ -1875,7 +2518,17 @@ class ForceConstant(Quantity[ForceConstantKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> ForceConstant[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> ForceConstant[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> ForceConstant[V, S]: ...
+    @overload
+    def __mul__(
+        self: ForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: ForceConstant[float, S], other: W, /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> ForceConstant[V, S]: ...
     @overload
     def __mul__[K, W](
         self: ForceConstant[float, S], other: Quantity[K, W, S], /
@@ -1906,7 +2559,17 @@ class ForceConstant(Quantity[ForceConstantKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> ForceConstant[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> ForceConstant[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> ForceConstant[V, S]: ...
+    @overload
+    def __truediv__(
+        self: ForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: ForceConstant[float, S], other: W, /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> ForceConstant[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: ForceConstant[float, S], other: Quantity[K, W, S], /
@@ -1919,11 +2582,37 @@ class ForceConstant(Quantity[ForceConstantKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ForceConstantKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> ForceConstant[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> ForceConstant[V, S]: ...
+    @overload
+    def __rmul__(
+        self: ForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: ForceConstant[float, S], other: W, /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> ForceConstant[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, ForceConstantKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: ForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, ForceConstantKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: ForceConstant[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, ForceConstantKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, ForceConstantKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -1947,9 +2636,23 @@ class Pressure(Quantity[PressureKind, V, S]):
     def from_value[W](cls, value: W) -> Pressure[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Pressure[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Pressure[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Pressure[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._PressureUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Pressure[V, T]: ...
     @overload
@@ -1970,6 +2673,10 @@ class Pressure(Quantity[PressureKind, V, S]):
     def __sub__(self, other: Pressure[float, S], /) -> Pressure[V, S]: ...
     @overload
     def __sub__(self, other: Pressure[V, S], /) -> Pressure[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Pressure[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Pressure[V, S]: ...
     @override
     def __neg__(self) -> Pressure[V, S]: ...
     @override
@@ -1996,7 +2703,17 @@ class Pressure(Quantity[PressureKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Pressure[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Pressure[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Pressure[V, S]: ...
+    @overload
+    def __mul__(
+        self: Pressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Pressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: Pressure[float, S], other: W, /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Pressure[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Pressure[float, S], other: Quantity[K, W, S], /
@@ -2027,7 +2744,17 @@ class Pressure(Quantity[PressureKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Pressure[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Pressure[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Pressure[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Pressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Pressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Pressure[float, S], other: W, /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Pressure[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Pressure[float, S], other: Quantity[K, W, S], /
@@ -2040,11 +2767,35 @@ class Pressure(Quantity[PressureKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[PressureKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Pressure[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Pressure[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Pressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Pressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Pressure[float, S], other: W, /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Pressure[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, PressureKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Pressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, PressureKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Pressure[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, PressureKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, PressureKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -2068,9 +2819,23 @@ class EnergyDensity(Quantity[EnergyDensityKind, V, S]):
     def from_value[W](cls, value: W) -> EnergyDensity[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> EnergyDensity[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> EnergyDensity[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._EnergyDensityUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> EnergyDensity[V, T]: ...
     @overload
@@ -2092,6 +2857,10 @@ class EnergyDensity(Quantity[EnergyDensityKind, V, S]):
     @overload
     def __sub__(self, other: EnergyDensity[V, S], /) -> EnergyDensity[V, S]: ...
     @override
+    def __radd__(self, other: int, /) -> EnergyDensity[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> EnergyDensity[V, S]: ...
+    @override
     def __neg__(self) -> EnergyDensity[V, S]: ...
     @override
     def __abs__(self) -> EnergyDensity[V, S]: ...
@@ -2109,7 +2878,17 @@ class EnergyDensity(Quantity[EnergyDensityKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> EnergyDensity[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> EnergyDensity[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> EnergyDensity[V, S]: ...
+    @overload
+    def __mul__(
+        self: EnergyDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: EnergyDensity[float, S], other: W, /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> EnergyDensity[V, S]: ...
     @overload
     def __mul__[K, W](
         self: EnergyDensity[float, S], other: Quantity[K, W, S], /
@@ -2140,7 +2919,17 @@ class EnergyDensity(Quantity[EnergyDensityKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> EnergyDensity[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> EnergyDensity[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> EnergyDensity[V, S]: ...
+    @overload
+    def __truediv__(
+        self: EnergyDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: EnergyDensity[float, S], other: W, /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> EnergyDensity[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: EnergyDensity[float, S], other: Quantity[K, W, S], /
@@ -2153,11 +2942,37 @@ class EnergyDensity(Quantity[EnergyDensityKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[EnergyDensityKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> EnergyDensity[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> EnergyDensity[V, S]: ...
+    @overload
+    def __rmul__(
+        self: EnergyDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: EnergyDensity[float, S], other: W, /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> EnergyDensity[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, EnergyDensityKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: EnergyDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, EnergyDensityKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: EnergyDensity[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, EnergyDensityKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, EnergyDensityKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -2181,9 +2996,23 @@ class EnergyPerVolume(Quantity[EnergyPerVolumeKind, V, S]):
     def from_value[W](cls, value: W) -> EnergyPerVolume[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> EnergyPerVolume[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> EnergyPerVolume[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._EnergyPerVolumeUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> EnergyPerVolume[V, T]: ...
     @overload
@@ -2205,6 +3034,10 @@ class EnergyPerVolume(Quantity[EnergyPerVolumeKind, V, S]):
     @overload
     def __sub__(self, other: EnergyPerVolume[V, S], /) -> EnergyPerVolume[V, S]: ...
     @override
+    def __radd__(self, other: int, /) -> EnergyPerVolume[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> EnergyPerVolume[V, S]: ...
+    @override
     def __neg__(self) -> EnergyPerVolume[V, S]: ...
     @override
     def __abs__(self) -> EnergyPerVolume[V, S]: ...
@@ -2222,7 +3055,17 @@ class EnergyPerVolume(Quantity[EnergyPerVolumeKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> EnergyPerVolume[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> EnergyPerVolume[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> EnergyPerVolume[V, S]: ...
+    @overload
+    def __mul__(
+        self: EnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: EnergyPerVolume[float, S], other: W, /
+    ) -> EnergyPerVolume[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> EnergyPerVolume[V, S]: ...
     @overload
     def __mul__[K, W](
         self: EnergyPerVolume[float, S], other: Quantity[K, W, S], /
@@ -2257,7 +3100,17 @@ class EnergyPerVolume(Quantity[EnergyPerVolumeKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> EnergyPerVolume[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> EnergyPerVolume[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> EnergyPerVolume[V, S]: ...
+    @overload
+    def __truediv__(
+        self: EnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: EnergyPerVolume[float, S], other: W, /
+    ) -> EnergyPerVolume[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> EnergyPerVolume[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: EnergyPerVolume[float, S], other: Quantity[K, W, S], /
@@ -2270,11 +3123,37 @@ class EnergyPerVolume(Quantity[EnergyPerVolumeKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[EnergyPerVolumeKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> EnergyPerVolume[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> EnergyPerVolume[V, S]: ...
+    @overload
+    def __rmul__(
+        self: EnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: EnergyPerVolume[float, S], other: W, /
+    ) -> EnergyPerVolume[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> EnergyPerVolume[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, EnergyPerVolumeKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: EnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, EnergyPerVolumeKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: EnergyPerVolume[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, EnergyPerVolumeKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, EnergyPerVolumeKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -2298,9 +3177,23 @@ class Temperature(Quantity[TemperatureKind, V, S]):
     def from_value[W](cls, value: W) -> Temperature[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Temperature[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Temperature[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Temperature[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._TemperatureUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Temperature[V, T]: ...
     @overload
@@ -2357,7 +3250,17 @@ class Temperature(Quantity[TemperatureKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Temperature[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Temperature[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Temperature[V, S]: ...
+    @overload
+    def __mul__(
+        self: Temperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Temperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: Temperature[float, S], other: W, /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Temperature[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Temperature[float, S], other: Quantity[K, W, S], /
@@ -2388,7 +3291,17 @@ class Temperature(Quantity[TemperatureKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Temperature[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Temperature[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Temperature[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Temperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Temperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Temperature[float, S], other: W, /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Temperature[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Temperature[float, S], other: Quantity[K, W, S], /
@@ -2401,11 +3314,37 @@ class Temperature(Quantity[TemperatureKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[TemperatureKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Temperature[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Temperature[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Temperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Temperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Temperature[float, S], other: W, /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Temperature[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, TemperatureKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Temperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, TemperatureKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Temperature[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, TemperatureKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, TemperatureKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -2429,9 +3368,23 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
     def from_value[W](cls, value: W) -> TemperatureDifference[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> TemperatureDifference[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> TemperatureDifference[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._TemperatureDifferenceUnit: ...
     @override
     def to_system[T: UnitSystem](
         self, system: type[T]
@@ -2471,6 +3424,10 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
         self, other: TemperatureDifference[V, S], /
     ) -> TemperatureDifference[V, S]: ...
     @override
+    def __radd__(self, other: int, /) -> TemperatureDifference[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> TemperatureDifference[V, S]: ...
+    @override
     def __neg__(self) -> TemperatureDifference[V, S]: ...
     @override
     def __abs__(self) -> TemperatureDifference[V, S]: ...
@@ -2498,7 +3455,17 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> TemperatureDifference[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> TemperatureDifference[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> TemperatureDifference[V, S]: ...
+    @overload
+    def __mul__(
+        self: TemperatureDifference[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: TemperatureDifference[float, S], other: W, /
+    ) -> TemperatureDifference[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> TemperatureDifference[V, S]: ...
     @overload
     def __mul__[K, W](
         self: TemperatureDifference[float, S], other: Quantity[K, W, S], /
@@ -2553,7 +3520,17 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
     @overload
     def __truediv__(self, other: TemperatureRate[V, S], /) -> Time[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> TemperatureDifference[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> TemperatureDifference[V, S]: ...
+    @overload
+    def __truediv__(
+        self: TemperatureDifference[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: TemperatureDifference[float, S], other: W, /
+    ) -> TemperatureDifference[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> TemperatureDifference[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: TemperatureDifference[float, S], other: Quantity[K, W, S], /
@@ -2566,11 +3543,37 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[TemperatureDifferenceKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> TemperatureDifference[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> TemperatureDifference[V, S]: ...
+    @overload
+    def __rmul__(
+        self: TemperatureDifference[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: TemperatureDifference[float, S], other: W, /
+    ) -> TemperatureDifference[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> TemperatureDifference[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, TemperatureDifferenceKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: TemperatureDifference[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, TemperatureDifferenceKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: TemperatureDifference[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, TemperatureDifferenceKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, TemperatureDifferenceKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -2594,9 +3597,23 @@ class TemperatureRate(Quantity[TemperatureRateKind, V, S]):
     def from_value[W](cls, value: W) -> TemperatureRate[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> TemperatureRate[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> TemperatureRate[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._TemperatureRateUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> TemperatureRate[V, T]: ...
     @overload
@@ -2617,6 +3634,10 @@ class TemperatureRate(Quantity[TemperatureRateKind, V, S]):
     def __sub__(self, other: TemperatureRate[float, S], /) -> TemperatureRate[V, S]: ...
     @overload
     def __sub__(self, other: TemperatureRate[V, S], /) -> TemperatureRate[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> TemperatureRate[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> TemperatureRate[V, S]: ...
     @override
     def __neg__(self) -> TemperatureRate[V, S]: ...
     @override
@@ -2643,7 +3664,17 @@ class TemperatureRate(Quantity[TemperatureRateKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> TemperatureRate[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> TemperatureRate[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> TemperatureRate[V, S]: ...
+    @overload
+    def __mul__(
+        self: TemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: TemperatureRate[float, S], other: W, /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> TemperatureRate[V, S]: ...
     @overload
     def __mul__[K, W](
         self: TemperatureRate[float, S], other: Quantity[K, W, S], /
@@ -2678,7 +3709,17 @@ class TemperatureRate(Quantity[TemperatureRateKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> TemperatureRate[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> TemperatureRate[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> TemperatureRate[V, S]: ...
+    @overload
+    def __truediv__(
+        self: TemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: TemperatureRate[float, S], other: W, /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> TemperatureRate[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: TemperatureRate[float, S], other: Quantity[K, W, S], /
@@ -2691,11 +3732,37 @@ class TemperatureRate(Quantity[TemperatureRateKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[TemperatureRateKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> TemperatureRate[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> TemperatureRate[V, S]: ...
+    @overload
+    def __rmul__(
+        self: TemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: TemperatureRate[float, S], other: W, /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> TemperatureRate[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, TemperatureRateKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: TemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, TemperatureRateKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: TemperatureRate[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, TemperatureRateKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, TemperatureRateKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -2719,9 +3786,23 @@ class MagneticMoment(Quantity[MagneticMomentKind, V, S]):
     def from_value[W](cls, value: W) -> MagneticMoment[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> MagneticMoment[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> MagneticMoment[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._MagneticMomentUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> MagneticMoment[V, T]: ...
     @overload
@@ -2743,6 +3824,10 @@ class MagneticMoment(Quantity[MagneticMomentKind, V, S]):
     @overload
     def __sub__(self, other: MagneticMoment[V, S], /) -> MagneticMoment[V, S]: ...
     @override
+    def __radd__(self, other: int, /) -> MagneticMoment[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> MagneticMoment[V, S]: ...
+    @override
     def __neg__(self) -> MagneticMoment[V, S]: ...
     @override
     def __abs__(self) -> MagneticMoment[V, S]: ...
@@ -2760,7 +3845,17 @@ class MagneticMoment(Quantity[MagneticMomentKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> MagneticMoment[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> MagneticMoment[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> MagneticMoment[V, S]: ...
+    @overload
+    def __mul__(
+        self: MagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: MagneticMoment[float, S], other: W, /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> MagneticMoment[V, S]: ...
     @overload
     def __mul__[K, W](
         self: MagneticMoment[float, S], other: Quantity[K, W, S], /
@@ -2811,7 +3906,17 @@ class MagneticMoment(Quantity[MagneticMomentKind, V, S]):
     @overload
     def __truediv__(self, other: Magnetization[V, S], /) -> Volume[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> MagneticMoment[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> MagneticMoment[V, S]: ...
+    @overload
+    def __truediv__(
+        self: MagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: MagneticMoment[float, S], other: W, /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> MagneticMoment[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: MagneticMoment[float, S], other: Quantity[K, W, S], /
@@ -2824,11 +3929,37 @@ class MagneticMoment(Quantity[MagneticMomentKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[MagneticMomentKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> MagneticMoment[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> MagneticMoment[V, S]: ...
+    @overload
+    def __rmul__(
+        self: MagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: MagneticMoment[float, S], other: W, /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> MagneticMoment[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, MagneticMomentKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: MagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, MagneticMomentKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: MagneticMoment[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, MagneticMomentKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, MagneticMomentKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -2852,9 +3983,23 @@ class Magnetization(Quantity[MagnetizationKind, V, S]):
     def from_value[W](cls, value: W) -> Magnetization[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Magnetization[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Magnetization[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Magnetization[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._MagnetizationUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Magnetization[V, T]: ...
     @overload
@@ -2875,6 +4020,10 @@ class Magnetization(Quantity[MagnetizationKind, V, S]):
     def __sub__(self, other: Magnetization[float, S], /) -> Magnetization[V, S]: ...
     @overload
     def __sub__(self, other: Magnetization[V, S], /) -> Magnetization[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Magnetization[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Magnetization[V, S]: ...
     @override
     def __neg__(self) -> Magnetization[V, S]: ...
     @override
@@ -2901,7 +4050,17 @@ class Magnetization(Quantity[MagnetizationKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Magnetization[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Magnetization[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Magnetization[V, S]: ...
+    @overload
+    def __mul__(
+        self: Magnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Magnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: Magnetization[float, S], other: W, /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Magnetization[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Magnetization[float, S], other: Quantity[K, W, S], /
@@ -2932,7 +4091,17 @@ class Magnetization(Quantity[MagnetizationKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Magnetization[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Magnetization[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Magnetization[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Magnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Magnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Magnetization[float, S], other: W, /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Magnetization[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Magnetization[float, S], other: Quantity[K, W, S], /
@@ -2945,11 +4114,37 @@ class Magnetization(Quantity[MagnetizationKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[MagnetizationKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Magnetization[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Magnetization[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Magnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Magnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Magnetization[float, S], other: W, /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Magnetization[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, MagnetizationKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Magnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, MagnetizationKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Magnetization[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, MagnetizationKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, MagnetizationKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -2973,9 +4168,23 @@ class ParticleDensity(Quantity[ParticleDensityKind, V, S]):
     def from_value[W](cls, value: W) -> ParticleDensity[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> ParticleDensity[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> ParticleDensity[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._ParticleDensityUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> ParticleDensity[V, T]: ...
     @overload
@@ -2996,6 +4205,10 @@ class ParticleDensity(Quantity[ParticleDensityKind, V, S]):
     def __sub__(self, other: ParticleDensity[float, S], /) -> ParticleDensity[V, S]: ...
     @overload
     def __sub__(self, other: ParticleDensity[V, S], /) -> ParticleDensity[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> ParticleDensity[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> ParticleDensity[V, S]: ...
     @override
     def __neg__(self) -> ParticleDensity[V, S]: ...
     @override
@@ -3022,7 +4235,17 @@ class ParticleDensity(Quantity[ParticleDensityKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> ParticleDensity[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> ParticleDensity[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> ParticleDensity[V, S]: ...
+    @overload
+    def __mul__(
+        self: ParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: ParticleDensity[float, S], other: W, /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> ParticleDensity[V, S]: ...
     @overload
     def __mul__[K, W](
         self: ParticleDensity[float, S], other: Quantity[K, W, S], /
@@ -3057,7 +4280,17 @@ class ParticleDensity(Quantity[ParticleDensityKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> ParticleDensity[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> ParticleDensity[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> ParticleDensity[V, S]: ...
+    @overload
+    def __truediv__(
+        self: ParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: ParticleDensity[float, S], other: W, /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> ParticleDensity[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: ParticleDensity[float, S], other: Quantity[K, W, S], /
@@ -3070,11 +4303,37 @@ class ParticleDensity(Quantity[ParticleDensityKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ParticleDensityKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> ParticleDensity[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> ParticleDensity[V, S]: ...
+    @overload
+    def __rmul__(
+        self: ParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: ParticleDensity[float, S], other: W, /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> ParticleDensity[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, ParticleDensityKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: ParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, ParticleDensityKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: ParticleDensity[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, ParticleDensityKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, ParticleDensityKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -3098,9 +4357,23 @@ class ElectronDensity(Quantity[ElectronDensityKind, V, S]):
     def from_value[W](cls, value: W) -> ElectronDensity[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> ElectronDensity[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> ElectronDensity[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._ElectronDensityUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> ElectronDensity[V, T]: ...
     @overload
@@ -3121,6 +4394,10 @@ class ElectronDensity(Quantity[ElectronDensityKind, V, S]):
     def __sub__(self, other: ElectronDensity[float, S], /) -> ElectronDensity[V, S]: ...
     @overload
     def __sub__(self, other: ElectronDensity[V, S], /) -> ElectronDensity[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> ElectronDensity[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> ElectronDensity[V, S]: ...
     @override
     def __neg__(self) -> ElectronDensity[V, S]: ...
     @override
@@ -3147,7 +4424,17 @@ class ElectronDensity(Quantity[ElectronDensityKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> ElectronDensity[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> ElectronDensity[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> ElectronDensity[V, S]: ...
+    @overload
+    def __mul__(
+        self: ElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: ElectronDensity[float, S], other: W, /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> ElectronDensity[V, S]: ...
     @overload
     def __mul__[K, W](
         self: ElectronDensity[float, S], other: Quantity[K, W, S], /
@@ -3182,7 +4469,17 @@ class ElectronDensity(Quantity[ElectronDensityKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> ElectronDensity[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> ElectronDensity[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> ElectronDensity[V, S]: ...
+    @overload
+    def __truediv__(
+        self: ElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: ElectronDensity[float, S], other: W, /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> ElectronDensity[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: ElectronDensity[float, S], other: Quantity[K, W, S], /
@@ -3195,11 +4492,37 @@ class ElectronDensity(Quantity[ElectronDensityKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ElectronDensityKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> ElectronDensity[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> ElectronDensity[V, S]: ...
+    @overload
+    def __rmul__(
+        self: ElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: ElectronDensity[float, S], other: W, /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> ElectronDensity[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, ElectronDensityKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: ElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, ElectronDensityKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: ElectronDensity[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, ElectronDensityKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, ElectronDensityKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -3223,9 +4546,23 @@ class Angle(Quantity[AngleKind, V, S]):
     def from_value[W](cls, value: W) -> Angle[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Angle[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Angle[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Angle[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._AngleUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Angle[V, T]: ...
     @overload
@@ -3242,6 +4579,10 @@ class Angle(Quantity[AngleKind, V, S]):
     def __sub__(self, other: Angle[float, S], /) -> Angle[V, S]: ...
     @overload
     def __sub__(self, other: Angle[V, S], /) -> Angle[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Angle[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Angle[V, S]: ...
     @override
     def __neg__(self) -> Angle[V, S]: ...
     @override
@@ -3260,7 +4601,15 @@ class Angle(Quantity[AngleKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Angle[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Angle[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Angle[V, S]: ...
+    @overload
+    def __mul__(
+        self: Angle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Angle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Angle[float, S], other: W, /) -> Angle[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Angle[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Angle[float, S], other: Quantity[K, W, S], /
@@ -3291,7 +4640,17 @@ class Angle(Quantity[AngleKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Angle[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Angle[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Angle[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Angle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Angle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Angle[float, S], other: W, /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Angle[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Angle[float, S], other: Quantity[K, W, S], /
@@ -3304,11 +4663,33 @@ class Angle(Quantity[AngleKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[AngleKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Angle[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Angle[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Angle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Angle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](self: Angle[float, S], other: W, /) -> Angle[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Angle[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, AngleKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Angle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, AngleKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Angle[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, AngleKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, AngleKind], V, S]: ...
     @override
     def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[AngleKind, N], V, S]: ...
@@ -3330,9 +4711,23 @@ class Frequency(Quantity[FrequencyKind, V, S]):
     def from_value[W](cls, value: W) -> Frequency[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Frequency[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Frequency[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Frequency[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._FrequencyUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Frequency[V, T]: ...
     @overload
@@ -3353,6 +4748,10 @@ class Frequency(Quantity[FrequencyKind, V, S]):
     def __sub__(self, other: Frequency[float, S], /) -> Frequency[V, S]: ...
     @overload
     def __sub__(self, other: Frequency[V, S], /) -> Frequency[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Frequency[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Frequency[V, S]: ...
     @override
     def __neg__(self) -> Frequency[V, S]: ...
     @override
@@ -3379,7 +4778,17 @@ class Frequency(Quantity[FrequencyKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Frequency[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Frequency[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Frequency[V, S]: ...
+    @overload
+    def __mul__(
+        self: Frequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Frequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: Frequency[float, S], other: W, /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Frequency[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Frequency[float, S], other: Quantity[K, W, S], /
@@ -3410,7 +4819,17 @@ class Frequency(Quantity[FrequencyKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Frequency[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Frequency[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Frequency[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Frequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Frequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Frequency[float, S], other: W, /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Frequency[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Frequency[float, S], other: Quantity[K, W, S], /
@@ -3423,10 +4842,32 @@ class Frequency(Quantity[FrequencyKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[FrequencyKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Frequency[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Frequency[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Frequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Frequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Frequency[float, S], other: W, /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Frequency[V, S]: ...
+    @overload
     @override
-    def __rtruediv__(self, other: float, /) -> Time[V, S]: ...  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]
+    def __rtruediv__(self, other: _Scalar, /) -> Time[V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Frequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Time[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Frequency[float, S], other: W, /
+    ) -> Time[W, S]: ...
+    @overload
+    def __rtruediv__(self, other: _Numerical, /) -> Time[V, S]: ...
     @override
     def __pow__[N: int](
         self, exponent: N, /
@@ -3449,9 +4890,23 @@ class InverseTime(Quantity[InverseTimeKind, V, S]):
     def from_value[W](cls, value: W) -> InverseTime[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> InverseTime[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> InverseTime[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> InverseTime[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._InverseTimeUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> InverseTime[V, T]: ...
     @overload
@@ -3472,6 +4927,10 @@ class InverseTime(Quantity[InverseTimeKind, V, S]):
     def __sub__(self, other: InverseTime[float, S], /) -> InverseTime[V, S]: ...
     @overload
     def __sub__(self, other: InverseTime[V, S], /) -> InverseTime[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> InverseTime[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> InverseTime[V, S]: ...
     @override
     def __neg__(self) -> InverseTime[V, S]: ...
     @override
@@ -3506,7 +4965,17 @@ class InverseTime(Quantity[InverseTimeKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> InverseTime[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> InverseTime[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> InverseTime[V, S]: ...
+    @overload
+    def __mul__(
+        self: InverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: InverseTime[float, S], other: W, /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> InverseTime[V, S]: ...
     @overload
     def __mul__[K, W](
         self: InverseTime[float, S], other: Quantity[K, W, S], /
@@ -3537,7 +5006,17 @@ class InverseTime(Quantity[InverseTimeKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> InverseTime[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> InverseTime[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> InverseTime[V, S]: ...
+    @overload
+    def __truediv__(
+        self: InverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: InverseTime[float, S], other: W, /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> InverseTime[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: InverseTime[float, S], other: Quantity[K, W, S], /
@@ -3550,10 +5029,32 @@ class InverseTime(Quantity[InverseTimeKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[InverseTimeKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> InverseTime[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> InverseTime[V, S]: ...
+    @overload
+    def __rmul__(
+        self: InverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: InverseTime[float, S], other: W, /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> InverseTime[V, S]: ...
+    @overload
     @override
-    def __rtruediv__(self, other: float, /) -> Time[V, S]: ...  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]
+    def __rtruediv__(self, other: _Scalar, /) -> Time[V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: InverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Time[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: InverseTime[float, S], other: W, /
+    ) -> Time[W, S]: ...
+    @overload
+    def __rtruediv__(self, other: _Numerical, /) -> Time[V, S]: ...
     @override
     def __pow__[N: int](
         self, exponent: N, /
@@ -3576,9 +5077,23 @@ class AtomCount(Quantity[AtomCountKind, V, S]):
     def from_value[W](cls, value: W) -> AtomCount[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> AtomCount[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> AtomCount[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> AtomCount[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._AtomCountUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> AtomCount[V, T]: ...
     @overload
@@ -3599,6 +5114,10 @@ class AtomCount(Quantity[AtomCountKind, V, S]):
     def __sub__(self, other: AtomCount[float, S], /) -> AtomCount[V, S]: ...
     @overload
     def __sub__(self, other: AtomCount[V, S], /) -> AtomCount[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> AtomCount[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> AtomCount[V, S]: ...
     @override
     def __neg__(self) -> AtomCount[V, S]: ...
     @override
@@ -3625,7 +5144,17 @@ class AtomCount(Quantity[AtomCountKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> AtomCount[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> AtomCount[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> AtomCount[V, S]: ...
+    @overload
+    def __mul__(
+        self: AtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: AtomCount[float, S], other: W, /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> AtomCount[V, S]: ...
     @overload
     def __mul__[K, W](
         self: AtomCount[float, S], other: Quantity[K, W, S], /
@@ -3672,7 +5201,17 @@ class AtomCount(Quantity[AtomCountKind, V, S]):
     @overload
     def __truediv__(self, other: ParticleDensity[V, S], /) -> Volume[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> AtomCount[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> AtomCount[V, S]: ...
+    @overload
+    def __truediv__(
+        self: AtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: AtomCount[float, S], other: W, /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> AtomCount[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: AtomCount[float, S], other: Quantity[K, W, S], /
@@ -3685,11 +5224,37 @@ class AtomCount(Quantity[AtomCountKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[AtomCountKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> AtomCount[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> AtomCount[V, S]: ...
+    @overload
+    def __rmul__(
+        self: AtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: AtomCount[float, S], other: W, /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> AtomCount[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, AtomCountKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: AtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, AtomCountKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: AtomCount[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, AtomCountKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, AtomCountKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -3713,9 +5278,23 @@ class ElectronCount(Quantity[ElectronCountKind, V, S]):
     def from_value[W](cls, value: W) -> ElectronCount[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> ElectronCount[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> ElectronCount[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._ElectronCountUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> ElectronCount[V, T]: ...
     @overload
@@ -3737,6 +5316,10 @@ class ElectronCount(Quantity[ElectronCountKind, V, S]):
     @overload
     def __sub__(self, other: ElectronCount[V, S], /) -> ElectronCount[V, S]: ...
     @override
+    def __radd__(self, other: int, /) -> ElectronCount[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> ElectronCount[V, S]: ...
+    @override
     def __neg__(self) -> ElectronCount[V, S]: ...
     @override
     def __abs__(self) -> ElectronCount[V, S]: ...
@@ -3754,7 +5337,17 @@ class ElectronCount(Quantity[ElectronCountKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> ElectronCount[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> ElectronCount[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> ElectronCount[V, S]: ...
+    @overload
+    def __mul__(
+        self: ElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: ElectronCount[float, S], other: W, /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> ElectronCount[V, S]: ...
     @overload
     def __mul__[K, W](
         self: ElectronCount[float, S], other: Quantity[K, W, S], /
@@ -3801,7 +5394,17 @@ class ElectronCount(Quantity[ElectronCountKind, V, S]):
     @overload
     def __truediv__(self, other: ElectronDensity[V, S], /) -> Volume[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> ElectronCount[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> ElectronCount[V, S]: ...
+    @overload
+    def __truediv__(
+        self: ElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: ElectronCount[float, S], other: W, /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> ElectronCount[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: ElectronCount[float, S], other: Quantity[K, W, S], /
@@ -3814,11 +5417,37 @@ class ElectronCount(Quantity[ElectronCountKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ElectronCountKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> ElectronCount[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> ElectronCount[V, S]: ...
+    @overload
+    def __rmul__(
+        self: ElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: ElectronCount[float, S], other: W, /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> ElectronCount[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, ElectronCountKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: ElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, ElectronCountKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: ElectronCount[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, ElectronCountKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, ElectronCountKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -3842,9 +5471,23 @@ class Mass(Quantity[MassKind, V, S]):
     def from_value[W](cls, value: W) -> Mass[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Mass[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Mass[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Mass[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._MassUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Mass[V, T]: ...
     @overload
@@ -3861,6 +5504,10 @@ class Mass(Quantity[MassKind, V, S]):
     def __sub__(self, other: Mass[float, S], /) -> Mass[V, S]: ...
     @overload
     def __sub__(self, other: Mass[V, S], /) -> Mass[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Mass[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Mass[V, S]: ...
     @override
     def __neg__(self) -> Mass[V, S]: ...
     @override
@@ -3895,7 +5542,15 @@ class Mass(Quantity[MassKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Mass[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Mass[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Mass[V, S]: ...
+    @overload
+    def __mul__(
+        self: Mass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Mass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Mass[float, S], other: W, /) -> Mass[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Mass[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Mass[float, S], other: Quantity[K, W, S], /
@@ -3942,7 +5597,15 @@ class Mass(Quantity[MassKind, V, S]):
     @overload
     def __truediv__(self, other: Volume[V, S], /) -> MassDensity[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Mass[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Mass[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Mass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Mass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](self: Mass[float, S], other: W, /) -> Mass[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Mass[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Mass[float, S], other: Quantity[K, W, S], /
@@ -3955,11 +5618,33 @@ class Mass(Quantity[MassKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[MassKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Mass[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Mass[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Mass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Mass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](self: Mass[float, S], other: W, /) -> Mass[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Mass[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, MassKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Mass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, MassKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Mass[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, MassKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, MassKind], V, S]: ...
     @override
     def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[MassKind, N], V, S]: ...
@@ -3981,9 +5666,23 @@ class MassDensity(Quantity[MassDensityKind, V, S]):
     def from_value[W](cls, value: W) -> MassDensity[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> MassDensity[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> MassDensity[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> MassDensity[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._MassDensityUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> MassDensity[V, T]: ...
     @overload
@@ -4004,6 +5703,10 @@ class MassDensity(Quantity[MassDensityKind, V, S]):
     def __sub__(self, other: MassDensity[float, S], /) -> MassDensity[V, S]: ...
     @overload
     def __sub__(self, other: MassDensity[V, S], /) -> MassDensity[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> MassDensity[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> MassDensity[V, S]: ...
     @override
     def __neg__(self) -> MassDensity[V, S]: ...
     @override
@@ -4030,7 +5733,17 @@ class MassDensity(Quantity[MassDensityKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> MassDensity[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> MassDensity[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> MassDensity[V, S]: ...
+    @overload
+    def __mul__(
+        self: MassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: MassDensity[float, S], other: W, /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> MassDensity[V, S]: ...
     @overload
     def __mul__[K, W](
         self: MassDensity[float, S], other: Quantity[K, W, S], /
@@ -4061,7 +5774,17 @@ class MassDensity(Quantity[MassDensityKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> MassDensity[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> MassDensity[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> MassDensity[V, S]: ...
+    @overload
+    def __truediv__(
+        self: MassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: MassDensity[float, S], other: W, /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> MassDensity[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: MassDensity[float, S], other: Quantity[K, W, S], /
@@ -4074,11 +5797,37 @@ class MassDensity(Quantity[MassDensityKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[MassDensityKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> MassDensity[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> MassDensity[V, S]: ...
+    @overload
+    def __rmul__(
+        self: MassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: MassDensity[float, S], other: W, /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> MassDensity[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, MassDensityKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: MassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, MassDensityKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: MassDensity[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, MassDensityKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, MassDensityKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -4102,9 +5851,23 @@ class Momentum(Quantity[MomentumKind, V, S]):
     def from_value[W](cls, value: W) -> Momentum[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Momentum[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Momentum[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Momentum[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._MomentumUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Momentum[V, T]: ...
     @overload
@@ -4125,6 +5888,10 @@ class Momentum(Quantity[MomentumKind, V, S]):
     def __sub__(self, other: Momentum[float, S], /) -> Momentum[V, S]: ...
     @overload
     def __sub__(self, other: Momentum[V, S], /) -> Momentum[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Momentum[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Momentum[V, S]: ...
     @override
     def __neg__(self) -> Momentum[V, S]: ...
     @override
@@ -4151,7 +5918,17 @@ class Momentum(Quantity[MomentumKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Momentum[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Momentum[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__(
+        self: Momentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Momentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: Momentum[float, S], other: W, /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Momentum[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Momentum[float, S], other: Quantity[K, W, S], /
@@ -4214,7 +5991,17 @@ class Momentum(Quantity[MomentumKind, V, S]):
     @overload
     def __truediv__(self, other: Time[V, S], /) -> Force[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Momentum[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Momentum[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Momentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Momentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Momentum[float, S], other: W, /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Momentum[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Momentum[float, S], other: Quantity[K, W, S], /
@@ -4227,11 +6014,35 @@ class Momentum(Quantity[MomentumKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[MomentumKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Momentum[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Momentum[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Momentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Momentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Momentum[float, S], other: W, /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Momentum[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, MomentumKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Momentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, MomentumKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Momentum[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, MomentumKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, MomentumKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -4255,9 +6066,23 @@ class Acceleration(Quantity[AccelerationKind, V, S]):
     def from_value[W](cls, value: W) -> Acceleration[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Acceleration[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Acceleration[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Acceleration[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._AccelerationUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Acceleration[V, T]: ...
     @overload
@@ -4278,6 +6103,10 @@ class Acceleration(Quantity[AccelerationKind, V, S]):
     def __sub__(self, other: Acceleration[float, S], /) -> Acceleration[V, S]: ...
     @overload
     def __sub__(self, other: Acceleration[V, S], /) -> Acceleration[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Acceleration[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Acceleration[V, S]: ...
     @override
     def __neg__(self) -> Acceleration[V, S]: ...
     @override
@@ -4312,7 +6141,17 @@ class Acceleration(Quantity[AccelerationKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Acceleration[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Acceleration[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Acceleration[V, S]: ...
+    @overload
+    def __mul__(
+        self: Acceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Acceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: Acceleration[float, S], other: W, /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Acceleration[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Acceleration[float, S], other: Quantity[K, W, S], /
@@ -4343,7 +6182,17 @@ class Acceleration(Quantity[AccelerationKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Acceleration[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Acceleration[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Acceleration[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Acceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Acceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Acceleration[float, S], other: W, /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Acceleration[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Acceleration[float, S], other: Quantity[K, W, S], /
@@ -4356,11 +6205,37 @@ class Acceleration(Quantity[AccelerationKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[AccelerationKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Acceleration[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Acceleration[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Acceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Acceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Acceleration[float, S], other: W, /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Acceleration[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, AccelerationKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Acceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, AccelerationKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Acceleration[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, AccelerationKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, AccelerationKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -4384,9 +6259,23 @@ class Charge(Quantity[ChargeKind, V, S]):
     def from_value[W](cls, value: W) -> Charge[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Charge[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Charge[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Charge[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._ChargeUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Charge[V, T]: ...
     @overload
@@ -4403,6 +6292,10 @@ class Charge(Quantity[ChargeKind, V, S]):
     def __sub__(self, other: Charge[float, S], /) -> Charge[V, S]: ...
     @overload
     def __sub__(self, other: Charge[V, S], /) -> Charge[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Charge[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Charge[V, S]: ...
     @override
     def __neg__(self) -> Charge[V, S]: ...
     @override
@@ -4445,7 +6338,15 @@ class Charge(Quantity[ChargeKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Charge[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Charge[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Charge[V, S]: ...
+    @overload
+    def __mul__(
+        self: Charge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Charge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Charge[float, S], other: W, /) -> Charge[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Charge[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Charge[float, S], other: Quantity[K, W, S], /
@@ -4476,7 +6377,17 @@ class Charge(Quantity[ChargeKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Charge[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Charge[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Charge[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Charge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Charge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Charge[float, S], other: W, /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Charge[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Charge[float, S], other: Quantity[K, W, S], /
@@ -4489,11 +6400,35 @@ class Charge(Quantity[ChargeKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ChargeKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Charge[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Charge[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Charge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Charge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Charge[float, S], other: W, /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Charge[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, ChargeKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Charge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, ChargeKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Charge[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, ChargeKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, ChargeKind], V, S]: ...
     @override
     def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[ChargeKind, N], V, S]: ...
@@ -4515,9 +6450,23 @@ class ElectricPotential(Quantity[ElectricPotentialKind, V, S]):
     def from_value[W](cls, value: W) -> ElectricPotential[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> ElectricPotential[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> ElectricPotential[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._ElectricPotentialUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> ElectricPotential[V, T]: ...
     @overload
@@ -4542,6 +6491,10 @@ class ElectricPotential(Quantity[ElectricPotentialKind, V, S]):
     ) -> ElectricPotential[V, S]: ...
     @overload
     def __sub__(self, other: ElectricPotential[V, S], /) -> ElectricPotential[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> ElectricPotential[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> ElectricPotential[V, S]: ...
     @override
     def __neg__(self) -> ElectricPotential[V, S]: ...
     @override
@@ -4568,7 +6521,17 @@ class ElectricPotential(Quantity[ElectricPotentialKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> ElectricPotential[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> ElectricPotential[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__(
+        self: ElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: ElectricPotential[float, S], other: W, /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> ElectricPotential[V, S]: ...
     @overload
     def __mul__[K, W](
         self: ElectricPotential[float, S], other: Quantity[K, W, S], /
@@ -4619,7 +6582,17 @@ class ElectricPotential(Quantity[ElectricPotentialKind, V, S]):
     @overload
     def __truediv__(self, other: Length[V, S], /) -> ElectricField[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> ElectricPotential[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __truediv__(
+        self: ElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: ElectricPotential[float, S], other: W, /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> ElectricPotential[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: ElectricPotential[float, S], other: Quantity[K, W, S], /
@@ -4632,11 +6605,37 @@ class ElectricPotential(Quantity[ElectricPotentialKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ElectricPotentialKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> ElectricPotential[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __rmul__(
+        self: ElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: ElectricPotential[float, S], other: W, /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> ElectricPotential[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, ElectricPotentialKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: ElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, ElectricPotentialKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: ElectricPotential[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, ElectricPotentialKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, ElectricPotentialKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -4660,9 +6659,23 @@ class ElectricField(Quantity[ElectricFieldKind, V, S]):
     def from_value[W](cls, value: W) -> ElectricField[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> ElectricField[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> ElectricField[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> ElectricField[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._ElectricFieldUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> ElectricField[V, T]: ...
     @overload
@@ -4683,6 +6696,10 @@ class ElectricField(Quantity[ElectricFieldKind, V, S]):
     def __sub__(self, other: ElectricField[float, S], /) -> ElectricField[V, S]: ...
     @overload
     def __sub__(self, other: ElectricField[V, S], /) -> ElectricField[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> ElectricField[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> ElectricField[V, S]: ...
     @override
     def __neg__(self) -> ElectricField[V, S]: ...
     @override
@@ -4725,7 +6742,17 @@ class ElectricField(Quantity[ElectricFieldKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> ElectricField[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> ElectricField[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> ElectricField[V, S]: ...
+    @overload
+    def __mul__(
+        self: ElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: ElectricField[float, S], other: W, /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> ElectricField[V, S]: ...
     @overload
     def __mul__[K, W](
         self: ElectricField[float, S], other: Quantity[K, W, S], /
@@ -4756,7 +6783,17 @@ class ElectricField(Quantity[ElectricFieldKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> ElectricField[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> ElectricField[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__(
+        self: ElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: ElectricField[float, S], other: W, /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> ElectricField[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: ElectricField[float, S], other: Quantity[K, W, S], /
@@ -4769,11 +6806,37 @@ class ElectricField(Quantity[ElectricFieldKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ElectricFieldKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> ElectricField[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> ElectricField[V, S]: ...
+    @overload
+    def __rmul__(
+        self: ElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: ElectricField[float, S], other: W, /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> ElectricField[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, ElectricFieldKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: ElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, ElectricFieldKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: ElectricField[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, ElectricFieldKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, ElectricFieldKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -4797,9 +6860,23 @@ class DipoleMoment(Quantity[DipoleMomentKind, V, S]):
     def from_value[W](cls, value: W) -> DipoleMoment[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> DipoleMoment[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> DipoleMoment[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._DipoleMomentUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> DipoleMoment[V, T]: ...
     @overload
@@ -4820,6 +6897,10 @@ class DipoleMoment(Quantity[DipoleMomentKind, V, S]):
     def __sub__(self, other: DipoleMoment[float, S], /) -> DipoleMoment[V, S]: ...
     @overload
     def __sub__(self, other: DipoleMoment[V, S], /) -> DipoleMoment[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> DipoleMoment[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> DipoleMoment[V, S]: ...
     @override
     def __neg__(self) -> DipoleMoment[V, S]: ...
     @override
@@ -4846,7 +6927,17 @@ class DipoleMoment(Quantity[DipoleMomentKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> DipoleMoment[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> DipoleMoment[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__(
+        self: DipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: DipoleMoment[float, S], other: W, /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> DipoleMoment[V, S]: ...
     @overload
     def __mul__[K, W](
         self: DipoleMoment[float, S], other: Quantity[K, W, S], /
@@ -4893,7 +6984,17 @@ class DipoleMoment(Quantity[DipoleMomentKind, V, S]):
     @overload
     def __truediv__(self, other: Length[V, S], /) -> Charge[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> DipoleMoment[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __truediv__(
+        self: DipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: DipoleMoment[float, S], other: W, /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> DipoleMoment[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: DipoleMoment[float, S], other: Quantity[K, W, S], /
@@ -4906,11 +7007,37 @@ class DipoleMoment(Quantity[DipoleMomentKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[DipoleMomentKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> DipoleMoment[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __rmul__(
+        self: DipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: DipoleMoment[float, S], other: W, /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> DipoleMoment[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, DipoleMomentKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: DipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[
+        Div[DimensionlessKind, DipoleMomentKind], npt.NDArray[np.float64], S
+    ]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: DipoleMoment[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, DipoleMomentKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, DipoleMomentKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -4934,9 +7061,23 @@ class Entropy(Quantity[EntropyKind, V, S]):
     def from_value[W](cls, value: W) -> Entropy[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Entropy[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Entropy[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Entropy[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._EntropyUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Entropy[V, T]: ...
     @overload
@@ -4957,6 +7098,10 @@ class Entropy(Quantity[EntropyKind, V, S]):
     def __sub__(self, other: Entropy[float, S], /) -> Entropy[V, S]: ...
     @overload
     def __sub__(self, other: Entropy[V, S], /) -> Entropy[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Entropy[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Entropy[V, S]: ...
     @override
     def __neg__(self) -> Entropy[V, S]: ...
     @override
@@ -4991,7 +7136,17 @@ class Entropy(Quantity[EntropyKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Entropy[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Entropy[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Entropy[V, S]: ...
+    @overload
+    def __mul__(
+        self: Entropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Entropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](
+        self: Entropy[float, S], other: W, /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Entropy[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Entropy[float, S], other: Quantity[K, W, S], /
@@ -5022,7 +7177,17 @@ class Entropy(Quantity[EntropyKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Entropy[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Entropy[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Entropy[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Entropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Entropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Entropy[float, S], other: W, /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Entropy[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Entropy[float, S], other: Quantity[K, W, S], /
@@ -5035,11 +7200,35 @@ class Entropy(Quantity[EntropyKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[EntropyKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Entropy[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Entropy[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Entropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Entropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Entropy[float, S], other: W, /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Entropy[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, EntropyKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Entropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, EntropyKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Entropy[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, EntropyKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, EntropyKind], V, S]: ...
     @override
     def __pow__[N: int](
@@ -5063,9 +7252,23 @@ class Action(Quantity[ActionKind, V, S]):
     def from_value[W](cls, value: W) -> Action[W, S]: ...
     @classmethod
     @override
+    def reinterpret[W, T: UnitSystem](
+        cls, quantity: Quantity[Any, W, T]
+    ) -> Action[W, T]: ...
+    @overload
+    @classmethod
+    @override
+    def parse(
+        cls, data: str, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Action[float, S]: ...
+    @overload
+    @classmethod
     def parse(
         cls, data: object, *, units: tuple[Unit[Any], ...] = ()
     ) -> Action[float | npt.NDArray[np.float64], S]: ...
+    @property
+    @override
+    def unit(self) -> _units._ActionUnit: ...
     @override
     def to_system[T: UnitSystem](self, system: type[T]) -> Action[V, T]: ...
     @overload
@@ -5082,6 +7285,10 @@ class Action(Quantity[ActionKind, V, S]):
     def __sub__(self, other: Action[float, S], /) -> Action[V, S]: ...
     @overload
     def __sub__(self, other: Action[V, S], /) -> Action[V, S]: ...
+    @override
+    def __radd__(self, other: int, /) -> Action[V, S]: ...
+    @override
+    def __rsub__(self, other: int, /) -> Action[V, S]: ...
     @override
     def __neg__(self) -> Action[V, S]: ...
     @override
@@ -5108,7 +7315,15 @@ class Action(Quantity[ActionKind, V, S]):
     @overload
     def __mul__(self, other: Dimensionless[V, S], /) -> Action[V, S]: ...
     @overload
-    def __mul__(self, other: float, /) -> Action[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> Action[V, S]: ...
+    @overload
+    def __mul__(
+        self: Action[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Action[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __mul__[W: _Numerical](self: Action[float, S], other: W, /) -> Action[W, S]: ...
+    @overload
+    def __mul__(self, other: _Numerical, /) -> Action[V, S]: ...
     @overload
     def __mul__[K, W](
         self: Action[float, S], other: Quantity[K, W, S], /
@@ -5155,7 +7370,17 @@ class Action(Quantity[ActionKind, V, S]):
     @overload
     def __truediv__(self, other: Time[V, S], /) -> Energy[V, S]: ...
     @overload
-    def __truediv__(self, other: float, /) -> Action[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> Action[V, S]: ...
+    @overload
+    def __truediv__(
+        self: Action[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Action[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __truediv__[W: _Numerical](
+        self: Action[float, S], other: W, /
+    ) -> Action[W, S]: ...
+    @overload
+    def __truediv__(self, other: _Numerical, /) -> Action[V, S]: ...
     @overload
     def __truediv__[K, W](
         self: Action[float, S], other: Quantity[K, W, S], /
@@ -5168,11 +7393,35 @@ class Action(Quantity[ActionKind, V, S]):
     def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ActionKind, K], V, S]: ...
+    @overload
     @override
-    def __rmul__(self, other: float, /) -> Action[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> Action[V, S]: ...
+    @overload
+    def __rmul__(
+        self: Action[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Action[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmul__[W: _Numerical](
+        self: Action[float, S], other: W, /
+    ) -> Action[W, S]: ...
+    @overload
+    def __rmul__(self, other: _Numerical, /) -> Action[V, S]: ...
+    @overload
     @override
     def __rtruediv__(
-        self, other: float, /
+        self, other: _Scalar, /
+    ) -> Quantity[Div[DimensionlessKind, ActionKind], V, S]: ...
+    @overload
+    def __rtruediv__(
+        self: Action[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> Quantity[Div[DimensionlessKind, ActionKind], npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rtruediv__[W: _Numerical](
+        self: Action[float, S], other: W, /
+    ) -> Quantity[Div[DimensionlessKind, ActionKind], W, S]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Numerical, /
     ) -> Quantity[Div[DimensionlessKind, ActionKind], V, S]: ...
     @override
     def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[ActionKind, N], V, S]: ...

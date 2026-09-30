@@ -58,3 +58,10 @@ def work[S: UnitSystem](f: Force[float, S], d: Length[float, S]) -> Energy[float
 
 
 mixed_generic = work(e_si / x_si, x_metal)  # error
+
+# Plain numbers are only added to Dimensionless values; only those convert to float.
+bad_plain_addition = (2 * u.nm) + 1  # error
+bad_float = float(2 * u.nm)  # error
+bad_text_scale = (2 * u.nm) * "2"  # error
+bad_reinterpret = Length.reinterpret(2.0)  # error
+bad_point_from_zero = 0 - (300 * u.K)  # error

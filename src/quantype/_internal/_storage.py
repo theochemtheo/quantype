@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import numbers
 import warnings
 from typing import TYPE_CHECKING, Any, TypeAliasType, cast, get_args, get_origin
 
@@ -75,6 +76,76 @@ def validate_floating_storage(value: Any) -> None:
             "Unit-first construction requires a real floating dtype; "
             "use a typed quantity constructor to convert integer magnitudes"
         )
+
+
+def real_operand(value: Any) -> Any | None:
+    """A real number or numerical array that may scale a quantity, else None.
+
+    Python and NumPy scalars, and real NumPy, JAX (including traced) and Torch
+    arrays qualify; booleans, complex numbers and other objects do not.
+    """
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return value
+    module = type(value).__module__
+    if module.startswith(("numpy", "torch", "jax", "jaxlib")):
+        return value if _real_numerical(value, module) else None
+    # Fraction and other registered reals.
+    return float(value) if isinstance(value, numbers.Real) else None
+
+
+def _real_numerical(value: Any, module: str) -> bool:
+    if module.startswith("numpy"):
+        import numpy as np
+
+        if not isinstance(value, (np.ndarray, np.generic)):
+            return False
+        return str(cast("Any", value).dtype.kind) in "iuf"
+    if module.startswith("torch"):
+        import torch
+
+        return isinstance(value, torch.Tensor) and not (
+            value.is_complex() or value.dtype == torch.bool
+        )
+    import jax.numpy as jnp
+
+    dtype = getattr(value, "dtype", None)
+    return dtype is not None and (
+        jnp.issubdtype(dtype, jnp.floating) or jnp.issubdtype(dtype, jnp.integer)
+    )
+
+
+def keep_storage(raw: Any, result: Any) -> Any:
+    """Scaling keeps the quantity's storage type and dtype, as conversion does.
+
+    A scalar quantity scaled by an array becomes an array of that result.
+    """
+    if type(raw) is float:
+        if type(result).__module__.startswith("numpy"):
+            import numpy as np
+
+            if isinstance(result, np.generic):
+                result = float(cast("Any", result))
+        return result
+    dtype = getattr(raw, "dtype", None)
+    if dtype is None or getattr(result, "dtype", dtype) == dtype:
+        return result
+    return _as_dtype(raw, result, dtype)
+
+
+def _as_dtype(raw: Any, result: Any, dtype: Any) -> Any:
+    module = type(raw).__module__
+    if module.startswith("torch"):
+        return result.to(dtype)
+    if not module.startswith("numpy"):
+        return result.astype(dtype)
+    import numpy as np
+
+    if not isinstance(raw, np.generic):
+        return np.asarray(result).astype(dtype, copy=False)
+    scalar_type: Any = cast("Any", raw).dtype.type
+    return scalar_type(result) if isinstance(result, np.generic) else result
 
 
 def storage_origin(storage: Any) -> Any:

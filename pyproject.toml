@@ -128,6 +128,7 @@ flake8-tidy-imports = { "ban-relative-imports" = "all" }
 # Numerical dispatch is deliberately dynamic and backend imports stay lazy.
 "src/quantype/core.py" = ["ANN401", "PLC0415", "SLF001"]
 "src/quantype/core.pyi" = ["ANN401"]
+"src/quantype/_generated.pyi" = ["ANN401"]
 "src/quantype/_internal/_math.py" = ["ANN401", "PLC0415"]
 
 [tool.ty.environment]
