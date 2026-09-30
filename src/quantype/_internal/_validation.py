@@ -10,7 +10,7 @@ from pydantic_core import core_schema
 from quantype._internal._storage import convert, storage_origin
 from quantype._internal._systems import Atomistic, require_system
 from quantype.core import _wrap
-from quantype.serialization import parse_quantity, to_dict
+from quantype.serialization import QUANTITY_STRING, parse_quantity, to_dict
 
 if TYPE_CHECKING:
     from pydantic import GetCoreSchemaHandler
@@ -96,7 +96,7 @@ def pydantic_schema(
         wrapper(
             validate_input,
             schema=core_schema.union_schema(
-                [payload, core_schema.str_schema(pattern=r"^\s*\S+\s+\S.*$")]
+                [payload, core_schema.str_schema(pattern=QUANTITY_STRING)]
             ),
             serialization=core_schema.plain_serializer_function_ser_schema(
                 to_dict, return_schema=payload

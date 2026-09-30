@@ -169,3 +169,34 @@ def test_invalid_unit_definitions() -> None:
             Length.define_unit("invalid", reference=u.nm, scale=scale)
     with pytest.raises(ValueError, match="offset"):
         Length.define_unit("shifted", reference=u.nm, offset=1)
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("5 nm", 50.0),
+        ("5nm", 50.0),
+        ("  -1.5e-1  nm ", -1.5),
+        ("1e-9m", 10.0),
+        (".5 Angstrom", 0.5),
+        ("2 Ang", 2.0),
+    ],
+)
+def test_quantity_strings_allow_an_optional_space(text: str, expected: float) -> None:
+    assert Length.parse(text).value == pytest.approx(expected)
+    assert TypeAdapter(Length[float]).validate_python(text).value == pytest.approx(
+        expected
+    )
+
+
+@pytest.mark.parametrize("text", ["nm", "5", "5 ", "five nm", ""])
+def test_quantity_strings_need_a_number_and_a_unit(text: str) -> None:
+    with pytest.raises(ValueError, match="Expected '<number> <unit>'"):
+        Length.parse(text)
+
+
+def test_quantity_string_schema_is_portable() -> None:
+    # JSON Schema patterns are ECMA-262: no Python-only named groups or flags.
+    pattern = TypeAdapter(Length[float]).json_schema()["anyOf"][1]["pattern"]
+    assert "(?P<" not in pattern
+    assert "(?i" not in pattern

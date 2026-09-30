@@ -8,6 +8,7 @@ including its unit system: the wire format records units, never a system.
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING, Any, TypeGuard, cast, get_args, get_origin
 
@@ -121,17 +122,26 @@ def _json_numbers(value: object) -> object:
     return value
 
 
+# "<number> <unit>", the space optional: "0.5 nm", "0.5nm", "1e-3 eV", "1eV".
+# Also the JSON-schema pattern, so it keeps to syntax ECMA-262 regexes share.
+QUANTITY_STRING = (
+    r"^\s*([-+]?(?:(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?"
+    r"|[iI][nN][fF](?:[iI][nN][iI][tT][yY])?|[nN][aA][nN]))\s*(\S.*?)\s*$"
+)
+_QUANTITY_STRING = re.compile(QUANTITY_STRING)
+
+
 def _is_quantity(value: object) -> TypeGuard[Quantity[Any, Any, Any]]:
     return isinstance(value, Quantity)
 
 
 def _wire_fields(data: object, expected: str) -> tuple[object, str]:
     if isinstance(data, str):
-        pieces = data.strip().split(maxsplit=1)
-        if len(pieces) != 2:  # noqa: PLR2004 -- magnitude and unit
-            raise ValueError("Expected '<number> <unit>'")
-        value: object = float(pieces[0])
-        name: object = pieces[1]
+        match = _QUANTITY_STRING.match(data)
+        if match is None:
+            raise ValueError(f"Expected '<number> <unit>'; received {data!r}")
+        value: object = float(match[1])
+        name: object = match[2]
     elif isinstance(data, Mapping):
         payload = cast("Mapping[object, object]", data)
         if set(payload) != {"kind", "magnitude", "unit"}:
