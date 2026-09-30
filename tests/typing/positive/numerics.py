@@ -42,7 +42,7 @@ assert_type(qnp.sqrt(Area[float, SI](4, u.angstrom_squared)), Length[float, SI])
 assert_type(qnp.arctan2(1 * u.nm, 1 * u.nm), Angle[float])
 assert_type(qnp.linalg.norm(positions, axis=-1), Length[Array])
 assert_type(qnp.stack([positions, positions]), Length[Array])
-assert_type(qnp.where(np.array([True, False]), positions, positions), Length[Array])
+assert_type(qnp.where(np.array([[True], [False]]), positions, positions), Length[Array])
 # pyright infers Any for dot of NumPy arrays (their shapes are Any); scalars are exact.
 assert_type(qnp.dot(Force[float](1, u.eV_per_angstrom), 1 * u.nm), Energy[float])
 assert_type(qnp.cross(positions, force), Quantity[Mul[LengthKind, ForceKind], Array])
