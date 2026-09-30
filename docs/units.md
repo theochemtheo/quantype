@@ -230,7 +230,9 @@ assert 1 * u.nm == 10 * u.angstrom
 
 Equality compares values: it returns `bool` for scalar storage and element-wise
 results for arrays, as NumPy does. Quantities of different kinds are unequal;
-comparing across systems raises `TypeError`. Quantities are unhashable. Ordering
+comparing across systems raises `TypeError`. Scalar quantities hash by value,
+consistently with `==`, so they work as dict keys and in sets; quantities with
+array storage are unhashable, like NumPy arrays. Ordering
 comparisons require the same kind and system, statically and at runtime, and
 return backend booleans.
 

@@ -139,8 +139,6 @@ class Quantity[K, V, S: UnitSystem]:
     _display: Unit[K] | None
     _echo: float | None
     __array_priority__: ClassVar[int] = 10000
-    # Equality compares values, and array storage is mutable.
-    __hash__: ClassVar[None] = None  # type: ignore[assignment]  # pyright: ignore[reportIncompatibleMethodOverride]
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
@@ -410,6 +408,23 @@ class Quantity[K, V, S: UnitSystem]:
         if rhs._semantic != self._semantic:
             return True
         return self._compare(rhs, operator.ne)
+
+    @override
+    def __hash__(self) -> int:
+        """Scalars hash by value, consistently with ``==``; arrays are unhashable.
+
+        Equal quantities share a kind, a system and stored value, so the display
+        unit and exact echo are deliberately excluded: ``1 nm`` and ``10 Å`` agree.
+        """
+        raw: Any = self._value
+        if not isinstance(raw, (int, float)):
+            if not type(raw).__module__.startswith("numpy"):
+                raise TypeError(f"unhashable array storage: {type(raw).__name__}")
+            import numpy as np
+
+            if not isinstance(raw, np.generic):
+                raise TypeError(f"unhashable array storage: {type(raw).__name__}")
+        return hash((self._semantic, self._system, cast("object", raw)))
 
     def __lt__(self, other: object) -> Any:
         return self._compare(other, operator.lt)

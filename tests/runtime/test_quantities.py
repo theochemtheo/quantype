@@ -138,10 +138,27 @@ def test_value_equality() -> None:
     np.testing.assert_array_equal(arrays == arrays.to(u.angstrom), [True, True])
     np.testing.assert_array_equal(arrays != 1 * u.nm, [False, True])
     with pytest.raises(TypeError, match="unhashable"):
-        hash(a)
+        hash(arrays)
     mixed: Any = a
     with pytest.raises(TypeError, match="Cannot combine Atomistic and SI"):
         _ = mixed == a.to_system(SI)
+
+
+def test_scalar_quantities_hash_by_value() -> None:
+    a, b = Length[float](1, u.nm), Length[float](10, u.angstrom)
+    assert hash(a) == hash(b)
+    assert hash(a) == hash(Length[np.float64](1, u.nm))
+    assert hash(-(0 * u.nm)) == hash(0 * u.nm)
+    assert len({a, b, 2 * u.nm}) == 2
+    assert {a: "cutoff"}[b] == "cutoff"
+    structural = (2 * u.angstrom) * (3 * u.fs)
+    assert hash(structural) == hash((6 * u.angstrom) * (1 * u.fs))
+    for unhashable in (
+        Length[npt.NDArray[np.float64]]([1.0], u.nm),
+        Length[npt.NDArray[np.float64]](1.0, u.nm),
+    ):
+        with pytest.raises(TypeError, match="unhashable array storage"):
+            hash(unhashable)
 
 
 def test_ordering_comparisons() -> None:

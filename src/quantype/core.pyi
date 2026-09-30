@@ -1,7 +1,7 @@
 # mypy: disable-error-code=overload-overlap
 # pyright: reportOverlappingOverload=false
 from collections.abc import Iterator
-from typing import Any, ClassVar, Generic, Self, overload, override
+from typing import Any, Generic, Self, overload, override
 
 import numpy as np
 import numpy.typing as npt
@@ -39,7 +39,6 @@ class Quantity(Generic[K, V, S]):
     _system: type[UnitSystem]
     _display: Unit[K] | None
     _echo: float | None
-    __hash__: ClassVar[None]  # type: ignore[assignment]
     def __init__(
         self, value: object, unit: Unit[K], *, dtype: object = ...
     ) -> None: ...
@@ -96,6 +95,9 @@ class Quantity(Generic[K, V, S]):
     def __eq__(self, other: object, /) -> Any: ...
     @override
     def __ne__(self, other: object, /) -> Any: ...
+    # Scalar storage hashes by value; array storage raises TypeError.
+    @override
+    def __hash__(self) -> int: ...
     # Ordering requires the same kind and system; K and S anchor to the class.
     @overload
     def __lt__(
