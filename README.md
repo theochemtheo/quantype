@@ -1,5 +1,10 @@
 # quantype
 
+[![checks](https://github.com/theochemtheo/quantype/actions/workflows/check.yml/badge.svg)](https://github.com/theochemtheo/quantype/actions/workflows/check.yml)
+[![PyPI](https://img.shields.io/pypi/v/quantype)](https://pypi.org/project/quantype/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/)
+[![SPEC 0](https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CB05C)](https://scientific-python.org/specs/spec-0000/)
+
 quantype makes physical dimensions and unit systems part of your types. mypy,
 Pyright, Pyrefly, and ty check them without a plugin, and the values underneath
 are still plain floats or NumPy, JAX, and Torch arrays.
