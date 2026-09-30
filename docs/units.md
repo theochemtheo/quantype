@@ -184,15 +184,14 @@ distinct despite equal dimensions. `Force / Area` yields `Pressure`;
 both by the supported type checkers and at runtime.
 
 Unlisted products retain structural types such as
-`Quantity[Mul[LengthKind, TimeKind], float]`, not `Any`. Runtime expressions are
-structured trees, not parsed strings. These quantities support arithmetic and
-reductions while retaining their structural kinds. Scalar reciprocals use
-declared relations, such as `1 / Time` yielding `InverseTime`, or retain a
-structural ratio. Structural reciprocals use the dimensionless identity of their
-catalogue. For expressions mixing catalogues, scalar reciprocals are ambiguous
-and raise `TypeError`; supply an explicit dimensionless quantity numerator
-instead. There is no arbitrary symbolic cancellation or inference of physical
-meaning from dimensions alone.
+`Quantity[Mul[LengthKind, TimeKind], float]`, not `Any`. These quantities
+support arithmetic and reductions while retaining their structural kinds.
+Scalar reciprocals use declared relations, such as `1 / Time` yielding
+`InverseTime`, or retain a structural ratio. Structural reciprocals use the
+dimensionless identity of their catalogue. For expressions mixing catalogues,
+scalar reciprocals are ambiguous and raise `TypeError`; supply an explicit
+dimensionless quantity numerator instead. There is no arbitrary symbolic
+cancellation or inference of physical meaning from dimensions alone.
 
 Absolute temperatures are affine points:
 

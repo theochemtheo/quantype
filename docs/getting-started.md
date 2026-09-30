@@ -53,7 +53,7 @@ assert restored == length
 `2 * u.nm` is a shorter construction spelling. Use `Length[float](...)` when
 choosing storage explicitly; use `Length[np.float64](...)` for a NumPy scalar
 and `Length[npt.NDArray[np.float64]](...)` for a NumPy array. The generic argument
-performs conversion, not just a type annotation. Bare `Length(...)` works at
+converts the input into that storage. Bare `Length(...)` works at
 runtime but leaves storage unspecified to strict type checkers; prefer an explicit
 storage argument or unit-first construction. Unit-first construction accepts
 arrays, not Python lists: use a typed constructor or `u.nm(np.asarray(values))`.

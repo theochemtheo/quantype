@@ -84,8 +84,8 @@ JSON number leaves are Python floats (binary64), including values from NumPy
 that would become infinity or round to zero are rejected with `ValueError`.
 Use NPZ when dtype and extended precision must be preserved.
 
-JSON stores values, not backend/device/dtype metadata. Torch tensors are detached
-and copied to CPU at serialization, never inside arithmetic or differentiation.
+JSON does not record the backend or dtype. Torch tensors are detached and copied
+to CPU at serialization, never inside arithmetic or differentiation.
 
 ## Binary arrays: NPZ and NPY
 
@@ -123,12 +123,12 @@ archive written from SI quantities can be read into `Atomistic`. Restored
 quantities remember the archived unit. Supply `units=(...)` for custom-unit
 decoding.
 
-Graphs and device placement are not serialized. Unsupported host dtypes, such as
-Torch bfloat16 through NumPy's normal conversion, are not silently approximated.
-JSON and NPZ are value-oriented formats, not bit-exact snapshots of model state;
-unit conversion can introduce floating-point roundoff. Low-precision storage
-presented in a distant unit can lose more: float16 ångströms written as metres
-are subnormal. Present such values in a nearby unit with `.to(...)` first.
+Unsupported host dtypes, such as Torch bfloat16 through NumPy's normal
+conversion, are not silently approximated. JSON and NPZ store values, not
+bit-exact snapshots: unit conversion can introduce floating-point roundoff.
+Low-precision storage presented in a distant unit can lose more: float16
+ångströms written as metres are subnormal. Present such values in a nearby unit
+with `.to(...)` first.
 
 NPY deliberately carries only numerical data. Use an explicit external unit:
 
