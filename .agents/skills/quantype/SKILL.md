@@ -37,7 +37,7 @@ Read the relevant specialization and its parent guidance. Load another branch on
 - Physical meaning comes from nominal kinds and declared relationships. Equal dimension vectors do not make kinds interchangeable.
 - `.value` holds raw numbers in the quantity's unit system (`Atomistic` by default). Units convert input and presentation; `.to(unit)` changes presentation without changing storage; `.to_system(T)` is the only bridge between systems.
 - Runtime and static contracts must agree. Generated files come from the catalogue and renderers; change those sources and regenerate rather than editing generated output alone.
-- The base import stays light. NumPy, SciPy, Pydantic, JAX and Torch are deferred until needed; each optional adapter works without the other backend installed.
+- The base import stays light. NumPy, Pydantic, JAX and Torch are deferred until needed; each optional adapter works without the other backend installed.
 - Existing dynamic internals support backend dispatch. Preserve precise public result types rather than widening them to `Any` to make a checker pass.
 
 For ownership across modules, read [architecture](references/architecture.md). For setup, verification commands, and CI scope, read [checks](references/checks.md) when planning validation. These skills support local work; publishing a package or changing remote systems requires authorization for that action.

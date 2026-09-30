@@ -24,9 +24,11 @@ typecheck:
     uv run scripts/check_typing.py
 
 generate:
+    uv run scripts/generate_codata.py
     uv run scripts/generate.py
 
 check-generated:
+    uv run scripts/generate_codata.py --check
     uv run scripts/generate.py --check
 
 test:

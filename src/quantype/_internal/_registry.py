@@ -7,9 +7,13 @@ Dimensions use the named basis below, not SI mass dimensions. Equal dimension
 vectors never imply semantic equality. Relations are deliberately explicit.
 """
 
+import math
 from dataclasses import dataclass
 from functools import cache
-from types import ModuleType
+from types import MappingProxyType
+
+from quantype import codata
+from quantype._internal._codata import Codata, Edition
 
 BASIS = (
     "length",
@@ -71,19 +75,45 @@ QUANTITIES = {
 }
 
 
+@dataclass(frozen=True)
+class _Constants:
+    """SI values that unit definitions use: exact definitions plus one edition."""
+
+    codata: Codata
+    # Exact by definition, whichever CODATA edition is in use.
+    angstrom = 1e-10
+    kilo, centi, milli, nano, pico, femto = 1e3, 1e-2, 1e-3, 1e-9, 1e-12, 1e-15
+    giga, tera = 1e9, 1e12
+    calorie = 4.184  # thermochemical
+    erg = 1e-7
+    zero_Celsius = 273.15  # noqa: N815 -- the conventional symbol
+    degree = math.pi / 180
+
+    @property
+    def electron_volt(self) -> float:
+        return self.codata.elementary_charge
+
+    @property
+    def N_A(self) -> float:  # noqa: N802 -- the conventional symbol
+        return self.codata.avogadro_constant
+
+
+def unit_specs(edition: Edition | None = None) -> MappingProxyType[str, UnitSpec]:
+    """Unit definitions from one CODATA edition; by default, the process's."""
+    return _unit_specs(codata.values(edition))
+
+
 @cache
-def unit_specs() -> dict[str, UnitSpec]:
-    """Resolve installed SciPy constants once, on first use of a unit."""
-    from scipy import constants as c  # noqa: PLC0415
-
-    return {**_common_units(c), **_system_units(c)}
+def _unit_specs(values: Codata) -> MappingProxyType[str, UnitSpec]:
+    c = _Constants(values)
+    return MappingProxyType({**_common_units(c), **_system_units(c)})
 
 
-def _common_units(c: ModuleType) -> dict[str, UnitSpec]:
+def _common_units(c: _Constants) -> dict[str, UnitSpec]:
     ev_joule = c.electron_volt
-    bohr_angstrom = c.physical_constants["Bohr radius"][0] / c.angstrom
-    hartree_ev = c.physical_constants["Hartree energy in eV"][0]
-    bohr_magneton_si = c.physical_constants["Bohr magneton"][0]
+    bohr_angstrom = c.codata.bohr_radius / c.angstrom
+    hartree_ev = c.codata.hartree_energy_in_ev
+    bohr_magneton_si = c.codata.bohr_magneton
     return {
         "one": UnitSpec("Dimensionless", symbol="1", aliases=("dimensionless",)),
         "angstrom": UnitSpec("Length", symbol="Å", aliases=("Å",)),
@@ -178,24 +208,21 @@ def _common_units(c: ModuleType) -> dict[str, UnitSpec]:
     }
 
 
-def _system_units(c: ModuleType) -> dict[str, UnitSpec]:
+def _system_units(c: _Constants) -> dict[str, UnitSpec]:
     """Named derived units, so every built-in system's kinds have catalogue names.
 
     Scales are products of each system's base scales, keeping the systems coherent.
     """
     ev_joule = c.electron_volt
-    au_time = c.physical_constants["atomic unit of time"][0] / c.femto
-    au_moment = (
-        c.physical_constants["atomic unit of mag. dipole mom."][0]
-        / c.physical_constants["Bohr magneton"][0]
-    )
-    bohr = c.physical_constants["Bohr radius"][0] / c.angstrom
-    hartree = c.physical_constants["Hartree energy in eV"][0]
+    au_time = c.codata.atomic_unit_of_time / c.femto
+    au_moment = c.codata.atomic_unit_of_magnetic_dipole_moment / c.codata.bohr_magneton
+    bohr = c.codata.bohr_radius / c.angstrom
+    hartree = c.codata.hartree_energy_in_ev
     kcal_mol = c.kilo * c.calorie / c.N_A / ev_joule
     metre, centimetre = 1 / c.angstrom, c.centi / c.angstrom
     second, picosecond = 1 / c.femto, c.pico / c.femto
     joule, erg = 1 / ev_joule, c.erg / ev_joule
-    ampere_metre2 = 1 / c.physical_constants["Bohr magneton"][0]
+    ampere_metre2 = 1 / c.codata.bohr_magneton
     erg_per_gauss = c.milli * ampere_metre2
     units = {
         # LAMMPS metal: Å, eV, ps.
@@ -299,7 +326,7 @@ def _system_units(c: ModuleType) -> dict[str, UnitSpec]:
     return units
 
 
-def __getattr__(name: str) -> dict[str, UnitSpec]:
+def __getattr__(name: str) -> MappingProxyType[str, UnitSpec]:
     if name == "UNITS":
         return unit_specs()
     raise AttributeError(name)

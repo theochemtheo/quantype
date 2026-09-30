@@ -8,7 +8,7 @@ presentation; they do not change a quantity's physical kind or its storage.
 ## Installation and status
 
 A prototype for scientific and atomistic modelling, not a complete SI unit system.
-Requires Python 3.12+; NumPy, SciPy, and Pydantic v2 are core dependencies.
+Requires Python 3.12+; NumPy and Pydantic v2 are core dependencies.
 
 ```bash
 uv add quantype

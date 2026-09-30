@@ -172,9 +172,27 @@ system when it is not the default; `str` shows only the magnitude and unit.
 
 The reference units behind every conversion are those of `Atomistic`: ångström,
 eV, fs, kelvin, Bohr magneton, atom, and electron. Atom and electron are
-independent dimensional axes. Conversion factors come from the **installed SciPy
-constants**, resolved once on first unit use. Importing `quantype` alone does not
-import NumPy, SciPy, Pydantic, Torch, or JAX.
+independent dimensional axes. Conversion factors come from **CODATA 2022** by
+default, vendored with quantype, so results never depend on another installed
+package. Importing `quantype` alone does not import NumPy, Pydantic, Torch, or
+JAX.
+
+CODATA 2014 and 2018 are carried too, for matching codes that use older
+constants. One edition applies to the whole process, including unit systems and
+generated catalogues, and it is fixed the first time a unit is used. Choose it
+beforehand with `QUANTYPE_CODATA=2018` in the environment, or in code:
+
+```python
+from quantype import codata
+
+codata.use("2022")  # before any unit is used; a later change raises
+assert codata.edition() == "2022"
+assert codata.values().boltzmann_constant == 1.380649e-23  # J/K
+```
+
+`codata.Edition` is the literal type of the carried editions, and
+`codata.values(edition)` returns that edition's typed values. NPZ archives
+record the edition they were written with.
 
 ## Physical algebra
 

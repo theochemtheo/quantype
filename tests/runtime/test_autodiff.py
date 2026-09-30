@@ -9,7 +9,6 @@ pytest.importorskip("jax")
 import jax
 import jax.numpy as jnp
 import numpy as np
-from scipy.constants import N_A
 
 from quantype import (
     Energy,
@@ -160,7 +159,7 @@ def test_jax_rejects_nonscalar_energy() -> None:
 class Gromacs(UnitSystem, name="test-autodiff:gromacs"):
     length = u.nanometer
     energy = Energy.define_unit(
-        "test-autodiff:kJ_per_mol", reference=u.joule, scale=1e3 / N_A
+        "test-autodiff:kJ_per_mol", reference=u.joule, scale=1e3 / 6.02214076e23
     )
     time = u.picosecond
 

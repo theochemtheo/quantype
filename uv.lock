@@ -822,7 +822,6 @@ source = { editable = "." }
 dependencies = [
     { name = "numpy" },
     { name = "pydantic" },
-    { name = "scipy" },
 ]
 
 [package.optional-dependencies]
@@ -845,6 +844,7 @@ dev = [
     { name = "pytest-xdist" },
     { name = "ruff" },
     { name = "rust-just" },
+    { name = "scipy" },
     { name = "scipy-stubs" },
     { name = "tombi" },
     { name = "ty" },
@@ -856,7 +856,6 @@ requires-dist = [
     { name = "jax", marker = "extra == 'jax'", specifier = ">=0.11.2" },
     { name = "numpy", specifier = ">=2" },
     { name = "pydantic", specifier = ">=2.0.3" },
-    { name = "scipy", specifier = ">=1.13" },
     { name = "torch", marker = "extra == 'torch'", specifier = ">=2.14.0", index = "https://download.pytorch.org/whl/cpu" },
 ]
 provides-extras = ["jax", "torch"]
@@ -872,6 +871,7 @@ dev = [
     { name = "pytest-xdist", specifier = ">=3.8.0" },
     { name = "ruff", specifier = ">=0.16.9" },
     { name = "rust-just", specifier = ">=1.58.0" },
+    { name = "scipy", specifier = ">=1.13" },
     { name = "scipy-stubs", specifier = ">=1.13" },
     { name = "tombi", specifier = ">=1.5.8" },
     { name = "ty", specifier = ">=0.0.84" },

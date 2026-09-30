@@ -13,7 +13,6 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 from pydantic import BaseModel, TypeAdapter
-from scipy.constants import N_A, kilo
 
 from quantype import (
     Energy,
@@ -46,7 +45,7 @@ DOCS = Path(__file__).parents[2] / "docs" / "units.md"
 
 # GROMACS uses kJ/mol, which is not a catalogue unit: define it first.
 kilojoule_per_mole = Energy.define_unit(
-    "gromacs:kJ_per_mol", reference=u.joule, scale=kilo / N_A, symbol="kJ/mol"
+    "gromacs:kJ_per_mol", reference=u.joule, scale=1e3 / 6.02214076e23, symbol="kJ/mol"
 )
 
 

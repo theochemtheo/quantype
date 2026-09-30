@@ -113,8 +113,8 @@ def _is_catalogue_unit(unit: Unit[Any]) -> bool:
         return False
 
 
-# Built-in systems name catalogue units, which load SciPy. Their validation is
-# deferred to first use and covered by the test suite instead.
+# Built-in systems name catalogue units, which resolve lazily. Their validation
+# is deferred to first use and covered by the test suite instead.
 _deferred_validation = False
 
 

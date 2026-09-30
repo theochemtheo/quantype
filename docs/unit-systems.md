@@ -12,14 +12,12 @@ need. Nothing is registered globally: the class is usable as soon as it is
 defined, as custom units are.
 
 ```python
-from scipy.constants import N_A, kilo
-
 from quantype import Energy, u
 from quantype.systems import UnitSystem
 
 # GROMACS uses kJ/mol, which is not a catalogue unit: define it first.
 kJ_per_mol = Energy.define_unit(
-    "gromacs:kJ_per_mol", reference=u.joule, scale=kilo / N_A, symbol="kJ/mol"
+    "gromacs:kJ_per_mol", reference=u.joule, scale=1e3 / 6.02214076e23, symbol="kJ/mol"
 )
 
 
@@ -36,13 +34,11 @@ Using it looks the same as using a built-in system:
 ```python
 import numpy as np
 import numpy.typing as npt
-from scipy.constants import N_A, kilo
-
 from quantype import Energy, Force, Length, u
 from quantype.systems import Atomistic, UnitSystem
 
 kJ_per_mol = Energy.define_unit(
-    "gromacs:kJ_per_mol", reference=u.joule, scale=kilo / N_A, symbol="kJ/mol"
+    "gromacs:kJ_per_mol", reference=u.joule, scale=1e3 / 6.02214076e23, symbol="kJ/mol"
 )
 
 

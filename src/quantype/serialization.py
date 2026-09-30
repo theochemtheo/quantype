@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any, TypeGuard, cast, get_args, get_origin
 
 import numpy as np
 
+from quantype import codata
 from quantype._internal._semantics import Kind
 from quantype._internal._storage import (
     backend_name,
@@ -199,7 +200,9 @@ def save_npz(
         if record_backend:
             entry["source_backend"] = backend_name(quantity.value)
         entries[name] = entry
-    arrays["metadata"] = np.asarray(json.dumps({"version": 1, "quantities": entries}))
+    # The CODATA edition is provenance: it fixes what units such as bohr meant.
+    metadata = {"version": 1, "codata": codata.edition(), "quantities": entries}
+    arrays["metadata"] = np.asarray(json.dumps(metadata))
     np.savez(path, **arrays)
 
 
@@ -208,9 +211,10 @@ def _archive_entry(document: object, name: str) -> Mapping[str, str]:
         raise ValueError("Expected a quantity archive metadata object")
     metadata = cast("dict[str, object]", document)
     if (
-        set(metadata) != {"version", "quantities"}
+        set(metadata) - {"codata"} != {"version", "quantities"}
         or type(metadata["version"]) is not int
         or metadata["version"] != 1
+        or not isinstance(metadata.get("codata", ""), str)
     ):
         raise ValueError("Unsupported quantity archive version or metadata fields")
     entries = metadata["quantities"]

@@ -114,7 +114,8 @@ with np.load("frame.npz", allow_pickle=False) as archive:
 ```
 
 Arrays carry dtype and shape, including zero-dimensional and empty arrays.
-Metadata identifies each quantity's kind, unit, and array key. With
+Metadata identifies each quantity's kind, unit, and array key, and records the
+CODATA edition that gave the units their values (for example, `"2022"`). With
 `record_backend=True`, it also records `source_backend`, for example `"numpy"`
 or `"torch"`. That field is **provenance**, not an instruction to import a backend.
 The target type controls restoration, including its storage and unit system;

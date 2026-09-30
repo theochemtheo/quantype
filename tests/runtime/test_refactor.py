@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 import numpy.typing as npt
 import pytest
-from scipy import constants
 
 from quantype import Energy, Length, Temperature, u
 from quantype.serialization import load_npz, save_npz
@@ -35,16 +34,6 @@ def test_typed_constructor_converts_storage_and_units() -> None:
     with pytest.raises(ValueError, match="scalar storage"):
         Length[np.float64]([1, 2], u.nm)
     assert Temperature[float](0, u.temperature.celsius).value == 273.15
-
-
-def test_scipy_is_the_conversion_authority() -> None:
-    assert (
-        u.bohr.scale
-        == constants.physical_constants["Bohr radius"][0] / constants.angstrom
-    )
-    assert u.hartree.scale == constants.physical_constants["Hartree energy in eV"][0]
-    assert u.joule.scale == 1 / constants.electron_volt
-    assert u.celsius.offset == constants.zero_Celsius
 
 
 def test_import_defers_numerical_dependencies() -> None:
