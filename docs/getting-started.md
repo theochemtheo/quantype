@@ -196,8 +196,9 @@ it does not infer physical meaning by cancelling arbitrary dimension expressions
 
 ## Next steps
 
-- [NPZ arrays and NPY boundaries](../README.md#binary-arrays-npz-and-npy)
-- [JAX and Torch differentiation](../README.md#optional-numerical-backends)
+- [Units, storage, and physical algebra](units.md)
+- [JSON, Pydantic, NPZ arrays, and NPY boundaries](serialization.md)
+- [JAX and Torch differentiation](autodiff.md)
   (`uv add 'quantype[jax]'` or `uv add 'quantype[torch]'`)
-- [Application catalogues](../README.md#generate-an-application-catalogue)
-- [Contributor setup and checks](../README.md#development)
+- [Application catalogues](custom-catalogues.md)
+- [Contributor setup and checks](development.md)

@@ -1,281 +1,73 @@
 # quantype
 
-Physical meaning in Python types, with canonical numerical storage. Python 3.12+
-with NumPy, SciPy, and Pydantic v2; JAX and Torch are optional extras.
+Physical meaning in Python types, with canonical numerical storage. quantype
+catches invalid physical operations both statically and at runtime, while NumPy,
+JAX, and Torch do the numerical work. Units describe input and presentation;
+they do not change a quantity's physical kind.
+
+## Installation and status
+
+A prototype for scientific and atomistic modelling, not a complete SI unit system.
+Requires Python 3.12+; NumPy, SciPy, and Pydantic v2 are core dependencies.
 
 ```bash
 uv add quantype
-uv add 'quantype[jax]'       # JAX transformations and autodiff
-uv add 'quantype[torch]'     # Torch tensors and autograd
+uv add 'quantype[jax]'       # optional JAX transformations and autodiff
+uv add 'quantype[torch]'     # optional Torch tensors and autograd
 ```
 
-## Start here
+`python -m pip install quantype` also works in an activated virtual environment.
 
-New to quantype? Follow the [getting-started guide](docs/getting-started.md) for
-standalone scalar, NumPy, and Pydantic examples, an API selection table, and
-troubleshooting. Python 3.12+ is required; `python -m pip install quantype` also
-works in an activated virtual environment.
+## Construction and static physical algebra
 
 ```python
-from quantype import Length, u
+from typing import assert_type
+from quantype import Energy, EnergyDensity, Force, Length, Pressure, u
 
 length = Length[float](2, u.nm)
+energy = Energy[float](3, u.eV)
 assert length.value == 20.0  # canonical angstroms
 assert length.magnitude(u.nm) == 2.0
-assert length.to(u.nm).magnitude() == 2.0  # presentation only
-assert Length.parse(length.to_dict()).value == length.value
+
+force = energy / length
+assert_type(force, Force[float])
+assert force.magnitude(u.eV_per_angstrom) == 0.15
+
+pressure = force / (length**2)
+density = energy / (length**3)
+assert_type(pressure, Pressure[float])
+assert_type(density, EnergyDensity[float])  # same dimensions, different meaning
+
+shown = length.to(u.nm)
+assert shown.value == length.value  # presentation only
+assert shown.magnitude() == 2.0
 ```
 
-## Construction and storage
+The storage argument converts the input, not just its annotation. Declared
+physical relationships determine result types without a type-checker plugin;
+adding a length to an energy is rejected by type checkers and at runtime.
 
-The remaining sections form an extended tour; some snippets reuse earlier
-variables. The [getting-started guide](docs/getting-started.md) has independent,
-copy-and-run examples.
+## NumPy arrays
 
 ```python
 import numpy as np
 import numpy.typing as npt
-from typing import assert_type
-from quantype import Energy, Force, Length, u
+from quantype import Length, u
 
-length = Length[np.float64](2, u.length.nanometer)
-assert_type(length, Length[np.float64])
-assert length.value == 20  # canonical angstroms, stored as a NumPy float64 scalar
-
-positions = Length[npt.NDArray[np.float64]](
-    [[1, 2, 3]],
-    u.length.nanometer,
-)
-energy = Energy[np.float64](3, u.energy.electron_volt)
-assert_type(energy / length, Force[np.float64])
+positions = Length[npt.NDArray[np.float64]]([[0, 0, 0], [3, 4, 0]], u.nm)
+distances = u.sqrt((positions**2).sum(axis=-1))
+np.testing.assert_allclose(distances.magnitude(u.nm), [0, 5])
 ```
 
-The type argument **converts storage** at construction. `np.float64` means a
-NumPy scalar; `npt.NDArray[np.float64]` means an array, including zero-dimensional
-arrays. Python `float` is also supported. Scalars reject non-scalar input; real
-floating storage rejects boolean, complex, and non-numerical magnitudes.
+Use quantity arithmetic and reductions. For other numerical APIs, explicitly
+extract `.value` (canonical data) or `.magnitude(unit)`; implicit coercion is rejected.
 
-Units describe input magnitudes, not the resulting quantity type. Construction
-converts into canonical units and defaults to canonical presentation. Shape and
-symmetry are the caller's responsibility.
-
-Units can also construct quantities directly:
-
-```python
-length = 2 * u.nm
-positions = u.angstrom(np.zeros((100, 3)))
-```
-
-Unit-first construction preserves the input's numerical storage where conversion
-allows it; Python integers become `float`. Use `unit(array)` for reliable
-cross-backend construction; backend-left multiplication is not promised outside
-NumPy.
-
-Hierarchical namespaces use full catalogue names, such as `u.length.nanometer`
-and `u.temperature.celsius`. Flat abbreviations such as `u.nm` are also available.
-Where a flat name conflicts with a namespace, the namespace wins: use
-`u.dimensionless.one`, `u.energy_density.energy_density`, or
-`u.energy_per_volume.energy_per_volume`.
-
-### Explicit numerical boundaries
-
-- `.value` exposes canonical numerical data.
-- `.magnitude(unit)` converts to a compatible unit.
-- `.to(unit)` selects presentation/serialization units without changing data.
-- `.magnitude()` uses the chosen presentation unit, or canonical units.
-- `Length.from_canonical(raw)` is the trusted, storage-preserving boundary. It
-  does not inspect or convert data, including when used in compiled models.
-- Implicit NumPy coercion is rejected rather than silently discarding meaning.
-
-Canonical units are angstrom, eV, fs, kelvin, Bohr magneton, atom, and electron.
-Atom and electron are independent dimensional axes. Conversion factors come
-from the **installed SciPy constants**, resolved once on first unit use. Importing
-`quantype` alone does not import NumPy, SciPy, Pydantic, Torch, or JAX.
-
-## Physical algebra
-
-Kinds are nominal: `Pressure`, `EnergyDensity`, and `EnergyPerVolume` remain
-distinct despite equal dimensions. `Force / Area` yields `Pressure`;
-`Energy / Volume` yields `EnergyDensity`. Incompatible operations are rejected
-both by the supported type checkers and at runtime.
-
-Unlisted products retain structural types such as
-`Quantity[Mul[LengthKind, TimeKind], float]`, not `Any`. Runtime expressions are
-structured trees, not parsed strings. There is no arbitrary symbolic cancellation
-or inference of physical meaning from dimensions alone.
-
-Absolute temperatures are affine points:
-
-```python
-from typing import assert_type
-from quantype import Temperature, TemperatureDifference, u
-
-cold = Temperature[float](0, u.temperature.celsius)
-warm = Temperature[float](300, u.temperature.kelvin)
-assert_type(warm - cold, TemperatureDifference[float])
-```
-
-Differences can be scaled; absolute temperatures cannot be added together,
-multiplied, scaled, or exponentiated. Means of absolute temperatures are valid;
-sums are not.
-
-Quantity methods `.sum()` and `.mean()`, plus `u.sqrt(Area)`, `u.sin(Angle)`, and
-`u.exp(Dimensionless)`, delegate to numerical backends. Array shape algebra and
-arbitrary dtype promotion are
-outside the static contract. Use quantity reductions, not `np.sum(q)` or
-`np.mean(q)`. For indexing and other unsupported array operations, see the
-[explicit NumPy boundary example](docs/getting-started.md#work-with-numpy-arrays).
-
-## Define a unit without global registration
-
-```python
-from math import sqrt
-import numpy as np
-from quantype import Temperature, u
-
-bleb = Temperature.define_unit(
-    "my_lab:bleb",
-    reference=u.temperature.celsius,
-    scale=sqrt(2),
-)
-point = Temperature[np.float64](1, bleb)
-assert point.magnitude(u.temperature.celsius) > 1.4
-```
-
-This definition means `kelvin = bleb * sqrt(2) + 273.15`: zero bleb is zero
-Celsius. In general, `reference_magnitude = input * scale + offset`.
-Definitions are immutable and validated once. A difference unit must be defined
-explicitly using a temperature-difference reference.
-
-A unit object can be used immediately for construction, conversion, and
-serialization. Decoding its identifier requires the definition explicitly:
-
-```python
-wire = point.to(bleb).to_dict()
-restored = Temperature.parse(wire, units=(bleb,))
-```
-
-Namespaced identifiers avoid accidental collisions. Duplicate definitions and
-shadowing built-in identifiers are rejected during decoding. There is no
-import-time mutation of the public unit namespace.
-
-## JSON and Pydantic
-
-Serialized quantities carry an explicit physical kind:
-
-```json
-{"kind": "Length", "magnitude": 5.0, "unit": "angstrom"}
-```
-
-Quantity objects require exactly `kind`, `magnitude`, and `unit`. Scalar strings
-such as `"5 angstrom"` are accepted when the expected quantity kind is supplied.
-
-```python
-import numpy as np
-import numpy.typing as npt
-from pydantic import BaseModel, TypeAdapter
-from quantype import Length, Temperature
-
-
-class Configuration(BaseModel):
-    cutoff: Length[float]
-    positions: Length[npt.NDArray[np.float64]]
-
-
-config = Configuration.model_validate(
-    {
-        "cutoff": "0.5 nm",
-        "positions": {"kind": "Length", "magnitude": [[1, 2, 3]], "unit": "nm"},
-    }
-)
-restored = Configuration.model_validate_json(config.model_dump_json())
-
-# `wire` and `bleb` are from the custom-unit example above.
-adapter = TypeAdapter(Temperature[np.float64])
-restored_point = adapter.validate_python(wire, context={"units": (bleb,)})
-```
-
-Pydantic restoration converts to the annotated storage, including NumPy dtype.
-Bare quantity annotations work at runtime; strict static code should specify
-storage. `Length.parse(...)` intentionally returns scalar-or-float64-array
-storage; use a typed constructor or `TypeAdapter` for a particular target.
-
-JSON stores values, not backend/device/dtype metadata. Serialization is an
-explicit host boundary: Torch tensors are detached and copied to CPU there,
-never inside arithmetic or differentiation.
-
-## Binary arrays: NPZ and NPY
-
-NPZ archives store numerical arrays plus a versioned JSON metadata entry, with
-no pickle dependency:
-
-```python
-from quantype.serialization import load_npz, save_npz
-
-save_npz("frame.npz", positions=positions, energy=energy, record_backend=True)
-restored_positions = load_npz(
-    "frame.npz",
-    "positions",
-    Length[npt.NDArray[np.float64]],
-)
-```
-
-Arrays carry dtype and shape, including zero-dimensional and empty arrays.
-Metadata identifies each quantity's kind, unit, and array key. With
-`record_backend=True`, it also records `source_backend`, for example `"numpy"`
-or `"torch"`. That field is **provenance**, not an instruction to import a backend.
-The target type controls restoration; a Torch-produced archive can be read into
-NumPy without Torch installed. Supply `units=(bleb,)` for custom-unit decoding.
-
-```python
-with np.load("frame.npz", allow_pickle=False) as archive:
-    metadata_json = str(archive["metadata"])
-```
-
-Graphs and device placement are not serialized. Unsupported host dtypes, such as
-Torch bfloat16 through NumPy's normal conversion, are not silently approximated.
-JSON and NPZ are value-oriented formats, not bit-exact snapshots of model state;
-noncanonical unit conversion can introduce floating-point roundoff.
-
-NPY deliberately carries only numerical data. Use an explicit external unit:
-
-```python
-np.save("positions.npy", positions.magnitude(u.nm), allow_pickle=False)
-restored_positions = Length[npt.NDArray[np.float64]](
-    np.load("positions.npy", allow_pickle=False),
-    u.nm,
-)
-```
-
-## Optional numerical backends
-
-```python
-import torch
-from quantype import Energy, Length, u, utorch
-
-x = Length[torch.Tensor](
-    torch.tensor([1.0, 2.0], requires_grad=True),
-    u.length.nanometer,
-    dtype=torch.float64,
-)
-energy = Energy.from_canonical((x.value**2).sum())
-gradient = utorch.grad(energy, x, create_graph=True)
-force = -gradient
-```
-
-Torch differentiation requires an input tensor with `requires_grad=True`;
-constructing `Length[torch.Tensor]` from a list does not enable gradients.
-To extract host values explicitly, use `force.magnitude(u.eV_per_angstrom).detach().cpu().numpy()`.
-This detaches the graph; arithmetic does not.
-
-Torch/JAX classes do not encode dtype, so constructors and `load_npz` accept an
-explicit `dtype=`. Existing Torch tensors retain their graph and device during
-conversion. JAX float64 requests require x64 support; unavailable explicit dtypes
-fail rather than silently producing a different dtype.
+## Differentiation with physical meaning
 
 ```python
 import jax
-from quantype import Energy, Length, u, ujax
+from typing import assert_type
+from quantype import Energy, Force, Length, u, ujax
 
 
 def harmonic(x: Length[jax.Array]) -> Energy[jax.Array]:
@@ -283,75 +75,39 @@ def harmonic(x: Length[jax.Array]) -> Energy[jax.Array]:
     return 0.5 * k * (x**2).sum()
 
 
-x = Length[jax.Array]([1, 2, 3], u.length.angstrom)
-gradient = ujax.jit(ujax.grad(harmonic))(x)
-hessian = ujax.hessian(harmonic)(x)
+x = Length[jax.Array]([1, 2, 3], u.angstrom)
+force = -ujax.jit(ujax.grad(harmonic))(x)
+assert_type(force, Force[jax.Array])
 ```
 
-Importing `ujax` registers quantities as single-leaf pytrees for JAX `jit` and
-`vmap`. Arithmetic and autodiff use the same physical algebra. Gradients are
-positive derivatives; physical force is `-gradient`. The adapters support one
-quantity input and scalar output, not general JVP/VJP or multi-input models.
+Differentiating energy with respect to length returns a **Force**, not a bare
+array, including under JIT. The negative derivative is the physical force.
+[Torch autograd and Hessians](docs/autodiff.md) use the same physical algebra.
 
-## Generate an application catalogue
+## Features
 
-Application catalogues use the same definition model, validation, and renderers
-as the built-in API. Generation requires Ruff for formatting, not a type-checker
-plugin. Install it in the environment running generation (`uv add --dev ruff`
-in an application project, or `python -m pip install ruff`).
+- Nominal physical kinds; equal dimensions do not imply interchangeable meaning.
+- Canonical storage with explicit conversion and numerical boundaries.
+- Affine temperatures, typed reductions, and structural types for unnamed products.
+- JSON, Pydantic, and pickle-free NPZ serialization.
+- Local custom units and generated application catalogues, without global registration.
+- Optional JAX/Torch adapters that preserve graphs during arithmetic.
 
-```python
-from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
-from quantype.codegen import generate
+## Documentation
 
-catalogue = builtin_catalogue().extend(
-    quantities={
-        "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0), "surface_tension"),
-    },
-    units={"surface_tension": UnitSpec("SurfaceTension")},
-    relations={("mul", "Pressure", "Length"): "SurfaceTension"},
-)
-generate(catalogue, "src/labquantities", package="labquantities")
-```
-
-Run generation from your application project, not from quantype's source tree.
-For the `src/` layout above, install your application in editable mode (for example,
-`uv pip install -e .`) so Python can import `labquantities`. Alternatively, generate
-into `"labquantities"` beside a script for a standalone experiment.
-
-Then import consistently from that generated package:
-
-```python
-from typing import assert_type
-from labquantities import Length, Pressure, SurfaceTension, u
-
-length = Length[float](2, u.length.angstrom)
-pressure = Pressure[float](3, u.pressure.pascal)
-assert_type(length * pressure, SurfaceTension[float])
-assert_type(pressure * length, SurfaceTension[float])
-```
-
-Multiplication relations are symmetric; division relations are explicit.
-Generation includes runtime classes, stubs, units, numerical helpers, and
-optional autodiff adapters. `generate(..., check=True)` returns stale file names
-without writing; `render(...)` returns source strings without invoking tools.
-Names and aliases that collide with generated API bindings (such as `sqrt` or
-`get_unit`) are rejected, as are conflicting quantity namespaces.
-
-A generated catalogue is a separate, combined API, not an extension of the
-installed classes. Its `Length` is a distinct nominal type from
-`quantype.Length`; import quantities consistently from the generated package.
-Generating a package does not change `quantype`'s operator overloads.
+- [Getting started](docs/getting-started.md)
+- [Units, storage, and physical algebra](docs/units.md)
+- [Serialization: JSON, Pydantic, NPZ, and NPY](docs/serialization.md)
+- [JAX and Torch autodiff](docs/autodiff.md)
+- [Custom catalogues](docs/custom-catalogues.md)
+- [Development and conformance checks](docs/development.md)
 
 ## Development
 
-From a checkout, [install uv](https://docs.astral.sh/uv/getting-started/installation/)
-and run the following at the repository root. `just` and the type checkers are
-included in the development dependencies; no global `just` installation is needed.
+From a checkout, install [uv](https://docs.astral.sh/uv/getting-started/installation/)
+and run at the repository root. `just` and type checkers are development dependencies.
 
 ```bash
-git clone https://github.com/theochemtheo/quantype.git
-cd quantype
 uv sync --all-extras
 uv run just generate
 uv run just check-generated
@@ -361,21 +117,5 @@ uv run just lint
 uv build
 ```
 
-For a lighter, core-only environment, use `uv sync` and
-`uv run pytest tests/runtime` (optional-backend tests skip when unavailable).
-The `just test`, `just typecheck`, and `just lint` recipes request all extras.
-To install the repository's commit hooks, run `uv run just setup`.
-
-`just lint` runs [zizmor](https://github.com/zizmorcore/zizmor) offline against the
-GitHub Actions workflows; the pre-commit hook checks workflow changes too.
-
-The top-level `quantype` import provides quantities and `u`; `quantype.units`
-holds the unit namespaces. Use `quantype.serialization` for JSON/NPZ boundaries,
-`quantype.ujax` or `quantype.utorch` for optional autodiff, and
-`quantype.catalogue` with `quantype.codegen` for application catalogues.
-`quantype.core` and `quantype.kinds` expose base types and structural markers
-for advanced annotations.
-
-The conformance suite checks runtime behavior, positive and negative typing
-examples across mypy, Pyright, Pyrefly, and ty, and runtime/stub agreement.
-CI tests core-only, JAX-only, Torch-only, and minimum-core-dependency environments.
+For core-only testing, use `uv sync` and `uv run pytest tests/runtime`.
+See the [development guide](docs/development.md) for hooks and CI details.

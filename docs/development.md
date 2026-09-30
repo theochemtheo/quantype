@@ -1,0 +1,42 @@
+# Development
+
+## Setup and commands
+
+From a checkout, [install uv](https://docs.astral.sh/uv/getting-started/installation/)
+and run the following at the repository root. `just` and the type checkers are
+included in the development dependencies; no global `just` installation is needed.
+
+```bash
+git clone https://github.com/theochemtheo/quantype.git
+cd quantype
+uv sync --all-extras
+uv run just generate
+uv run just check-generated
+uv run just test
+uv run just typecheck
+uv run just lint
+uv build
+```
+
+For a lighter, core-only environment, use `uv sync` and
+`uv run pytest tests/runtime` (optional-backend tests skip when unavailable).
+The `just test`, `just typecheck`, and `just lint` recipes request all extras.
+To install the repository's commit hooks, run `uv run just setup`.
+
+`just lint` runs [zizmor](https://github.com/zizmorcore/zizmor) offline against the
+GitHub Actions workflows; the pre-commit hook checks workflow changes too.
+
+## Package layout
+
+The top-level `quantype` import provides quantities and `u`; `quantype.units`
+holds the unit namespaces. Use `quantype.serialization` for JSON/NPZ boundaries,
+`quantype.ujax` or `quantype.utorch` for optional autodiff, and
+`quantype.catalogue` with `quantype.codegen` for application catalogues.
+`quantype.core` and `quantype.kinds` expose base types and structural markers
+for advanced annotations.
+
+## Conformance
+
+The conformance suite checks runtime behavior, positive and negative typing
+examples across mypy, Pyright, Pyrefly, and ty, and runtime/stub agreement.
+CI tests core-only, JAX-only, Torch-only, and minimum-core-dependency environments.
