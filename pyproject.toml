@@ -129,7 +129,11 @@ flake8-tidy-imports = { "ban-relative-imports" = "all" }
 "src/quantype/core.py" = ["ANN401", "PLC0415", "SLF001"]
 "src/quantype/core.pyi" = ["ANN401"]
 "src/quantype/_generated.pyi" = ["ANN401"]
-"src/quantype/_internal/_math.py" = ["ANN401", "PLC0415"]
+"src/quantype/numpy.pyi" = ["ANN401"]
+"src/quantype/_internal/_numpy.py" = ["ANN401", "PLC0415", "SLF001"]
+# The JAX and Torch adapters are dynamic backend boundaries.
+"src/quantype/_internal/_jax.py" = ["ANN401"]
+"src/quantype/_internal/_torch.py" = ["ANN401"]
 
 [tool.ty.environment]
 python-version = "3.12"

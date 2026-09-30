@@ -11,7 +11,8 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from quantype import ForceConstant, Length, u, ujax
+import quantype.numpy as qnp
+from quantype import Angle, Dimensionless, Energy, Force, ForceConstant, Length, u, ujax
 from quantype.systems import SI, Atomistic, Metal, UnitSystem
 
 if TYPE_CHECKING:
@@ -110,3 +111,57 @@ def test_backend_scalars_and_traced_values_scale_quantities() -> None:
     np.testing.assert_allclose(np.asarray(scaled.value, dtype=np.float64), [3, 6])
     weighted = length * _jnp.ones(2)
     np.testing.assert_allclose(np.asarray(weighted.value, dtype=np.float64), [1, 2])
+
+
+def _pair_energy(x: Length[jax.Array], k: ForceConstant[float]) -> Energy[jax.Array]:
+    return 0.5 * k * (x**2).sum()
+
+
+def test_value_and_grad_evaluates_once_and_passes_parameters_through() -> None:
+    x = Length[jax.Array](_jnp.array([1.0, 2.0]), u.angstrom)
+    k = ForceConstant[float](2.0, u.eV_per_angstrom_squared)
+    energy, gradient = ujax.value_and_grad(_pair_energy)(x, k)
+    assert isinstance(energy, Energy)
+    assert isinstance(gradient, Force)
+    assert float(energy.value) == 5.0
+    np.testing.assert_allclose(np.asarray(gradient.value, dtype=np.float64), [2, 4])
+    compiled: Any = _jit(ujax.value_and_grad(_pair_energy))
+    energy, gradient = compiled(x, k)
+    np.testing.assert_allclose(np.asarray(gradient.value, dtype=np.float64), [2, 4])
+    hessian = ujax.hessian(_pair_energy)(x, k)
+    assert isinstance(hessian, ForceConstant)
+
+
+def test_argnums_differentiates_several_quantities() -> None:
+    def energy(x: Length[jax.Array], y: Length[jax.Array]) -> Energy[jax.Array]:
+        k = 2.0 * u.eV_per_angstrom_squared
+        return 0.5 * k * ((x**2).sum() + (y**2).sum())
+
+    x = Length[jax.Array](_jnp.array([1.0]), u.angstrom)
+    y = Length[jax.Array](_jnp.array([3.0]), u.angstrom)
+    gradients: Any = ujax.grad(energy, argnums=(0, 1))(x, y)
+    assert [type(g) for g in gradients] == [Force, Force]
+    np.testing.assert_allclose(np.asarray(gradients[1].value, dtype=np.float64), [6])
+    second: Any = ujax.grad(energy, argnums=1)(x, y)
+    assert isinstance(second, Force)
+    untyped: Any = ujax.grad(energy, argnums=1)
+    with pytest.raises(TypeError, match="Differentiated argument 1 must be a quantity"):
+        untyped(x, 3.0)
+
+
+def test_quantype_numpy_works_on_jax_arrays() -> None:
+    angles = Angle[jax.Array](_jnp.array([0.0, 90.0]), u.deg)
+    cosines = qnp.cos(angles)
+    assert isinstance(cosines, Dimensionless)
+    np.testing.assert_allclose(
+        np.asarray(cosines.value, dtype=np.float64), [1, 0], atol=1e-6
+    )
+    positions = Length[jax.Array](_jnp.array([[3.0, 4.0]]), u.angstrom)
+    distances = qnp.linalg.norm(positions, axis=-1)
+    np.testing.assert_allclose(np.asarray(distances.value, dtype=np.float64), [5])
+
+    def distance(x: Length[jax.Array]) -> Length[jax.Array]:
+        return qnp.linalg.norm(x, axis=-1).sum()
+
+    traced: Any = _jit(distance)(positions)
+    np.testing.assert_allclose(float(traced.value), 5)

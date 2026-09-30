@@ -1,5 +1,6 @@
 """Run with pytest after generating labquantities in this fixture project."""
 
+import labquantities.numpy as qnp
 import pytest
 from labquantities import (
     InverseTime,
@@ -74,7 +75,7 @@ def test_unit_systems_cover_new_kinds() -> None:
     assert SurfaceTension[float, SI].parse(wire).value == pytest.approx(6e-9)
     restored = SurfaceTension.parse(wire, units=SI.units)
     assert restored.magnitude(unit) == pytest.approx(6e-9)
-    assert u.sqrt(Length[float, SI](2, u.nm) ** 2).system is SI
+    assert qnp.sqrt(Length[float, SI](2, u.nm) ** 2).system is SI
 
 
 def test_portable_unit_factors() -> None:
@@ -99,10 +100,13 @@ def test_serialization_roundtrip() -> None:
 def test_math_preserves_catalogue() -> None:
     length = Length[float](2, u.length.angstrom)
 
-    result = u.sqrt(length**2)
+    result = qnp.sqrt(length**2)
 
     assert isinstance(result, Length)
     assert result.value == length.value
+    ratio = length / length
+    assert type(qnp.exp(ratio)) is type(ratio)  # the catalogue's own Dimensionless
+    assert type(qnp.arccos(ratio)).__module__.startswith("labquantities")
 
 
 def test_temperature_difference() -> None:

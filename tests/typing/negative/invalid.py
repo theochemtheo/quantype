@@ -1,5 +1,6 @@
 """Each marked line must produce a diagnostic in every supported checker."""
 
+import quantype.numpy as qnp
 from quantype import Energy, EnergyPerAtom, Force, Length, Pressure, Temperature
 from quantype import units as u
 from quantype.systems import SI, Metal, UnitSystem
@@ -23,9 +24,9 @@ bad_conversion = (1.0 * u.angstrom).to(u.eV)  # error
 pressure_only((1.0 * u.eV) / ((1.0 * u.angstrom) ** 3))  # error
 per_atom_only(1.0 * u.eV)  # error
 bad_temperature = (300 * u.K) + (280 * u.K)  # error
-bad_sine = u.sin(2.0 * u.angstrom)  # error
-bad_exponential = u.exp(1.0 * u.eV)  # error
-bad_root = u.sqrt(1.0 * u.eV)  # error
+bad_sine = qnp.sin(2.0 * u.angstrom)  # error
+bad_exponential = qnp.exp(1.0 * u.eV)  # error
+bad_root = qnp.sqrt(1.0 * u.eV)  # error
 bad_constructor = Length[float](2, u.energy.hartree)  # error
 bad_definition = Temperature.define_unit("bleb", reference=u.nm)  # error
 missing_unit = Length[float](2)  # error

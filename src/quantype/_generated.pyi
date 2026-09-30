@@ -170,6 +170,10 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     @override
     def __abs__(self) -> Dimensionless[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Dimensionless[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Dimensionless[V, S]: ...
@@ -676,6 +680,10 @@ class Length(Quantity[LengthKind, V, S]):
     @override
     def __abs__(self) -> Length[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Length[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Length[V, S]: ...
@@ -906,6 +914,10 @@ class Area(Quantity[AreaKind, V, S]):
     @override
     def __abs__(self) -> Area[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Area[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Area[V, S]: ...
@@ -1090,6 +1102,10 @@ class Volume(Quantity[VolumeKind, V, S]):
     def __neg__(self) -> Volume[V, S]: ...
     @override
     def __abs__(self) -> Volume[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Volume[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -1314,6 +1330,10 @@ class Time(Quantity[TimeKind, V, S]):
     @override
     def __abs__(self) -> Time[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Time[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Time[V, S]: ...
@@ -1531,6 +1551,10 @@ class Velocity(Quantity[VelocityKind, V, S]):
     @override
     def __abs__(self) -> Velocity[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Velocity[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Velocity[V, S]: ...
@@ -1739,6 +1763,10 @@ class Energy(Quantity[EnergyKind, V, S]):
     def __neg__(self) -> Energy[V, S]: ...
     @override
     def __abs__(self) -> Energy[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Energy[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -2071,6 +2099,10 @@ class EnergyPerAtom(Quantity[EnergyPerAtomKind, V, S]):
     @override
     def __abs__(self) -> EnergyPerAtom[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> EnergyPerAtom[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> EnergyPerAtom[V, S]: ...
@@ -2251,6 +2283,10 @@ class Force(Quantity[ForceKind, V, S]):
     def __neg__(self) -> Force[V, S]: ...
     @override
     def __abs__(self) -> Force[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Force[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -2489,6 +2525,10 @@ class ForceConstant(Quantity[ForceConstantKind, V, S]):
     @override
     def __abs__(self) -> ForceConstant[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> ForceConstant[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> ForceConstant[V, S]: ...
@@ -2682,6 +2722,10 @@ class Pressure(Quantity[PressureKind, V, S]):
     @override
     def __abs__(self) -> Pressure[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Pressure[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Pressure[V, S]: ...
@@ -2865,6 +2909,10 @@ class EnergyDensity(Quantity[EnergyDensityKind, V, S]):
     @override
     def __abs__(self) -> EnergyDensity[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> EnergyDensity[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> EnergyDensity[V, S]: ...
@@ -3041,6 +3089,10 @@ class EnergyPerVolume(Quantity[EnergyPerVolumeKind, V, S]):
     def __neg__(self) -> EnergyPerVolume[V, S]: ...
     @override
     def __abs__(self) -> EnergyPerVolume[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> EnergyPerVolume[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -3232,6 +3284,10 @@ class Temperature(Quantity[TemperatureKind, V, S]):
     def __neg__(self) -> Temperature[V, S]: ...
     @override
     def __abs__(self) -> Temperature[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> TemperatureDifference[V, S]: ...
     @overload
     @override
     def __mul__[W](
@@ -3431,6 +3487,10 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
     def __neg__(self) -> TemperatureDifference[V, S]: ...
     @override
     def __abs__(self) -> TemperatureDifference[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> TemperatureDifference[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -3643,6 +3703,10 @@ class TemperatureRate(Quantity[TemperatureRateKind, V, S]):
     @override
     def __abs__(self) -> TemperatureRate[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> TemperatureRate[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> TemperatureRate[V, S]: ...
@@ -3831,6 +3895,10 @@ class MagneticMoment(Quantity[MagneticMomentKind, V, S]):
     def __neg__(self) -> MagneticMoment[V, S]: ...
     @override
     def __abs__(self) -> MagneticMoment[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> MagneticMoment[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -4029,6 +4097,10 @@ class Magnetization(Quantity[MagnetizationKind, V, S]):
     @override
     def __abs__(self) -> Magnetization[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Magnetization[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Magnetization[V, S]: ...
@@ -4213,6 +4285,10 @@ class ParticleDensity(Quantity[ParticleDensityKind, V, S]):
     def __neg__(self) -> ParticleDensity[V, S]: ...
     @override
     def __abs__(self) -> ParticleDensity[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> ParticleDensity[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -4403,6 +4479,10 @@ class ElectronDensity(Quantity[ElectronDensityKind, V, S]):
     @override
     def __abs__(self) -> ElectronDensity[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> ElectronDensity[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> ElectronDensity[V, S]: ...
@@ -4588,6 +4668,10 @@ class Angle(Quantity[AngleKind, V, S]):
     @override
     def __abs__(self) -> Angle[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Angle[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Angle[V, S]: ...
@@ -4756,6 +4840,10 @@ class Frequency(Quantity[FrequencyKind, V, S]):
     def __neg__(self) -> Frequency[V, S]: ...
     @override
     def __abs__(self) -> Frequency[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Frequency[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -4935,6 +5023,10 @@ class InverseTime(Quantity[InverseTimeKind, V, S]):
     def __neg__(self) -> InverseTime[V, S]: ...
     @override
     def __abs__(self) -> InverseTime[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> InverseTime[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -5122,6 +5214,10 @@ class AtomCount(Quantity[AtomCountKind, V, S]):
     def __neg__(self) -> AtomCount[V, S]: ...
     @override
     def __abs__(self) -> AtomCount[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> AtomCount[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -5324,6 +5420,10 @@ class ElectronCount(Quantity[ElectronCountKind, V, S]):
     @override
     def __abs__(self) -> ElectronCount[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> ElectronCount[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> ElectronCount[V, S]: ...
@@ -5512,6 +5612,10 @@ class Mass(Quantity[MassKind, V, S]):
     def __neg__(self) -> Mass[V, S]: ...
     @override
     def __abs__(self) -> Mass[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Mass[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -5712,6 +5816,10 @@ class MassDensity(Quantity[MassDensityKind, V, S]):
     @override
     def __abs__(self) -> MassDensity[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> MassDensity[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> MassDensity[V, S]: ...
@@ -5896,6 +6004,10 @@ class Momentum(Quantity[MomentumKind, V, S]):
     def __neg__(self) -> Momentum[V, S]: ...
     @override
     def __abs__(self) -> Momentum[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Momentum[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -6112,6 +6224,10 @@ class Acceleration(Quantity[AccelerationKind, V, S]):
     @override
     def __abs__(self) -> Acceleration[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Acceleration[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Acceleration[V, S]: ...
@@ -6300,6 +6416,10 @@ class Charge(Quantity[ChargeKind, V, S]):
     def __neg__(self) -> Charge[V, S]: ...
     @override
     def __abs__(self) -> Charge[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Charge[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -6499,6 +6619,10 @@ class ElectricPotential(Quantity[ElectricPotentialKind, V, S]):
     def __neg__(self) -> ElectricPotential[V, S]: ...
     @override
     def __abs__(self) -> ElectricPotential[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> ElectricPotential[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -6705,6 +6829,10 @@ class ElectricField(Quantity[ElectricFieldKind, V, S]):
     @override
     def __abs__(self) -> ElectricField[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> ElectricField[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> ElectricField[V, S]: ...
@@ -6905,6 +7033,10 @@ class DipoleMoment(Quantity[DipoleMomentKind, V, S]):
     def __neg__(self) -> DipoleMoment[V, S]: ...
     @override
     def __abs__(self) -> DipoleMoment[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> DipoleMoment[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
@@ -7107,6 +7239,10 @@ class Entropy(Quantity[EntropyKind, V, S]):
     @override
     def __abs__(self) -> Entropy[V, S]: ...
     @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Entropy[V, S]: ...
+    @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
     ) -> Entropy[V, S]: ...
@@ -7293,6 +7429,10 @@ class Action(Quantity[ActionKind, V, S]):
     def __neg__(self) -> Action[V, S]: ...
     @override
     def __abs__(self) -> Action[V, S]: ...
+    @override
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Action[V, S]: ...
     @override
     def sum(
         self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False

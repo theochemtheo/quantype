@@ -8,6 +8,7 @@ import numpy as np
 import numpy.typing as npt
 import torch
 
+import quantype.numpy as qnp
 from quantype import (
     Area,
     Dimensionless,
@@ -64,9 +65,9 @@ assert_type(positions, Length[npt.NDArray[np.float64]])
 assert_type(u.angstrom * array, Length[npt.NDArray[np.float64]])
 assert_type(positions.sum(), Length[npt.NDArray[np.float64]])
 assert_type(positions.mean(), Length[npt.NDArray[np.float64]])
-assert_type(u.sqrt(positions**2), Length[npt.NDArray[np.float64]])
-assert_type(u.sin(u.degree(array)), Dimensionless[npt.NDArray[np.float64]])
-assert_type(u.exp(u.one(array)), Dimensionless[npt.NDArray[np.float64]])
+assert_type(qnp.sqrt(positions**2), Length[npt.NDArray[np.float64]])
+assert_type(qnp.sin(u.degree(array)), Dimensionless[npt.NDArray[np.float64]])
+assert_type(qnp.exp(u.one(array)), Dimensionless[npt.NDArray[np.float64]])
 
 
 def harmonic_jax(x: Length[jax.Array]) -> Energy[jax.Array]:

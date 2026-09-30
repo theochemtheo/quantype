@@ -8,6 +8,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
+import quantype.numpy as qnp
 from quantype import (
     Area,
     Energy,
@@ -174,25 +175,33 @@ def test_numpy_workflow() -> None:
     assert isinstance(positions.sum().value, np.ndarray)
     assert positions.sum().value == 6
     assert positions.mean().value == 2
-    np.testing.assert_allclose(u.sqrt(positions**2).value, raw)
-    np.testing.assert_allclose(u.sin(u.degree(np.array([0.0, 90.0]))).value, [0, 1])
+    np.testing.assert_allclose(qnp.sqrt(positions**2).value, raw)
+    np.testing.assert_allclose(qnp.sin(u.degree(np.array([0.0, 90.0]))).value, [0, 1])
     np.testing.assert_allclose((u.angstrom * raw).value, raw)
     np.testing.assert_allclose((raw * u.angstrom).value, raw)
     with pytest.raises(TypeError, match="Implicit array coercion"):
         np.asarray(positions)
     untyped: Any = positions
-    with pytest.raises(TypeError, match="quantity arithmetic"):
+    with pytest.raises(TypeError, match="sin expects Angle, received Length"):
         np.sin(untyped)
 
 
 @pytest.mark.parametrize("function", [np.sum, np.mean, np.concatenate])
-def test_numpy_functions_explain_explicit_boundary(
-    function: Callable[[Any], Any],
-) -> None:
+def test_numpy_functions_keep_units(function: Callable[[Any], Any]) -> None:
     quantity: Any = u.angstrom(np.array([1.0, 2.0]))
     argument = [quantity, quantity] if function is np.concatenate else quantity
-    with pytest.raises(TypeError, match=r"quantity methods.*\.magnitude\(unit\)"):
-        function(argument)
+    assert isinstance(function(argument), Length)
+
+
+@pytest.mark.parametrize(
+    "function", [np.fft.fft, np.cumprod, np.linalg.inv], ids=lambda f: f.__name__
+)
+def test_other_numpy_functions_explain_explicit_boundary(
+    function: Callable[[Any], Any],
+) -> None:
+    quantity: Any = u.angstrom(np.eye(2))
+    with pytest.raises(TypeError, match=r"quantype\.numpy.*\.magnitude\(unit\)"):
+        function(quantity)
 
 
 def test_unit_first_list_error_explains_construction() -> None:

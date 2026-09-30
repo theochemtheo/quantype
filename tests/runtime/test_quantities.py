@@ -8,6 +8,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
+import quantype.numpy as qnp
 from quantype import (
     Area,
     Dimensionless,
@@ -219,15 +220,15 @@ def test_reflected_numpy_scalars() -> None:
     assert inverse.kind == "InverseTime"
     assert inverse.value == 1.0
     untyped: Any = q
-    with pytest.raises(TypeError, match="math helpers"):
+    with pytest.raises(TypeError, match="Cannot add float64 and Length"):
         np.add(np.float64(1), untyped)
 
 
 def test_math_helpers_keep_the_system() -> None:
     area = Area[float, SI](4, u.square_meter)
-    assert u.sqrt(area).system is SI
-    assert u.sqrt(area).value == pytest.approx(2.0)
-    assert u.exp(Dimensionless[float, SI](0, u.one)).system is SI
+    assert qnp.sqrt(area).system is SI
+    assert qnp.sqrt(area).value == pytest.approx(2.0)
+    assert qnp.exp(Dimensionless[float, SI](0, u.one)).system is SI
 
 
 def test_derived_kinds_of_one_system_multiply_coherently() -> None:

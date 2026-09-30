@@ -96,12 +96,13 @@ error and a runtime `TypeError`; `.to_system(...)` is the explicit bridge. See
 import numpy as np
 import numpy.typing as npt
 
+import quantype.numpy as qnp
 from quantype import Length, u
 
 positions = Length[npt.NDArray[np.float64]]([[0, 0, 0], [3, 4, 0]], u.nm)
 origin = positions[0]
 displacements = positions - origin
-distances = u.sqrt((displacements**2).sum(axis=-1))
+distances = qnp.sqrt((displacements**2).sum(axis=-1))
 
 np.testing.assert_allclose(distances.magnitude(u.nm), [0, 5])
 np.testing.assert_allclose(positions.mean(axis=0).magnitude(u.nm), [1.5, 2, 0])
@@ -110,16 +111,21 @@ np.testing.assert_array_equal(distances < 1 * u.nm, [True, False])
 assert distances.max() == 5 * u.nm
 ```
 
-Call quantity methods such as `q.sum(axis=...)` and `q.mean(axis=...)`, not
-`np.sum(q)` or `np.mean(q)`. Use `q**2` and `u.sqrt(q)`, not NumPy ufuncs on
-quantities. `np.asarray(q)` is deliberately rejected: use `q.value` or
-`q.magnitude(unit)` to cross the numerical boundary explicitly.
+`quantype.numpy`, imported as `qnp`, has NumPy's names with unit rules, and
+works on NumPy, JAX, and Torch arrays: `qnp.cos(angle)` is `Dimensionless`,
+`qnp.arccos(ratio)` an `Angle`, and `qnp.linalg.norm(positions, axis=-1)` a
+`Length`. NumPy's and Torch's own functions apply the same rules, so `np.cos(q)`
+and `np.sum(q)` work too, though their static types cannot name the result's
+kind. JAX's `jnp` functions cannot see quantities; use `qnp` in JAX code.
+Functions without a unit rule, such as FFTs, raise, as does `np.asarray(q)`:
+use `q.value` or `q.magnitude(unit)` to cross the numerical boundary explicitly.
 
 Indexing, iteration, `len()`, `.shape`, `.max()`, `.min()`, and comparisons keep
 physical meaning. Ordering comparisons need the same kind and unit system and
 return backend booleans; `==` compares values, element-wise for arrays, and
-quantities of different kinds or systems are simply unequal. For reshaping
-and other array operations, operate on `.value` and rewrap with
+quantities of different kinds or systems are simply unequal. So do
+`q.reshape(...)`, `q.T`, `q.squeeze()`, `q.cumsum()`, and `q.std()`. For other
+array operations, operate on `.value` and rewrap with
 `Length.from_value(...)` when the result still represents lengths in the same
 system. This trusted constructor does **not** validate or convert its input.
 Shape validation remains the caller's responsibility.
@@ -245,7 +251,7 @@ or differentiation graphs.
 | `Expected Length; received Energy` | Check the input's physical kind and unit; conversion cannot turn energy into length. |
 | `Unknown unit` for a custom identifier | Supply its definition at the decoding boundary. |
 | `u.length.nm` raises `AttributeError` | Hierarchical namespaces use full names: `u.length.nanometer`. Abbreviations are flat: `u.nm`. |
-| Implicit NumPy coercion or ufunc error | Use quantity arithmetic, `.sum()`/`.mean()`, and `u.sqrt`/`u.sin`/`u.exp`; extract magnitudes for other numerical APIs. |
+| `np.fft does not know the units of a quantity` | That function has no unit rule; pass `.value` or `.magnitude(unit)` explicitly. `quantype.numpy` lists the functions that have one. |
 | `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists are not magnitudes; convert lists with `np.asarray`. |
 | `Cannot add int and Length; give it a unit` | Only zero, so that `sum()` works, and `Dimensionless` values mix with plain numbers. |
 | `The truth value of a Length quantity is ambiguous` | Compare explicitly, such as `q > 0 * u.nm`, or test `q is not None`. |

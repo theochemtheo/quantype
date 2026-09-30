@@ -69,7 +69,7 @@ def generate(
                     "check",
                     "--fix",
                     "--select",
-                    "I",
+                    "I,RUF022",
                     "--stdin-filename",
                     name,
                     "-",

@@ -330,13 +330,14 @@ comparisons require the same kind and system, statically and at runtime, and
 return backend booleans.
 
 Indexing, iteration, `.shape`, `.ndim`, `len()`, `.sum()`, `.mean()`, `.max()`,
-and `.min()` keep the kind, system, and display unit. `u.sqrt(Area)`,
-`u.sin(Angle)`, and `u.exp(Dimensionless)` keep the system. Any real number or
+and `.min()` keep the kind, system, and display unit. `qnp.sqrt(Area)`,
+`qnp.sin(Angle)`, and `qnp.exp(Dimensionless)` keep the system. Any real number or
 numerical array multiplies and divides a quantity from either side, and the
 quantity keeps its dtype; a scalar quantity scaled by an array becomes an array.
 Array shape algebra and arbitrary dtype promotion are outside the static
-contract. Use quantity reductions, not `np.sum(q)` or `np.mean(q)`. Builtin
-`sum()` works too, because zero, alone among plain numbers, may be added to a
+contract. `np.sum(q)`, `np.cos(angle)`, and the other functions of
+`quantype.numpy` apply the same rules through NumPy's dispatch. Builtin `sum()`
+works too, because zero, alone among plain numbers, may be added to a
 quantity.
 
 `Dimensionless` values mix with plain numbers: `ratio + 1`, `ratio < 0.5`, and

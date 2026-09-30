@@ -80,13 +80,13 @@ def test_invalid_catalogue_extension() -> None:
 @pytest.mark.parametrize(
     "name",
     [
-        "sqrt",
-        "sin",
-        "exp",
-        "get_unit",
-        "runtime",
+        "_typing",
+        "_get_unit",
+        "_runtime",
+        "_NAMES",
+        "overload",
         "Unit",
-        "cast",
+        "np",
         "Any",
         "globals",
         "__name__",
@@ -116,7 +116,7 @@ def test_unit_identifiers_cannot_shadow_generated_bindings(
         builtin_catalogue().extend(quantities={}, units=units)
 
 
-@pytest.mark.parametrize("kind", ["Sqrt", "Sin", "Exp", "GetUnit", "Runtime"])
+@pytest.mark.parametrize("kind", ["Overload", "Np", "Globals"])
 def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None:
     with pytest.raises(ValueError, match="Conflicting quantity namespace"):
         builtin_catalogue().extend(
@@ -145,7 +145,7 @@ def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None
         "utorch",
         "_generated",
         "_catalogue",
-        "_math",
+        "numpy",
         "Callable",
         "Array",
         "Tensor",

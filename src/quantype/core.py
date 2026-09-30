@@ -661,26 +661,98 @@ class Quantity[K, V, S: UnitSystem]:
     def __array_ufunc__(
         self, ufunc: Any, method: str, *inputs: Any, **kwargs: Any
     ) -> Any:
-        # A NumPy scalar on the left (np.float64(2) * q) dispatches here.
-        if (
-            method == "__call__"
-            and not kwargs
-            and len(inputs) == 2  # noqa: PLR2004 -- binary ufunc
-            and ufunc.__name__ in {"multiply", "divide"}
-        ):
-            left, right = inputs
-            if left is self and not isinstance(right, Quantity):
-                return self * right if ufunc.__name__ == "multiply" else self / right
-            if right is self and not isinstance(left, Quantity):
-                if ufunc.__name__ == "multiply":
-                    return self.__rmul__(left)
-                return self.__rtruediv__(left)
-        raise TypeError("Use quantity arithmetic or quantype.units math helpers")
+        """``np.cos(angle)`` and friends apply quantype's unit rules.
 
-    def __array_function__(self, *args: Any, **kwargs: Any) -> Any:
-        raise TypeError(
-            "Use quantity methods such as .sum() and .mean(), or pass "
-            ".value or .magnitude(unit) to NumPy explicitly"
+        Supported ufuncs are those of ``quantype.numpy``, plus arithmetic and
+        comparisons. Results keep physical meaning, though NumPy's static types
+        cannot say so; ``quantype.numpy`` is the typed spelling.
+        """
+        from quantype._internal._numpy import REFLECTED, UFUNCS
+
+        name = str(ufunc.__name__)
+        function = UFUNCS.get(name)
+        if method != "__call__" or kwargs or function is None:
+            raise TypeError(
+                f"np.{name}{'' if method == '__call__' else '.' + method} does not "
+                "know the units of a quantity; use quantype.numpy, quantity "
+                "methods, or .value and .magnitude(unit) explicitly"
+            )
+        # An array on the left (array * q) arrives here from ndarray.__mul__, so
+        # hand it to the quantity's reflected operator instead of recursing.
+        binary = len(inputs) == 2  # noqa: PLR2004 -- binary ufunc
+        if binary and inputs[1] is self and not isinstance(inputs[0], Quantity):
+            reflected = REFLECTED.get(name)
+            result = (
+                NotImplemented
+                if reflected is None
+                else getattr(self, reflected)(inputs[0])
+            )
+            if result is NotImplemented:
+                raise TypeError(f"np.{name} of a plain array and {self.kind}")
+            return result
+        return function(*inputs)
+
+    def __array_function__(self, func: Any, types: Any, args: Any, kwargs: Any) -> Any:
+        """``np.sum(q)``, ``np.stack([...])`` and friends apply unit rules."""
+        from quantype._internal._numpy import FUNCTIONS, LINALG
+
+        name = str(func.__name__)
+        table = LINALG if str(func.__module__).endswith("linalg") else FUNCTIONS
+        function = table.get(name)
+        if function is None:
+            raise TypeError(
+                f"np.{name} does not know the units of a quantity; use "
+                "quantype.numpy, quantity methods, or .value and .magnitude(unit)"
+            )
+        return function(*args, **kwargs)
+
+    @classmethod
+    def __torch_function__(
+        cls, func: Any, types: Any, args: Any = (), kwargs: Any = None
+    ) -> Any:
+        """``torch.cos(angle)`` and friends apply unit rules, as NumPy's do."""
+        from quantype._internal._numpy import torch_function
+
+        return torch_function(func, args, kwargs or {})
+
+    @property
+    def dtype(self) -> Any:
+        """The storage's dtype; None for Python scalars."""
+        return getattr(self._value, "dtype", None)
+
+    def reshape(self, *shape: Any) -> Self:
+        from quantype._internal._numpy import reshape
+
+        target = shape[0] if len(shape) == 1 else shape
+        return cast("Self", reshape(self, target))
+
+    def transpose(self, *axes: int) -> Self:
+        from quantype._internal._numpy import transpose
+
+        return cast("Self", transpose(self, axes or None))
+
+    @property
+    def T(self) -> Self:  # noqa: N802 -- NumPy's name
+        return self.transpose()
+
+    def squeeze(self, axis: int | None = None) -> Self:
+        from quantype._internal._numpy import squeeze
+
+        return cast("Self", squeeze(self, axis))
+
+    def cumsum(self, axis: int | None = None) -> Self:
+        from quantype._internal._numpy import cumsum
+
+        return cast("Self", cumsum(self, axis))
+
+    def std(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Quantity[Any, Any, Any]:
+        """Standard deviation; of absolute temperatures, a temperature difference."""
+        from quantype._internal._numpy import std
+
+        return cast(
+            "Quantity[Any, Any, Any]", std(self, axis, ddof=ddof, keepdims=keepdims)
         )
 
     def _symbol(self) -> str:

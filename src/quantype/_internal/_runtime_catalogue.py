@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from quantype._internal._semantics import (
+    CATALOGUE_KINDS,
     DIMENSIONLESS_KINDS,
     EXPONENTS,
     PRODUCTS,
@@ -35,6 +36,7 @@ class RuntimeCatalogue:
             DIMENSIONLESS_KINDS.update(
                 dict.fromkeys(self.kinds.values(), self.kinds["Dimensionless"])
             )
+            CATALOGUE_KINDS[self.kinds["Dimensionless"]] = self.kinds
         self.units: dict[str, Unit[Any]] = {}
         by_kind: dict[Kind, list[Unit[Any]]] = {
             kind: [] for kind in self.kinds.values()

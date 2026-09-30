@@ -52,6 +52,18 @@ KINDS = {
 }
 TEMPERATURE_DIFFERENCES = {KINDS["Temperature"]: KINDS["TemperatureDifference"]}
 DIMENSIONLESS_KINDS = dict.fromkeys(KINDS.values(), KINDS["Dimensionless"])
+# Each catalogue's kinds by name, keyed by its dimensionless kind, so a function
+# can name the Angle or Dimensionless of its operand's own catalogue.
+CATALOGUE_KINDS: dict[Kind, dict[str, Kind]] = {KINDS["Dimensionless"]: KINDS}
+
+
+def named_kind(semantic: Semantic, name: str) -> Kind:
+    """The kind called ``name`` in the catalogue ``semantic`` belongs to."""
+    kinds = CATALOGUE_KINDS[dimensionless_kind(semantic)]
+    try:
+        return kinds[name]
+    except KeyError as exc:
+        raise TypeError(f"This quantity's catalogue has no {name} kind") from exc
 
 
 def dimensionless_kind(semantic: Semantic) -> Kind:

@@ -2,6 +2,7 @@
 
 from typing import assert_type
 
+import labquantities.numpy as qnp
 import numpy as np
 from labquantities import (
     InverseTime,
@@ -53,4 +54,4 @@ length_si = Length[float, SI](2, u.nm)
 pressure_si = Pressure[float, SI](3, u.pascal)
 assert_type(length_si * pressure_si, SurfaceTension[float, SI])
 assert_type((length_si * pressure_si).to_system(Atomistic), SurfaceTension[float])
-assert_type(u.sqrt(length_si * length_si), Length[float, SI])
+assert_type(qnp.sqrt(length_si * length_si), Length[float, SI])

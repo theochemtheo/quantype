@@ -13,6 +13,7 @@
 ^quantype\._internal\._semantics\.Semantic$
 ^quantype\._internal\._codata\.Edition$
 ^quantype\._internal\._registry\.Relations$
+^quantype\._internal\._(jax|numpy|torch)\._(Argnums|Metadata|Quantity|RawFunction)$
 
 # functools.cache exposes a variadic checker signature but preserves runtime __wrapped__.
 ^quantype\._internal\._registry\._unit_specs$
@@ -25,8 +26,9 @@
 # stays a static error.
 ^quantype\.core\.Quantity\.(__bool__|__float__)$
 
-# NumPy coercion/dispatch methods intentionally reject implicit unit loss.
-^quantype\.core\.Quantity\.(__array__|__array_function__|__array_priority__|__array_ufunc__)$
+# NumPy and Torch dispatch methods: unit rules at runtime; NumPy's and Torch's
+# stubs do not accept quantities, so declaring them would type results as arrays.
+^quantype\.core\.Quantity\.(__array__|__array_function__|__array_priority__|__array_ufunc__|__torch_function__)$
 
 # Unit calls/operators have kind-specific overloads on the generated unit types.
 # NumPy dispatch and array priority are runtime-only implementation details.
@@ -42,3 +44,7 @@
 ^quantype\._internal\._systems\.UnitSystem\.__init_subclass__$
 # A descriptor: each concrete system computes its own units on access.
 ^quantype\._internal\._systems\.UnitSystem\.units$
+
+# The stub types qnp.linalg's functions with its catalogue's classes; at runtime
+# every catalogue shares one namespace object.
+^quantype\.numpy\.linalg$

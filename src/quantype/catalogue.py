@@ -27,17 +27,17 @@ if TYPE_CHECKING:
 # object or a public math helper instead.
 _UNIT_MODULE_BINDINGS = frozenset(
     {
+        # Stub imports.
         "Any",
         "Unit",
-        "cast",
-        "get_unit",
-        "runtime",
         "overload",
-        "globals",
-        "sqrt",
-        "sin",
-        "exp",
+        "np",
+        # Private runtime helpers.
+        "_typing",
+        "_get_unit",
+        "_runtime",
         "_NAMES",
+        "globals",
         "__getattr__",
         "__all__",
         "__name__",
@@ -73,7 +73,7 @@ _QUANTITY_BINDINGS = _UNIT_MODULE_BINDINGS | frozenset(
         "Tensor",
         "_generated",
         "_catalogue",
-        "_math",
+        "numpy",
         "units",
         "kinds",
         "ujax",

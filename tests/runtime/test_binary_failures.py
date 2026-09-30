@@ -9,6 +9,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
+import quantype.numpy as qnp
 from quantype import Length, u
 from quantype.serialization import load_npz, save_npz
 
@@ -73,7 +74,7 @@ def test_storage_dtype_and_unit_invariants() -> None:
             Length[npt.NDArray[np.float64]](value, u.nm)
     scalar = Length[np.float32](2, u.nm)
     assert type(scalar.sum().value) is np.float32
-    assert type(u.sqrt(scalar**2).value) is np.float32
+    assert type(qnp.sqrt(scalar**2).value) is np.float32
     unit: Any = u.nm
     with pytest.raises(AttributeError, match="assign"):
         unit.scale = 100

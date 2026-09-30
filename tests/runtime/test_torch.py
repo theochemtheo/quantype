@@ -1,6 +1,6 @@
 """Torch works independently of the JAX extra."""
 
-from typing import Any
+from typing import Any, cast
 
 # Optional dependency gate must precede backend imports.
 import pytest
@@ -8,7 +8,17 @@ import pytest
 pytest.importorskip("torch")
 import torch
 
-from quantype import Energy, Force, ForceConstant, Length, u, utorch
+import quantype.numpy as qnp
+from quantype import (
+    Angle,
+    Dimensionless,
+    Energy,
+    Force,
+    ForceConstant,
+    Length,
+    u,
+    utorch,
+)
 from quantype.systems import SI
 
 
@@ -80,3 +90,35 @@ def test_torch_tensors_scale_quantities() -> None:
     # The quantity's dtype is kept, as unit conversion keeps it.
     doubled = torch.tensor(2.0, dtype=torch.float64) * length
     assert doubled.value.dtype == torch.float32
+
+
+def test_grad_takes_several_inputs() -> None:
+    x = Length[torch.Tensor](torch.tensor([1.0, 2.0], requires_grad=True), u.angstrom)
+    y = Length[torch.Tensor](torch.tensor([3.0], requires_grad=True), u.angstrom)
+    k = 2.0 * u.eV_per_angstrom_squared
+    energy = 0.5 * k * ((x**2).sum() + (y**2).sum())
+    gradients = utorch.grad(energy, [x, y])
+    assert len(gradients) == 2
+    assert all(isinstance(gradient, Force) for gradient in gradients)
+    assert torch.allclose(gradients[1].value, torch.tensor([6.0]))
+
+
+def test_torch_functions_apply_unit_rules() -> None:
+    angles = Angle[torch.Tensor](torch.tensor([0.0, 90.0]), u.deg)
+    untyped_torch: Any = torch
+    cosines = cast("Dimensionless[torch.Tensor]", untyped_torch.cos(angles))
+    assert isinstance(cosines, Dimensionless)
+    assert torch.allclose(cosines.value, torch.tensor([1.0, 0.0]), atol=1e-6)
+    positions = Length[torch.Tensor](torch.tensor([[3.0, 4.0]]), u.angstrom)
+    norms = cast(
+        "Length[torch.Tensor]", untyped_torch.linalg.vector_norm(positions, dim=-1)
+    )
+    assert isinstance(norms, Length)
+    assert torch.allclose(norms.value, torch.tensor([5.0]))
+    assert isinstance(qnp.linalg.norm(positions, axis=-1), Length)
+    stacked = untyped_torch.stack([positions, positions])
+    assert stacked.shape == (2, 1, 2)
+    spread = untyped_torch.std(Length[torch.Tensor](torch.tensor([1.0, 3.0]), u.nm))
+    assert torch.allclose(spread.magnitude(u.nm), torch.tensor(2**0.5))  # unbiased
+    with pytest.raises(TypeError, match=r"torch\.fft_fft does not know|does not know"):
+        untyped_torch.fft.fft(positions)

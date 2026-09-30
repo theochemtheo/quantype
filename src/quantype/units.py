@@ -2,47 +2,50 @@
 # Scientific unit names preserve conventional case; flat names load lazily.
 # ruff: noqa: N802, F822, E501
 # pyright: reportUnsupportedDunderAll=false
-from typing import Any, cast
+import typing as _typing
 
-from quantype._internal._math import exp, sin, sqrt
-from quantype.core import Unit, get_unit
-from quantype.kinds import (
-    AccelerationKind,
-    ActionKind,
-    AngleKind,
-    AreaKind,
-    AtomCountKind,
-    ChargeKind,
-    DimensionlessKind,
-    DipoleMomentKind,
-    ElectricFieldKind,
-    ElectricPotentialKind,
-    ElectronCountKind,
-    ElectronDensityKind,
-    EnergyDensityKind,
-    EnergyKind,
-    EnergyPerAtomKind,
-    EnergyPerVolumeKind,
-    EntropyKind,
-    ForceConstantKind,
-    ForceKind,
-    FrequencyKind,
-    InverseTimeKind,
-    LengthKind,
-    MagneticMomentKind,
-    MagnetizationKind,
-    MassDensityKind,
-    MassKind,
-    MomentumKind,
-    ParticleDensityKind,
-    PressureKind,
-    TemperatureDifferenceKind,
-    TemperatureKind,
-    TemperatureRateKind,
-    TimeKind,
-    VelocityKind,
-    VolumeKind,
-)
+if _typing.TYPE_CHECKING:
+    from typing import Any
+
+    from quantype.core import Unit
+    from quantype.kinds import (
+        AccelerationKind,
+        ActionKind,
+        AngleKind,
+        AreaKind,
+        AtomCountKind,
+        ChargeKind,
+        DimensionlessKind,
+        DipoleMomentKind,
+        ElectricFieldKind,
+        ElectricPotentialKind,
+        ElectronCountKind,
+        ElectronDensityKind,
+        EnergyDensityKind,
+        EnergyKind,
+        EnergyPerAtomKind,
+        EnergyPerVolumeKind,
+        EntropyKind,
+        ForceConstantKind,
+        ForceKind,
+        FrequencyKind,
+        InverseTimeKind,
+        LengthKind,
+        MagneticMomentKind,
+        MagnetizationKind,
+        MassDensityKind,
+        MassKind,
+        MomentumKind,
+        ParticleDensityKind,
+        PressureKind,
+        TemperatureDifferenceKind,
+        TemperatureKind,
+        TemperatureRateKind,
+        TimeKind,
+        VelocityKind,
+        VolumeKind,
+    )
+from quantype.core import get_unit as _get_unit
 
 _NAMES = {
     "one": "one",
@@ -256,18 +259,18 @@ _NAMES = {
 }
 
 
-def __getattr__(name: str) -> Unit[Any]:
+def __getattr__(name: str) -> "Unit[Any]":
     if name not in _NAMES:
         raise AttributeError(name)
-    unit = get_unit(_NAMES[name])
+    unit = _get_unit(_NAMES[name])
     globals()[name] = unit
     return unit
 
 
 class _DimensionlessNamespace:
     @property
-    def one(self) -> Unit[DimensionlessKind]:
-        return cast("Unit[DimensionlessKind]", get_unit("one"))
+    def one(self) -> "Unit[DimensionlessKind]":
+        return _typing.cast("Unit[DimensionlessKind]", _get_unit("one"))
 
 
 dimensionless = _DimensionlessNamespace()
@@ -275,36 +278,36 @@ dimensionless = _DimensionlessNamespace()
 
 class _LengthNamespace:
     @property
-    def angstrom(self) -> Unit[LengthKind]:
-        return cast("Unit[LengthKind]", get_unit("angstrom"))
+    def angstrom(self) -> "Unit[LengthKind]":
+        return _typing.cast("Unit[LengthKind]", _get_unit("angstrom"))
 
     @property
-    def meter(self) -> Unit[LengthKind]:
-        return cast("Unit[LengthKind]", get_unit("meter"))
+    def meter(self) -> "Unit[LengthKind]":
+        return _typing.cast("Unit[LengthKind]", _get_unit("meter"))
 
     @property
-    def centimeter(self) -> Unit[LengthKind]:
-        return cast("Unit[LengthKind]", get_unit("centimeter"))
+    def centimeter(self) -> "Unit[LengthKind]":
+        return _typing.cast("Unit[LengthKind]", _get_unit("centimeter"))
 
     @property
-    def nanometer(self) -> Unit[LengthKind]:
-        return cast("Unit[LengthKind]", get_unit("nanometer"))
+    def nanometer(self) -> "Unit[LengthKind]":
+        return _typing.cast("Unit[LengthKind]", _get_unit("nanometer"))
 
     @property
-    def bohr(self) -> Unit[LengthKind]:
-        return cast("Unit[LengthKind]", get_unit("bohr"))
+    def bohr(self) -> "Unit[LengthKind]":
+        return _typing.cast("Unit[LengthKind]", _get_unit("bohr"))
 
     @property
-    def millimeter(self) -> Unit[LengthKind]:
-        return cast("Unit[LengthKind]", get_unit("millimeter"))
+    def millimeter(self) -> "Unit[LengthKind]":
+        return _typing.cast("Unit[LengthKind]", _get_unit("millimeter"))
 
     @property
-    def micrometer(self) -> Unit[LengthKind]:
-        return cast("Unit[LengthKind]", get_unit("micrometer"))
+    def micrometer(self) -> "Unit[LengthKind]":
+        return _typing.cast("Unit[LengthKind]", _get_unit("micrometer"))
 
     @property
-    def picometer(self) -> Unit[LengthKind]:
-        return cast("Unit[LengthKind]", get_unit("picometer"))
+    def picometer(self) -> "Unit[LengthKind]":
+        return _typing.cast("Unit[LengthKind]", _get_unit("picometer"))
 
 
 length = _LengthNamespace()
@@ -312,20 +315,20 @@ length = _LengthNamespace()
 
 class _AreaNamespace:
     @property
-    def angstrom_squared(self) -> Unit[AreaKind]:
-        return cast("Unit[AreaKind]", get_unit("angstrom_squared"))
+    def angstrom_squared(self) -> "Unit[AreaKind]":
+        return _typing.cast("Unit[AreaKind]", _get_unit("angstrom_squared"))
 
     @property
-    def square_meter(self) -> Unit[AreaKind]:
-        return cast("Unit[AreaKind]", get_unit("square_meter"))
+    def square_meter(self) -> "Unit[AreaKind]":
+        return _typing.cast("Unit[AreaKind]", _get_unit("square_meter"))
 
     @property
-    def square_centimeter(self) -> Unit[AreaKind]:
-        return cast("Unit[AreaKind]", get_unit("square_centimeter"))
+    def square_centimeter(self) -> "Unit[AreaKind]":
+        return _typing.cast("Unit[AreaKind]", _get_unit("square_centimeter"))
 
     @property
-    def bohr_squared(self) -> Unit[AreaKind]:
-        return cast("Unit[AreaKind]", get_unit("bohr_squared"))
+    def bohr_squared(self) -> "Unit[AreaKind]":
+        return _typing.cast("Unit[AreaKind]", _get_unit("bohr_squared"))
 
 
 area = _AreaNamespace()
@@ -333,20 +336,20 @@ area = _AreaNamespace()
 
 class _VolumeNamespace:
     @property
-    def angstrom_cubed(self) -> Unit[VolumeKind]:
-        return cast("Unit[VolumeKind]", get_unit("angstrom_cubed"))
+    def angstrom_cubed(self) -> "Unit[VolumeKind]":
+        return _typing.cast("Unit[VolumeKind]", _get_unit("angstrom_cubed"))
 
     @property
-    def cubic_meter(self) -> Unit[VolumeKind]:
-        return cast("Unit[VolumeKind]", get_unit("cubic_meter"))
+    def cubic_meter(self) -> "Unit[VolumeKind]":
+        return _typing.cast("Unit[VolumeKind]", _get_unit("cubic_meter"))
 
     @property
-    def cubic_centimeter(self) -> Unit[VolumeKind]:
-        return cast("Unit[VolumeKind]", get_unit("cubic_centimeter"))
+    def cubic_centimeter(self) -> "Unit[VolumeKind]":
+        return _typing.cast("Unit[VolumeKind]", _get_unit("cubic_centimeter"))
 
     @property
-    def bohr_cubed(self) -> Unit[VolumeKind]:
-        return cast("Unit[VolumeKind]", get_unit("bohr_cubed"))
+    def bohr_cubed(self) -> "Unit[VolumeKind]":
+        return _typing.cast("Unit[VolumeKind]", _get_unit("bohr_cubed"))
 
 
 volume = _VolumeNamespace()
@@ -354,32 +357,32 @@ volume = _VolumeNamespace()
 
 class _TimeNamespace:
     @property
-    def femtosecond(self) -> Unit[TimeKind]:
-        return cast("Unit[TimeKind]", get_unit("femtosecond"))
+    def femtosecond(self) -> "Unit[TimeKind]":
+        return _typing.cast("Unit[TimeKind]", _get_unit("femtosecond"))
 
     @property
-    def picosecond(self) -> Unit[TimeKind]:
-        return cast("Unit[TimeKind]", get_unit("picosecond"))
+    def picosecond(self) -> "Unit[TimeKind]":
+        return _typing.cast("Unit[TimeKind]", _get_unit("picosecond"))
 
     @property
-    def second(self) -> Unit[TimeKind]:
-        return cast("Unit[TimeKind]", get_unit("second"))
+    def second(self) -> "Unit[TimeKind]":
+        return _typing.cast("Unit[TimeKind]", _get_unit("second"))
 
     @property
-    def atomic_time(self) -> Unit[TimeKind]:
-        return cast("Unit[TimeKind]", get_unit("atomic_time"))
+    def atomic_time(self) -> "Unit[TimeKind]":
+        return _typing.cast("Unit[TimeKind]", _get_unit("atomic_time"))
 
     @property
-    def nanosecond(self) -> Unit[TimeKind]:
-        return cast("Unit[TimeKind]", get_unit("nanosecond"))
+    def nanosecond(self) -> "Unit[TimeKind]":
+        return _typing.cast("Unit[TimeKind]", _get_unit("nanosecond"))
 
     @property
-    def microsecond(self) -> Unit[TimeKind]:
-        return cast("Unit[TimeKind]", get_unit("microsecond"))
+    def microsecond(self) -> "Unit[TimeKind]":
+        return _typing.cast("Unit[TimeKind]", _get_unit("microsecond"))
 
     @property
-    def millisecond(self) -> Unit[TimeKind]:
-        return cast("Unit[TimeKind]", get_unit("millisecond"))
+    def millisecond(self) -> "Unit[TimeKind]":
+        return _typing.cast("Unit[TimeKind]", _get_unit("millisecond"))
 
 
 time = _TimeNamespace()
@@ -387,24 +390,24 @@ time = _TimeNamespace()
 
 class _VelocityNamespace:
     @property
-    def angstrom_per_fs(self) -> Unit[VelocityKind]:
-        return cast("Unit[VelocityKind]", get_unit("angstrom_per_fs"))
+    def angstrom_per_fs(self) -> "Unit[VelocityKind]":
+        return _typing.cast("Unit[VelocityKind]", _get_unit("angstrom_per_fs"))
 
     @property
-    def angstrom_per_ps(self) -> Unit[VelocityKind]:
-        return cast("Unit[VelocityKind]", get_unit("angstrom_per_ps"))
+    def angstrom_per_ps(self) -> "Unit[VelocityKind]":
+        return _typing.cast("Unit[VelocityKind]", _get_unit("angstrom_per_ps"))
 
     @property
-    def meter_per_second(self) -> Unit[VelocityKind]:
-        return cast("Unit[VelocityKind]", get_unit("meter_per_second"))
+    def meter_per_second(self) -> "Unit[VelocityKind]":
+        return _typing.cast("Unit[VelocityKind]", _get_unit("meter_per_second"))
 
     @property
-    def centimeter_per_second(self) -> Unit[VelocityKind]:
-        return cast("Unit[VelocityKind]", get_unit("centimeter_per_second"))
+    def centimeter_per_second(self) -> "Unit[VelocityKind]":
+        return _typing.cast("Unit[VelocityKind]", _get_unit("centimeter_per_second"))
 
     @property
-    def atomic_velocity(self) -> Unit[VelocityKind]:
-        return cast("Unit[VelocityKind]", get_unit("atomic_velocity"))
+    def atomic_velocity(self) -> "Unit[VelocityKind]":
+        return _typing.cast("Unit[VelocityKind]", _get_unit("atomic_velocity"))
 
 
 velocity = _VelocityNamespace()
@@ -412,44 +415,44 @@ velocity = _VelocityNamespace()
 
 class _EnergyNamespace:
     @property
-    def electron_volt(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("electron_volt"))
+    def electron_volt(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("electron_volt"))
 
     @property
-    def millielectron_volt(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("millielectron_volt"))
+    def millielectron_volt(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("millielectron_volt"))
 
     @property
-    def joule(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("joule"))
+    def joule(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("joule"))
 
     @property
-    def hartree(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("hartree"))
+    def hartree(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("hartree"))
 
     @property
-    def rydberg(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("rydberg"))
+    def rydberg(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("rydberg"))
 
     @property
-    def kcal_per_mol(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("kcal_per_mol"))
+    def kcal_per_mol(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("kcal_per_mol"))
 
     @property
-    def erg(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("erg"))
+    def erg(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("erg"))
 
     @property
-    def kilojoule(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("kilojoule"))
+    def kilojoule(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("kilojoule"))
 
     @property
-    def kilocalorie(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("kilocalorie"))
+    def kilocalorie(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("kilocalorie"))
 
     @property
-    def kJ_per_mol(self) -> Unit[EnergyKind]:
-        return cast("Unit[EnergyKind]", get_unit("kJ_per_mol"))
+    def kJ_per_mol(self) -> "Unit[EnergyKind]":
+        return _typing.cast("Unit[EnergyKind]", _get_unit("kJ_per_mol"))
 
 
 energy = _EnergyNamespace()
@@ -457,24 +460,26 @@ energy = _EnergyNamespace()
 
 class _EnergyPerAtomNamespace:
     @property
-    def eV_per_atom(self) -> Unit[EnergyPerAtomKind]:
-        return cast("Unit[EnergyPerAtomKind]", get_unit("eV_per_atom"))
+    def eV_per_atom(self) -> "Unit[EnergyPerAtomKind]":
+        return _typing.cast("Unit[EnergyPerAtomKind]", _get_unit("eV_per_atom"))
 
     @property
-    def hartree_per_atom(self) -> Unit[EnergyPerAtomKind]:
-        return cast("Unit[EnergyPerAtomKind]", get_unit("hartree_per_atom"))
+    def hartree_per_atom(self) -> "Unit[EnergyPerAtomKind]":
+        return _typing.cast("Unit[EnergyPerAtomKind]", _get_unit("hartree_per_atom"))
 
     @property
-    def J_per_atom(self) -> Unit[EnergyPerAtomKind]:
-        return cast("Unit[EnergyPerAtomKind]", get_unit("J_per_atom"))
+    def J_per_atom(self) -> "Unit[EnergyPerAtomKind]":
+        return _typing.cast("Unit[EnergyPerAtomKind]", _get_unit("J_per_atom"))
 
     @property
-    def kcal_per_mol_per_atom(self) -> Unit[EnergyPerAtomKind]:
-        return cast("Unit[EnergyPerAtomKind]", get_unit("kcal_per_mol_per_atom"))
+    def kcal_per_mol_per_atom(self) -> "Unit[EnergyPerAtomKind]":
+        return _typing.cast(
+            "Unit[EnergyPerAtomKind]", _get_unit("kcal_per_mol_per_atom")
+        )
 
     @property
-    def erg_per_atom(self) -> Unit[EnergyPerAtomKind]:
-        return cast("Unit[EnergyPerAtomKind]", get_unit("erg_per_atom"))
+    def erg_per_atom(self) -> "Unit[EnergyPerAtomKind]":
+        return _typing.cast("Unit[EnergyPerAtomKind]", _get_unit("erg_per_atom"))
 
 
 energy_per_atom = _EnergyPerAtomNamespace()
@@ -482,24 +487,24 @@ energy_per_atom = _EnergyPerAtomNamespace()
 
 class _ForceNamespace:
     @property
-    def eV_per_angstrom(self) -> Unit[ForceKind]:
-        return cast("Unit[ForceKind]", get_unit("eV_per_angstrom"))
+    def eV_per_angstrom(self) -> "Unit[ForceKind]":
+        return _typing.cast("Unit[ForceKind]", _get_unit("eV_per_angstrom"))
 
     @property
-    def newton(self) -> Unit[ForceKind]:
-        return cast("Unit[ForceKind]", get_unit("newton"))
+    def newton(self) -> "Unit[ForceKind]":
+        return _typing.cast("Unit[ForceKind]", _get_unit("newton"))
 
     @property
-    def hartree_per_bohr(self) -> Unit[ForceKind]:
-        return cast("Unit[ForceKind]", get_unit("hartree_per_bohr"))
+    def hartree_per_bohr(self) -> "Unit[ForceKind]":
+        return _typing.cast("Unit[ForceKind]", _get_unit("hartree_per_bohr"))
 
     @property
-    def kcal_per_mol_per_angstrom(self) -> Unit[ForceKind]:
-        return cast("Unit[ForceKind]", get_unit("kcal_per_mol_per_angstrom"))
+    def kcal_per_mol_per_angstrom(self) -> "Unit[ForceKind]":
+        return _typing.cast("Unit[ForceKind]", _get_unit("kcal_per_mol_per_angstrom"))
 
     @property
-    def dyne(self) -> Unit[ForceKind]:
-        return cast("Unit[ForceKind]", get_unit("dyne"))
+    def dyne(self) -> "Unit[ForceKind]":
+        return _typing.cast("Unit[ForceKind]", _get_unit("dyne"))
 
 
 force = _ForceNamespace()
@@ -507,26 +512,30 @@ force = _ForceNamespace()
 
 class _ForceConstantNamespace:
     @property
-    def eV_per_angstrom_squared(self) -> Unit[ForceConstantKind]:
-        return cast("Unit[ForceConstantKind]", get_unit("eV_per_angstrom_squared"))
-
-    @property
-    def kcal_per_mol_per_angstrom_squared(self) -> Unit[ForceConstantKind]:
-        return cast(
-            "Unit[ForceConstantKind]", get_unit("kcal_per_mol_per_angstrom_squared")
+    def eV_per_angstrom_squared(self) -> "Unit[ForceConstantKind]":
+        return _typing.cast(
+            "Unit[ForceConstantKind]", _get_unit("eV_per_angstrom_squared")
         )
 
     @property
-    def newton_per_meter(self) -> Unit[ForceConstantKind]:
-        return cast("Unit[ForceConstantKind]", get_unit("newton_per_meter"))
+    def kcal_per_mol_per_angstrom_squared(self) -> "Unit[ForceConstantKind]":
+        return _typing.cast(
+            "Unit[ForceConstantKind]", _get_unit("kcal_per_mol_per_angstrom_squared")
+        )
 
     @property
-    def dyne_per_centimeter(self) -> Unit[ForceConstantKind]:
-        return cast("Unit[ForceConstantKind]", get_unit("dyne_per_centimeter"))
+    def newton_per_meter(self) -> "Unit[ForceConstantKind]":
+        return _typing.cast("Unit[ForceConstantKind]", _get_unit("newton_per_meter"))
 
     @property
-    def hartree_per_bohr_squared(self) -> Unit[ForceConstantKind]:
-        return cast("Unit[ForceConstantKind]", get_unit("hartree_per_bohr_squared"))
+    def dyne_per_centimeter(self) -> "Unit[ForceConstantKind]":
+        return _typing.cast("Unit[ForceConstantKind]", _get_unit("dyne_per_centimeter"))
+
+    @property
+    def hartree_per_bohr_squared(self) -> "Unit[ForceConstantKind]":
+        return _typing.cast(
+            "Unit[ForceConstantKind]", _get_unit("hartree_per_bohr_squared")
+        )
 
 
 force_constant = _ForceConstantNamespace()
@@ -534,44 +543,46 @@ force_constant = _ForceConstantNamespace()
 
 class _PressureNamespace:
     @property
-    def eV_per_angstrom_cubed(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("eV_per_angstrom_cubed"))
+    def eV_per_angstrom_cubed(self) -> "Unit[PressureKind]":
+        return _typing.cast("Unit[PressureKind]", _get_unit("eV_per_angstrom_cubed"))
 
     @property
-    def pascal(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("pascal"))
+    def pascal(self) -> "Unit[PressureKind]":
+        return _typing.cast("Unit[PressureKind]", _get_unit("pascal"))
 
     @property
-    def gigapascal(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("gigapascal"))
+    def gigapascal(self) -> "Unit[PressureKind]":
+        return _typing.cast("Unit[PressureKind]", _get_unit("gigapascal"))
 
     @property
-    def hartree_per_bohr_cubed(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("hartree_per_bohr_cubed"))
+    def hartree_per_bohr_cubed(self) -> "Unit[PressureKind]":
+        return _typing.cast("Unit[PressureKind]", _get_unit("hartree_per_bohr_cubed"))
 
     @property
-    def kcal_per_mol_per_angstrom_cubed(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("kcal_per_mol_per_angstrom_cubed"))
+    def kcal_per_mol_per_angstrom_cubed(self) -> "Unit[PressureKind]":
+        return _typing.cast(
+            "Unit[PressureKind]", _get_unit("kcal_per_mol_per_angstrom_cubed")
+        )
 
     @property
-    def barye(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("barye"))
+    def barye(self) -> "Unit[PressureKind]":
+        return _typing.cast("Unit[PressureKind]", _get_unit("barye"))
 
     @property
-    def bar(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("bar"))
+    def bar(self) -> "Unit[PressureKind]":
+        return _typing.cast("Unit[PressureKind]", _get_unit("bar"))
 
     @property
-    def kilobar(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("kilobar"))
+    def kilobar(self) -> "Unit[PressureKind]":
+        return _typing.cast("Unit[PressureKind]", _get_unit("kilobar"))
 
     @property
-    def atmosphere(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("atmosphere"))
+    def atmosphere(self) -> "Unit[PressureKind]":
+        return _typing.cast("Unit[PressureKind]", _get_unit("atmosphere"))
 
     @property
-    def megapascal(self) -> Unit[PressureKind]:
-        return cast("Unit[PressureKind]", get_unit("megapascal"))
+    def megapascal(self) -> "Unit[PressureKind]":
+        return _typing.cast("Unit[PressureKind]", _get_unit("megapascal"))
 
 
 pressure = _PressureNamespace()
@@ -579,33 +590,36 @@ pressure = _PressureNamespace()
 
 class _EnergyDensityNamespace:
     @property
-    def energy_density(self) -> Unit[EnergyDensityKind]:
-        return cast("Unit[EnergyDensityKind]", get_unit("energy_density"))
+    def energy_density(self) -> "Unit[EnergyDensityKind]":
+        return _typing.cast("Unit[EnergyDensityKind]", _get_unit("energy_density"))
 
     @property
-    def energy_density_kcal_per_mol_per_angstrom_cubed(self) -> Unit[EnergyDensityKind]:
-        return cast(
+    def energy_density_kcal_per_mol_per_angstrom_cubed(
+        self,
+    ) -> "Unit[EnergyDensityKind]":
+        return _typing.cast(
             "Unit[EnergyDensityKind]",
-            get_unit("energy_density_kcal_per_mol_per_angstrom_cubed"),
+            _get_unit("energy_density_kcal_per_mol_per_angstrom_cubed"),
         )
 
     @property
-    def energy_density_joule_per_cubic_meter(self) -> Unit[EnergyDensityKind]:
-        return cast(
-            "Unit[EnergyDensityKind]", get_unit("energy_density_joule_per_cubic_meter")
+    def energy_density_joule_per_cubic_meter(self) -> "Unit[EnergyDensityKind]":
+        return _typing.cast(
+            "Unit[EnergyDensityKind]", _get_unit("energy_density_joule_per_cubic_meter")
         )
 
     @property
-    def energy_density_erg_per_cubic_centimeter(self) -> Unit[EnergyDensityKind]:
-        return cast(
+    def energy_density_erg_per_cubic_centimeter(self) -> "Unit[EnergyDensityKind]":
+        return _typing.cast(
             "Unit[EnergyDensityKind]",
-            get_unit("energy_density_erg_per_cubic_centimeter"),
+            _get_unit("energy_density_erg_per_cubic_centimeter"),
         )
 
     @property
-    def energy_density_hartree_per_bohr_cubed(self) -> Unit[EnergyDensityKind]:
-        return cast(
-            "Unit[EnergyDensityKind]", get_unit("energy_density_hartree_per_bohr_cubed")
+    def energy_density_hartree_per_bohr_cubed(self) -> "Unit[EnergyDensityKind]":
+        return _typing.cast(
+            "Unit[EnergyDensityKind]",
+            _get_unit("energy_density_hartree_per_bohr_cubed"),
         )
 
 
@@ -614,37 +628,37 @@ energy_density = _EnergyDensityNamespace()
 
 class _EnergyPerVolumeNamespace:
     @property
-    def energy_per_volume(self) -> Unit[EnergyPerVolumeKind]:
-        return cast("Unit[EnergyPerVolumeKind]", get_unit("energy_per_volume"))
+    def energy_per_volume(self) -> "Unit[EnergyPerVolumeKind]":
+        return _typing.cast("Unit[EnergyPerVolumeKind]", _get_unit("energy_per_volume"))
 
     @property
     def energy_per_volume_kcal_per_mol_per_angstrom_cubed(
         self,
-    ) -> Unit[EnergyPerVolumeKind]:
-        return cast(
+    ) -> "Unit[EnergyPerVolumeKind]":
+        return _typing.cast(
             "Unit[EnergyPerVolumeKind]",
-            get_unit("energy_per_volume_kcal_per_mol_per_angstrom_cubed"),
+            _get_unit("energy_per_volume_kcal_per_mol_per_angstrom_cubed"),
         )
 
     @property
-    def energy_per_volume_joule_per_cubic_meter(self) -> Unit[EnergyPerVolumeKind]:
-        return cast(
+    def energy_per_volume_joule_per_cubic_meter(self) -> "Unit[EnergyPerVolumeKind]":
+        return _typing.cast(
             "Unit[EnergyPerVolumeKind]",
-            get_unit("energy_per_volume_joule_per_cubic_meter"),
+            _get_unit("energy_per_volume_joule_per_cubic_meter"),
         )
 
     @property
-    def energy_per_volume_erg_per_cubic_centimeter(self) -> Unit[EnergyPerVolumeKind]:
-        return cast(
+    def energy_per_volume_erg_per_cubic_centimeter(self) -> "Unit[EnergyPerVolumeKind]":
+        return _typing.cast(
             "Unit[EnergyPerVolumeKind]",
-            get_unit("energy_per_volume_erg_per_cubic_centimeter"),
+            _get_unit("energy_per_volume_erg_per_cubic_centimeter"),
         )
 
     @property
-    def energy_per_volume_hartree_per_bohr_cubed(self) -> Unit[EnergyPerVolumeKind]:
-        return cast(
+    def energy_per_volume_hartree_per_bohr_cubed(self) -> "Unit[EnergyPerVolumeKind]":
+        return _typing.cast(
             "Unit[EnergyPerVolumeKind]",
-            get_unit("energy_per_volume_hartree_per_bohr_cubed"),
+            _get_unit("energy_per_volume_hartree_per_bohr_cubed"),
         )
 
 
@@ -653,12 +667,12 @@ energy_per_volume = _EnergyPerVolumeNamespace()
 
 class _TemperatureNamespace:
     @property
-    def kelvin(self) -> Unit[TemperatureKind]:
-        return cast("Unit[TemperatureKind]", get_unit("kelvin"))
+    def kelvin(self) -> "Unit[TemperatureKind]":
+        return _typing.cast("Unit[TemperatureKind]", _get_unit("kelvin"))
 
     @property
-    def celsius(self) -> Unit[TemperatureKind]:
-        return cast("Unit[TemperatureKind]", get_unit("celsius"))
+    def celsius(self) -> "Unit[TemperatureKind]":
+        return _typing.cast("Unit[TemperatureKind]", _get_unit("celsius"))
 
 
 temperature = _TemperatureNamespace()
@@ -666,12 +680,16 @@ temperature = _TemperatureNamespace()
 
 class _TemperatureDifferenceNamespace:
     @property
-    def delta_kelvin(self) -> Unit[TemperatureDifferenceKind]:
-        return cast("Unit[TemperatureDifferenceKind]", get_unit("delta_kelvin"))
+    def delta_kelvin(self) -> "Unit[TemperatureDifferenceKind]":
+        return _typing.cast(
+            "Unit[TemperatureDifferenceKind]", _get_unit("delta_kelvin")
+        )
 
     @property
-    def delta_celsius(self) -> Unit[TemperatureDifferenceKind]:
-        return cast("Unit[TemperatureDifferenceKind]", get_unit("delta_celsius"))
+    def delta_celsius(self) -> "Unit[TemperatureDifferenceKind]":
+        return _typing.cast(
+            "Unit[TemperatureDifferenceKind]", _get_unit("delta_celsius")
+        )
 
 
 temperature_difference = _TemperatureDifferenceNamespace()
@@ -679,20 +697,22 @@ temperature_difference = _TemperatureDifferenceNamespace()
 
 class _TemperatureRateNamespace:
     @property
-    def kelvin_per_fs(self) -> Unit[TemperatureRateKind]:
-        return cast("Unit[TemperatureRateKind]", get_unit("kelvin_per_fs"))
+    def kelvin_per_fs(self) -> "Unit[TemperatureRateKind]":
+        return _typing.cast("Unit[TemperatureRateKind]", _get_unit("kelvin_per_fs"))
 
     @property
-    def kelvin_per_ps(self) -> Unit[TemperatureRateKind]:
-        return cast("Unit[TemperatureRateKind]", get_unit("kelvin_per_ps"))
+    def kelvin_per_ps(self) -> "Unit[TemperatureRateKind]":
+        return _typing.cast("Unit[TemperatureRateKind]", _get_unit("kelvin_per_ps"))
 
     @property
-    def kelvin_per_second(self) -> Unit[TemperatureRateKind]:
-        return cast("Unit[TemperatureRateKind]", get_unit("kelvin_per_second"))
+    def kelvin_per_second(self) -> "Unit[TemperatureRateKind]":
+        return _typing.cast("Unit[TemperatureRateKind]", _get_unit("kelvin_per_second"))
 
     @property
-    def kelvin_per_atomic_time(self) -> Unit[TemperatureRateKind]:
-        return cast("Unit[TemperatureRateKind]", get_unit("kelvin_per_atomic_time"))
+    def kelvin_per_atomic_time(self) -> "Unit[TemperatureRateKind]":
+        return _typing.cast(
+            "Unit[TemperatureRateKind]", _get_unit("kelvin_per_atomic_time")
+        )
 
 
 temperature_rate = _TemperatureRateNamespace()
@@ -700,20 +720,24 @@ temperature_rate = _TemperatureRateNamespace()
 
 class _MagneticMomentNamespace:
     @property
-    def bohr_magneton(self) -> Unit[MagneticMomentKind]:
-        return cast("Unit[MagneticMomentKind]", get_unit("bohr_magneton"))
+    def bohr_magneton(self) -> "Unit[MagneticMomentKind]":
+        return _typing.cast("Unit[MagneticMomentKind]", _get_unit("bohr_magneton"))
 
     @property
-    def ampere_meter_squared(self) -> Unit[MagneticMomentKind]:
-        return cast("Unit[MagneticMomentKind]", get_unit("ampere_meter_squared"))
+    def ampere_meter_squared(self) -> "Unit[MagneticMomentKind]":
+        return _typing.cast(
+            "Unit[MagneticMomentKind]", _get_unit("ampere_meter_squared")
+        )
 
     @property
-    def erg_per_gauss(self) -> Unit[MagneticMomentKind]:
-        return cast("Unit[MagneticMomentKind]", get_unit("erg_per_gauss"))
+    def erg_per_gauss(self) -> "Unit[MagneticMomentKind]":
+        return _typing.cast("Unit[MagneticMomentKind]", _get_unit("erg_per_gauss"))
 
     @property
-    def atomic_magnetic_moment(self) -> Unit[MagneticMomentKind]:
-        return cast("Unit[MagneticMomentKind]", get_unit("atomic_magnetic_moment"))
+    def atomic_magnetic_moment(self) -> "Unit[MagneticMomentKind]":
+        return _typing.cast(
+            "Unit[MagneticMomentKind]", _get_unit("atomic_magnetic_moment")
+        )
 
 
 magnetic_moment = _MagneticMomentNamespace()
@@ -721,22 +745,26 @@ magnetic_moment = _MagneticMomentNamespace()
 
 class _MagnetizationNamespace:
     @property
-    def bohr_magneton_per_angstrom_cubed(self) -> Unit[MagnetizationKind]:
-        return cast(
-            "Unit[MagnetizationKind]", get_unit("bohr_magneton_per_angstrom_cubed")
+    def bohr_magneton_per_angstrom_cubed(self) -> "Unit[MagnetizationKind]":
+        return _typing.cast(
+            "Unit[MagnetizationKind]", _get_unit("bohr_magneton_per_angstrom_cubed")
         )
 
     @property
-    def ampere_per_meter(self) -> Unit[MagnetizationKind]:
-        return cast("Unit[MagnetizationKind]", get_unit("ampere_per_meter"))
+    def ampere_per_meter(self) -> "Unit[MagnetizationKind]":
+        return _typing.cast("Unit[MagnetizationKind]", _get_unit("ampere_per_meter"))
 
     @property
-    def emu_per_cubic_centimeter(self) -> Unit[MagnetizationKind]:
-        return cast("Unit[MagnetizationKind]", get_unit("emu_per_cubic_centimeter"))
+    def emu_per_cubic_centimeter(self) -> "Unit[MagnetizationKind]":
+        return _typing.cast(
+            "Unit[MagnetizationKind]", _get_unit("emu_per_cubic_centimeter")
+        )
 
     @property
-    def atomic_magnetization(self) -> Unit[MagnetizationKind]:
-        return cast("Unit[MagnetizationKind]", get_unit("atomic_magnetization"))
+    def atomic_magnetization(self) -> "Unit[MagnetizationKind]":
+        return _typing.cast(
+            "Unit[MagnetizationKind]", _get_unit("atomic_magnetization")
+        )
 
 
 magnetization = _MagnetizationNamespace()
@@ -744,20 +772,28 @@ magnetization = _MagnetizationNamespace()
 
 class _ParticleDensityNamespace:
     @property
-    def atom_per_angstrom_cubed(self) -> Unit[ParticleDensityKind]:
-        return cast("Unit[ParticleDensityKind]", get_unit("atom_per_angstrom_cubed"))
+    def atom_per_angstrom_cubed(self) -> "Unit[ParticleDensityKind]":
+        return _typing.cast(
+            "Unit[ParticleDensityKind]", _get_unit("atom_per_angstrom_cubed")
+        )
 
     @property
-    def atom_per_cubic_meter(self) -> Unit[ParticleDensityKind]:
-        return cast("Unit[ParticleDensityKind]", get_unit("atom_per_cubic_meter"))
+    def atom_per_cubic_meter(self) -> "Unit[ParticleDensityKind]":
+        return _typing.cast(
+            "Unit[ParticleDensityKind]", _get_unit("atom_per_cubic_meter")
+        )
 
     @property
-    def atom_per_cubic_centimeter(self) -> Unit[ParticleDensityKind]:
-        return cast("Unit[ParticleDensityKind]", get_unit("atom_per_cubic_centimeter"))
+    def atom_per_cubic_centimeter(self) -> "Unit[ParticleDensityKind]":
+        return _typing.cast(
+            "Unit[ParticleDensityKind]", _get_unit("atom_per_cubic_centimeter")
+        )
 
     @property
-    def atom_per_bohr_cubed(self) -> Unit[ParticleDensityKind]:
-        return cast("Unit[ParticleDensityKind]", get_unit("atom_per_bohr_cubed"))
+    def atom_per_bohr_cubed(self) -> "Unit[ParticleDensityKind]":
+        return _typing.cast(
+            "Unit[ParticleDensityKind]", _get_unit("atom_per_bohr_cubed")
+        )
 
 
 particle_density = _ParticleDensityNamespace()
@@ -765,24 +801,28 @@ particle_density = _ParticleDensityNamespace()
 
 class _ElectronDensityNamespace:
     @property
-    def electron_per_angstrom_cubed(self) -> Unit[ElectronDensityKind]:
-        return cast(
-            "Unit[ElectronDensityKind]", get_unit("electron_per_angstrom_cubed")
+    def electron_per_angstrom_cubed(self) -> "Unit[ElectronDensityKind]":
+        return _typing.cast(
+            "Unit[ElectronDensityKind]", _get_unit("electron_per_angstrom_cubed")
         )
 
     @property
-    def electron_per_cubic_meter(self) -> Unit[ElectronDensityKind]:
-        return cast("Unit[ElectronDensityKind]", get_unit("electron_per_cubic_meter"))
-
-    @property
-    def electron_per_cubic_centimeter(self) -> Unit[ElectronDensityKind]:
-        return cast(
-            "Unit[ElectronDensityKind]", get_unit("electron_per_cubic_centimeter")
+    def electron_per_cubic_meter(self) -> "Unit[ElectronDensityKind]":
+        return _typing.cast(
+            "Unit[ElectronDensityKind]", _get_unit("electron_per_cubic_meter")
         )
 
     @property
-    def electron_per_bohr_cubed(self) -> Unit[ElectronDensityKind]:
-        return cast("Unit[ElectronDensityKind]", get_unit("electron_per_bohr_cubed"))
+    def electron_per_cubic_centimeter(self) -> "Unit[ElectronDensityKind]":
+        return _typing.cast(
+            "Unit[ElectronDensityKind]", _get_unit("electron_per_cubic_centimeter")
+        )
+
+    @property
+    def electron_per_bohr_cubed(self) -> "Unit[ElectronDensityKind]":
+        return _typing.cast(
+            "Unit[ElectronDensityKind]", _get_unit("electron_per_bohr_cubed")
+        )
 
 
 electron_density = _ElectronDensityNamespace()
@@ -790,12 +830,12 @@ electron_density = _ElectronDensityNamespace()
 
 class _AngleNamespace:
     @property
-    def radian(self) -> Unit[AngleKind]:
-        return cast("Unit[AngleKind]", get_unit("radian"))
+    def radian(self) -> "Unit[AngleKind]":
+        return _typing.cast("Unit[AngleKind]", _get_unit("radian"))
 
     @property
-    def degree(self) -> Unit[AngleKind]:
-        return cast("Unit[AngleKind]", get_unit("degree"))
+    def degree(self) -> "Unit[AngleKind]":
+        return _typing.cast("Unit[AngleKind]", _get_unit("degree"))
 
 
 angle = _AngleNamespace()
@@ -803,24 +843,26 @@ angle = _AngleNamespace()
 
 class _FrequencyNamespace:
     @property
-    def frequency_per_fs(self) -> Unit[FrequencyKind]:
-        return cast("Unit[FrequencyKind]", get_unit("frequency_per_fs"))
+    def frequency_per_fs(self) -> "Unit[FrequencyKind]":
+        return _typing.cast("Unit[FrequencyKind]", _get_unit("frequency_per_fs"))
 
     @property
-    def terahertz(self) -> Unit[FrequencyKind]:
-        return cast("Unit[FrequencyKind]", get_unit("terahertz"))
+    def terahertz(self) -> "Unit[FrequencyKind]":
+        return _typing.cast("Unit[FrequencyKind]", _get_unit("terahertz"))
 
     @property
-    def hertz(self) -> Unit[FrequencyKind]:
-        return cast("Unit[FrequencyKind]", get_unit("hertz"))
+    def hertz(self) -> "Unit[FrequencyKind]":
+        return _typing.cast("Unit[FrequencyKind]", _get_unit("hertz"))
 
     @property
-    def frequency_per_atomic_time(self) -> Unit[FrequencyKind]:
-        return cast("Unit[FrequencyKind]", get_unit("frequency_per_atomic_time"))
+    def frequency_per_atomic_time(self) -> "Unit[FrequencyKind]":
+        return _typing.cast(
+            "Unit[FrequencyKind]", _get_unit("frequency_per_atomic_time")
+        )
 
     @property
-    def inverse_centimeter(self) -> Unit[FrequencyKind]:
-        return cast("Unit[FrequencyKind]", get_unit("inverse_centimeter"))
+    def inverse_centimeter(self) -> "Unit[FrequencyKind]":
+        return _typing.cast("Unit[FrequencyKind]", _get_unit("inverse_centimeter"))
 
 
 frequency = _FrequencyNamespace()
@@ -828,20 +870,20 @@ frequency = _FrequencyNamespace()
 
 class _InverseTimeNamespace:
     @property
-    def per_fs(self) -> Unit[InverseTimeKind]:
-        return cast("Unit[InverseTimeKind]", get_unit("per_fs"))
+    def per_fs(self) -> "Unit[InverseTimeKind]":
+        return _typing.cast("Unit[InverseTimeKind]", _get_unit("per_fs"))
 
     @property
-    def per_ps(self) -> Unit[InverseTimeKind]:
-        return cast("Unit[InverseTimeKind]", get_unit("per_ps"))
+    def per_ps(self) -> "Unit[InverseTimeKind]":
+        return _typing.cast("Unit[InverseTimeKind]", _get_unit("per_ps"))
 
     @property
-    def per_second(self) -> Unit[InverseTimeKind]:
-        return cast("Unit[InverseTimeKind]", get_unit("per_second"))
+    def per_second(self) -> "Unit[InverseTimeKind]":
+        return _typing.cast("Unit[InverseTimeKind]", _get_unit("per_second"))
 
     @property
-    def per_atomic_time(self) -> Unit[InverseTimeKind]:
-        return cast("Unit[InverseTimeKind]", get_unit("per_atomic_time"))
+    def per_atomic_time(self) -> "Unit[InverseTimeKind]":
+        return _typing.cast("Unit[InverseTimeKind]", _get_unit("per_atomic_time"))
 
 
 inverse_time = _InverseTimeNamespace()
@@ -849,8 +891,8 @@ inverse_time = _InverseTimeNamespace()
 
 class _AtomCountNamespace:
     @property
-    def atom(self) -> Unit[AtomCountKind]:
-        return cast("Unit[AtomCountKind]", get_unit("atom"))
+    def atom(self) -> "Unit[AtomCountKind]":
+        return _typing.cast("Unit[AtomCountKind]", _get_unit("atom"))
 
 
 atom_count = _AtomCountNamespace()
@@ -858,8 +900,8 @@ atom_count = _AtomCountNamespace()
 
 class _ElectronCountNamespace:
     @property
-    def electron(self) -> Unit[ElectronCountKind]:
-        return cast("Unit[ElectronCountKind]", get_unit("electron"))
+    def electron(self) -> "Unit[ElectronCountKind]":
+        return _typing.cast("Unit[ElectronCountKind]", _get_unit("electron"))
 
 
 electron_count = _ElectronCountNamespace()
@@ -867,28 +909,28 @@ electron_count = _ElectronCountNamespace()
 
 class _MassNamespace:
     @property
-    def eV_fs2_per_angstrom2(self) -> Unit[MassKind]:
-        return cast("Unit[MassKind]", get_unit("eV_fs2_per_angstrom2"))
+    def eV_fs2_per_angstrom2(self) -> "Unit[MassKind]":
+        return _typing.cast("Unit[MassKind]", _get_unit("eV_fs2_per_angstrom2"))
 
     @property
-    def dalton(self) -> Unit[MassKind]:
-        return cast("Unit[MassKind]", get_unit("dalton"))
+    def dalton(self) -> "Unit[MassKind]":
+        return _typing.cast("Unit[MassKind]", _get_unit("dalton"))
 
     @property
-    def gram_per_mole(self) -> Unit[MassKind]:
-        return cast("Unit[MassKind]", get_unit("gram_per_mole"))
+    def gram_per_mole(self) -> "Unit[MassKind]":
+        return _typing.cast("Unit[MassKind]", _get_unit("gram_per_mole"))
 
     @property
-    def kilogram(self) -> Unit[MassKind]:
-        return cast("Unit[MassKind]", get_unit("kilogram"))
+    def kilogram(self) -> "Unit[MassKind]":
+        return _typing.cast("Unit[MassKind]", _get_unit("kilogram"))
 
     @property
-    def gram(self) -> Unit[MassKind]:
-        return cast("Unit[MassKind]", get_unit("gram"))
+    def gram(self) -> "Unit[MassKind]":
+        return _typing.cast("Unit[MassKind]", _get_unit("gram"))
 
     @property
-    def electron_mass(self) -> Unit[MassKind]:
-        return cast("Unit[MassKind]", get_unit("electron_mass"))
+    def electron_mass(self) -> "Unit[MassKind]":
+        return _typing.cast("Unit[MassKind]", _get_unit("electron_mass"))
 
 
 mass = _MassNamespace()
@@ -896,20 +938,26 @@ mass = _MassNamespace()
 
 class _MassDensityNamespace:
     @property
-    def eV_fs2_per_angstrom5(self) -> Unit[MassDensityKind]:
-        return cast("Unit[MassDensityKind]", get_unit("eV_fs2_per_angstrom5"))
+    def eV_fs2_per_angstrom5(self) -> "Unit[MassDensityKind]":
+        return _typing.cast("Unit[MassDensityKind]", _get_unit("eV_fs2_per_angstrom5"))
 
     @property
-    def gram_per_cubic_centimeter(self) -> Unit[MassDensityKind]:
-        return cast("Unit[MassDensityKind]", get_unit("gram_per_cubic_centimeter"))
+    def gram_per_cubic_centimeter(self) -> "Unit[MassDensityKind]":
+        return _typing.cast(
+            "Unit[MassDensityKind]", _get_unit("gram_per_cubic_centimeter")
+        )
 
     @property
-    def kilogram_per_cubic_meter(self) -> Unit[MassDensityKind]:
-        return cast("Unit[MassDensityKind]", get_unit("kilogram_per_cubic_meter"))
+    def kilogram_per_cubic_meter(self) -> "Unit[MassDensityKind]":
+        return _typing.cast(
+            "Unit[MassDensityKind]", _get_unit("kilogram_per_cubic_meter")
+        )
 
     @property
-    def electron_mass_per_bohr_cubed(self) -> Unit[MassDensityKind]:
-        return cast("Unit[MassDensityKind]", get_unit("electron_mass_per_bohr_cubed"))
+    def electron_mass_per_bohr_cubed(self) -> "Unit[MassDensityKind]":
+        return _typing.cast(
+            "Unit[MassDensityKind]", _get_unit("electron_mass_per_bohr_cubed")
+        )
 
 
 mass_density = _MassDensityNamespace()
@@ -917,28 +965,34 @@ mass_density = _MassDensityNamespace()
 
 class _MomentumNamespace:
     @property
-    def eV_fs_per_angstrom(self) -> Unit[MomentumKind]:
-        return cast("Unit[MomentumKind]", get_unit("eV_fs_per_angstrom"))
+    def eV_fs_per_angstrom(self) -> "Unit[MomentumKind]":
+        return _typing.cast("Unit[MomentumKind]", _get_unit("eV_fs_per_angstrom"))
 
     @property
-    def eV_ps_per_angstrom(self) -> Unit[MomentumKind]:
-        return cast("Unit[MomentumKind]", get_unit("eV_ps_per_angstrom"))
+    def eV_ps_per_angstrom(self) -> "Unit[MomentumKind]":
+        return _typing.cast("Unit[MomentumKind]", _get_unit("eV_ps_per_angstrom"))
 
     @property
-    def kcal_per_mol_fs_per_angstrom(self) -> Unit[MomentumKind]:
-        return cast("Unit[MomentumKind]", get_unit("kcal_per_mol_fs_per_angstrom"))
+    def kcal_per_mol_fs_per_angstrom(self) -> "Unit[MomentumKind]":
+        return _typing.cast(
+            "Unit[MomentumKind]", _get_unit("kcal_per_mol_fs_per_angstrom")
+        )
 
     @property
-    def kilogram_meter_per_second(self) -> Unit[MomentumKind]:
-        return cast("Unit[MomentumKind]", get_unit("kilogram_meter_per_second"))
+    def kilogram_meter_per_second(self) -> "Unit[MomentumKind]":
+        return _typing.cast(
+            "Unit[MomentumKind]", _get_unit("kilogram_meter_per_second")
+        )
 
     @property
-    def gram_centimeter_per_second(self) -> Unit[MomentumKind]:
-        return cast("Unit[MomentumKind]", get_unit("gram_centimeter_per_second"))
+    def gram_centimeter_per_second(self) -> "Unit[MomentumKind]":
+        return _typing.cast(
+            "Unit[MomentumKind]", _get_unit("gram_centimeter_per_second")
+        )
 
     @property
-    def atomic_momentum(self) -> Unit[MomentumKind]:
-        return cast("Unit[MomentumKind]", get_unit("atomic_momentum"))
+    def atomic_momentum(self) -> "Unit[MomentumKind]":
+        return _typing.cast("Unit[MomentumKind]", _get_unit("atomic_momentum"))
 
 
 momentum = _MomentumNamespace()
@@ -946,24 +1000,28 @@ momentum = _MomentumNamespace()
 
 class _AccelerationNamespace:
     @property
-    def angstrom_per_fs2(self) -> Unit[AccelerationKind]:
-        return cast("Unit[AccelerationKind]", get_unit("angstrom_per_fs2"))
+    def angstrom_per_fs2(self) -> "Unit[AccelerationKind]":
+        return _typing.cast("Unit[AccelerationKind]", _get_unit("angstrom_per_fs2"))
 
     @property
-    def angstrom_per_ps2(self) -> Unit[AccelerationKind]:
-        return cast("Unit[AccelerationKind]", get_unit("angstrom_per_ps2"))
+    def angstrom_per_ps2(self) -> "Unit[AccelerationKind]":
+        return _typing.cast("Unit[AccelerationKind]", _get_unit("angstrom_per_ps2"))
 
     @property
-    def meter_per_second_squared(self) -> Unit[AccelerationKind]:
-        return cast("Unit[AccelerationKind]", get_unit("meter_per_second_squared"))
+    def meter_per_second_squared(self) -> "Unit[AccelerationKind]":
+        return _typing.cast(
+            "Unit[AccelerationKind]", _get_unit("meter_per_second_squared")
+        )
 
     @property
-    def centimeter_per_second_squared(self) -> Unit[AccelerationKind]:
-        return cast("Unit[AccelerationKind]", get_unit("centimeter_per_second_squared"))
+    def centimeter_per_second_squared(self) -> "Unit[AccelerationKind]":
+        return _typing.cast(
+            "Unit[AccelerationKind]", _get_unit("centimeter_per_second_squared")
+        )
 
     @property
-    def atomic_acceleration(self) -> Unit[AccelerationKind]:
-        return cast("Unit[AccelerationKind]", get_unit("atomic_acceleration"))
+    def atomic_acceleration(self) -> "Unit[AccelerationKind]":
+        return _typing.cast("Unit[AccelerationKind]", _get_unit("atomic_acceleration"))
 
 
 acceleration = _AccelerationNamespace()
@@ -971,16 +1029,16 @@ acceleration = _AccelerationNamespace()
 
 class _ChargeNamespace:
     @property
-    def elementary_charge(self) -> Unit[ChargeKind]:
-        return cast("Unit[ChargeKind]", get_unit("elementary_charge"))
+    def elementary_charge(self) -> "Unit[ChargeKind]":
+        return _typing.cast("Unit[ChargeKind]", _get_unit("elementary_charge"))
 
     @property
-    def coulomb(self) -> Unit[ChargeKind]:
-        return cast("Unit[ChargeKind]", get_unit("coulomb"))
+    def coulomb(self) -> "Unit[ChargeKind]":
+        return _typing.cast("Unit[ChargeKind]", _get_unit("coulomb"))
 
     @property
-    def statcoulomb(self) -> Unit[ChargeKind]:
-        return cast("Unit[ChargeKind]", get_unit("statcoulomb"))
+    def statcoulomb(self) -> "Unit[ChargeKind]":
+        return _typing.cast("Unit[ChargeKind]", _get_unit("statcoulomb"))
 
 
 charge = _ChargeNamespace()
@@ -988,20 +1046,22 @@ charge = _ChargeNamespace()
 
 class _ElectricPotentialNamespace:
     @property
-    def volt(self) -> Unit[ElectricPotentialKind]:
-        return cast("Unit[ElectricPotentialKind]", get_unit("volt"))
+    def volt(self) -> "Unit[ElectricPotentialKind]":
+        return _typing.cast("Unit[ElectricPotentialKind]", _get_unit("volt"))
 
     @property
-    def kcal_per_mol_per_e(self) -> Unit[ElectricPotentialKind]:
-        return cast("Unit[ElectricPotentialKind]", get_unit("kcal_per_mol_per_e"))
+    def kcal_per_mol_per_e(self) -> "Unit[ElectricPotentialKind]":
+        return _typing.cast(
+            "Unit[ElectricPotentialKind]", _get_unit("kcal_per_mol_per_e")
+        )
 
     @property
-    def statvolt(self) -> Unit[ElectricPotentialKind]:
-        return cast("Unit[ElectricPotentialKind]", get_unit("statvolt"))
+    def statvolt(self) -> "Unit[ElectricPotentialKind]":
+        return _typing.cast("Unit[ElectricPotentialKind]", _get_unit("statvolt"))
 
     @property
-    def hartree_per_e(self) -> Unit[ElectricPotentialKind]:
-        return cast("Unit[ElectricPotentialKind]", get_unit("hartree_per_e"))
+    def hartree_per_e(self) -> "Unit[ElectricPotentialKind]":
+        return _typing.cast("Unit[ElectricPotentialKind]", _get_unit("hartree_per_e"))
 
 
 electric_potential = _ElectricPotentialNamespace()
@@ -1009,20 +1069,24 @@ electric_potential = _ElectricPotentialNamespace()
 
 class _ElectricFieldNamespace:
     @property
-    def volt_per_angstrom(self) -> Unit[ElectricFieldKind]:
-        return cast("Unit[ElectricFieldKind]", get_unit("volt_per_angstrom"))
+    def volt_per_angstrom(self) -> "Unit[ElectricFieldKind]":
+        return _typing.cast("Unit[ElectricFieldKind]", _get_unit("volt_per_angstrom"))
 
     @property
-    def volt_per_meter(self) -> Unit[ElectricFieldKind]:
-        return cast("Unit[ElectricFieldKind]", get_unit("volt_per_meter"))
+    def volt_per_meter(self) -> "Unit[ElectricFieldKind]":
+        return _typing.cast("Unit[ElectricFieldKind]", _get_unit("volt_per_meter"))
 
     @property
-    def statvolt_per_centimeter(self) -> Unit[ElectricFieldKind]:
-        return cast("Unit[ElectricFieldKind]", get_unit("statvolt_per_centimeter"))
+    def statvolt_per_centimeter(self) -> "Unit[ElectricFieldKind]":
+        return _typing.cast(
+            "Unit[ElectricFieldKind]", _get_unit("statvolt_per_centimeter")
+        )
 
     @property
-    def atomic_electric_field(self) -> Unit[ElectricFieldKind]:
-        return cast("Unit[ElectricFieldKind]", get_unit("atomic_electric_field"))
+    def atomic_electric_field(self) -> "Unit[ElectricFieldKind]":
+        return _typing.cast(
+            "Unit[ElectricFieldKind]", _get_unit("atomic_electric_field")
+        )
 
 
 electric_field = _ElectricFieldNamespace()
@@ -1030,24 +1094,26 @@ electric_field = _ElectricFieldNamespace()
 
 class _DipoleMomentNamespace:
     @property
-    def e_angstrom(self) -> Unit[DipoleMomentKind]:
-        return cast("Unit[DipoleMomentKind]", get_unit("e_angstrom"))
+    def e_angstrom(self) -> "Unit[DipoleMomentKind]":
+        return _typing.cast("Unit[DipoleMomentKind]", _get_unit("e_angstrom"))
 
     @property
-    def debye(self) -> Unit[DipoleMomentKind]:
-        return cast("Unit[DipoleMomentKind]", get_unit("debye"))
+    def debye(self) -> "Unit[DipoleMomentKind]":
+        return _typing.cast("Unit[DipoleMomentKind]", _get_unit("debye"))
 
     @property
-    def coulomb_meter(self) -> Unit[DipoleMomentKind]:
-        return cast("Unit[DipoleMomentKind]", get_unit("coulomb_meter"))
+    def coulomb_meter(self) -> "Unit[DipoleMomentKind]":
+        return _typing.cast("Unit[DipoleMomentKind]", _get_unit("coulomb_meter"))
 
     @property
-    def statcoulomb_centimeter(self) -> Unit[DipoleMomentKind]:
-        return cast("Unit[DipoleMomentKind]", get_unit("statcoulomb_centimeter"))
+    def statcoulomb_centimeter(self) -> "Unit[DipoleMomentKind]":
+        return _typing.cast(
+            "Unit[DipoleMomentKind]", _get_unit("statcoulomb_centimeter")
+        )
 
     @property
-    def e_bohr(self) -> Unit[DipoleMomentKind]:
-        return cast("Unit[DipoleMomentKind]", get_unit("e_bohr"))
+    def e_bohr(self) -> "Unit[DipoleMomentKind]":
+        return _typing.cast("Unit[DipoleMomentKind]", _get_unit("e_bohr"))
 
 
 dipole_moment = _DipoleMomentNamespace()
@@ -1055,24 +1121,24 @@ dipole_moment = _DipoleMomentNamespace()
 
 class _EntropyNamespace:
     @property
-    def eV_per_kelvin(self) -> Unit[EntropyKind]:
-        return cast("Unit[EntropyKind]", get_unit("eV_per_kelvin"))
+    def eV_per_kelvin(self) -> "Unit[EntropyKind]":
+        return _typing.cast("Unit[EntropyKind]", _get_unit("eV_per_kelvin"))
 
     @property
-    def joule_per_kelvin(self) -> Unit[EntropyKind]:
-        return cast("Unit[EntropyKind]", get_unit("joule_per_kelvin"))
+    def joule_per_kelvin(self) -> "Unit[EntropyKind]":
+        return _typing.cast("Unit[EntropyKind]", _get_unit("joule_per_kelvin"))
 
     @property
-    def erg_per_kelvin(self) -> Unit[EntropyKind]:
-        return cast("Unit[EntropyKind]", get_unit("erg_per_kelvin"))
+    def erg_per_kelvin(self) -> "Unit[EntropyKind]":
+        return _typing.cast("Unit[EntropyKind]", _get_unit("erg_per_kelvin"))
 
     @property
-    def kcal_per_mol_per_kelvin(self) -> Unit[EntropyKind]:
-        return cast("Unit[EntropyKind]", get_unit("kcal_per_mol_per_kelvin"))
+    def kcal_per_mol_per_kelvin(self) -> "Unit[EntropyKind]":
+        return _typing.cast("Unit[EntropyKind]", _get_unit("kcal_per_mol_per_kelvin"))
 
     @property
-    def hartree_per_kelvin(self) -> Unit[EntropyKind]:
-        return cast("Unit[EntropyKind]", get_unit("hartree_per_kelvin"))
+    def hartree_per_kelvin(self) -> "Unit[EntropyKind]":
+        return _typing.cast("Unit[EntropyKind]", _get_unit("hartree_per_kelvin"))
 
 
 entropy = _EntropyNamespace()
@@ -1080,28 +1146,28 @@ entropy = _EntropyNamespace()
 
 class _ActionNamespace:
     @property
-    def eV_fs(self) -> Unit[ActionKind]:
-        return cast("Unit[ActionKind]", get_unit("eV_fs"))
+    def eV_fs(self) -> "Unit[ActionKind]":
+        return _typing.cast("Unit[ActionKind]", _get_unit("eV_fs"))
 
     @property
-    def eV_ps(self) -> Unit[ActionKind]:
-        return cast("Unit[ActionKind]", get_unit("eV_ps"))
+    def eV_ps(self) -> "Unit[ActionKind]":
+        return _typing.cast("Unit[ActionKind]", _get_unit("eV_ps"))
 
     @property
-    def kcal_per_mol_fs(self) -> Unit[ActionKind]:
-        return cast("Unit[ActionKind]", get_unit("kcal_per_mol_fs"))
+    def kcal_per_mol_fs(self) -> "Unit[ActionKind]":
+        return _typing.cast("Unit[ActionKind]", _get_unit("kcal_per_mol_fs"))
 
     @property
-    def joule_second(self) -> Unit[ActionKind]:
-        return cast("Unit[ActionKind]", get_unit("joule_second"))
+    def joule_second(self) -> "Unit[ActionKind]":
+        return _typing.cast("Unit[ActionKind]", _get_unit("joule_second"))
 
     @property
-    def erg_second(self) -> Unit[ActionKind]:
-        return cast("Unit[ActionKind]", get_unit("erg_second"))
+    def erg_second(self) -> "Unit[ActionKind]":
+        return _typing.cast("Unit[ActionKind]", _get_unit("erg_second"))
 
     @property
-    def atomic_action(self) -> Unit[ActionKind]:
-        return cast("Unit[ActionKind]", get_unit("atomic_action"))
+    def atomic_action(self) -> "Unit[ActionKind]":
+        return _typing.cast("Unit[ActionKind]", _get_unit("atomic_action"))
 
 
 action = _ActionNamespace()
@@ -1234,7 +1300,6 @@ __all__ = [
     "erg_per_gauss",
     "erg_per_kelvin",
     "erg_second",
-    "exp",
     "femtosecond",
     "force",
     "force_constant",
@@ -1331,8 +1396,6 @@ __all__ = [
     "rydberg",
     "s",
     "second",
-    "sin",
-    "sqrt",
     "square_centimeter",
     "square_meter",
     "statC",

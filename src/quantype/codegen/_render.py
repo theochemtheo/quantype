@@ -185,6 +185,9 @@ def quantity_methods(name: str, catalogue: Catalogue) -> str:
     text += additive_stubs(name)
     for method in ("__neg__", "__abs__"):
         text += f"    @override\n    def {method}(self) -> {name}[V, S]: ...\n"
+    # A spread of absolute temperatures is a temperature difference.
+    spread = "TemperatureDifference" if name == "Temperature" else name
+    text += f"    @override\n    def std(self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False) -> {spread}[V, S]: ...\n"
     # Absolute temperatures scale and multiply, but a sum of them is meaningless.
     if name != "Temperature":
         text += f"    @override\n    def sum(self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False) -> {name}[V, S]: ...\n"
@@ -393,7 +396,7 @@ def namespace_outputs(catalogue: Catalogue) -> tuple[str, str, list[str]]:
         stub += f"\nclass _{kind}Namespace:\n"
         for name, spec in catalogue.units.items():
             if spec.kind == kind:
-                runtime += f"    @property\n    def {name}(self) -> Unit[{kind}Kind]:\n        return cast('Unit[{kind}Kind]', get_unit({name!r}))\n"
+                runtime += f"    @property\n    def {name}(self) -> 'Unit[{kind}Kind]':\n        return _typing.cast('Unit[{kind}Kind]', _get_unit({name!r}))\n"
                 stub += f"    @property\n    def {name}(self) -> _{kind}Unit: ...\n"
         runtime += f"\n{namespace} = _{kind}Namespace()\n"
         stub += f"\n{namespace}: _{kind}Namespace\n"
@@ -413,29 +416,27 @@ def unit_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         + ", ".join(f"{name}Kind" for name in catalogue.quantities)
         + ")\n"
     )
+    # Runtime helpers are private, so dir(u) lists only units and namespaces.
     runtime = (
         HEADER
         + "# Scientific unit names preserve conventional case; flat names load lazily.\n# ruff: noqa: N802, F822, E501\n# pyright: reportUnsupportedDunderAll=false\n"
     )
+    runtime += "import typing as _typing\n"
     runtime += (
-        "from typing import Any, cast\nfrom quantype.core import Unit\n" + markers
+        "if _typing.TYPE_CHECKING:\n    from typing import Any\n    from quantype.core import Unit\n    "
+        + markers
     )
     runtime += (
-        "from quantype.core import get_unit\n"
+        "from quantype.core import get_unit as _get_unit\n"
         if package == "quantype"
-        else f"from {package}._catalogue import runtime\nget_unit = runtime.get_unit\n"
+        else f"from {package}._catalogue import runtime as _runtime\n_get_unit = _runtime.get_unit\n"
     )
-    math_module = (
-        "quantype._internal._math" if package == "quantype" else f"{package}._math"
-    )
-    runtime += f"from {math_module} import exp, sin, sqrt\n"
     stub = (
         HEADER
         + OVERLAPS
         + "# ruff: noqa: N816, N802\nfrom typing import Any, overload\nimport numpy as np\nfrom quantype.core import Unit\n"
         + markers
     )
-    stub += f"from {math_module} import exp as exp, sin as sin, sqrt as sqrt\n"
     stub += (
         f"from {package}._generated import (" + ", ".join(catalogue.quantities) + ")\n"
     )
@@ -452,50 +453,69 @@ def unit_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
     for identifier, name in names.items():
         stub += f"{identifier}: _{catalogue.units[name].kind}Unit\n"
     runtime += f"\n_NAMES = {names!r}\n"
-    runtime += "\ndef __getattr__(name: str) -> Unit[Any]:\n    if name not in _NAMES:\n        raise AttributeError(name)\n    unit = get_unit(_NAMES[name])\n    globals()[name] = unit\n    return unit\n"
+    runtime += "\ndef __getattr__(name: str) -> 'Unit[Any]':\n    if name not in _NAMES:\n        raise AttributeError(name)\n    unit = _get_unit(_NAMES[name])\n    globals()[name] = unit\n    return unit\n"
     namespace_runtime, namespace_stub, namespace_names = namespace_outputs(catalogue)
-    exports = sorted(["exp", "sin", "sqrt", *names, *namespace_names])
+    exports = sorted([*names, *namespace_names])
     return {
         "units.py": runtime + namespace_runtime + f"\n__all__ = {exports!r}\n",
         "units.pyi": stub + namespace_stub + f"\n__all__ = {exports!r}\n",
     }
 
 
-def gradient_signatures(catalogue: Catalogue, backend: str, array: str) -> list[str]:
-    signatures: list[str] = []
-    for (operation, output, input_), result in catalogue.algebra.items():
-        if operation != "div":
-            continue
-        if backend == "ujax":
-            signatures.append(
-                f"def grad[S: UnitSystem](function: Callable[[{input_}[Array, S]], {output}[Array, S]]) -> Callable[[{input_}[Array, S]], {result}[Array, S]]: ..."
-            )
-        else:
-            signatures.append(
-                f"def grad[S: UnitSystem](output: {output}[Tensor, S], inputs: {input_}[Tensor, S], *, create_graph: bool = False, retain_graph: bool | None = None) -> {result}[Tensor, S]: ..."
-            )
-    if backend == "ujax":
-        signatures.append(
-            "def grad[I, O, S: UnitSystem](function: Callable[[Quantity[I, Array, S]], Quantity[O, Array, S]]) -> Callable[[Quantity[I, Array, S]], Quantity[Div[O, I], Array, S]]: ..."
-        )
-    else:
-        signatures.append(
-            f"def grad[I, O, S: UnitSystem](output: Quantity[O, {array}, S], inputs: Quantity[I, {array}, S], *, create_graph: bool = False, retain_graph: bool | None = None) -> Quantity[Div[O, I], {array}, S]: ..."
-        )
+def _derivatives(catalogue: Catalogue) -> list[tuple[str, str, str]]:
+    """(output, input, derivative) for each declared or derived division."""
+    return [
+        (output, input_, result)
+        for (operation, output, input_), result in catalogue.algebra.items()
+        if operation == "div"
+    ]
+
+
+def jax_signatures(catalogue: Catalogue, name: str) -> list[str]:
+    """``grad``/``value_and_grad``: the first argument's derivative is typed.
+
+    Further arguments pass through a ParamSpec; other ``argnums`` are untyped.
+    """
+
+    def returned(output: str, result: str) -> str:
+        return f"tuple[{output}, {result}]" if name == "value_and_grad" else result
+
+    signatures = [
+        f"def {name}[S: UnitSystem, **P](function: Callable[Concatenate[{input_}[Array, S], P], {output}[Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[{input_}[Array, S], P], {returned(f'{output}[Array, S]', f'{result}[Array, S]')}]: ..."
+        for output, input_, result in _derivatives(catalogue)
+    ]
+    signatures += [
+        f"def {name}[I, O, S: UnitSystem, **P](function: Callable[Concatenate[Quantity[I, Array, S], P], Quantity[O, Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[Quantity[I, Array, S], P], {returned('Quantity[O, Array, S]', 'Quantity[Div[O, I], Array, S]')}]: ...",
+        f"def {name}(function: Callable[..., Quantity[Any, Array, Any]], argnums: int | tuple[int, ...]) -> Callable[..., Any]: ...",
+    ]
+    return signatures
+
+
+def torch_signatures(catalogue: Catalogue) -> list[str]:
+    options = "*, create_graph: bool = False, retain_graph: bool | None = None"
+    signatures = [
+        f"def grad[S: UnitSystem](output: {output}[Tensor, S], inputs: {input_}[Tensor, S], {options}) -> {result}[Tensor, S]: ..."
+        for output, input_, result in _derivatives(catalogue)
+    ]
+    signatures += [
+        f"def grad[I, O, S: UnitSystem](output: Quantity[O, Tensor, S], inputs: Quantity[I, Tensor, S], {options}) -> Quantity[Div[O, I], Tensor, S]: ...",
+        f"def grad[S: UnitSystem](output: Quantity[Any, Tensor, S], inputs: Sequence[Quantity[Any, Tensor, S]], {options}) -> tuple[Quantity[Any, Tensor, S], ...]: ...",
+    ]
     return signatures
 
 
 def hessian_signatures(catalogue: Catalogue) -> list[str]:
     signatures: list[str] = []
-    for (operation, output, input_), result in catalogue.algebra.items():
+    for output, input_, result in _derivatives(catalogue):
         second = catalogue.algebra.get(("div", result, input_))
-        if operation == "div" and second is not None:
+        if second is not None:
             signatures.append(
-                f"def hessian[S: UnitSystem](function: Callable[[{input_}[Array, S]], {output}[Array, S]]) -> Callable[[{input_}[Array, S]], {second}[Array, S]]: ..."
+                f"def hessian[S: UnitSystem, **P](function: Callable[Concatenate[{input_}[Array, S], P], {output}[Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[{input_}[Array, S], P], {second}[Array, S]]: ..."
             )
-    signatures.append(
-        "def hessian[I, O, S: UnitSystem](function: Callable[[Quantity[I, Array, S]], Quantity[O, Array, S]]) -> Callable[[Quantity[I, Array, S]], Quantity[Div[Div[O, I], I], Array, S]]: ..."
-    )
+    signatures += [
+        "def hessian[I, O, S: UnitSystem, **P](function: Callable[Concatenate[Quantity[I, Array, S], P], Quantity[O, Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[Quantity[I, Array, S], P], Quantity[Div[Div[O, I], I], Array, S]]: ...",
+        "def hessian(function: Callable[..., Quantity[Any, Array, Any]], argnums: int) -> Callable[..., Any]: ...",
+    ]
     return signatures
 
 
@@ -508,13 +528,14 @@ def adapter_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         text = (
             HEADER
             + OVERLAPS
-            + f"from {source} import {array}\nfrom typing import overload\n"
+            + f"from {source} import {array}\n"
+            + (
+                "from typing import Any, Concatenate, Literal, overload\nfrom collections.abc import Callable\n"
+                if backend == "ujax"
+                else "from typing import Any, overload\nfrom collections.abc import Sequence\n"
+            )
             + "from quantype.systems import UnitSystem\n"
         )
-        if backend == "ujax":
-            text += "from collections.abc import Callable\n"
-        if package == "quantype" and backend == "ujax":
-            text += "from typing import Any\n"
         derivative_kinds = {
             kind
             for (op, left, right), result in catalogue.algebra.items()
@@ -533,15 +554,242 @@ def adapter_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         text += (
             f"from {quantity_module} import Quantity\nfrom {package}.kinds import Div\n"
         )
-        text += overloads(gradient_signatures(catalogue, backend, array), indent="")
         if backend == "ujax":
+            text += (
+                f"__all__ = {['grad', 'hessian', 'jit', 'value_and_grad', 'vmap']!r}\n"
+            )
+            text += overloads(jax_signatures(catalogue, "grad"), indent="")
+            text += overloads(jax_signatures(catalogue, "value_and_grad"), indent="")
             text += overloads(hessian_signatures(catalogue), indent="")
             text += "def jit[**P, T](fun: Callable[P, T]) -> Callable[P, T]: ...\n"
             text += "def vmap[**P, T](fun: Callable[P, T], in_axes: int | None = 0, out_axes: int = 0) -> Callable[P, T]: ...\n"
+        else:
+            text += "__all__ = ['grad']\n"
+            text += overloads(torch_signatures(catalogue), indent="")
         if package == "quantype" and backend == "ujax":
             text += "def _register_quantity(cls: type[Quantity[Any, Any, Any]]) -> None: ...\n"
         outputs[f"{backend}.pyi"] = text
     return outputs
+
+
+NUMPY_FUNCTIONS = (
+    "abs", "absolute", "allclose", "arccos", "arcsin", "arctan", "arctan2", "clip",
+    "concatenate", "cos", "cosh", "cross", "cumsum", "diff", "dot", "exp",
+    "expand_dims", "expm1", "isclose", "isfinite", "isinf", "isnan", "linalg", "log",
+    "log1p", "log2", "log10", "max", "maximum", "mean", "min", "minimum", "reshape",
+    "sin", "sinh", "sqrt", "squeeze", "stack", "std", "sum", "tan", "tanh",
+    "transpose", "where", "zeros_like",
+)  # fmt: skip
+# Unary functions with unit rules: names, argument kind, result kind.
+NUMPY_UNARY = (
+    *((name, "Angle", "Dimensionless") for name in ("sin", "cos", "tan")),
+    *((name, "Dimensionless", "Angle") for name in ("arcsin", "arccos", "arctan")),
+    *(
+        (name, "Dimensionless", "Dimensionless")
+        for name in (
+            "exp",
+            "expm1",
+            "log",
+            "log1p",
+            "log2",
+            "log10",
+            "sinh",
+            "cosh",
+            "tanh",
+        )
+    ),
+)
+# Plain numbers and arrays go to their own backend.
+RAW_UNARY = (
+    "def {0}(x: float, /) -> float: ...",
+    "def {0}[F: np.floating[Any]](x: F, /) -> F: ...",
+    "def {0}[A: _Numerical](x: A, /) -> A: ...",
+)
+
+
+def numpy_stub(catalogue: Catalogue, package: str) -> str:
+    """``qnp``: NumPy's names with unit rules, typed with the catalogue's classes."""
+    text = (
+        HEADER
+        + OVERLAPS
+        + "# NumPy's names, including builtin ones.\n# ruff: noqa: A001\n"
+        + "# pyright: reportPrivateUsage=false\n"
+    )
+    text += "from collections.abc import Sequence\nfrom typing import Any, Literal, overload\n"
+    text += "import numpy as np\nfrom quantype.core import Quantity as _BaseQuantity, _Numerical\n"
+    text += "from quantype.systems import UnitSystem\n"
+    text += (
+        f"from {package}._generated import (" + ", ".join(catalogue.quantities) + ")\n"
+    )
+    text += (
+        f"from {package}._generated import Quantity\n"
+        if package != "quantype"
+        else "from quantype.core import Quantity\n"
+    )
+    text += f"from {package}.kinds import Mul\n"
+    text += f"__all__ = {sorted(NUMPY_FUNCTIONS)!r}\n\n"
+    quantity = "_BaseQuantity[Any, Any, Any]"
+    for name, source, target in NUMPY_UNARY:
+        text += overloads(
+            [
+                f"def {name}[V, S: UnitSystem](x: {source}[V, S], /) -> {target}[V, S]: ...",
+                *(raw.format(name) for raw in RAW_UNARY),
+            ],
+            indent="",
+        )
+    roots = [
+        f"def sqrt[V, S: UnitSystem](x: {result}[V, S], /) -> {base}[V, S]: ..."
+        for (base, exponent), result in catalogue.powers.items()
+        if exponent == 2  # noqa: PLR2004 -- square roots undo squares
+    ]
+    roots.append(
+        "def sqrt[V, S: UnitSystem](x: Dimensionless[V, S], /) -> Dimensionless[V, S]: ..."
+    )
+    text += overloads([*roots, *(raw.format("sqrt") for raw in RAW_UNARY)], indent="")
+    for name in ("absolute", "abs"):
+        text += overloads(
+            [
+                f"def {name}[Q: {quantity}](x: Q, /) -> Q: ...",
+                *(raw.format(name) for raw in RAW_UNARY),
+            ],
+            indent="",
+        )
+    text += overloads(
+        [
+            "def arctan2[K, V, S: UnitSystem](y: _BaseQuantity[K, V, S], x: _BaseQuantity[K, V, S], /) -> Angle[V, S]: ...",
+            "def arctan2[A: _Numerical](y: A, x: A, /) -> A: ...",
+            "def arctan2(y: float, x: float, /) -> float: ...",
+        ],
+        indent="",
+    )
+    for name in ("maximum", "minimum"):
+        text += overloads(
+            [
+                f"def {name}[Q: {quantity}](a: Q, b: Q, /) -> Q: ...",
+                f"def {name}[A: _Numerical](a: A, b: A, /) -> A: ...",
+            ],
+            indent="",
+        )
+    text += overloads(
+        [
+            f"def clip[Q: {quantity}](x: Q, a_min: Q | None, a_max: Q | None, /) -> Q: ...",
+            "def clip[A: _Numerical](x: A, a_min: Any, a_max: Any, /) -> A: ...",
+        ],
+        indent="",
+    )
+    text += overloads(
+        [
+            f"def where[Q: {quantity}](condition: Any, x: Q, y: Q, /) -> Q: ...",
+            "def where[A: _Numerical](condition: Any, x: A, y: A, /) -> A: ...",
+        ],
+        indent="",
+    )
+    for name in ("isnan", "isfinite", "isinf"):
+        text += f"def {name}(x: Any, /) -> Any: ...\n"
+    for name, returned in (("isclose", "Any"), ("allclose", "bool")):
+        text += overloads(
+            [
+                f"def {name}[Q: {quantity}](a: Q, b: Q, *, rtol: float = ..., atol: Q | Literal[0] = ..., equal_nan: bool = ...) -> {returned}: ...",
+                f"def {name}[A: _Numerical](a: A, b: A, *, rtol: float = ..., atol: float = ..., equal_nan: bool = ...) -> {returned}: ...",
+            ],
+            indent="",
+        )
+    products = [
+        f"def dot[V, S: UnitSystem](a: {left}[V, S], b: {right}[V, S], /) -> {result}[V, S]: ..."
+        for (operation, left, right), result in catalogue.algebra.items()
+        if operation == "mul"
+    ]
+    text += overloads(
+        [
+            *products,
+            "def dot[K, L, V, S: UnitSystem](a: _BaseQuantity[K, V, S], b: _BaseQuantity[L, V, S], /) -> Quantity[Mul[K, L], V, S]: ...",
+            "def dot[A: _Numerical](a: A, b: A, /) -> Any: ...",
+        ],
+        indent="",
+    )
+    text += overloads(
+        [
+            "def cross[K, L, V, S: UnitSystem](a: _BaseQuantity[K, V, S], b: _BaseQuantity[L, V, S], /, axis: int = ...) -> Quantity[Mul[K, L], V, S]: ...",
+            "def cross[A: _Numerical](a: A, b: A, /, axis: int = ...) -> A: ...",
+        ],
+        indent="",
+    )
+    for name in ("stack", "concatenate"):
+        text += overloads(
+            [
+                f"def {name}[Q: {quantity}](arrays: Sequence[Q], axis: int = ...) -> Q: ...",
+                f"def {name}[A: _Numerical](arrays: Sequence[A], axis: int = ...) -> A: ...",
+            ],
+            indent="",
+        )
+    for name, parameters in (
+        ("reshape", "shape: int | tuple[int, ...]"),
+        ("transpose", "axes: Sequence[int] | None = ..."),
+        ("squeeze", "axis: int | None = ..."),
+        ("expand_dims", "axis: int"),
+        ("cumsum", "axis: int | None = ..."),
+    ):
+        text += overloads(
+            [
+                f"def {name}[Q: {quantity}](x: Q, {parameters}) -> Q: ...",
+                f"def {name}[A: _Numerical](x: A, {parameters}) -> A: ...",
+            ],
+            indent="",
+        )
+    text += overloads(
+        [
+            f"def zeros_like[Q: {quantity}](x: Q) -> Q: ...",
+            "def zeros_like[A: _Numerical](x: A) -> A: ...",
+        ],
+        indent="",
+    )
+    for name in ("sum", "mean", "max", "min"):
+        text += overloads(
+            [
+                f"def {name}[Q: {quantity}](x: Q, axis: int | None = ..., *, keepdims: bool = ...) -> Q: ...",
+                f"def {name}(x: _Numerical, axis: int | None = ..., *, keepdims: bool = ...) -> Any: ...",
+            ],
+            indent="",
+        )
+    # A spread or difference of absolute temperatures is a temperature difference.
+    text += overloads(
+        [
+            "def std[V, S: UnitSystem](x: Temperature[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...) -> TemperatureDifference[V, S]: ...",
+            f"def std[Q: {quantity}](x: Q, axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...) -> Q: ...",
+            "def std(x: _Numerical, axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...) -> Any: ...",
+        ],
+        indent="",
+    )
+    text += overloads(
+        [
+            "def diff[V, S: UnitSystem](x: Temperature[V, S], n: int = ..., axis: int = ...) -> TemperatureDifference[V, S]: ...",
+            f"def diff[Q: {quantity}](x: Q, n: int = ..., axis: int = ...) -> Q: ...",
+            "def diff[A: _Numerical](x: A, n: int = ..., axis: int = ...) -> A: ...",
+        ],
+        indent="",
+    )
+    text += "\nclass _Linalg:\n"
+    text += "    @overload\n    @staticmethod\n"
+    text += f"    def norm[Q: {quantity}](x: Q, axis: int | None = ..., *, keepdims: bool = ...) -> Q: ...\n"
+    text += "    @overload\n    @staticmethod\n"
+    text += "    def norm[A: _Numerical](x: A, axis: int | None = ..., *, keepdims: bool = ...) -> A: ...\n"
+    text += "\nlinalg: _Linalg\n"
+    return text
+
+
+def numpy_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
+    runtime = HEADER + (
+        '"""Unit-aware NumPy functions for NumPy, JAX and Torch arrays: ``qnp``.\n\n'
+        "Quantities follow their physical rules; plain numbers and arrays go\n"
+        'straight to their own backend.\n"""\n\n'
+    )
+    runtime += "# ruff: noqa: A004\n"
+    runtime += (
+        "from quantype._internal._numpy import (" + ", ".join(NUMPY_FUNCTIONS) + ")\n"
+    )
+
+    runtime += f"__all__ = {sorted(NUMPY_FUNCTIONS)!r}\n"
+    return {"numpy.py": runtime, "numpy.pyi": numpy_stub(catalogue, package)}
 
 
 def outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
@@ -549,4 +797,5 @@ def outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         **quantity_outputs(catalogue, package),
         **unit_outputs(catalogue, package),
         **adapter_outputs(catalogue, package),
+        **numpy_outputs(catalogue, package),
     }

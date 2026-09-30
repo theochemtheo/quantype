@@ -72,14 +72,17 @@ combining SI and metal quantities is a type error and a runtime `TypeError`.
 ```python
 import numpy as np
 import numpy.typing as npt
+import quantype.numpy as qnp
 from quantype import Length, u
 
 positions = Length[npt.NDArray[np.float64]]([[0, 0, 0], [3, 4, 0]], u.nm)
-distances = u.sqrt((positions**2).sum(axis=-1))
+distances = qnp.linalg.norm(positions, axis=-1)  # a Length
 np.testing.assert_allclose(distances.magnitude(u.nm), [0, 5])
+assert np.linalg.norm(positions, axis=-1).max() == 5 * u.nm  # NumPy agrees
 ```
 
-Use quantity arithmetic, reductions, indexing, and comparisons. For other
+`quantype.numpy` has NumPy's names with unit rules for NumPy, JAX, and Torch
+arrays, and NumPy's and Torch's own functions apply the same rules. For other
 numerical APIs, explicitly extract `.value` (raw numbers in the unit system) or
 `.magnitude(unit)`; implicit coercion is rejected.
 

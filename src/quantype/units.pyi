@@ -43,9 +43,6 @@ from quantype._generated import (
     Velocity,
     Volume,
 )
-from quantype._internal._math import exp as exp
-from quantype._internal._math import sin as sin
-from quantype._internal._math import sqrt as sqrt
 from quantype.core import Unit
 from quantype.kinds import (
     AccelerationKind,
@@ -1586,7 +1583,6 @@ __all__ = [
     "erg_per_gauss",
     "erg_per_kelvin",
     "erg_second",
-    "exp",
     "femtosecond",
     "force",
     "force_constant",
@@ -1683,8 +1679,6 @@ __all__ = [
     "rydberg",
     "s",
     "second",
-    "sin",
-    "sqrt",
     "square_centimeter",
     "square_meter",
     "statC",
