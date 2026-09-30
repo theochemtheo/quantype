@@ -95,7 +95,7 @@ at the boundary. `System.units` holds every unit a system defines that the
 catalogue cannot name, so one argument covers them. These lines are API
 patterns: `data` and `text` stand for your input, and the imports are as above.
 
-```python
+```python notest
 Force.parse(data, units=Gromacs.units)
 TypeAdapter(Force[float, Gromacs]).validate_json(text)
 load_npz("frame.npz", "forces", Force[npt.NDArray[np.float32], Gromacs])

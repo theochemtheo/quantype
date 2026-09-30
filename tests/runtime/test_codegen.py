@@ -310,7 +310,8 @@ def test_generated_typing(generated_project: Path, command: tuple[str, ...]) -> 
         text=True,
         check=False,
     )
-    output = result.stdout + result.stderr
+    # Checkers colour their output when FORCE_COLOR is set, even into a pipe.
+    output = re.sub(r"\x1b\[[0-9;]*m", "", result.stdout + result.stderr)
     reported = {int(line) for line in re.findall(r"invalid\.py:(\d+):", output)}
     assert result.returncode == 1, output
     assert expected <= reported, output

@@ -7,7 +7,7 @@ in an application project, or `python -m pip install ruff`).
 
 ## Generate an application catalogue
 
-```python
+```python notest
 from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
 from quantype.codegen import generate
 
@@ -28,7 +28,7 @@ into `"labquantities"` beside a script for a standalone experiment.
 
 Then import consistently from that generated package:
 
-```python
+```python notest
 from typing import assert_type
 from labquantities import Length, Pressure, SurfaceTension, u
 
