@@ -68,12 +68,18 @@ class Unit[K]:
         raw: Any = value
         if isinstance(raw, bool):
             raise TypeError("Boolean values are not physical magnitudes")
-        if isinstance(raw, (int, float)):
+        # NumPy float64 is also a Python float: inspect numerical storage first.
+        if hasattr(raw, "shape") and hasattr(raw, "dtype"):
+            from quantype._internal._storage import validate_floating_storage
+
+            validate_floating_storage(raw)
+        elif isinstance(raw, (int, float)):
             raw = float(raw)
-        elif not (hasattr(raw, "shape") and hasattr(raw, "dtype")):
+        else:
             raise TypeError(
                 "Use a real scalar or numerical array as a magnitude; "
-                "for lists, use a typed quantity constructor or numpy.asarray first"
+                "for lists, use a typed quantity constructor or numpy.asarray "
+                "with a floating dtype first"
             )
         return cast("Quantity[K, V]", _wrap(self.semantic, self.canonical(raw)))
 
@@ -114,12 +120,21 @@ def canonical_unit(kind: Kind) -> Unit[Any]:
 
 
 @cache
+def _builtin_units() -> dict[str, Unit[Any]]:
+    from quantype._internal._registry import unit_specs
+
+    units: dict[str, Unit[Any]] = {}
+    for name, spec in unit_specs().items():
+        unit: Unit[Any] = Unit(name, spec.kind, spec.scale, spec.offset, spec.symbol)
+        for identifier in (name, *spec.aliases):
+            units[identifier] = unit
+    return units
+
+
 def get_unit(name: str, *, kind: Kind | None = None) -> Unit[Any]:
     if kind is not None and kind in _UNIT_LOOKUPS:
         return _UNIT_LOOKUPS[kind](name)
-    from quantype._internal._registry import unit_specs
-
-    for identifier, spec in unit_specs().items():
-        if name == identifier or name in spec.aliases:
-            return Unit(identifier, spec.kind, spec.scale, spec.offset, spec.symbol)
-    raise ValueError(f"Unknown unit {name!r}")
+    try:
+        return _builtin_units()[name]
+    except KeyError as exc:
+        raise ValueError(f"Unknown unit {name!r}") from exc

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import re
 import shlex
 import shutil
 import subprocess
@@ -84,6 +85,12 @@ def test_invalid_catalogue_extension() -> None:
         "Any",
         "globals",
         "__name__",
+        "__init__",
+        "__new__",
+        "__getattribute__",
+        "__setattr__",
+        "__class__",
+        "__dict__",
         "Length",
         "LengthKind",
         "_LengthNamespace",
@@ -118,6 +125,14 @@ def test_quantity_namespaces_are_unique() -> None:
         builtin_catalogue().extend(
             quantities={"length": QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
             units={"lab_unit": UnitSpec("length")},
+        )
+
+
+def test_canonical_unit_cannot_override_namespace_constructor() -> None:
+    with pytest.raises(ValueError, match="conflicts with a generated API binding"):
+        builtin_catalogue().extend(
+            quantities={"Sample": QuantitySpec((0, 0, 0, 0, 0, 0, 0), "__init__")},
+            units={"__init__": UnitSpec("Sample")},
         )
 
 
@@ -201,3 +216,24 @@ def test_generated_typing(generated_project: Path, command: tuple[str, ...]) -> 
     if shutil.which(command[0]) is None:
         pytest.skip(f"{command[0]} is not installed")
     _run(generated_project, *command, "consumer.py")
+
+    # Negative generated consumers need per-line diagnostics, not just a
+    # nonzero checker exit that could hide a different generation failure.
+    expected = {
+        index
+        for index, line in enumerate(
+            (generated_project / "invalid.py").read_text().splitlines(), start=1
+        )
+        if line.endswith("# error")
+    }
+    result = subprocess.run(  # noqa: S603 -- fixed checker commands, no shell
+        (*command, "invalid.py"),
+        cwd=generated_project,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    output = result.stdout + result.stderr
+    reported = {int(line) for line in re.findall(r"invalid\.py:(\d+):", output)}
+    assert result.returncode == 1, output
+    assert expected <= reported, output

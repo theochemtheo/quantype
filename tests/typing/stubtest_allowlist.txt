@@ -2,7 +2,7 @@
 ^quantype\._generated\.[A-Za-z]+\.__type_params__$
 ^quantype\.core\.Quantity\.__type_params__$
 ^quantype\._internal\._unit\.Unit\.__type_params__$
-^quantype\.kinds\.(Div|Mul|Pow)\.__type_params__$
+^quantype\._internal\._kind_types\.(Div|Mul|Pow)\.__type_params__$
 
 # A type alias has no runtime tuple base class (stubtest treats it as a class).
 ^quantype\._internal\._registry\.Dimensions$
@@ -14,9 +14,12 @@
 # Standard static generics are retained; the runtime alias adds conversion on call.
 ^quantype\.core\.Quantity\.__class_getitem__$
 
-# Base-class arithmetic/NumPy methods are intentionally typed only on named
-# quantities; exposing them on Quantity would bypass the semantic overloads.
-^quantype\.core\.Quantity\.(__abs__|__add__|__array__|__array_function__|__array_priority__|__array_ufunc__|__mul__|__neg__|__pos__|__pow__|__rmul__|__rtruediv__|__sub__|__truediv__|mean|sum)$
+# NumPy coercion/dispatch methods intentionally reject implicit unit loss.
+^quantype\.core\.Quantity\.(__array__|__array_function__|__array_priority__|__array_ufunc__)$
+
+# Runtime abs(Temperature) always raises; its static special method is disabled
+# explicitly because mypy ignores self restrictions through SupportsAbs.
+^quantype\._generated\.Temperature\.__abs__$
 
 # Unit calls/operators have kind-specific overloads on the generated unit types.
 # NumPy dispatch and array priority are runtime-only implementation details.

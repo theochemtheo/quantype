@@ -13,7 +13,12 @@ from typing import TYPE_CHECKING, Any, TypeGuard, cast, get_args, get_origin
 import numpy as np
 
 from quantype._internal._semantics import Kind
-from quantype._internal._storage import backend_name, convert, host_array
+from quantype._internal._storage import (
+    backend_name,
+    convert,
+    host_array,
+    reject_booleans,
+)
 from quantype.core import Quantity, Unit, _wrap, canonical_unit, get_unit
 
 if TYPE_CHECKING:
@@ -104,6 +109,7 @@ def parse_quantity(
     unit = resolve_unit(name, units, kind=cast("Kind", cls._semantic))
     if unit.semantic is not cls._semantic:
         raise ValueError(f"Expected {cls._kind}; received {unit.kind} (unit {name!r})")
+    reject_booleans(value)
     array = np.asarray(value)
     if array.dtype.kind not in "iuf":
         raise ValueError(

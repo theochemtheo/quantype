@@ -76,7 +76,7 @@ class Catalogue:
         self._validate_algebra()
 
     def _validate_quantities(self) -> None:
-        reserved = {"Quantity", "Unit", "Mul", "Div", "Pow"}
+        reserved = {"Quantity", "Unit", "Mul", "Div", "Pow", "NonAffineKind"}
         namespaces: set[str] = set()
         for name, spec in self.quantities.items():
             if (
@@ -131,7 +131,9 @@ class Catalogue:
             for identifier in (name, *unit.aliases):
                 if not identifier.strip() or identifier in identifiers:
                     raise ValueError(f"Empty or duplicate unit name {identifier!r}")
-                if identifier in reserved:
+                if identifier in reserved or (
+                    identifier.startswith("__") and identifier.endswith("__")
+                ):
                     raise ValueError(
                         f"Unit name {identifier!r} conflicts with "
                         "a generated API binding"

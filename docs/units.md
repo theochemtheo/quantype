@@ -39,10 +39,12 @@ length = 2 * u.nm
 positions = u.angstrom(np.zeros((100, 3)))
 ```
 
-Unit-first construction preserves the input's numerical storage where conversion
-allows it; Python integers become `float`. Use `unit(array)` for reliable
-cross-backend construction; backend-left multiplication is not promised outside
-NumPy. For Python lists, use a typed constructor instead.
+Unit-first construction preserves existing real floating numerical storage,
+including NumPy floating scalars, where conversion allows it; Python integers
+become `float`. Boolean, complex, non-numerical, and integer backend
+arrays/scalars are rejected. To convert integer arrays or Python lists to floating
+storage, use a typed constructor. Use `unit(array)` for reliable cross-backend construction;
+backend-left multiplication is not promised outside NumPy.
 
 Hierarchical namespaces use full catalogue names, such as `u.length.nanometer`
 and `u.temperature.celsius`. Flat abbreviations such as `u.nm` are also available.
@@ -74,8 +76,11 @@ both by the supported type checkers and at runtime.
 
 Unlisted products retain structural types such as
 `Quantity[Mul[LengthKind, TimeKind], float]`, not `Any`. Runtime expressions are
-structured trees, not parsed strings. There is no arbitrary symbolic cancellation
-or inference of physical meaning from dimensions alone.
+structured trees, not parsed strings. These quantities support arithmetic and
+reductions while retaining their structural kinds. Scalar reciprocals use declared
+relations, such as `1 / Time` yielding `InverseTime`, or retain a structural ratio.
+There is no arbitrary symbolic cancellation or inference of physical meaning from
+dimensions alone.
 
 Absolute temperatures are affine points:
 
@@ -126,8 +131,9 @@ explicitly using a temperature-difference reference.
 A unit object can be used immediately for construction, conversion, and
 serialization. Decoding its identifier requires the definition explicitly.
 Namespaced identifiers avoid accidental collisions. Duplicate definitions and
-shadowing built-in identifiers are rejected during decoding. There is no
-import-time mutation of the public unit namespace.
+shadowing built-in identifiers are rejected during decoding. Existing built-in
+unit objects may also be supplied in `units=`; they do not count as shadowing.
+There is no import-time mutation of the public unit namespace.
 
 For typed restoration, see [serialization](serialization.md). To add new
 physical kinds and relationships, see [custom catalogues](custom-catalogues.md).

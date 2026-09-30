@@ -2,10 +2,43 @@
 
 from __future__ import annotations
 
-from typing import Any, TypeAliasType, cast, get_args, get_origin
+from typing import TYPE_CHECKING, Any, TypeAliasType, cast, get_args, get_origin
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 # Backend APIs and NumPy's runtime dtype generics form a dynamic boundary.
 # ruff: noqa: ANN401, PLC0415
+
+
+def reject_booleans(value: Any) -> None:
+    """Reject observable booleans before numerical coercion erases their types."""
+    if (
+        isinstance(value, bool)
+        or getattr(getattr(value, "dtype", None), "kind", None) == "b"
+    ):
+        raise ValueError("Quantity magnitudes must be real numbers, not booleans")
+    if isinstance(value, (list, tuple)):
+        for item in cast("Iterable[Any]", value):
+            reject_booleans(item)
+
+
+def validate_floating_storage(value: Any) -> None:
+    """Inspect existing storage without converting, detaching, or moving it."""
+    module = type(value).__module__
+    if module.startswith("torch"):
+        valid = value.is_floating_point()
+    elif module.startswith(("jax", "jaxlib")):
+        import jax.numpy as jnp
+
+        valid = jnp.issubdtype(value.dtype, jnp.floating)
+    else:
+        valid = value.dtype.kind == "f"
+    if not valid:
+        raise ValueError(
+            "Unit-first construction requires a real floating dtype; "
+            "use a typed quantity constructor to convert integer magnitudes"
+        )
 
 
 def storage_origin(storage: Any) -> Any:
@@ -85,6 +118,7 @@ def _jax(value: Any, dtype: Any) -> Any:
 def convert(value: Any, storage: Any, *, dtype: Any = None) -> Any:
     import numpy as np
 
+    reject_booleans(value)
     origin = storage_origin(storage)
     if origin in (float, np.ndarray) or (
         isinstance(origin, type) and issubclass(origin, np.floating)

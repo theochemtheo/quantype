@@ -1,6 +1,8 @@
 """Run with pytest after generating labquantities in this fixture project."""
 
+import pytest
 from labquantities import (
+    InverseTime,
     Length,
     Pressure,
     SurfaceTension,
@@ -9,6 +11,7 @@ from labquantities import (
 )
 
 from quantype import Length as OriginalLength
+from quantype import u as original_units
 
 
 def test_physical_algebra() -> None:
@@ -19,6 +22,15 @@ def test_physical_algebra() -> None:
     assert isinstance(pressure * length, SurfaceTension)
     assert (length * pressure).value == (pressure * length).value
     assert not isinstance(length, OriginalLength)
+    product = length * (3 * u.fs)
+    assert (product + product).value == 12
+    assert (product * 2).mean().value == 12
+    inverse = 1.0 / (2 * u.fs)
+    assert isinstance(inverse, InverseTime)
+    assert inverse.value == 0.5
+    inverse_tension = 1.0 / (length * pressure)
+    assert inverse_tension.kind == "Div[Dimensionless,SurfaceTension]"
+    assert inverse_tension.value == 1.0 / (length * pressure).value
 
 
 def test_serialization_roundtrip() -> None:
@@ -28,6 +40,11 @@ def test_serialization_roundtrip() -> None:
 
     assert isinstance(restored, Length)
     assert restored.value == length.value
+    assert Length.parse("2 nm", units=(u.nm,)).value == length.value
+    assert u.nm is u.length.nanometer
+    assert u.nm is not original_units.nm
+    with pytest.raises(ValueError, match="shadows builtin"):
+        Length.parse("2 nm", units=(original_units.nm,))
 
 
 def test_math_preserves_catalogue() -> None:

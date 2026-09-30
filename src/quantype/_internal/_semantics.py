@@ -51,6 +51,7 @@ KINDS = {
     for name, spec in QUANTITIES.items()
 }
 TEMPERATURE_DIFFERENCES = {KINDS["Temperature"]: KINDS["TemperatureDifference"]}
+DIMENSIONLESS_KINDS = dict.fromkeys(KINDS.values(), KINDS["Dimensionless"])
 
 
 def addition(left: Semantic, right: Semantic, *, subtract: bool) -> Semantic:

@@ -12,6 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any, ClassVar, Self, cast, override
 
 from quantype._internal._semantics import (
+    DIMENSIONLESS_KINDS,
     KINDS,
     Kind,
     Semantic,
@@ -227,9 +228,10 @@ class Quantity[K, V]:
 
     def __rtruediv__(self, other: Any) -> Quantity[Any, Any]:
         self._check_scalar(other)
-        return _wrap(
-            product("div", KINDS["Dimensionless"], self._semantic), other / self.value
-        )
+        numerator = KINDS["Dimensionless"]
+        if isinstance(self._semantic, Kind):
+            numerator = DIMENSIONLESS_KINDS.get(self._semantic, numerator)
+        return _wrap(product("div", numerator, self._semantic), other / self.value)
 
     def _check_scalar(self, value: object) -> None:
         if isinstance(self._semantic, Kind) and self._semantic.affine:

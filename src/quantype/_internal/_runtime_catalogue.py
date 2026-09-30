@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from quantype._internal._semantics import (
+    DIMENSIONLESS_KINDS,
     EXPONENTS,
     PRODUCTS,
     TEMPERATURE_DIFFERENCES,
@@ -30,6 +31,10 @@ class RuntimeCatalogue:
             TEMPERATURE_DIFFERENCES[self.kinds["Temperature"]] = self.kinds[
                 "TemperatureDifference"
             ]
+        if "Dimensionless" in self.kinds:
+            DIMENSIONLESS_KINDS.update(
+                dict.fromkeys(self.kinds.values(), self.kinds["Dimensionless"])
+            )
         self.units: dict[str, Unit[Any]] = {}
         for name, spec in catalogue.units.items():
             kind = self.kinds[spec.kind]
