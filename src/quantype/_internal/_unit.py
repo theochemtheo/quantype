@@ -71,7 +71,10 @@ class Unit[K]:
         if isinstance(raw, (int, float)):
             raw = float(raw)
         elif not (hasattr(raw, "shape") and hasattr(raw, "dtype")):
-            raise TypeError("Use a real scalar or numerical array as a magnitude")
+            raise TypeError(
+                "Use a real scalar or numerical array as a magnitude; "
+                "for lists, use a typed quantity constructor or numpy.asarray first"
+            )
         return cast("Quantity[K, V]", _wrap(self.semantic, self.canonical(raw)))
 
     def canonical(self, raw: Any) -> Any:

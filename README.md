@@ -9,7 +9,28 @@ uv add 'quantype[jax]'       # JAX transformations and autodiff
 uv add 'quantype[torch]'     # Torch tensors and autograd
 ```
 
+## Start here
+
+New to quantype? Follow the [getting-started guide](docs/getting-started.md) for
+standalone scalar, NumPy, and Pydantic examples, an API selection table, and
+troubleshooting. Python 3.12+ is required; `python -m pip install quantype` also
+works in an activated virtual environment.
+
+```python
+from quantype import Length, u
+
+length = Length[float](2, u.nm)
+assert length.value == 20.0  # canonical angstroms
+assert length.magnitude(u.nm) == 2.0
+assert length.to(u.nm).magnitude() == 2.0  # presentation only
+assert Length.parse(length.to_dict()).value == length.value
+```
+
 ## Construction and storage
+
+The remaining sections form an extended tour; some snippets reuse earlier
+variables. The [getting-started guide](docs/getting-started.md) has independent,
+copy-and-run examples.
 
 ```python
 import numpy as np
@@ -86,7 +107,8 @@ or inference of physical meaning from dimensions alone.
 Absolute temperatures are affine points:
 
 ```python
-from quantype import Temperature, TemperatureDifference
+from typing import assert_type
+from quantype import Temperature, TemperatureDifference, u
 
 cold = Temperature[float](0, u.temperature.celsius)
 warm = Temperature[float](300, u.temperature.kelvin)
@@ -97,15 +119,19 @@ Differences can be scaled; absolute temperatures cannot be added together,
 multiplied, scaled, or exponentiated. Means of absolute temperatures are valid;
 sums are not.
 
-`sum`, `mean`, `u.sqrt(Area)`, `u.sin(Angle)`, and `u.exp(Dimensionless)` delegate
-to numerical backends. Array shape algebra and arbitrary dtype promotion are
-outside the static contract.
+Quantity methods `.sum()` and `.mean()`, plus `u.sqrt(Area)`, `u.sin(Angle)`, and
+`u.exp(Dimensionless)`, delegate to numerical backends. Array shape algebra and
+arbitrary dtype promotion are
+outside the static contract. Use quantity reductions, not `np.sum(q)` or
+`np.mean(q)`. For indexing and other unsupported array operations, see the
+[explicit NumPy boundary example](docs/getting-started.md#work-with-numpy-arrays).
 
 ## Define a unit without global registration
 
 ```python
 from math import sqrt
-from quantype import Temperature
+import numpy as np
+from quantype import Temperature, u
 
 bleb = Temperature.define_unit(
     "my_lab:bleb",
@@ -145,7 +171,10 @@ Quantity objects require exactly `kind`, `magnitude`, and `unit`. Scalar strings
 such as `"5 angstrom"` are accepted when the expected quantity kind is supplied.
 
 ```python
+import numpy as np
+import numpy.typing as npt
 from pydantic import BaseModel, TypeAdapter
+from quantype import Length, Temperature
 
 
 class Configuration(BaseModel):
@@ -161,6 +190,7 @@ config = Configuration.model_validate(
 )
 restored = Configuration.model_validate_json(config.model_dump_json())
 
+# `wire` and `bleb` are from the custom-unit example above.
 adapter = TypeAdapter(Temperature[np.float64])
 restored_point = adapter.validate_python(wire, context={"units": (bleb,)})
 ```
@@ -221,7 +251,7 @@ restored_positions = Length[npt.NDArray[np.float64]](
 
 ```python
 import torch
-from quantype import utorch
+from quantype import Energy, Length, u, utorch
 
 x = Length[torch.Tensor](
     torch.tensor([1.0, 2.0], requires_grad=True),
@@ -230,7 +260,13 @@ x = Length[torch.Tensor](
 )
 energy = Energy.from_canonical((x.value**2).sum())
 gradient = utorch.grad(energy, x, create_graph=True)
+force = -gradient
 ```
+
+Torch differentiation requires an input tensor with `requires_grad=True`;
+constructing `Length[torch.Tensor]` from a list does not enable gradients.
+To extract host values explicitly, use `force.magnitude(u.eV_per_angstrom).detach().cpu().numpy()`.
+This detaches the graph; arithmetic does not.
 
 Torch/JAX classes do not encode dtype, so constructors and `load_npz` accept an
 explicit `dtype=`. Existing Torch tensors retain their graph and device during
@@ -239,7 +275,7 @@ fail rather than silently producing a different dtype.
 
 ```python
 import jax
-from quantype import ujax
+from quantype import Energy, Length, u, ujax
 
 
 def harmonic(x: Length[jax.Array]) -> Energy[jax.Array]:
@@ -261,7 +297,8 @@ quantity input and scalar output, not general JVP/VJP or multi-input models.
 
 Application catalogues use the same definition model, validation, and renderers
 as the built-in API. Generation requires Ruff for formatting, not a type-checker
-plugin.
+plugin. Install it in the environment running generation (`uv add --dev ruff`
+in an application project, or `python -m pip install ruff`).
 
 ```python
 from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
@@ -277,9 +314,15 @@ catalogue = builtin_catalogue().extend(
 generate(catalogue, "src/labquantities", package="labquantities")
 ```
 
+Run generation from your application project, not from quantype's source tree.
+For the `src/` layout above, install your application in editable mode (for example,
+`uv pip install -e .`) so Python can import `labquantities`. Alternatively, generate
+into `"labquantities"` beside a script for a standalone experiment.
+
 Then import consistently from that generated package:
 
 ```python
+from typing import assert_type
 from labquantities import Length, Pressure, SurfaceTension, u
 
 length = Length[float](2, u.length.angstrom)
@@ -292,6 +335,8 @@ Multiplication relations are symmetric; division relations are explicit.
 Generation includes runtime classes, stubs, units, numerical helpers, and
 optional autodiff adapters. `generate(..., check=True)` returns stale file names
 without writing; `render(...)` returns source strings without invoking tools.
+Names and aliases that collide with generated API bindings (such as `sqrt` or
+`get_unit`) are rejected, as are conflicting quantity namespaces.
 
 A generated catalogue is a separate, combined API, not an extension of the
 installed classes. Its `Length` is a distinct nominal type from
@@ -300,7 +345,13 @@ Generating a package does not change `quantype`'s operator overloads.
 
 ## Development
 
+From a checkout, [install uv](https://docs.astral.sh/uv/getting-started/installation/)
+and run the following at the repository root. `just` and the type checkers are
+included in the development dependencies; no global `just` installation is needed.
+
 ```bash
+git clone https://github.com/theochemtheo/quantype.git
+cd quantype
 uv sync --all-extras
 uv run just generate
 uv run just check-generated
@@ -309,6 +360,11 @@ uv run just typecheck
 uv run just lint
 uv build
 ```
+
+For a lighter, core-only environment, use `uv sync` and
+`uv run pytest tests/runtime` (optional-backend tests skip when unavailable).
+The `just test`, `just typecheck`, and `just lint` recipes request all extras.
+To install the repository's commit hooks, run `uv run just setup`.
 
 `just lint` runs [zizmor](https://github.com/zizmorcore/zizmor) offline against the
 GitHub Actions workflows; the pre-commit hook checks workflow changes too.

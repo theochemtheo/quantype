@@ -154,6 +154,24 @@ def test_numpy_workflow() -> None:
         np.sin(untyped)
 
 
+@pytest.mark.parametrize("function", [np.sum, np.mean, np.concatenate])
+def test_numpy_functions_explain_explicit_boundary(
+    function: Callable[[Any], Any],
+) -> None:
+    quantity: Any = u.angstrom(np.array([1.0, 2.0]))
+    argument = [quantity, quantity] if function is np.concatenate else quantity
+    with pytest.raises(TypeError, match=r"quantity methods.*\.magnitude\(unit\)"):
+        function(argument)
+
+
+def test_unit_first_list_error_explains_construction() -> None:
+    untyped: Any = u.nm
+    with pytest.raises(
+        TypeError, match=r"typed quantity constructor or numpy\.asarray"
+    ):
+        untyped([1, 2])
+
+
 def test_registry_is_dimensionally_consistent() -> None:
     for (operation, left, right), result in RELATIONS.items():
         sign = 1 if operation == "mul" else -1

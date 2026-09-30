@@ -16,6 +16,42 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
 
+# These bindings exist in generated units modules before lazy units are resolved.
+# A declaration must not promise a unit where runtime exposes an implementation
+# object or a public math helper instead.
+_UNIT_MODULE_BINDINGS = frozenset(
+    {
+        "Any",
+        "Unit",
+        "cast",
+        "get_unit",
+        "runtime",
+        "overload",
+        "globals",
+        "sqrt",
+        "sin",
+        "exp",
+        "_NAMES",
+        "__getattr__",
+        "__all__",
+        "__name__",
+        "__doc__",
+        "__package__",
+        "__loader__",
+        "__spec__",
+        "__file__",
+        "__cached__",
+        "__builtins__",
+    }
+)
+
+
+def _namespace_name(kind: str) -> str:
+    return "".join(
+        ("_" + char.lower()) if char.isupper() else char for char in kind
+    ).lstrip("_")
+
+
 @dataclass(frozen=True)
 class Catalogue:
     quantities: Mapping[str, QuantitySpec]
@@ -41,6 +77,7 @@ class Catalogue:
 
     def _validate_quantities(self) -> None:
         reserved = {"Quantity", "Unit", "Mul", "Div", "Pow"}
+        namespaces: set[str] = set()
         for name, spec in self.quantities.items():
             if (
                 not name.isidentifier()
@@ -49,6 +86,15 @@ class Catalogue:
                 or len(spec.dimensions) != len(BASIS)
             ):
                 raise ValueError(f"Invalid quantity definition {name!r}")
+            namespace = _namespace_name(name)
+            if (
+                not namespace
+                or keyword.iskeyword(namespace)
+                or namespace in _UNIT_MODULE_BINDINGS
+                or namespace in namespaces
+            ):
+                raise ValueError(f"Conflicting quantity namespace {namespace!r}")
+            namespaces.add(namespace)
             if any(type(exponent) is not int for exponent in spec.dimensions):
                 raise ValueError("Dimensions must have integer exponents")
             canonical = self.units.get(spec.canonical_unit)
@@ -61,6 +107,11 @@ class Catalogue:
                 raise ValueError(f"Invalid canonical unit for {name}")
 
     def _validate_units(self) -> None:
+        reserved = _UNIT_MODULE_BINDINGS | {
+            binding
+            for kind in self.quantities
+            for binding in (kind, f"{kind}Kind", f"_{kind}Namespace", f"_{kind}Unit")
+        }
         identifiers: set[str] = set()
         for name, unit in self.units.items():
             if (
@@ -80,6 +131,11 @@ class Catalogue:
             for identifier in (name, *unit.aliases):
                 if not identifier.strip() or identifier in identifiers:
                     raise ValueError(f"Empty or duplicate unit name {identifier!r}")
+                if identifier in reserved:
+                    raise ValueError(
+                        f"Unit name {identifier!r} conflicts with "
+                        "a generated API binding"
+                    )
                 identifiers.add(identifier)
 
     def _validate_algebra(self) -> None:

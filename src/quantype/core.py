@@ -294,6 +294,12 @@ class Quantity[K, V]:
     def __array_ufunc__(self, *args: Any, **kwargs: Any) -> Any:
         raise TypeError("Use quantity arithmetic or quantype.units math helpers")
 
+    def __array_function__(self, *args: Any, **kwargs: Any) -> Any:
+        raise TypeError(
+            "Use quantity methods such as .sum() and .mean(), or pass "
+            ".value or .magnitude(unit) to NumPy explicitly"
+        )
+
     @override
     def __repr__(self) -> str:
         symbol = self._display.symbol if self._display else _symbol(self._semantic)

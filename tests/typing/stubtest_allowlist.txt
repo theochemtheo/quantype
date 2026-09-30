@@ -16,7 +16,7 @@
 
 # Base-class arithmetic/NumPy methods are intentionally typed only on named
 # quantities; exposing them on Quantity would bypass the semantic overloads.
-^quantype\.core\.Quantity\.(__abs__|__add__|__array__|__array_priority__|__array_ufunc__|__mul__|__neg__|__pos__|__pow__|__rmul__|__rtruediv__|__sub__|__truediv__|mean|sum)$
+^quantype\.core\.Quantity\.(__abs__|__add__|__array__|__array_function__|__array_priority__|__array_ufunc__|__mul__|__neg__|__pos__|__pow__|__rmul__|__rtruediv__|__sub__|__truediv__|mean|sum)$
 
 # Unit calls/operators have kind-specific overloads on the generated unit types.
 # NumPy dispatch and array priority are runtime-only implementation details.

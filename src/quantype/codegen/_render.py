@@ -5,6 +5,10 @@ from __future__ import annotations
 import keyword
 from typing import TYPE_CHECKING
 
+from quantype.catalogue import (
+    _namespace_name as namespace_name,  # pyright: ignore[reportPrivateUsage]
+)
+
 if TYPE_CHECKING:
     from quantype.catalogue import Catalogue
 
@@ -146,12 +150,6 @@ def unit_names(catalogue: Catalogue) -> dict[str, str]:
         and identifier.isascii()
         and not keyword.iskeyword(identifier)
     }
-
-
-def namespace_name(kind: str) -> str:
-    return "".join(
-        ("_" + char.lower()) if char.isupper() else char for char in kind
-    ).lstrip("_")
 
 
 def namespace_outputs(catalogue: Catalogue) -> tuple[str, str, list[str]]:

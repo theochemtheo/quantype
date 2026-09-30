@@ -50,12 +50,12 @@ def pydantic_schema(
 
     number = core_schema.float_schema()
     array = core_schema.list_schema(core_schema.any_schema())
+    scalar_storage = origin is float or (
+        isinstance(origin, type) and issubclass(origin, np.floating)
+    )
+    # Arrays include zero-dimensional storage, which serializes as a number.
     value_schema = (
-        number
-        if origin is float or origin is np.float64
-        else array
-        if origin is np.ndarray
-        else core_schema.union_schema([number, array])
+        number if scalar_storage else core_schema.union_schema([number, array])
     )
     payload = core_schema.typed_dict_schema(
         {

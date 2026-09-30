@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import warnings
 from typing import Any
 
 import numpy as np
@@ -53,6 +54,38 @@ def test_schema_and_bare_annotation() -> None:
     schema = Simulation.model_json_schema()["properties"]["cutoff"]["anyOf"][0]
     assert set(schema["required"]) == {"kind", "magnitude", "unit"}
     assert schema["properties"]["magnitude"]["type"] == "number"
+
+
+@pytest.mark.parametrize("storage", [float, np.float16, np.float32, np.float64])
+def test_scalar_json_schema(storage: object) -> None:
+    quantity_class: Any = Length
+    adapter: TypeAdapter[Any] = TypeAdapter(quantity_class[storage])
+    schemas = (
+        adapter.json_schema()["anyOf"][0],
+        adapter.json_schema(mode="serialization"),
+    )
+    for schema in schemas:
+        assert schema["properties"]["magnitude"]["type"] == "number"
+
+
+def test_zero_dimensional_array_json_schema_and_roundtrip() -> None:
+    adapter = TypeAdapter(Length[NDArray[np.float64]])
+    original = Length[NDArray[np.float64]](2, u.nm)
+    schemas = (
+        adapter.json_schema()["anyOf"][0],
+        adapter.json_schema(mode="serialization"),
+    )
+    for schema in schemas:
+        magnitude = schema["properties"]["magnitude"]
+        assert {branch["type"] for branch in magnitude["anyOf"]} == {"number", "array"}
+    # Catch disagreement with the serializer's return schema on all Pydantic v2s.
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        wire = adapter.dump_json(original)
+    restored = adapter.validate_json(wire)
+    assert restored.value.shape == ()
+    assert restored.value.dtype == np.float64
+    assert restored.value == original.value
 
 
 def test_storage_conversion() -> None:

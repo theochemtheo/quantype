@@ -71,6 +71,56 @@ def test_invalid_catalogue_extension() -> None:
         )
 
 
+@pytest.mark.parametrize(
+    "name",
+    [
+        "sqrt",
+        "sin",
+        "exp",
+        "get_unit",
+        "runtime",
+        "Unit",
+        "cast",
+        "Any",
+        "globals",
+        "__name__",
+        "Length",
+        "LengthKind",
+        "_LengthNamespace",
+    ],
+)
+@pytest.mark.parametrize("as_alias", [False, True])
+def test_unit_identifiers_cannot_shadow_generated_bindings(
+    name: str, *, as_alias: bool
+) -> None:
+    units = (
+        {"lab_length": UnitSpec("Length", aliases=(name,))}
+        if as_alias
+        else {name: UnitSpec("Length")}
+    )
+    with pytest.raises(
+        ValueError, match=f"{name!r} conflicts with a generated API binding"
+    ):
+        builtin_catalogue().extend(quantities={}, units=units)
+
+
+@pytest.mark.parametrize("kind", ["Sqrt", "Sin", "Exp", "GetUnit", "Runtime"])
+def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None:
+    with pytest.raises(ValueError, match="Conflicting quantity namespace"):
+        builtin_catalogue().extend(
+            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
+            units={"lab_unit": UnitSpec(kind)},
+        )
+
+
+def test_quantity_namespaces_are_unique() -> None:
+    with pytest.raises(ValueError, match="Conflicting quantity namespace 'length'"):
+        builtin_catalogue().extend(
+            quantities={"length": QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
+            units={"lab_unit": UnitSpec("length")},
+        )
+
+
 def test_rendering_is_deterministic(catalogue: Catalogue) -> None:
     assert render(catalogue, package="labquantities") == render(
         catalogue, package="labquantities"
