@@ -187,3 +187,35 @@ def test_overridden_kinds_rescale_through_functions() -> None:
     assert norm.magnitude(u.bar) == pytest.approx(5)
     angle = Angle[float, SI](90, u.deg)
     assert float(qnp.sin(angle)) == pytest.approx(1)
+
+
+def test_every_function_passes_plain_arrays_to_numpy() -> None:
+    a, b = np.array([1.0, 2.0, 0.0]), np.array([0.0, 1.0, 0.0])
+    np.testing.assert_allclose(qnp.arctan2(a, b), np.arctan2(a, b))
+    np.testing.assert_allclose(qnp.maximum(a, b), [1, 2, 0])
+    np.testing.assert_allclose(qnp.clip(a, 0.5, 1.5), [1, 1.5, 0.5])
+    np.testing.assert_allclose(qnp.where(a > 1, a, b), [0, 2, 0])
+    assert qnp.allclose(a, a)
+    np.testing.assert_array_equal(qnp.isclose(a, b), [False, False, True])
+    assert qnp.dot(a, b) == 2
+    np.testing.assert_allclose(qnp.cross(a, b), [0, 0, 1])
+    np.testing.assert_allclose(qnp.linalg.norm(a), 5**0.5)
+    assert qnp.stack([a, b]).shape == qnp.concatenate([a[None], b[None]]).shape
+    assert qnp.reshape(a, (3, 1)).shape == (3, 1)
+    np.testing.assert_allclose(qnp.zeros_like(a), 0)
+    np.testing.assert_allclose(qnp.cumsum(a), [1, 3, 3])
+    np.testing.assert_allclose(qnp.diff(a), [1, -2])
+    assert qnp.std(a) == np.std(a)
+    assert qnp.absolute(-2.0) == 2
+    assert qnp.sqrt(4.0) == 2
+
+
+def test_dot_and_cross_need_two_quantities() -> None:
+    length: Any = 1 * u.nm
+    number: Any = 2.0
+    with pytest.raises(TypeError, match="dot of a quantity needs another"):
+        qnp.dot(length, number)
+    with pytest.raises(TypeError, match="cross of a quantity needs another"):
+        qnp.cross(length, np.ones(3))
+    with pytest.raises(TypeError, match="norm is meaningless"):
+        qnp.linalg.norm(Temperature[Array]([300.0], u.K))

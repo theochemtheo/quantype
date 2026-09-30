@@ -122,3 +122,31 @@ def test_torch_functions_apply_unit_rules() -> None:
     assert torch.allclose(spread.magnitude(u.nm), torch.tensor(2**0.5))  # unbiased
     with pytest.raises(TypeError, match=r"torch\.fft_fft does not know|does not know"):
         untyped_torch.fft.fft(positions)
+
+
+def test_quantype_numpy_on_tensors_uses_numpys_names() -> None:
+    positions = Length[torch.Tensor](
+        torch.tensor([[1.0, 0.0, 0.0], [0.0, 2.0, 0.0]]), u.angstrom
+    )
+    force = Force[torch.Tensor](torch.tensor([0.0, 1.0, 0.0]), u.eV_per_angstrom)
+    assert qnp.transpose(positions).shape == (3, 2)
+    assert qnp.expand_dims(positions, 0).shape == (1, 2, 3)
+    assert qnp.squeeze(qnp.expand_dims(positions, 0)).shape == (2, 3)
+    assert qnp.squeeze(qnp.expand_dims(positions, 0), 0).shape == (2, 3)
+    assert qnp.concatenate([positions, positions]).shape == (4, 3)
+    assert torch.equal(qnp.cumsum(positions).value[-1], torch.tensor(3.0))
+    assert torch.equal(
+        qnp.cumsum(positions, axis=0).value[-1], torch.tensor([1.0, 2.0, 0.0])
+    )
+    assert torch.equal(
+        qnp.diff(positions, axis=0).value, torch.tensor([[-1.0, 2.0, 0.0]])
+    )
+    assert qnp.std(positions).shape == ()
+    work = qnp.dot(force, positions[1])
+    assert isinstance(work, Energy)
+    assert float(work.value) == 2.0
+    torque = qnp.cross(positions[0], force)
+    assert torch.equal(torque.value, torch.tensor([0.0, 0.0, 1.0]))
+    assert torch.equal(
+        qnp.linalg.norm(positions, axis=-1).value, torch.tensor([1.0, 2.0])
+    )

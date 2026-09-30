@@ -13,3 +13,9 @@ wheels/
 .mypy_cache/
 .pytest_cache/
 .ruff_cache/
+
+# Coverage outputs (scripts/coverage.sh)
+.coverage
+.coverage.*
+htmlcov/
+coverage/

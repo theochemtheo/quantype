@@ -35,3 +35,7 @@ check-generated:
 
 test:
     uv run --all-extras pytest tests/runtime
+
+coverage:
+    uv sync --all-extras
+    bash scripts/coverage.sh

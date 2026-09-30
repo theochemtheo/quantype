@@ -18,8 +18,12 @@ uv run just lint
 uv build
 ```
 
-For a lighter, core-only environment, use `uv sync` and
-`uv run pytest tests/runtime` (optional-backend tests skip when unavailable).
+For a lighter environment, install only the `test` dependency group and at
+most one backend, as CI's tier jobs do:
+`uv sync --no-default-groups --group test --extra jax`, then
+`uv run --no-sync pytest tests/runtime` (optional-backend tests skip when
+unavailable). The `dev` group includes `test`, so a plain `uv sync` installs
+everything needed to develop.
 The `just test`, `just typecheck`, and `just lint` recipes request all extras.
 To install the repository's commit hooks, run `uv run just setup`.
 
@@ -37,6 +41,24 @@ autodiff, and `quantype.catalogue` with `quantype.codegen` for application
 catalogues. `quantype.core` and `quantype.kinds` expose base types and
 structural markers for advanced annotations. Implementations live in
 `quantype._internal`; the public modules only re-export them.
+
+## Coverage
+
+`uv run just coverage` syncs every extra and runs `scripts/coverage.sh`: one
+pytest run with every backend present, including subprocesses the tests start,
+writing `htmlcov/`, `coverage/quantype.lcov`, and `coverage/summary.md`, and
+failing below 95% line-and-branch coverage (`COVERAGE_MIN` overrides it). CI
+posts the summary to the job and to pull requests.
+
+## Dependency tiers
+
+CI runs the suite in the full environment and in deliberately incomplete ones:
+the `test` group alone, with JAX, and with Torch, plus the oldest supported
+NumPy and Pydantic. Each job sets `QUANTYPE_TEST_TIER`, and a canary in
+`tests/runtime/test_optional_backends.py` fails when the installed backends
+differ from the tier's, so a tier cannot pass by quietly skipping. Import guards
+that only run when a backend is missing are tested in-process
+(`test_install_hints.py`), so they count toward coverage.
 
 ## Conformance
 
