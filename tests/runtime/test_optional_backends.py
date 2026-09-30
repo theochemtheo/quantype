@@ -27,7 +27,7 @@ import jax
 from quantype import ujax
 x = Length[jax.Array]([1, 2], u.length.nanometer)
 def energy(x):
-    return Energy.from_canonical((x.value**2).sum())
+    return Energy.from_value((x.value**2).sum())
 assert isinstance(ujax.grad(energy)(x), Force)
 """
     else:
@@ -35,7 +35,7 @@ assert isinstance(ujax.grad(energy)(x), Force)
 import torch
 from quantype import utorch
 x = Length[torch.Tensor](torch.tensor([1., 2.], requires_grad=True), u.length.nanometer)
-energy = Energy.from_canonical((x.value**2).sum())
+energy = Energy.from_value((x.value**2).sum())
 assert isinstance(utorch.grad(energy, x), Force)
 """
     program += f"\nassert {blocked!r} not in sys.modules\n"

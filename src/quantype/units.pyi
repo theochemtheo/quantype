@@ -641,6 +641,56 @@ Hz: _FrequencyUnit
 per_fs: _InverseTimeUnit
 atom: _AtomCountUnit
 electron: _ElectronCountUnit
+angstrom_per_ps: _VelocityUnit
+kelvin_per_ps: _TemperatureRateUnit
+per_ps: _InverseTimeUnit
+kcal_per_mol: _EnergyUnit
+kcal_per_mol_per_atom: _EnergyPerAtomUnit
+kcal_per_mol_per_angstrom: _ForceUnit
+kcal_per_mol_per_angstrom_squared: _ForceConstantUnit
+kcal_per_mol_per_angstrom_cubed: _PressureUnit
+square_meter: _AreaUnit
+cubic_meter: _VolumeUnit
+meter_per_second: _VelocityUnit
+newton_per_meter: _ForceConstantUnit
+kelvin_per_second: _TemperatureRateUnit
+ampere_per_meter: _MagnetizationUnit
+atom_per_cubic_meter: _ParticleDensityUnit
+electron_per_cubic_meter: _ElectronDensityUnit
+per_second: _InverseTimeUnit
+square_centimeter: _AreaUnit
+cubic_centimeter: _VolumeUnit
+centimeter_per_second: _VelocityUnit
+erg: _EnergyUnit
+erg_per_atom: _EnergyPerAtomUnit
+dyne: _ForceUnit
+dyn: _ForceUnit
+dyne_per_centimeter: _ForceConstantUnit
+barye: _PressureUnit
+erg_per_gauss: _MagneticMomentUnit
+emu_per_cubic_centimeter: _MagnetizationUnit
+atom_per_cubic_centimeter: _ParticleDensityUnit
+electron_per_cubic_centimeter: _ElectronDensityUnit
+bohr_squared: _AreaUnit
+bohr_cubed: _VolumeUnit
+atomic_time: _TimeUnit
+atomic_velocity: _VelocityUnit
+hartree_per_bohr_squared: _ForceConstantUnit
+kelvin_per_atomic_time: _TemperatureRateUnit
+atomic_magnetic_moment: _MagneticMomentUnit
+atomic_magnetization: _MagnetizationUnit
+atom_per_bohr_cubed: _ParticleDensityUnit
+electron_per_bohr_cubed: _ElectronDensityUnit
+frequency_per_atomic_time: _FrequencyUnit
+per_atomic_time: _InverseTimeUnit
+energy_density_kcal_per_mol_per_angstrom_cubed: _EnergyDensityUnit
+energy_density_joule_per_cubic_meter: _EnergyDensityUnit
+energy_density_erg_per_cubic_centimeter: _EnergyDensityUnit
+energy_density_hartree_per_bohr_cubed: _EnergyDensityUnit
+energy_per_volume_kcal_per_mol_per_angstrom_cubed: _EnergyPerVolumeUnit
+energy_per_volume_joule_per_cubic_meter: _EnergyPerVolumeUnit
+energy_per_volume_erg_per_cubic_centimeter: _EnergyPerVolumeUnit
+energy_per_volume_hartree_per_bohr_cubed: _EnergyPerVolumeUnit
 
 class _DimensionlessNamespace:
     @property
@@ -665,12 +715,24 @@ length: _LengthNamespace
 class _AreaNamespace:
     @property
     def angstrom_squared(self) -> _AreaUnit: ...
+    @property
+    def square_meter(self) -> _AreaUnit: ...
+    @property
+    def square_centimeter(self) -> _AreaUnit: ...
+    @property
+    def bohr_squared(self) -> _AreaUnit: ...
 
 area: _AreaNamespace
 
 class _VolumeNamespace:
     @property
     def angstrom_cubed(self) -> _VolumeUnit: ...
+    @property
+    def cubic_meter(self) -> _VolumeUnit: ...
+    @property
+    def cubic_centimeter(self) -> _VolumeUnit: ...
+    @property
+    def bohr_cubed(self) -> _VolumeUnit: ...
 
 volume: _VolumeNamespace
 
@@ -681,12 +743,22 @@ class _TimeNamespace:
     def picosecond(self) -> _TimeUnit: ...
     @property
     def second(self) -> _TimeUnit: ...
+    @property
+    def atomic_time(self) -> _TimeUnit: ...
 
 time: _TimeNamespace
 
 class _VelocityNamespace:
     @property
     def angstrom_per_fs(self) -> _VelocityUnit: ...
+    @property
+    def angstrom_per_ps(self) -> _VelocityUnit: ...
+    @property
+    def meter_per_second(self) -> _VelocityUnit: ...
+    @property
+    def centimeter_per_second(self) -> _VelocityUnit: ...
+    @property
+    def atomic_velocity(self) -> _VelocityUnit: ...
 
 velocity: _VelocityNamespace
 
@@ -701,6 +773,10 @@ class _EnergyNamespace:
     def hartree(self) -> _EnergyUnit: ...
     @property
     def rydberg(self) -> _EnergyUnit: ...
+    @property
+    def kcal_per_mol(self) -> _EnergyUnit: ...
+    @property
+    def erg(self) -> _EnergyUnit: ...
 
 energy: _EnergyNamespace
 
@@ -711,6 +787,10 @@ class _EnergyPerAtomNamespace:
     def hartree_per_atom(self) -> _EnergyPerAtomUnit: ...
     @property
     def J_per_atom(self) -> _EnergyPerAtomUnit: ...
+    @property
+    def kcal_per_mol_per_atom(self) -> _EnergyPerAtomUnit: ...
+    @property
+    def erg_per_atom(self) -> _EnergyPerAtomUnit: ...
 
 energy_per_atom: _EnergyPerAtomNamespace
 
@@ -721,12 +801,24 @@ class _ForceNamespace:
     def newton(self) -> _ForceUnit: ...
     @property
     def hartree_per_bohr(self) -> _ForceUnit: ...
+    @property
+    def kcal_per_mol_per_angstrom(self) -> _ForceUnit: ...
+    @property
+    def dyne(self) -> _ForceUnit: ...
 
 force: _ForceNamespace
 
 class _ForceConstantNamespace:
     @property
     def eV_per_angstrom_squared(self) -> _ForceConstantUnit: ...
+    @property
+    def kcal_per_mol_per_angstrom_squared(self) -> _ForceConstantUnit: ...
+    @property
+    def newton_per_meter(self) -> _ForceConstantUnit: ...
+    @property
+    def dyne_per_centimeter(self) -> _ForceConstantUnit: ...
+    @property
+    def hartree_per_bohr_squared(self) -> _ForceConstantUnit: ...
 
 force_constant: _ForceConstantNamespace
 
@@ -739,18 +831,40 @@ class _PressureNamespace:
     def gigapascal(self) -> _PressureUnit: ...
     @property
     def hartree_per_bohr_cubed(self) -> _PressureUnit: ...
+    @property
+    def kcal_per_mol_per_angstrom_cubed(self) -> _PressureUnit: ...
+    @property
+    def barye(self) -> _PressureUnit: ...
 
 pressure: _PressureNamespace
 
 class _EnergyDensityNamespace:
     @property
     def energy_density(self) -> _EnergyDensityUnit: ...
+    @property
+    def energy_density_kcal_per_mol_per_angstrom_cubed(self) -> _EnergyDensityUnit: ...
+    @property
+    def energy_density_joule_per_cubic_meter(self) -> _EnergyDensityUnit: ...
+    @property
+    def energy_density_erg_per_cubic_centimeter(self) -> _EnergyDensityUnit: ...
+    @property
+    def energy_density_hartree_per_bohr_cubed(self) -> _EnergyDensityUnit: ...
 
 energy_density: _EnergyDensityNamespace
 
 class _EnergyPerVolumeNamespace:
     @property
     def energy_per_volume(self) -> _EnergyPerVolumeUnit: ...
+    @property
+    def energy_per_volume_kcal_per_mol_per_angstrom_cubed(
+        self,
+    ) -> _EnergyPerVolumeUnit: ...
+    @property
+    def energy_per_volume_joule_per_cubic_meter(self) -> _EnergyPerVolumeUnit: ...
+    @property
+    def energy_per_volume_erg_per_cubic_centimeter(self) -> _EnergyPerVolumeUnit: ...
+    @property
+    def energy_per_volume_hartree_per_bohr_cubed(self) -> _EnergyPerVolumeUnit: ...
 
 energy_per_volume: _EnergyPerVolumeNamespace
 
@@ -773,6 +887,12 @@ temperature_difference: _TemperatureDifferenceNamespace
 class _TemperatureRateNamespace:
     @property
     def kelvin_per_fs(self) -> _TemperatureRateUnit: ...
+    @property
+    def kelvin_per_ps(self) -> _TemperatureRateUnit: ...
+    @property
+    def kelvin_per_second(self) -> _TemperatureRateUnit: ...
+    @property
+    def kelvin_per_atomic_time(self) -> _TemperatureRateUnit: ...
 
 temperature_rate: _TemperatureRateNamespace
 
@@ -781,24 +901,46 @@ class _MagneticMomentNamespace:
     def bohr_magneton(self) -> _MagneticMomentUnit: ...
     @property
     def ampere_meter_squared(self) -> _MagneticMomentUnit: ...
+    @property
+    def erg_per_gauss(self) -> _MagneticMomentUnit: ...
+    @property
+    def atomic_magnetic_moment(self) -> _MagneticMomentUnit: ...
 
 magnetic_moment: _MagneticMomentNamespace
 
 class _MagnetizationNamespace:
     @property
     def bohr_magneton_per_angstrom_cubed(self) -> _MagnetizationUnit: ...
+    @property
+    def ampere_per_meter(self) -> _MagnetizationUnit: ...
+    @property
+    def emu_per_cubic_centimeter(self) -> _MagnetizationUnit: ...
+    @property
+    def atomic_magnetization(self) -> _MagnetizationUnit: ...
 
 magnetization: _MagnetizationNamespace
 
 class _ParticleDensityNamespace:
     @property
     def atom_per_angstrom_cubed(self) -> _ParticleDensityUnit: ...
+    @property
+    def atom_per_cubic_meter(self) -> _ParticleDensityUnit: ...
+    @property
+    def atom_per_cubic_centimeter(self) -> _ParticleDensityUnit: ...
+    @property
+    def atom_per_bohr_cubed(self) -> _ParticleDensityUnit: ...
 
 particle_density: _ParticleDensityNamespace
 
 class _ElectronDensityNamespace:
     @property
     def electron_per_angstrom_cubed(self) -> _ElectronDensityUnit: ...
+    @property
+    def electron_per_cubic_meter(self) -> _ElectronDensityUnit: ...
+    @property
+    def electron_per_cubic_centimeter(self) -> _ElectronDensityUnit: ...
+    @property
+    def electron_per_bohr_cubed(self) -> _ElectronDensityUnit: ...
 
 electron_density: _ElectronDensityNamespace
 
@@ -817,12 +959,20 @@ class _FrequencyNamespace:
     def terahertz(self) -> _FrequencyUnit: ...
     @property
     def hertz(self) -> _FrequencyUnit: ...
+    @property
+    def frequency_per_atomic_time(self) -> _FrequencyUnit: ...
 
 frequency: _FrequencyNamespace
 
 class _InverseTimeNamespace:
     @property
     def per_fs(self) -> _InverseTimeUnit: ...
+    @property
+    def per_ps(self) -> _InverseTimeUnit: ...
+    @property
+    def per_second(self) -> _InverseTimeUnit: ...
+    @property
+    def per_atomic_time(self) -> _InverseTimeUnit: ...
 
 inverse_time: _InverseTimeNamespace
 
@@ -850,23 +1000,38 @@ __all__ = [
     "Ry",
     "THz",
     "ampere_meter_squared",
+    "ampere_per_meter",
     "angle",
     "angstrom",
     "angstrom2",
     "angstrom3",
     "angstrom_cubed",
     "angstrom_per_fs",
+    "angstrom_per_ps",
     "angstrom_squared",
     "area",
     "atom",
     "atom_count",
     "atom_per_angstrom_cubed",
+    "atom_per_bohr_cubed",
+    "atom_per_cubic_centimeter",
+    "atom_per_cubic_meter",
+    "atomic_magnetic_moment",
+    "atomic_magnetization",
+    "atomic_time",
+    "atomic_velocity",
+    "barye",
     "bohr",
+    "bohr_cubed",
     "bohr_magneton",
     "bohr_magneton_per_angstrom_cubed",
+    "bohr_squared",
     "celsius",
     "centimeter",
+    "centimeter_per_second",
     "cm",
+    "cubic_centimeter",
+    "cubic_meter",
     "deg",
     "degC",
     "degree",
@@ -875,6 +1040,9 @@ __all__ = [
     "delta_degC",
     "delta_kelvin",
     "dimensionless",
+    "dyn",
+    "dyne",
+    "dyne_per_centimeter",
     "eV",
     "eV_per_angstrom",
     "eV_per_angstrom_cubed",
@@ -884,16 +1052,32 @@ __all__ = [
     "electron_count",
     "electron_density",
     "electron_per_angstrom_cubed",
+    "electron_per_bohr_cubed",
+    "electron_per_cubic_centimeter",
+    "electron_per_cubic_meter",
     "electron_volt",
+    "emu_per_cubic_centimeter",
     "energy",
     "energy_density",
+    "energy_density_erg_per_cubic_centimeter",
+    "energy_density_hartree_per_bohr_cubed",
+    "energy_density_joule_per_cubic_meter",
+    "energy_density_kcal_per_mol_per_angstrom_cubed",
     "energy_per_atom",
     "energy_per_volume",
+    "energy_per_volume_erg_per_cubic_centimeter",
+    "energy_per_volume_hartree_per_bohr_cubed",
+    "energy_per_volume_joule_per_cubic_meter",
+    "energy_per_volume_kcal_per_mol_per_angstrom_cubed",
+    "erg",
+    "erg_per_atom",
+    "erg_per_gauss",
     "exp",
     "femtosecond",
     "force",
     "force_constant",
     "frequency",
+    "frequency_per_atomic_time",
     "frequency_per_fs",
     "fs",
     "gigapascal",
@@ -901,27 +1085,41 @@ __all__ = [
     "hartree_per_atom",
     "hartree_per_bohr",
     "hartree_per_bohr_cubed",
+    "hartree_per_bohr_squared",
     "hertz",
     "inverse_time",
     "joule",
+    "kcal_per_mol",
+    "kcal_per_mol_per_angstrom",
+    "kcal_per_mol_per_angstrom_cubed",
+    "kcal_per_mol_per_angstrom_squared",
+    "kcal_per_mol_per_atom",
     "kelvin",
+    "kelvin_per_atomic_time",
     "kelvin_per_fs",
+    "kelvin_per_ps",
+    "kelvin_per_second",
     "length",
     "m",
     "magnetic_moment",
     "magnetization",
     "meV",
     "meter",
+    "meter_per_second",
     "metre",
     "millielectron_volt",
     "mu_B",
     "nanometer",
     "newton",
+    "newton_per_meter",
     "nm",
     "one",
     "particle_density",
     "pascal",
+    "per_atomic_time",
     "per_fs",
+    "per_ps",
+    "per_second",
     "picosecond",
     "pressure",
     "ps",
@@ -932,6 +1130,8 @@ __all__ = [
     "second",
     "sin",
     "sqrt",
+    "square_centimeter",
+    "square_meter",
     "temperature",
     "temperature_difference",
     "temperature_rate",

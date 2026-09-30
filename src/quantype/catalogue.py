@@ -73,12 +73,18 @@ _QUANTITY_BINDINGS = _UNIT_MODULE_BINDINGS | frozenset(
         "kinds",
         "ujax",
         "utorch",
+        # Unit-system bindings imported by generated stubs.
+        "TypeVar",
+        "UnitSystem",
+        "Atomistic",
+        "systems",
         # These generic parameters occur alongside named-class references in
         # generated methods, so they cannot also name a quantity class.
         "V",
         "W",
         "K",
         "S",
+        "T",
     }
 )
 

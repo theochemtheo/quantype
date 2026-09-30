@@ -1,9 +1,9 @@
 # quantype
 
-Physical meaning in Python types, with canonical numerical storage. quantype
-catches invalid physical operations both statically and at runtime, while NumPy,
-JAX, and Torch do the numerical work. Units describe input and presentation;
-they do not change a quantity's physical kind.
+Physical meaning in Python types, with the unit system in the type too.
+quantype catches invalid physical operations both statically and at runtime,
+while NumPy, JAX, and Torch do the numerical work. Units describe input and
+presentation; they do not change a quantity's physical kind or its storage.
 
 ## Installation and status
 
@@ -26,8 +26,8 @@ from quantype import Energy, EnergyDensity, Force, Length, Pressure, u
 
 length = Length[float](2, u.nm)
 energy = Energy[float](3, u.eV)
-assert length.value == 20.0  # canonical angstroms
-assert length.magnitude(u.nm) == 2.0
+assert length.value == 20.0  # raw numbers in ångströms, the default system
+assert length.magnitude() == 2.0  # presented in the unit it was given in
 
 force = energy / length
 assert_type(force, Force[float])
@@ -38,14 +38,34 @@ density = energy / (length**3)
 assert_type(pressure, Pressure[float])
 assert_type(density, EnergyDensity[float])  # same dimensions, different meaning
 
-shown = length.to(u.nm)
+shown = length.to(u.angstrom)
 assert shown.value == length.value  # presentation only
-assert shown.magnitude() == 2.0
+assert shown.magnitude() == 20.0
 ```
 
 The storage argument converts the input, not just its annotation. Declared
 physical relationships determine result types without a type-checker plugin;
 adding a length to an energy is rejected by type checkers and at runtime.
+
+## Unit systems
+
+```python
+from typing import assert_type
+from quantype import Energy, Force, Length, u
+from quantype.systems import SI, Metal
+
+x = Length[float, SI](2, u.nm)
+assert x.value == 2e-9  # metres
+assert_type(Energy[float, SI](3, u.eV) / x, Force[float, SI])
+
+metal = x.to_system(Metal)  # the only bridge between systems
+assert_type(metal, Length[float, Metal])
+```
+
+`Length[float]` means `Length[float, Atomistic]` (Å, eV, fs). Built-in systems
+include `SI`, `CGS`, Hartree `Atomic`, and the LAMMPS `Metal` and `Real` units;
+you can [define your own](docs/unit-systems.md). Systems never mix implicitly:
+combining SI and metal quantities is a type error and a runtime `TypeError`.
 
 ## NumPy arrays
 
@@ -59,8 +79,9 @@ distances = u.sqrt((positions**2).sum(axis=-1))
 np.testing.assert_allclose(distances.magnitude(u.nm), [0, 5])
 ```
 
-Use quantity arithmetic and reductions. For other numerical APIs, explicitly
-extract `.value` (canonical data) or `.magnitude(unit)`; implicit coercion is rejected.
+Use quantity arithmetic, reductions, indexing, and comparisons. For other
+numerical APIs, explicitly extract `.value` (raw numbers in the unit system) or
+`.magnitude(unit)`; implicit coercion is rejected.
 
 ## Differentiation with physical meaning
 
@@ -87,7 +108,9 @@ array, including under JIT. The negative derivative is the physical force.
 ## Features
 
 - Nominal physical kinds; equal dimensions do not imply interchangeable meaning.
-- Canonical storage with explicit conversion and numerical boundaries.
+- Unit systems in the static type, including user-defined systems; explicit
+  conversion between them and explicit numerical boundaries.
+- Display units remembered from input, so `"0.5 nm"` round-trips as `0.5 nm`.
 - Affine temperatures, typed reductions, and structural types for unnamed products.
 - JSON, Pydantic, and pickle-free NPZ serialization.
 - Local custom units and generated application catalogues, without global registration.
@@ -96,7 +119,8 @@ array, including under JIT. The negative derivative is the physical force.
 ## Documentation
 
 - [Getting started](docs/getting-started.md)
-- [Units, storage, and physical algebra](docs/units.md)
+- [Units, unit systems, and physical algebra](docs/units.md)
+- [Defining unit systems and system-generic code](docs/unit-systems.md)
 - [Serialization: JSON, Pydantic, NPZ, and NPY](docs/serialization.md)
 - [JAX and Torch autodiff](docs/autodiff.md)
 - [Custom catalogues](docs/custom-catalogues.md)

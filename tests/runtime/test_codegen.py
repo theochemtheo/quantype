@@ -252,6 +252,7 @@ def test_stale_check_does_not_rewrite_files(
         "temperature_difference",
         "structural_reciprocals",
         "portable_unit_factors",
+        "unit_systems_cover_new_kinds",
     ],
 )
 def test_generated_runtime(generated_project: Path, case: str) -> None:

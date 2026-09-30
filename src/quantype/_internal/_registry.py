@@ -1,4 +1,7 @@
-"""Declarative semantic catalogue; scales convert into atomistic canonical units.
+"""Declarative semantic catalogue; scales convert into the reference units.
+
+The reference units (Å, eV, fs, K, μB) are the coherent units of the default
+``Atomistic`` system. Every other unit system is defined relative to them.
 
 Dimensions use the named basis below, not SI mass dimensions. Equal dimension
 vectors never imply semantic equality. Relations are deliberately explicit.
@@ -6,6 +9,7 @@ vectors never imply semantic equality. Relations are deliberately explicit.
 
 from dataclasses import dataclass
 from functools import cache
+from types import ModuleType
 
 BASIS = (
     "length",
@@ -72,6 +76,10 @@ def unit_specs() -> dict[str, UnitSpec]:
     """Resolve installed SciPy constants once, on first use of a unit."""
     from scipy import constants as c  # noqa: PLC0415
 
+    return {**_common_units(c), **_system_units(c)}
+
+
+def _common_units(c: ModuleType) -> dict[str, UnitSpec]:
     ev_joule = c.electron_volt
     bohr_angstrom = c.physical_constants["Bohr radius"][0] / c.angstrom
     hartree_ev = c.physical_constants["Hartree energy in eV"][0]
@@ -168,6 +176,127 @@ def unit_specs() -> dict[str, UnitSpec]:
         "atom": UnitSpec("AtomCount", symbol="atom"),
         "electron": UnitSpec("ElectronCount", symbol="electron"),
     }
+
+
+def _system_units(c: ModuleType) -> dict[str, UnitSpec]:
+    """Named derived units, so every built-in system's kinds have catalogue names.
+
+    Scales are products of each system's base scales, keeping the systems coherent.
+    """
+    ev_joule = c.electron_volt
+    au_time = c.physical_constants["atomic unit of time"][0] / c.femto
+    au_moment = (
+        c.physical_constants["atomic unit of mag. dipole mom."][0]
+        / c.physical_constants["Bohr magneton"][0]
+    )
+    bohr = c.physical_constants["Bohr radius"][0] / c.angstrom
+    hartree = c.physical_constants["Hartree energy in eV"][0]
+    kcal_mol = c.kilo * c.calorie / c.N_A / ev_joule
+    metre, centimetre = 1 / c.angstrom, c.centi / c.angstrom
+    second, picosecond = 1 / c.femto, c.pico / c.femto
+    joule, erg = 1 / ev_joule, c.erg / ev_joule
+    ampere_metre2 = 1 / c.physical_constants["Bohr magneton"][0]
+    erg_per_gauss = c.milli * ampere_metre2
+    units = {
+        # LAMMPS metal: Å, eV, ps.
+        "angstrom_per_ps": UnitSpec("Velocity", 1 / picosecond, symbol="Å/ps"),
+        "kelvin_per_ps": UnitSpec("TemperatureRate", 1 / picosecond, symbol="K/ps"),
+        "per_ps": UnitSpec("InverseTime", 1 / picosecond, symbol="ps^-1"),
+        # LAMMPS real: Å, kcal/mol, fs.
+        "kcal_per_mol": UnitSpec(
+            "Energy", kcal_mol, symbol="kcal/mol", aliases=("kcal/mol",)
+        ),
+        "kcal_per_mol_per_atom": UnitSpec(
+            "EnergyPerAtom", kcal_mol, symbol="kcal/mol/atom"
+        ),
+        "kcal_per_mol_per_angstrom": UnitSpec(
+            "Force", kcal_mol, symbol="kcal/mol/Å", aliases=("kcal/mol/Å",)
+        ),
+        "kcal_per_mol_per_angstrom_squared": UnitSpec(
+            "ForceConstant", kcal_mol, symbol="kcal/mol/Å^2"
+        ),
+        "kcal_per_mol_per_angstrom_cubed": UnitSpec(
+            "Pressure", kcal_mol, symbol="kcal/mol/Å^3"
+        ),
+        # SI: m, J, s, A·m².
+        "square_meter": UnitSpec("Area", metre**2, symbol="m^2"),
+        "cubic_meter": UnitSpec("Volume", metre**3, symbol="m^3"),
+        "meter_per_second": UnitSpec(
+            "Velocity", metre / second, symbol="m/s", aliases=("m/s",)
+        ),
+        "newton_per_meter": UnitSpec("ForceConstant", joule / metre**2, symbol="N/m"),
+        "kelvin_per_second": UnitSpec("TemperatureRate", 1 / second, symbol="K/s"),
+        "ampere_per_meter": UnitSpec(
+            "Magnetization", ampere_metre2 / metre**3, symbol="A/m"
+        ),
+        "atom_per_cubic_meter": UnitSpec(
+            "ParticleDensity", metre**-3, symbol="atom/m^3"
+        ),
+        "electron_per_cubic_meter": UnitSpec(
+            "ElectronDensity", metre**-3, symbol="electron/m^3"
+        ),
+        "per_second": UnitSpec("InverseTime", 1 / second, symbol="s^-1"),
+        # CGS: cm, erg, s, erg/G.
+        "square_centimeter": UnitSpec("Area", centimetre**2, symbol="cm^2"),
+        "cubic_centimeter": UnitSpec("Volume", centimetre**3, symbol="cm^3"),
+        "centimeter_per_second": UnitSpec(
+            "Velocity", centimetre / second, symbol="cm/s"
+        ),
+        "erg": UnitSpec("Energy", erg, symbol="erg"),
+        "erg_per_atom": UnitSpec("EnergyPerAtom", erg, symbol="erg/atom"),
+        "dyne": UnitSpec("Force", erg / centimetre, symbol="dyn", aliases=("dyn",)),
+        "dyne_per_centimeter": UnitSpec(
+            "ForceConstant", erg / centimetre**2, symbol="dyn/cm"
+        ),
+        "barye": UnitSpec("Pressure", erg / centimetre**3, symbol="Ba"),
+        "erg_per_gauss": UnitSpec("MagneticMoment", erg_per_gauss, symbol="erg/G"),
+        "emu_per_cubic_centimeter": UnitSpec(
+            "Magnetization", erg_per_gauss / centimetre**3, symbol="emu/cm^3"
+        ),
+        "atom_per_cubic_centimeter": UnitSpec(
+            "ParticleDensity", centimetre**-3, symbol="atom/cm^3"
+        ),
+        "electron_per_cubic_centimeter": UnitSpec(
+            "ElectronDensity", centimetre**-3, symbol="electron/cm^3"
+        ),
+        # Hartree atomic units: a0, Ha, ħ/Eh, eħ/me.
+        "bohr_squared": UnitSpec("Area", bohr**2, symbol="a0^2"),
+        "bohr_cubed": UnitSpec("Volume", bohr**3, symbol="a0^3"),
+        "atomic_time": UnitSpec("Time", au_time, symbol="ħ/Eh"),
+        "atomic_velocity": UnitSpec("Velocity", bohr / au_time, symbol="a0 Eh/ħ"),
+        "hartree_per_bohr_squared": UnitSpec(
+            "ForceConstant", hartree / bohr**2, symbol="Ha/a0^2"
+        ),
+        "kelvin_per_atomic_time": UnitSpec(
+            "TemperatureRate", 1 / au_time, symbol="K Eh/ħ"
+        ),
+        "atomic_magnetic_moment": UnitSpec("MagneticMoment", au_moment, symbol="eħ/me"),
+        "atomic_magnetization": UnitSpec(
+            "Magnetization", au_moment / bohr**3, symbol="eħ/me/a0^3"
+        ),
+        "atom_per_bohr_cubed": UnitSpec(
+            "ParticleDensity", bohr**-3, symbol="atom/a0^3"
+        ),
+        "electron_per_bohr_cubed": UnitSpec(
+            "ElectronDensity", bohr**-3, symbol="electron/a0^3"
+        ),
+        "frequency_per_atomic_time": UnitSpec("Frequency", 1 / au_time, symbol="Eh/ħ"),
+        "per_atomic_time": UnitSpec("InverseTime", 1 / au_time, symbol="Eh/ħ"),
+    }
+    # Pressure, EnergyDensity and EnergyPerVolume share dimensions but not kinds,
+    # so each needs its own named unit in every system.
+    for prefix, kind in (
+        ("energy_density", "EnergyDensity"),
+        ("energy_per_volume", "EnergyPerVolume"),
+    ):
+        for suffix, scale, symbol in (
+            ("kcal_per_mol_per_angstrom_cubed", kcal_mol, "kcal/mol/Å^3"),
+            ("joule_per_cubic_meter", joule / metre**3, "J/m^3"),
+            ("erg_per_cubic_centimeter", erg / centimetre**3, "erg/cm^3"),
+            ("hartree_per_bohr_cubed", hartree / bohr**3, "Ha/a0^3"),
+        ):
+            units[f"{prefix}_{suffix}"] = UnitSpec(kind, scale, symbol=symbol)
+    return units
 
 
 def __getattr__(name: str) -> dict[str, UnitSpec]:

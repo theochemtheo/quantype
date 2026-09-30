@@ -1,11 +1,16 @@
-"""A standard generic alias whose call is an explicit storage conversion boundary."""
+"""A standard generic alias whose call is an explicit storage conversion boundary.
+
+``Length[V, S]`` names storage first and the unit system second (default
+``Atomistic``). Calling the alias converts the input into ``S``'s units.
+"""
 
 from __future__ import annotations
 
 from types import GenericAlias
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, cast, override
 
 if TYPE_CHECKING:
+    from quantype._internal._systems import UnitSystem
     from quantype._internal._unit import Unit
     from quantype.core import Quantity
 
@@ -13,24 +18,73 @@ if TYPE_CHECKING:
 # ruff: noqa: PLC0415
 # pyright: reportPrivateUsage=false
 
+# GenericAlias forwards every other attribute to the unparameterized class.
+_OWN_ATTRIBUTES = frozenset({"from_value", "parse", "storage", "unit_system"})
+
 
 class StorageAlias(GenericAlias):
+    @override
+    def __getattribute__(self, name: str) -> Any:
+        if name in _OWN_ATTRIBUTES:
+            return object.__getattribute__(self, name)
+        return super().__getattribute__(name)
+
+    @property
+    def storage(self) -> object:
+        return self.__args__[0]
+
+    @property
+    def unit_system(self) -> type[UnitSystem]:
+        from quantype._internal._systems import Atomistic, UnitSystem, require_system
+
+        storage, *rest = self.__args__
+        if isinstance(storage, type) and issubclass(storage, UnitSystem):
+            raise TypeError(
+                "Name the storage type first and the unit system second, "
+                "for example Length[float, SI]"
+            )
+        return require_system(rest[0]) if rest else Atomistic
+
     def __call__(
         self, value: object, unit: Unit[Any] | None = None, *, dtype: object = None
-    ) -> Quantity[Any, Any]:
-        from quantype._internal._storage import convert
+    ) -> Quantity[Any, Any, Any]:
+        from quantype._internal._storage import convert, storage_origin
+        from quantype._internal._systems import into_system
         from quantype.core import _wrap
 
         cls = cast("Any", self.__origin__)
+        system = self.unit_system
         if unit is None:
             raise TypeError(
                 "Typed construction requires an input unit; "
-                "use from_canonical for trusted data"
+                "use from_value for trusted raw numbers"
             )
         if unit.semantic is not cls._semantic:
             raise ValueError(f"Expected {cls._kind}; received {unit.kind}")
-        storage = self.__args__[-1]
-        canonical = convert(
-            value, storage, dtype=dtype, scale=unit.scale, offset=unit.offset
-        )
-        return _wrap(cls._semantic, canonical)
+        scale, offset = into_system(unit, system)
+        raw = convert(value, self.storage, dtype=dtype, scale=scale, offset=offset)
+        # Python scalars are echoed exactly, so "20.1 degC" is not 20.100000000000023.
+        echo = None
+        if (
+            storage_origin(self.storage) is float
+            and isinstance(value, (int, float))
+            and not isinstance(value, bool)
+        ):
+            echo = float(value)
+        return _wrap(cls._semantic, raw, system, display=unit, echo=echo)
+
+    def from_value(self, value: object) -> Quantity[Any, Any, Any]:
+        """Trusted wrap of raw numbers already in this alias's unit system."""
+        from quantype.core import _wrap
+
+        cls = cast("Any", self.__origin__)
+        if not cls._kind:
+            raise TypeError("from_value requires a named quantity class")
+        return _wrap(cls._semantic, value, self.unit_system)
+
+    def parse(
+        self, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Quantity[Any, Any, Any]:
+        from quantype.core import _parse
+
+        return _parse(cast("Any", self.__origin__), data, units, self.unit_system)

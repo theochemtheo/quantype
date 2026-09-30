@@ -13,6 +13,7 @@ from labquantities import (
 
 from quantype import Length as OriginalLength
 from quantype import u as original_units
+from quantype.systems import SI, Atomistic
 
 
 def test_physical_algebra() -> None:
@@ -56,6 +57,24 @@ def test_structural_reciprocals() -> None:
     other = original_units.one(1) / quantities[0]
     with pytest.raises(TypeError, match="Cannot add"):
         other + 1 / quantities[0]
+
+
+def test_unit_systems_cover_new_kinds() -> None:
+    tension = Length[float, SI](2, u.nm) * Pressure[float, SI](3, u.pascal)
+    assert isinstance(tension, SurfaceTension)
+    assert tension.system is SI
+    assert tension.value == pytest.approx(6e-9)
+    unit = SI.unit_for(SurfaceTension)
+    assert unit.name == "si:SurfaceTension"
+    assert unit.symbol == "J/m^2"
+    assert Atomistic.unit_for(SurfaceTension) is u.surface_tension.surface_tension
+    assert tension.to_system(Atomistic).magnitude(unit) == pytest.approx(6e-9)
+    wire = tension.to_dict()
+    assert wire["unit"] == "si:SurfaceTension"
+    assert SurfaceTension[float, SI].parse(wire).value == pytest.approx(6e-9)
+    restored = SurfaceTension.parse(wire, units=SI.units)
+    assert restored.magnitude(unit) == pytest.approx(6e-9)
+    assert u.sqrt(Length[float, SI](2, u.nm) ** 2).system is SI
 
 
 def test_portable_unit_factors() -> None:

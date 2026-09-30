@@ -40,7 +40,8 @@ def main() -> None:
     setup = (
         "from scipy import constants as c; "
         "scale=c.physical_constants['Hartree energy in eV'][0]; "
-        "from quantype import Length,u; import numpy as np; a=np.ones(1000)"
+        "from quantype import Length,u; import numpy as np; a=np.ones(1000); "
+        "from quantype.systems import SI; q=u.angstrom(a)"
     )
     for label, statement in {
         "cached_factor": "2.0 * scale",
@@ -48,7 +49,10 @@ def main() -> None:
         "scalar_quantity": "u.hartree(2.0)",
         "array_quantity_1000": "u.hartree(a)",
         "typed_scalar": "Length[np.float64](2, u.length.nanometer)",
-        "trusted_boundary": "Length.from_canonical(a)",
+        "typed_scalar_si": "Length[np.float64, SI](2, u.length.nanometer)",
+        "trusted_boundary": "Length.from_value(a)",
+        "array_add_1000": "q + q",
+        "to_system_1000": "q.to_system(SI)",
     }.items():
         results[f"seconds_per_call/{label}"] = (
             min(timeit.repeat(statement, setup, number=10000, repeat=5)) / 10000

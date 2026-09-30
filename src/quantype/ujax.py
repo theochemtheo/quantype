@@ -1,8 +1,11 @@
-"""JAX transformations on canonical magnitudes with physical derivative kinds.
+"""JAX transformations on raw magnitudes with physical derivative kinds.
 
-Importing this module registers quantity classes as single-leaf pytrees.
+Importing this module registers quantity classes as single-leaf pytrees whose
+static metadata is the kind and the unit system. Display units are not part of
+the tree structure, so values presented differently still share one trace.
 Only unary, scalar-output functions are supported by the autodiff adapters.
 Gradients are positive derivatives; physical forces are their explicit negation.
+Inside one unit system the raw derivative is already in that system's units.
 """
 
 # Internal pytree registration deliberately shares core's wrapping/metadata.
@@ -21,11 +24,12 @@ except ModuleNotFoundError as exc:
 
 from quantype import _generated
 from quantype._internal._semantics import Semantic
-from quantype.core import Quantity, Unit, _wrap, result_kind
+from quantype._internal._systems import UnitSystem
+from quantype.core import Quantity, _wrap, result_kind
 
 # These aliases describe the intentionally dynamic backend integration boundary.
-type _Quantity = Quantity[Any, Any]
-type _Metadata = tuple[Semantic, Unit[Any] | None]
+type _Quantity = Quantity[Any, Any, Any]
+type _Metadata = tuple[Semantic, type[UnitSystem]]
 type _RawFunction = Callable[[Any], tuple[Any, _Quantity]]
 
 
@@ -62,16 +66,14 @@ def _is_quantity_class(candidate: object) -> TypeGuard[type[_Quantity]]:
 
 
 def _flatten(quantity: _Quantity) -> tuple[tuple[Any], _Metadata]:
-    return (quantity.value,), (quantity._semantic, quantity._display)
+    return (quantity.value,), (quantity._semantic, quantity._system)
 
 
 def _unflatten(metadata: _Metadata, leaves: tuple[Any]) -> _Quantity:
-    kind, display = metadata
-    quantity = _wrap(kind, leaves[0])
-    # JAX may supply sentinel objects during vmap tree manipulation. Neither
-    # reconstruction nor restoring display metadata may coerce the leaf.
-    object.__setattr__(quantity, "_display", display)
-    return quantity
+    kind, system = metadata
+    # JAX may supply sentinel objects during vmap tree manipulation, so
+    # reconstruction must not coerce the leaf.
+    return _wrap(kind, leaves[0], system)
 
 
 def _register_quantity(cls: type[_Quantity]) -> None:
@@ -105,13 +107,19 @@ def vmap[**P, T](
 def _raw_function(
     function: Callable[[_Quantity], _Quantity], argument: _Quantity
 ) -> Callable[[Any], tuple[Any, _Quantity]]:
-    metadata = (argument._semantic, argument._display)
+    metadata = (argument._semantic, argument._system)
 
     def evaluate(value: Any) -> tuple[Any, _Quantity]:  # noqa: ANN401
         output = function(_unflatten(metadata, (value,)))
         # Validate untyped callers as well as the statically checked contract.
         if not isinstance(output, Quantity):  # pyright: ignore[reportUnnecessaryIsInstance]
             raise TypeError("Differentiated functions must return a Quantity.")
+        if output._system is not argument._system:
+            raise TypeError(
+                "Differentiated functions must return a quantity in their "
+                f"argument's unit system ({argument._system.__name__}); "
+                f"received {output._system.__name__}"
+            )
         # Carry output metadata through has_aux, rather than evaluating the
         # user's function a second time just to discover its physical kind.
         return output.value, output
@@ -122,13 +130,14 @@ def _raw_function(
 def grad(
     function: Callable[[_Quantity], _Quantity],
 ) -> Callable[[_Quantity], _Quantity]:
-    """Differentiate a unary scalar quantity function in canonical units."""
+    """Differentiate a unary scalar quantity function in its unit system."""
 
     def derivative(argument: _Quantity) -> _Quantity:
         value, output = _jax.grad(_raw_function(function, argument), has_aux=True)(
             argument.value
         )
-        return _wrap(result_kind("div", output._semantic, argument._semantic), value)
+        kind = result_kind("div", output._semantic, argument._semantic)
+        return _wrap(kind, value, argument._system)
 
     return derivative
 
@@ -142,6 +151,7 @@ def hessian(
         first = _jax.grad(_raw_function(function, argument), has_aux=True)
         value, output = _jax.jacfwd(first, has_aux=True)(argument.value)
         first_kind = result_kind("div", output._semantic, argument._semantic)
-        return _wrap(result_kind("div", first_kind, argument._semantic), value)
+        kind = result_kind("div", first_kind, argument._semantic)
+        return _wrap(kind, value, argument._system)
 
     return derivative

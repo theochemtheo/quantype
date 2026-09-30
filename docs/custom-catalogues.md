@@ -57,5 +57,12 @@ structural results use the package's own `Quantity` subclass; import that class
 for structural annotations so reciprocal types retain the catalogue's
 `DimensionlessKind`. It remains a subclass of `quantype.core.Quantity`.
 
+Generated quantities take a unit system parameter like the built-in ones:
+`Length[float, SI]` works with no extra definitions. Unit systems are defined
+over base axes, not kinds, so every kind in the catalogue has a unit in every
+system. A kind without a named catalogue unit in a system gets a
+system-qualified identifier, such as `si:SurfaceTension` (symbol `J/m^2`); see
+[unit systems](unit-systems.md#derived-units).
+
 To define a new unit for an existing physical kind instead, see
 [custom units](units.md#define-a-unit-without-global-registration).

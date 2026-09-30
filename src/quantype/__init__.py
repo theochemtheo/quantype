@@ -1,4 +1,4 @@
-"""Physical meaning in Python types, canonical values in numerical kernels."""
+"""Physical meaning in Python types, with the unit system in the type too."""
 
 from quantype import units as u
 from quantype import units as units

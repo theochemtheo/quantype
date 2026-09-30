@@ -6,7 +6,7 @@ from labquantities import Energy, Force, ForceConstant, Length, Quantity, u, uja
 
 
 def energy(x: Length[jax.Array]) -> Energy[jax.Array]:
-    return Energy.from_canonical((x.value**2).sum())
+    return Energy.from_value((x.value**2).sum())
 
 
 def test_jit_gradient() -> None:

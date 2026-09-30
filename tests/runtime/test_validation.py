@@ -25,8 +25,14 @@ class Simulation(BaseModel):
 def test_scalar_roundtrip_and_display_unit() -> None:
     length = Length.parse({"kind": "Length", "magnitude": 0.5, "unit": "nm"})
     assert length.value == pytest.approx(5)
-    assert to_dict(length) == {"kind": "Length", "magnitude": 5.0, "unit": "angstrom"}
+    # The input unit is remembered, so a config's "0.5 nm" is written back as-is.
     wire = {"kind": "Length", "magnitude": 0.5, "unit": "nanometer"}
+    assert to_dict(length) == wire
+    assert to_dict(length, u.angstrom) == {
+        "kind": "Length",
+        "magnitude": 5.0,
+        "unit": "angstrom",
+    }
     assert to_dict(length, u.nm) == wire
     assert length.to(u.nm).to_dict() == wire
     assert parse_quantity(Length, length) is length

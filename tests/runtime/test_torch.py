@@ -1,13 +1,15 @@
 """Torch works independently of the JAX extra."""
 
-# Optional dependency gate must precede backend imports.
+from typing import Any
 
+# Optional dependency gate must precede backend imports.
 import pytest
 
 pytest.importorskip("torch")
 import torch
 
 from quantype import Energy, Force, ForceConstant, Length, u, utorch
+from quantype.systems import SI
 
 
 def _torch_harmonic(x: Length[torch.Tensor]) -> Energy[torch.Tensor]:
@@ -43,12 +45,29 @@ def test_torch_conversion_preserves_graph_and_canonical_derivative() -> None:
 
 def test_torch_raw_model_boundary() -> None:
     x = u.angstrom(torch.tensor([1.0, 2.0], requires_grad=True))
-    energy = Energy.from_canonical(torch.sum(x.value**2))
+    energy = Energy.from_value(torch.sum(x.value**2))
     torch.testing.assert_close(utorch.grad(energy, x).value, 2.0 * x.value)
 
 
 def test_torch_rejects_nonscalar_energy() -> None:
     x = u.angstrom(torch.tensor([1.0, 2.0], requires_grad=True))
-    energy = Energy.from_canonical(x.value**2)
+    energy = Energy.from_value(x.value**2)
     with pytest.raises(ValueError, match="scalar"):
         utorch.grad(energy, x)
+
+
+def test_torch_grad_in_another_system() -> None:
+    raw = torch.tensor([0.1, 0.2], dtype=torch.float64, requires_grad=True)
+    x = Length[torch.Tensor, SI](raw, u.nm)
+    k = ForceConstant[float, SI](2.0, u.eV_per_angstrom_squared)
+    force = utorch.grad(0.5 * k * (x**2).sum(), x)
+    assert force.system is SI
+    torch.testing.assert_close(
+        torch.as_tensor(force.magnitude(u.eV_per_angstrom)),
+        torch.tensor([2.0, 4.0], dtype=torch.float64),
+    )
+    untyped: Any = utorch.grad
+    with pytest.raises(
+        TypeError, match="output in Atomistic with respect to an input in SI"
+    ):
+        untyped(Energy.from_value(x.value.sum()) * 1.0, x)

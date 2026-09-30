@@ -8,6 +8,8 @@ import numpy as np
 from pydantic_core import core_schema
 
 from quantype._internal._storage import convert, storage_origin
+from quantype._internal._systems import Atomistic, require_system
+from quantype.core import _wrap
 from quantype.serialization import parse_quantity, to_dict
 
 if TYPE_CHECKING:
@@ -23,19 +25,24 @@ serialize_quantity = to_dict
 
 
 def pydantic_schema(
-    cls: type[Quantity[Any, Any]], source_type: Any, handler: GetCoreSchemaHandler
+    cls: type[Quantity[Any, Any, Any]],
+    source_type: Any,
+    handler: GetCoreSchemaHandler,
 ) -> core_schema.CoreSchema:
     del handler
     arguments = get_args(source_type)
-    storage = arguments[-1] if arguments else Any
+    storage = arguments[0] if arguments else Any
+    system = require_system(arguments[1]) if len(arguments) > 1 else Atomistic
     origin = storage_origin(storage)
 
-    def validate(data: object, info: core_schema.ValidationInfo) -> Quantity[Any, Any]:
+    def validate(
+        data: object, info: core_schema.ValidationInfo
+    ) -> Quantity[Any, Any, Any]:
         units: tuple[Unit[Any], ...] = ()
         context: Any = info.context
         if isinstance(context, dict):
             units = tuple(cast("dict[str, Any]", context).get("units", ()))
-        quantity = parse_quantity(cls, data, units=units)
+        quantity = parse_quantity(cls, data, units=units, system=system)
         if storage is Any:
             return quantity
         try:
@@ -44,9 +51,9 @@ def pydantic_schema(
             raise ValueError(
                 f"Expected {cls._kind} storage {storage!r}: {exc}"
             ) from exc
-        result = cls.from_canonical(raw)
-        result._display = quantity._display
-        return result
+        # The echo is a Python float, so only float storage can keep it.
+        echo = quantity._echo if origin is float else None
+        return _wrap(cls._semantic, raw, system, display=quantity._display, echo=echo)
 
     number = core_schema.float_schema()
     array = core_schema.list_schema(core_schema.any_schema())
@@ -74,7 +81,7 @@ def pydantic_schema(
         data: object,
         handler: core_schema.ValidatorFunctionWrapHandler,
         info: core_schema.ValidationInfo,
-    ) -> Quantity[Any, Any]:
+    ) -> Quantity[Any, Any, Any]:
         # The inner schema describes the wire shape. Parsing the original value
         # ourselves avoids Pydantic coercing boolean magnitudes into numbers.
         del handler

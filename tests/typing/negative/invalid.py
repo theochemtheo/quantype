@@ -1,7 +1,8 @@
 """Each marked line must produce a diagnostic in every supported checker."""
 
-from quantype import Energy, EnergyPerAtom, Length, Pressure, Temperature
+from quantype import Energy, EnergyPerAtom, Force, Length, Pressure, Temperature
 from quantype import units as u
+from quantype.systems import SI, Metal, UnitSystem
 
 
 def energy_only(value: Energy[float]) -> None:
@@ -49,3 +50,24 @@ bad_structural_sum = product + ratio  # error
 bad_structural_nominal_sum = product + ((3 * u.fs) * (2 * u.angstrom))  # error
 bad_structural_point_product = product * point  # error
 bad_structural_point_ratio = product / point  # error
+
+# Unit systems never mix; .to_system(...) is the explicit bridge.
+x_si = Length[float, SI](2.0, u.nm)
+x_metal = Length[float, Metal](20.0, u.angstrom)
+e_si = Energy[float, SI](3.0, u.eV)
+mixed_addition = x_si + x_metal  # error
+mixed_ratio = e_si / x_metal  # error
+mixed_comparison = x_si < x_metal  # error
+energy_only(e_si)  # error
+default_length: Length[float] = x_si  # error
+not_a_system = Length[float, int]  # error
+swapped_parameters = Length[SI, float]  # error
+converted = x_si.to_system(Metal)
+converted_is_metal = x_si + converted  # error
+
+
+def work[S: UnitSystem](f: Force[float, S], d: Length[float, S]) -> Energy[float, S]:
+    return f * d
+
+
+mixed_generic = work(e_si / x_si, x_metal)  # error

@@ -1,4 +1,7 @@
 # Python 3.12 generic runtime metadata is not represented by mypy's PEP 695 stubs.
+# PEP 695 cannot declare the defaulted unit-system parameter before Python 3.13,
+# so the stubs declare typing_extensions TypeVars that the runtime has no use for.
+^quantype\.(core|_generated)\.(K|V|S)$
 ^quantype\._generated\.[A-Za-z]+\.__type_params__$
 ^quantype\.core\.Quantity\.__type_params__$
 ^quantype\._internal\._unit\.Unit\.__type_params__$
@@ -27,4 +30,11 @@
 
 # The unit catalogue's stub variables use kind-specific static subclasses of
 # Unit so unit calls return named quantities; runtime instances are plain Unit.
-^quantype\.units\.(GPa|Ha|Hz|J|J_per_atom|K|N|Pa|Ry|THz|ampere_meter_squared|angstrom|angstrom2|angstrom3|angstrom_cubed|angstrom_per_fs|angstrom_squared|atom|atom_per_angstrom_cubed|bohr|bohr_magneton|bohr_magneton_per_angstrom_cubed|celsius|centimeter|cm|deg|degC|degree|delta_K|delta_celsius|delta_degC|delta_kelvin|dimensionless|eV|eV_per_angstrom|eV_per_angstrom_cubed|eV_per_angstrom_squared|eV_per_atom|electron|electron_per_angstrom_cubed|electron_volt|energy_density|energy_per_volume|femtosecond|frequency_per_fs|fs|gigapascal|hartree|hartree_per_atom|hartree_per_bohr|hartree_per_bohr_cubed|hertz|joule|kelvin|kelvin_per_fs|m|meV|meter|metre|millielectron_volt|mu_B|nanometer|newton|nm|one|pascal|per_fs|picosecond|ps|rad|radian|rydberg|s|second|terahertz)$
+^quantype\.units\.(GPa|Ha|Hz|J|J_per_atom|K|N|Pa|Ry|THz|ampere_meter_squared|ampere_per_meter|angstrom|angstrom2|angstrom3|angstrom_cubed|angstrom_per_fs|angstrom_per_ps|angstrom_squared|atom|atom_per_angstrom_cubed|atom_per_bohr_cubed|atom_per_cubic_centimeter|atom_per_cubic_meter|atomic_magnetic_moment|atomic_magnetization|atomic_time|atomic_velocity|barye|bohr|bohr_cubed|bohr_magneton|bohr_magneton_per_angstrom_cubed|bohr_squared|celsius|centimeter|centimeter_per_second|cm|cubic_centimeter|cubic_meter|deg|degC|degree|delta_K|delta_celsius|delta_degC|delta_kelvin|dimensionless|dyn|dyne|dyne_per_centimeter|eV|eV_per_angstrom|eV_per_angstrom_cubed|eV_per_angstrom_squared|eV_per_atom|electron|electron_per_angstrom_cubed|electron_per_bohr_cubed|electron_per_cubic_centimeter|electron_per_cubic_meter|electron_volt|emu_per_cubic_centimeter|energy_density|energy_density_erg_per_cubic_centimeter|energy_density_hartree_per_bohr_cubed|energy_density_joule_per_cubic_meter|energy_density_kcal_per_mol_per_angstrom_cubed|energy_per_volume|energy_per_volume_erg_per_cubic_centimeter|energy_per_volume_hartree_per_bohr_cubed|energy_per_volume_joule_per_cubic_meter|energy_per_volume_kcal_per_mol_per_angstrom_cubed|erg|erg_per_atom|erg_per_gauss|femtosecond|frequency_per_atomic_time|frequency_per_fs|fs|gigapascal|hartree|hartree_per_atom|hartree_per_bohr|hartree_per_bohr_cubed|hartree_per_bohr_squared|hertz|joule|kcal_per_mol|kcal_per_mol_per_angstrom|kcal_per_mol_per_angstrom_cubed|kcal_per_mol_per_angstrom_squared|kcal_per_mol_per_atom|kelvin|kelvin_per_atomic_time|kelvin_per_fs|kelvin_per_ps|kelvin_per_second|m|meV|meter|meter_per_second|metre|millielectron_volt|mu_B|nanometer|newton|newton_per_meter|nm|one|pascal|per_atomic_time|per_fs|per_ps|per_second|picosecond|ps|rad|radian|rydberg|s|second|square_centimeter|square_meter|terahertz)$
+
+# UnitSystem subclasses must pass name=, which stubtest's probe subclass omits.
+^quantype\._internal\._systems\.(UnitSystem|Atomistic|Metal|Real|SI|CGS|Atomic)$
+# The static signature requires name=; the runtime default gives a clearer error.
+^quantype\._internal\._systems\.UnitSystem\.__init_subclass__$
+# A descriptor: each concrete system computes its own units on access.
+^quantype\._internal\._systems\.UnitSystem\.units$

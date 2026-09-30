@@ -10,6 +10,7 @@ Paths here are relative to the repository root. `README.md` and `docs/` describe
 | Runtime semantic identities and expression trees | `src/quantype/_internal/_semantics.py` | `test_core.py`, `test_validation.py` |
 | Quantity wrapping, operators and reductions | `src/quantype/core.py`; handwritten `core.pyi` | `test_core.py`, `test_refactor.py`, typing fixtures |
 | Unit definitions and catalogue lookup | `src/quantype/_internal/_unit.py`; handwritten `_unit.pyi` | `test_core.py`, `test_validation.py` |
+| Unit systems, derived units, range checks | `src/quantype/_internal/_systems.py`; public `systems.py` | `test_systems.py`, `test_scenarios.py`, typing fixtures |
 | Typed constructors and backend conversion | `src/quantype/_internal/_construction.py`, `_storage.py` | `test_refactor.py`, `test_binary_failures.py` |
 | Mathematical helpers | `src/quantype/_internal/_math.py`; handwritten `_math.pyi` | `test_core.py`, `test_codegen.py` |
 | JSON, archive and Pydantic boundaries | `src/quantype/serialization.py`, `_internal/_validation.py` | `test_validation.py`, `test_binary_failures.py`, `test_refactor.py` |
@@ -31,4 +32,4 @@ External generation emits a combined, separate nominal API with its own package 
 
 `unit_specs()` lazily resolves and caches conversion constants from installed SciPy. Public unit lookup is also lazy. Moving heavy imports into these modules' top level can break the base-import contract.
 
-Construction converts storage and units; `_wrap` and `from_canonical` preserve already-canonical raw objects. Arithmetic uses backend operators. `host_array` intentionally detaches and transfers only at serialization. A change spanning these boundaries needs checks for both values and the relevant graph, dtype or storage behavior.
+Construction converts storage and units into the target system; `_wrap` and `from_value` preserve raw objects already in a system's units. Arithmetic uses backend operators. `host_array` intentionally detaches and transfers only at serialization. A change spanning these boundaries needs checks for both values and the relevant graph, dtype or storage behavior.

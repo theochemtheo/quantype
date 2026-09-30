@@ -30,19 +30,19 @@ def _unary(name: str, value: Any) -> Any:
     return result if isinstance(value, np.generic) else np.asarray(result)
 
 
-def sqrt(quantity: Quantity[Any, Any]) -> Quantity[Any, Any]:
+def sqrt(quantity: Quantity[Any, Any, Any]) -> Quantity[Any, Any, Any]:
     if quantity._semantic is not KINDS["Area"]:  # noqa: SLF001
         raise TypeError(f"sqrt expects Area, received {quantity.kind}")
-    return _wrap("Length", _unary("sqrt", quantity.value))
+    return _wrap("Length", _unary("sqrt", quantity.value), quantity.system)
 
 
-def sin(quantity: Quantity[Any, Any]) -> Quantity[Any, Any]:
+def sin(quantity: Quantity[Any, Any, Any]) -> Quantity[Any, Any, Any]:
     if quantity._semantic is not KINDS["Angle"]:  # noqa: SLF001
         raise TypeError(f"sin expects Angle, received {quantity.kind}")
-    return _wrap("Dimensionless", _unary("sin", quantity.value))
+    return _wrap("Dimensionless", _unary("sin", quantity.value), quantity.system)
 
 
-def exp(quantity: Quantity[Any, Any]) -> Quantity[Any, Any]:
+def exp(quantity: Quantity[Any, Any, Any]) -> Quantity[Any, Any, Any]:
     if quantity._semantic is not KINDS["Dimensionless"]:  # noqa: SLF001
         raise TypeError(f"exp expects Dimensionless, received {quantity.kind}")
-    return _wrap("Dimensionless", _unary("exp", quantity.value))
+    return _wrap("Dimensionless", _unary("exp", quantity.value), quantity.system)

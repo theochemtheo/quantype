@@ -28,7 +28,7 @@ def test_typed_constructor_converts_storage_and_units() -> None:
     np.testing.assert_array_equal(array.value, [[10, 20, 30]])
     raw = np.ones(3)
     assert Length[npt.NDArray[np.float64]](raw, u.length.angstrom).value is raw
-    assert Length.from_canonical(raw).value is raw
+    assert Length.from_value(raw).value is raw
     wrong: Any = u.eV
     with pytest.raises(ValueError, match="Expected Length"):
         Length[np.float64](2, wrong)

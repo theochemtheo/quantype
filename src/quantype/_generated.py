@@ -27,103 +27,106 @@ from quantype.kinds import (
     VelocityKind,
     VolumeKind,
 )
+from quantype.systems import UnitSystem
 
 
-class Dimensionless[V](Quantity[DimensionlessKind, V]):
+class Dimensionless[V, S: UnitSystem](Quantity[DimensionlessKind, V, S]):
     _kind = "Dimensionless"
 
 
-class Length[V](Quantity[LengthKind, V]):
+class Length[V, S: UnitSystem](Quantity[LengthKind, V, S]):
     _kind = "Length"
 
 
-class Area[V](Quantity[AreaKind, V]):
+class Area[V, S: UnitSystem](Quantity[AreaKind, V, S]):
     _kind = "Area"
 
 
-class Volume[V](Quantity[VolumeKind, V]):
+class Volume[V, S: UnitSystem](Quantity[VolumeKind, V, S]):
     _kind = "Volume"
 
 
-class Time[V](Quantity[TimeKind, V]):
+class Time[V, S: UnitSystem](Quantity[TimeKind, V, S]):
     _kind = "Time"
 
 
-class Velocity[V](Quantity[VelocityKind, V]):
+class Velocity[V, S: UnitSystem](Quantity[VelocityKind, V, S]):
     _kind = "Velocity"
 
 
-class Energy[V](Quantity[EnergyKind, V]):
+class Energy[V, S: UnitSystem](Quantity[EnergyKind, V, S]):
     _kind = "Energy"
 
 
-class EnergyPerAtom[V](Quantity[EnergyPerAtomKind, V]):
+class EnergyPerAtom[V, S: UnitSystem](Quantity[EnergyPerAtomKind, V, S]):
     _kind = "EnergyPerAtom"
 
 
-class Force[V](Quantity[ForceKind, V]):
+class Force[V, S: UnitSystem](Quantity[ForceKind, V, S]):
     _kind = "Force"
 
 
-class ForceConstant[V](Quantity[ForceConstantKind, V]):
+class ForceConstant[V, S: UnitSystem](Quantity[ForceConstantKind, V, S]):
     _kind = "ForceConstant"
 
 
-class Pressure[V](Quantity[PressureKind, V]):
+class Pressure[V, S: UnitSystem](Quantity[PressureKind, V, S]):
     _kind = "Pressure"
 
 
-class EnergyDensity[V](Quantity[EnergyDensityKind, V]):
+class EnergyDensity[V, S: UnitSystem](Quantity[EnergyDensityKind, V, S]):
     _kind = "EnergyDensity"
 
 
-class EnergyPerVolume[V](Quantity[EnergyPerVolumeKind, V]):
+class EnergyPerVolume[V, S: UnitSystem](Quantity[EnergyPerVolumeKind, V, S]):
     _kind = "EnergyPerVolume"
 
 
-class Temperature[V](Quantity[TemperatureKind, V]):
+class Temperature[V, S: UnitSystem](Quantity[TemperatureKind, V, S]):
     _kind = "Temperature"
 
 
-class TemperatureDifference[V](Quantity[TemperatureDifferenceKind, V]):
+class TemperatureDifference[V, S: UnitSystem](
+    Quantity[TemperatureDifferenceKind, V, S]
+):
     _kind = "TemperatureDifference"
 
 
-class TemperatureRate[V](Quantity[TemperatureRateKind, V]):
+class TemperatureRate[V, S: UnitSystem](Quantity[TemperatureRateKind, V, S]):
     _kind = "TemperatureRate"
 
 
-class MagneticMoment[V](Quantity[MagneticMomentKind, V]):
+class MagneticMoment[V, S: UnitSystem](Quantity[MagneticMomentKind, V, S]):
     _kind = "MagneticMoment"
 
 
-class Magnetization[V](Quantity[MagnetizationKind, V]):
+class Magnetization[V, S: UnitSystem](Quantity[MagnetizationKind, V, S]):
     _kind = "Magnetization"
 
 
-class ParticleDensity[V](Quantity[ParticleDensityKind, V]):
+class ParticleDensity[V, S: UnitSystem](Quantity[ParticleDensityKind, V, S]):
     _kind = "ParticleDensity"
 
 
-class ElectronDensity[V](Quantity[ElectronDensityKind, V]):
+class ElectronDensity[V, S: UnitSystem](Quantity[ElectronDensityKind, V, S]):
     _kind = "ElectronDensity"
 
 
-class Angle[V](Quantity[AngleKind, V]):
+class Angle[V, S: UnitSystem](Quantity[AngleKind, V, S]):
     _kind = "Angle"
 
 
-class Frequency[V](Quantity[FrequencyKind, V]):
+class Frequency[V, S: UnitSystem](Quantity[FrequencyKind, V, S]):
     _kind = "Frequency"
 
 
-class InverseTime[V](Quantity[InverseTimeKind, V]):
+class InverseTime[V, S: UnitSystem](Quantity[InverseTimeKind, V, S]):
     _kind = "InverseTime"
 
 
-class AtomCount[V](Quantity[AtomCountKind, V]):
+class AtomCount[V, S: UnitSystem](Quantity[AtomCountKind, V, S]):
     _kind = "AtomCount"
 
 
-class ElectronCount[V](Quantity[ElectronCountKind, V]):
+class ElectronCount[V, S: UnitSystem](Quantity[ElectronCountKind, V, S]):
     _kind = "ElectronCount"

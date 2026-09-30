@@ -21,6 +21,8 @@ from labquantities.kinds import (
     TimeKind,
 )
 
+from quantype.systems import SI, Atomistic
+
 length = Length[float](2, u.length.angstrom)
 pressure = Pressure[float](3, u.pressure.pascal)
 
@@ -46,3 +48,9 @@ assert_type(
 )
 assert_type(u.angstrom(np.float64(2)), Length[np.float64])
 assert_type((300 * u.K).mean(), Temperature[float])
+
+length_si = Length[float, SI](2, u.nm)
+pressure_si = Pressure[float, SI](3, u.pascal)
+assert_type(length_si * pressure_si, SurfaceTension[float, SI])
+assert_type((length_si * pressure_si).to_system(Atomistic), SurfaceTension[float])
+assert_type(u.sqrt(length_si * length_si), Length[float, SI])

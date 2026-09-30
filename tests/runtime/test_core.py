@@ -78,7 +78,8 @@ def test_explicit_conversion() -> None:
     assert converted.value == q.value
     assert converted.magnitude() == pytest.approx(27.211386245988)
     assert q.magnitude(u.hartree) == 1.0
-    assert repr(5 * u.angstrom) == "5.0 Å"
+    assert repr(5 * u.angstrom) == "Length(5.0 Å)"
+    assert str(5 * u.angstrom) == "5.0 Å"
     wrong: Any = u.second
     with pytest.raises(ValueError, match=r"Expected Energy.*Time"):
         q.to(wrong)
@@ -108,17 +109,23 @@ def test_temperature_affine_algebra() -> None:
 
 
 def test_semantic_dimensions() -> None:
-    pressure: Any = _wrap("Pressure", 1.0)
-    density = _wrap("EnergyDensity", 1.0)
-    per_volume = _wrap("EnergyPerVolume", 1.0)
+    pressure: Any = _wrap("Pressure", 1.0, None)
+    density = _wrap("EnergyDensity", 1.0, None)
+    per_volume = _wrap("EnergyPerVolume", 1.0, None)
     assert pressure.dimensions == density.dimensions == per_volume.dimensions
     with pytest.raises(TypeError, match=r"Pressure.*EnergyDensity"):
         _ = pressure + density
-    assert _wrap("Frequency", 1.0).dimensions == _wrap("InverseTime", 1.0).dimensions
-    assert _wrap("EnergyPerAtom", 1.0).dimensions != _wrap("Energy", 1.0).dimensions
     assert (
-        _wrap("ParticleDensity", 1.0).dimensions
-        != _wrap("ElectronDensity", 1.0).dimensions
+        _wrap("Frequency", 1.0, None).dimensions
+        == _wrap("InverseTime", 1.0, None).dimensions
+    )
+    assert (
+        _wrap("EnergyPerAtom", 1.0, None).dimensions
+        != _wrap("Energy", 1.0, None).dimensions
+    )
+    assert (
+        _wrap("ParticleDensity", 1.0, None).dimensions
+        != _wrap("ElectronDensity", 1.0, None).dimensions
     )
 
 

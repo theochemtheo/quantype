@@ -87,7 +87,7 @@ assert_type(
 tx = u.angstrom(torch.tensor([1.0, 2.0, 3.0], requires_grad=True))
 assert_type(tx, Length[torch.Tensor])
 assert_type(utorch.grad(harmonic_torch(tx), tx), Force[torch.Tensor])
-assert_type(Energy.from_canonical(array), Energy[npt.NDArray[np.float64]])
+assert_type(Energy.from_value(array), Energy[npt.NDArray[np.float64]])
 assert_type(
     Length.parse({"kind": "Length", "magnitude": 1.0, "unit": "angstrom"}),
     Length[float | npt.NDArray[np.float64]],

@@ -1,7 +1,8 @@
 """Value/unit JSON and pickle-free NumPy archives at an explicit host boundary.
 
 NPY contains only an array; use NPZ when physical metadata must travel with it.
-Recorded backends are provenance. The requested target type controls restoration.
+Recorded backends are provenance. The requested target type controls restoration,
+including its unit system: the wire format records units, never a system.
 """
 
 from __future__ import annotations
@@ -18,8 +19,15 @@ from quantype._internal._storage import (
     convert,
     host_array,
     reject_booleans,
+    unit_conversion,
 )
-from quantype.core import Quantity, Unit, _wrap, canonical_unit, get_unit
+from quantype._internal._systems import (
+    Atomistic,
+    UnitSystem,
+    into_system,
+    require_system,
+)
+from quantype.core import Quantity, Unit, _wrap, get_unit
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -31,12 +39,38 @@ if TYPE_CHECKING:
 
 
 def resolve_unit(
-    name: str, units: Iterable[Unit[Any]] = (), *, kind: Kind | None = None
+    name: str,
+    units: Iterable[Unit[Any]] = (),
+    *,
+    kind: Kind | None = None,
+    system: type[UnitSystem] = Atomistic,
 ) -> Unit[Any]:
-    """Resolve explicit definitions without mutating the builtin catalogue."""
-    definitions: dict[str, Unit[Any]] = {}
+    """Resolve explicit definitions without mutating the builtin catalogue.
+
+    The target system's own units (custom bases and derived identifiers such as
+    ``gromacs:Force``) are found automatically after explicit definitions.
+    """
+    definitions = _definitions(units, kind)
+    named = [unit for (key, _), unit in definitions.items() if key == name]
+    # Different kinds may share an identifier: prefer the requested kind.
+    for unit in named:
+        if unit.semantic is kind:
+            return unit
+    if kind is not None and system is not Atomistic:
+        for unit in (system.unit_for(kind), *system.units):
+            if unit.name == name and unit.semantic is kind:
+                return unit
+    if named:
+        return named[0]
+    return get_unit(name, kind=kind)
+
+
+def _definitions(
+    units: Iterable[Unit[Any]], kind: Kind | None
+) -> dict[tuple[str, Kind], Unit[Any]]:
+    definitions: dict[tuple[str, Kind], Unit[Any]] = {}
     for unit in units:
-        if unit.name in definitions:
+        if (unit.name, unit.semantic) in definitions:
             raise ValueError(f"Duplicate unit definition {unit.name!r}")
         try:
             builtin = get_unit(unit.name, kind=kind)
@@ -44,24 +78,24 @@ def resolve_unit(
             builtin = None
         if builtin is not None and builtin is not unit:
             raise ValueError(f"Custom unit shadows builtin {unit.name!r}")
-        definitions[unit.name] = unit
-    if name in definitions:
-        return definitions[name]
-    return get_unit(name, kind=kind)
+        definitions[unit.name, unit.semantic] = unit
+    return definitions
 
 
 def selected_unit(
-    quantity: Quantity[Any, Any], unit: Unit[Any] | None = None
+    quantity: Quantity[Any, Any, Any], unit: Unit[Any] | None = None
 ) -> Unit[Any]:
     if not isinstance(quantity._semantic, Kind):
         raise ValueError("Serialization requires a named quantity")
-    selected = unit or quantity._display or canonical_unit(quantity._semantic)
+    selected = (
+        unit or quantity._display or quantity._system.unit_for(quantity._semantic)
+    )
     quantity._check_unit(selected)
     return selected
 
 
 def to_dict(
-    quantity: Quantity[Any, Any], unit: Unit[Any] | None = None
+    quantity: Quantity[Any, Any, Any], unit: Unit[Any] | None = None
 ) -> dict[str, object]:
     selected = selected_unit(quantity, unit)
     return {
@@ -86,7 +120,7 @@ def _json_numbers(value: object) -> object:
     return value
 
 
-def _is_quantity(value: object) -> TypeGuard[Quantity[Any, Any]]:
+def _is_quantity(value: object) -> TypeGuard[Quantity[Any, Any, Any]]:
     return isinstance(value, Quantity)
 
 
@@ -114,14 +148,25 @@ def _wire_fields(data: object, expected: str) -> tuple[object, str]:
 
 
 def parse_quantity(
-    cls: type[Quantity[Any, Any]], data: object, *, units: Iterable[Unit[Any]] = ()
-) -> Quantity[Any, Any]:
+    cls: type[Quantity[Any, Any, Any]],
+    data: object,
+    *,
+    units: Iterable[Unit[Any]] = (),
+    system: type[UnitSystem] = Atomistic,
+) -> Quantity[Any, Any, Any]:
+    """Decode into ``system``'s storage, remembering the unit the data used."""
     if _is_quantity(data):
         if data._semantic is not cls._semantic:
             raise ValueError(f"Expected {cls._kind}; received {data.kind}")
+        if data._system is not system:
+            raise ValueError(
+                f"Expected a quantity in {system.__name__}; received one in "
+                f"{data._system.__name__}. Convert it explicitly with .to_system(...)"
+            )
         return data
     value, name = _wire_fields(data, cls._kind)
-    unit = resolve_unit(name, units, kind=cast("Kind", cls._semantic))
+    kind = cast("Kind", cls._semantic)
+    unit = resolve_unit(name, units, kind=kind, system=system)
     if unit.semantic is not cls._semantic:
         raise ValueError(f"Expected {cls._kind}; received {unit.kind} (unit {name!r})")
     reject_booleans(value)
@@ -131,11 +176,17 @@ def parse_quantity(
             "Quantity magnitudes must be real numbers, not booleans or strings"
         )
     raw = float(array) if array.ndim == 0 else array.astype(np.float64)
-    return _wrap(cls._semantic, unit.canonical(raw))
+    scale, offset = into_system(unit, system)
+    stored = unit_conversion(raw, scale, offset)
+    echo = raw if isinstance(raw, float) else None
+    return _wrap(cls._semantic, stored, system, display=unit, echo=echo)
 
 
 def save_npz(
-    path: str | Path, *, record_backend: bool = False, **quantities: Quantity[Any, Any]
+    path: str | Path,
+    *,
+    record_backend: bool = False,
+    **quantities: Quantity[Any, Any, Any],
 ) -> None:
     """Save named quantities plus versioned metadata; never write pickled objects."""
     arrays: dict[str, Any] = {}
@@ -187,18 +238,25 @@ def load_npz[Q](
     units: Iterable[Unit[Any]] = (),
     dtype: object = None,
 ) -> Q:
-    """Restore to the explicit quantity/storage type, regardless of source backend."""
+    """Restore to the explicit quantity/storage/system type, whatever the source.
+
+    ``Length[NDArray[np.float64], SI]`` restores metres. Archives are system
+    independent: one written from any system decodes into any other.
+    """
     cls = get_origin(target) or target
-    storage = get_args(target)
-    if not storage or not isinstance(cls, type) or not issubclass(cls, Quantity):
+    arguments = get_args(target)
+    if not arguments or not isinstance(cls, type) or not issubclass(cls, Quantity):
         raise TypeError("Restoration requires a parameterized quantity type")
+    storage = arguments[0]
+    system = require_system(arguments[1]) if len(arguments) > 1 else Atomistic
+    kind = cast("Kind", cls._semantic)
     with np.load(path, allow_pickle=False) as archive:
         if "metadata" not in archive:
             raise ValueError("Archive is missing physical metadata")
         entry = _archive_entry(json.loads(str(archive["metadata"])), name)
         if entry["kind"] != cls._kind:
             raise ValueError(f"Expected {cls._kind}; received {entry['kind']}")
-        unit = resolve_unit(entry["unit"], units, kind=cast("Kind", cls._semantic))
+        unit = resolve_unit(entry["unit"], units, kind=kind, system=system)
         if unit.semantic is not cls._semantic:
             raise ValueError(f"Expected {cls._kind}; received {unit.kind}")
         if entry["array"] not in archive:
@@ -206,7 +264,6 @@ def load_npz[Q](
         array = archive[entry["array"]]
         if array.dtype.kind not in "iuf":
             raise ValueError("Archive magnitude must have a real numerical dtype")
-        canonical = convert(
-            array, storage[-1], dtype=dtype, scale=unit.scale, offset=unit.offset
-        )
-        return cast("Q", _wrap(cls._semantic, canonical))
+        scale, offset = into_system(unit, system)
+        raw = convert(array, storage, dtype=dtype, scale=scale, offset=offset)
+        return cast("Q", _wrap(cls._semantic, raw, system, display=unit))

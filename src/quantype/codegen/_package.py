@@ -40,19 +40,22 @@ def package_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         "from quantype._internal._math import _unary\n"
         f"from {package}._catalogue import runtime\n"
     )
-    math_stub = f"from {package}._generated import Area, Length, Angle, Dimensionless\n"
+    math_stub = (
+        "from quantype.systems import UnitSystem\n"
+        f"from {package}._generated import Area, Length, Angle, Dimensionless\n"
+    )
     for name, source, result in (
         ("sqrt", "Area", "Length"),
         ("sin", "Angle", "Dimensionless"),
         ("exp", "Dimensionless", "Dimensionless"),
     ):
         math_runtime += (
-            f"def {name}(quantity: Quantity[Any, Any]) -> Quantity[Any, Any]:\n"
+            f"def {name}(quantity: Quantity[Any, Any, Any]) -> Quantity[Any, Any, Any]:\n"
             f"    if quantity._semantic is not runtime.kinds[{source!r}]:\n"
             f"        raise TypeError('Expected {source}')\n"
-            f"    return _wrap(runtime.kinds[{result!r}], _unary({name!r}, quantity.value))\n"
+            f"    return _wrap(runtime.kinds[{result!r}], _unary({name!r}, quantity.value), quantity.system)\n"
         )
-        math_stub += f"def {name}[V](quantity: {source}[V]) -> {result}[V]: ...\n"
+        math_stub += f"def {name}[V, S: UnitSystem](quantity: {source}[V, S]) -> {result}[V, S]: ...\n"
     jax_runtime = (
         "from quantype.ujax import grad as grad, hessian as hessian, jit as jit, vmap as vmap, _register_quantity\n"
         f"from {package} import _generated\n"
