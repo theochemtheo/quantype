@@ -13,7 +13,7 @@ from quantype.codegen import generate
 
 catalogue = builtin_catalogue().extend(
     quantities={
-        "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0), "surface_tension"),
+        "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0, 0), "surface_tension"),
     },
     units={"surface_tension": UnitSpec("SurfaceTension")},
     relations={("mul", "Pressure", "Length"): "SurfaceTension"},
@@ -38,7 +38,10 @@ assert_type(length * pressure, SurfaceTension[float])
 assert_type(pressure * length, SurfaceTension[float])
 ```
 
-Multiplication relations are symmetric; division relations are explicit.
+Multiplication relations are symmetric, and each also names the divisions that
+undo it, so the catalogue above gives `SurfaceTension / Length -> Pressure`.
+Declared divisions take precedence; a division two multiplications would undo
+differently must be declared.
 Generation includes runtime classes, stubs, units, numerical helpers, and
 optional autodiff adapters. `generate(..., check=True)` returns stale file names
 without writing; `render(...)` returns source strings without invoking tools.

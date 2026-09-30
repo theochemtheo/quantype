@@ -7,16 +7,23 @@ from typing import Any, overload
 from jax import Array
 
 from quantype._generated import (
+    Acceleration,
+    Action,
     Angle,
     Area,
     AtomCount,
+    Charge,
     Dimensionless,
+    DipoleMoment,
+    ElectricField,
+    ElectricPotential,
     ElectronCount,
     ElectronDensity,
     Energy,
     EnergyDensity,
     EnergyPerAtom,
     EnergyPerVolume,
+    Entropy,
     Force,
     ForceConstant,
     Frequency,
@@ -24,8 +31,12 @@ from quantype._generated import (
     Length,
     MagneticMoment,
     Magnetization,
+    Mass,
+    MassDensity,
+    Momentum,
     ParticleDensity,
     Pressure,
+    Temperature,
     TemperatureDifference,
     TemperatureRate,
     Time,
@@ -36,26 +47,6 @@ from quantype.core import Quantity
 from quantype.kinds import Div
 from quantype.systems import UnitSystem
 
-@overload
-def grad[S: UnitSystem](
-    function: Callable[[Time[Array, S]], Length[Array, S]],
-) -> Callable[[Time[Array, S]], Velocity[Array, S]]: ...
-@overload
-def grad[S: UnitSystem](
-    function: Callable[[Length[Array, S]], Area[Array, S]],
-) -> Callable[[Length[Array, S]], Length[Array, S]]: ...
-@overload
-def grad[S: UnitSystem](
-    function: Callable[[Length[Array, S]], Volume[Array, S]],
-) -> Callable[[Length[Array, S]], Area[Array, S]]: ...
-@overload
-def grad[S: UnitSystem](
-    function: Callable[[Area[Array, S]], Volume[Array, S]],
-) -> Callable[[Area[Array, S]], Length[Array, S]]: ...
-@overload
-def grad[S: UnitSystem](
-    function: Callable[[Length[Array, S]], Energy[Array, S]],
-) -> Callable[[Length[Array, S]], Force[Array, S]]: ...
 @overload
 def grad[S: UnitSystem](
     function: Callable[[Area[Array, S]], Energy[Array, S]],
@@ -96,6 +87,10 @@ def grad[S: UnitSystem](
 def grad[S: UnitSystem](
     function: Callable[[Time[Array, S]], Dimensionless[Array, S]],
 ) -> Callable[[Time[Array, S]], InverseTime[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Entropy[Array, S]], Energy[Array, S]],
+) -> Callable[[Entropy[Array, S]], Temperature[Array, S]]: ...
 @overload
 def grad[S: UnitSystem](
     function: Callable[[Dimensionless[Array, S]], Dimensionless[Array, S]],
@@ -198,6 +193,14 @@ def grad[S: UnitSystem](
 ) -> Callable[[Dimensionless[Array, S]], EnergyPerVolume[Array, S]]: ...
 @overload
 def grad[S: UnitSystem](
+    function: Callable[[Temperature[Array, S]], Temperature[Array, S]],
+) -> Callable[[Temperature[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Temperature[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Temperature[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
     function: Callable[
         [TemperatureDifference[Array, S]], TemperatureDifference[Array, S]
     ],
@@ -287,21 +290,269 @@ def grad[S: UnitSystem](
     function: Callable[[Dimensionless[Array, S]], ElectronCount[Array, S]],
 ) -> Callable[[Dimensionless[Array, S]], ElectronCount[Array, S]]: ...
 @overload
+def grad[S: UnitSystem](
+    function: Callable[[Mass[Array, S]], Mass[Array, S]],
+) -> Callable[[Mass[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Mass[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Mass[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[MassDensity[Array, S]], MassDensity[Array, S]],
+) -> Callable[[MassDensity[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], MassDensity[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], MassDensity[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Momentum[Array, S]], Momentum[Array, S]],
+) -> Callable[[Momentum[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Momentum[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Momentum[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Acceleration[Array, S]], Acceleration[Array, S]],
+) -> Callable[[Acceleration[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Acceleration[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Acceleration[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Charge[Array, S]], Charge[Array, S]],
+) -> Callable[[Charge[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Charge[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Charge[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ElectricPotential[Array, S]], ElectricPotential[Array, S]],
+) -> Callable[[ElectricPotential[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], ElectricPotential[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], ElectricPotential[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ElectricField[Array, S]], ElectricField[Array, S]],
+) -> Callable[[ElectricField[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], ElectricField[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], ElectricField[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[DipoleMoment[Array, S]], DipoleMoment[Array, S]],
+) -> Callable[[DipoleMoment[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], DipoleMoment[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], DipoleMoment[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Entropy[Array, S]], Entropy[Array, S]],
+) -> Callable[[Entropy[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Entropy[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Entropy[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Action[Array, S]], Action[Array, S]],
+) -> Callable[[Action[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Action[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Action[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Length[Array, S]], Area[Array, S]],
+) -> Callable[[Length[Array, S]], Length[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Area[Array, S]], Volume[Array, S]],
+) -> Callable[[Area[Array, S]], Length[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Length[Array, S]], Volume[Array, S]],
+) -> Callable[[Length[Array, S]], Area[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Force[Array, S]], Energy[Array, S]],
+) -> Callable[[Force[Array, S]], Length[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Length[Array, S]], Energy[Array, S]],
+) -> Callable[[Length[Array, S]], Force[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ForceConstant[Array, S]], Force[Array, S]],
+) -> Callable[[ForceConstant[Array, S]], Length[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ForceConstant[Array, S]], Energy[Array, S]],
+) -> Callable[[ForceConstant[Array, S]], Area[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Pressure[Array, S]], Energy[Array, S]],
+) -> Callable[[Pressure[Array, S]], Volume[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Velocity[Array, S]], Length[Array, S]],
+) -> Callable[[Velocity[Array, S]], Time[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Time[Array, S]], Length[Array, S]],
+) -> Callable[[Time[Array, S]], Velocity[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Acceleration[Array, S]], Velocity[Array, S]],
+) -> Callable[[Acceleration[Array, S]], Time[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Time[Array, S]], Velocity[Array, S]],
+) -> Callable[[Time[Array, S]], Acceleration[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Mass[Array, S]], Momentum[Array, S]],
+) -> Callable[[Mass[Array, S]], Velocity[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Velocity[Array, S]], Momentum[Array, S]],
+) -> Callable[[Velocity[Array, S]], Mass[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Mass[Array, S]], Force[Array, S]],
+) -> Callable[[Mass[Array, S]], Acceleration[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Acceleration[Array, S]], Force[Array, S]],
+) -> Callable[[Acceleration[Array, S]], Mass[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Momentum[Array, S]], Energy[Array, S]],
+) -> Callable[[Momentum[Array, S]], Velocity[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Velocity[Array, S]], Energy[Array, S]],
+) -> Callable[[Velocity[Array, S]], Momentum[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Force[Array, S]], Momentum[Array, S]],
+) -> Callable[[Force[Array, S]], Time[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Time[Array, S]], Momentum[Array, S]],
+) -> Callable[[Time[Array, S]], Force[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[MassDensity[Array, S]], Mass[Array, S]],
+) -> Callable[[MassDensity[Array, S]], Volume[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Volume[Array, S]], Mass[Array, S]],
+) -> Callable[[Volume[Array, S]], MassDensity[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[EnergyPerAtom[Array, S]], Energy[Array, S]],
+) -> Callable[[EnergyPerAtom[Array, S]], AtomCount[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ParticleDensity[Array, S]], AtomCount[Array, S]],
+) -> Callable[[ParticleDensity[Array, S]], Volume[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ElectronDensity[Array, S]], ElectronCount[Array, S]],
+) -> Callable[[ElectronDensity[Array, S]], Volume[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Magnetization[Array, S]], MagneticMoment[Array, S]],
+) -> Callable[[Magnetization[Array, S]], Volume[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[TemperatureRate[Array, S]], TemperatureDifference[Array, S]],
+) -> Callable[[TemperatureRate[Array, S]], Time[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Temperature[Array, S]], Energy[Array, S]],
+) -> Callable[[Temperature[Array, S]], Entropy[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[TemperatureDifference[Array, S]], Energy[Array, S]],
+) -> Callable[[TemperatureDifference[Array, S]], Entropy[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Charge[Array, S]], Energy[Array, S]],
+) -> Callable[[Charge[Array, S]], ElectricPotential[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ElectricPotential[Array, S]], Energy[Array, S]],
+) -> Callable[[ElectricPotential[Array, S]], Charge[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Charge[Array, S]], Force[Array, S]],
+) -> Callable[[Charge[Array, S]], ElectricField[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ElectricField[Array, S]], Force[Array, S]],
+) -> Callable[[ElectricField[Array, S]], Charge[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ElectricField[Array, S]], ElectricPotential[Array, S]],
+) -> Callable[[ElectricField[Array, S]], Length[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Length[Array, S]], ElectricPotential[Array, S]],
+) -> Callable[[Length[Array, S]], ElectricField[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Charge[Array, S]], DipoleMoment[Array, S]],
+) -> Callable[[Charge[Array, S]], Length[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Length[Array, S]], DipoleMoment[Array, S]],
+) -> Callable[[Length[Array, S]], Charge[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[DipoleMoment[Array, S]], Energy[Array, S]],
+) -> Callable[[DipoleMoment[Array, S]], ElectricField[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[ElectricField[Array, S]], Energy[Array, S]],
+) -> Callable[[ElectricField[Array, S]], DipoleMoment[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Energy[Array, S]], Action[Array, S]],
+) -> Callable[[Energy[Array, S]], Time[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Time[Array, S]], Action[Array, S]],
+) -> Callable[[Time[Array, S]], Energy[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Action[Array, S]], Energy[Array, S]],
+) -> Callable[[Action[Array, S]], InverseTime[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[InverseTime[Array, S]], Energy[Array, S]],
+) -> Callable[[InverseTime[Array, S]], Action[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[Frequency[Array, S]], Dimensionless[Array, S]],
+) -> Callable[[Frequency[Array, S]], Time[Array, S]]: ...
+@overload
+def grad[S: UnitSystem](
+    function: Callable[[InverseTime[Array, S]], Dimensionless[Array, S]],
+) -> Callable[[InverseTime[Array, S]], Time[Array, S]]: ...
+@overload
 def grad[I, O, S: UnitSystem](
     function: Callable[[Quantity[I, Array, S]], Quantity[O, Array, S]],
 ) -> Callable[[Quantity[I, Array, S]], Quantity[Div[O, I], Array, S]]: ...
-@overload
-def hessian[S: UnitSystem](
-    function: Callable[[Length[Array, S]], Area[Array, S]],
-) -> Callable[[Length[Array, S]], Dimensionless[Array, S]]: ...
-@overload
-def hessian[S: UnitSystem](
-    function: Callable[[Length[Array, S]], Volume[Array, S]],
-) -> Callable[[Length[Array, S]], Length[Array, S]]: ...
-@overload
-def hessian[S: UnitSystem](
-    function: Callable[[Length[Array, S]], Energy[Array, S]],
-) -> Callable[[Length[Array, S]], ForceConstant[Array, S]]: ...
 @overload
 def hessian[S: UnitSystem](
     function: Callable[[Dimensionless[Array, S]], Dimensionless[Array, S]],
@@ -360,6 +611,10 @@ def hessian[S: UnitSystem](
 ) -> Callable[[Dimensionless[Array, S]], EnergyPerVolume[Array, S]]: ...
 @overload
 def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Temperature[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Temperature[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
     function: Callable[[Dimensionless[Array, S]], TemperatureDifference[Array, S]],
 ) -> Callable[[Dimensionless[Array, S]], TemperatureDifference[Array, S]]: ...
 @overload
@@ -388,8 +643,16 @@ def hessian[S: UnitSystem](
 ) -> Callable[[Dimensionless[Array, S]], Angle[Array, S]]: ...
 @overload
 def hessian[S: UnitSystem](
+    function: Callable[[Frequency[Array, S]], Frequency[Array, S]],
+) -> Callable[[Frequency[Array, S]], Time[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
     function: Callable[[Dimensionless[Array, S]], Frequency[Array, S]],
 ) -> Callable[[Dimensionless[Array, S]], Frequency[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[InverseTime[Array, S]], InverseTime[Array, S]],
+) -> Callable[[InverseTime[Array, S]], Time[Array, S]]: ...
 @overload
 def hessian[S: UnitSystem](
     function: Callable[[Dimensionless[Array, S]], InverseTime[Array, S]],
@@ -402,6 +665,66 @@ def hessian[S: UnitSystem](
 def hessian[S: UnitSystem](
     function: Callable[[Dimensionless[Array, S]], ElectronCount[Array, S]],
 ) -> Callable[[Dimensionless[Array, S]], ElectronCount[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Mass[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Mass[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], MassDensity[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], MassDensity[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Momentum[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Momentum[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Acceleration[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Acceleration[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Charge[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Charge[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], ElectricPotential[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], ElectricPotential[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], ElectricField[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], ElectricField[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], DipoleMoment[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], DipoleMoment[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Entropy[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Entropy[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Dimensionless[Array, S]], Action[Array, S]],
+) -> Callable[[Dimensionless[Array, S]], Action[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Length[Array, S]], Area[Array, S]],
+) -> Callable[[Length[Array, S]], Dimensionless[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Length[Array, S]], Volume[Array, S]],
+) -> Callable[[Length[Array, S]], Length[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Length[Array, S]], Energy[Array, S]],
+) -> Callable[[Length[Array, S]], ForceConstant[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Time[Array, S]], Length[Array, S]],
+) -> Callable[[Time[Array, S]], Acceleration[Array, S]]: ...
+@overload
+def hessian[S: UnitSystem](
+    function: Callable[[Velocity[Array, S]], Energy[Array, S]],
+) -> Callable[[Velocity[Array, S]], Mass[Array, S]]: ...
 @overload
 def hessian[I, O, S: UnitSystem](
     function: Callable[[Quantity[I, Array, S]], Quantity[O, Array, S]],

@@ -13,7 +13,7 @@ Parent: read [core physical semantics](../quantype-core/SKILL.md), including its
 - Application definitions use `Catalogue`, `QuantitySpec`, `UnitSpec` and `builtin_catalogue().extend(...)` from `quantype.catalogue`.
 - A new unit for an existing kind may need only `QuantityClass.define_unit`; it does not require package generation.
 
-`Catalogue` snapshots mappings and validates on construction. Preserve dimensional consistency, canonical scale 1/offset 0, valid unique identifiers and namespace names, reserved generated bindings, and affine restrictions. `extend` rejects replacement of existing definitions. Multiplication relations are symmetric; inverse/division relations must be declared explicitly.
+`Catalogue` snapshots mappings and validates on construction. Preserve dimensional consistency, canonical scale 1/offset 0, valid unique identifiers and namespace names, reserved generated bindings, and offset units only for absolute temperatures. `extend` rejects replacement of existing definitions. Declared relations are kept in `Catalogue.relations`; `Catalogue.algebra` (via `close_relations` in `_internal/_registry.py`) adds multiplication's symmetry and the divisions undoing each product. Declared divisions win; two products undoing into different kinds are an error until that division is declared. Renderers and `RuntimeCatalogue` use `algebra`. Dimension tuples have eight axes, the last being charge.
 
 ## Generation ownership
 

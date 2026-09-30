@@ -7,16 +7,23 @@ from typing import Any, cast
 from quantype._internal._math import exp, sin, sqrt
 from quantype.core import Unit, get_unit
 from quantype.kinds import (
+    AccelerationKind,
+    ActionKind,
     AngleKind,
     AreaKind,
     AtomCountKind,
+    ChargeKind,
     DimensionlessKind,
+    DipoleMomentKind,
+    ElectricFieldKind,
+    ElectricPotentialKind,
     ElectronCountKind,
     ElectronDensityKind,
     EnergyDensityKind,
     EnergyKind,
     EnergyPerAtomKind,
     EnergyPerVolumeKind,
+    EntropyKind,
     ForceConstantKind,
     ForceKind,
     FrequencyKind,
@@ -24,6 +31,9 @@ from quantype.kinds import (
     LengthKind,
     MagneticMomentKind,
     MagnetizationKind,
+    MassDensityKind,
+    MassKind,
+    MomentumKind,
     ParticleDensityKind,
     PressureKind,
     TemperatureDifferenceKind,
@@ -37,6 +47,8 @@ from quantype.kinds import (
 _NAMES = {
     "one": "one",
     "angstrom": "angstrom",
+    "Angstrom": "angstrom",
+    "Ang": "angstrom",
     "meter": "meter",
     "m": "meter",
     "metre": "meter",
@@ -157,6 +169,90 @@ _NAMES = {
     "energy_per_volume_joule_per_cubic_meter": "energy_per_volume_joule_per_cubic_meter",
     "energy_per_volume_erg_per_cubic_centimeter": "energy_per_volume_erg_per_cubic_centimeter",
     "energy_per_volume_hartree_per_bohr_cubed": "energy_per_volume_hartree_per_bohr_cubed",
+    "millimeter": "millimeter",
+    "mm": "millimeter",
+    "micrometer": "micrometer",
+    "um": "micrometer",
+    "picometer": "picometer",
+    "pm": "picometer",
+    "nanosecond": "nanosecond",
+    "ns": "nanosecond",
+    "microsecond": "microsecond",
+    "us": "microsecond",
+    "millisecond": "millisecond",
+    "ms": "millisecond",
+    "kilojoule": "kilojoule",
+    "kJ": "kilojoule",
+    "kilocalorie": "kilocalorie",
+    "kcal": "kilocalorie",
+    "kJ_per_mol": "kJ_per_mol",
+    "bar": "bar",
+    "kilobar": "kilobar",
+    "kbar": "kilobar",
+    "atmosphere": "atmosphere",
+    "atm": "atmosphere",
+    "megapascal": "megapascal",
+    "MPa": "megapascal",
+    "inverse_centimeter": "inverse_centimeter",
+    "eV_fs2_per_angstrom2": "eV_fs2_per_angstrom2",
+    "dalton": "dalton",
+    "Da": "dalton",
+    "amu": "dalton",
+    "gram_per_mole": "gram_per_mole",
+    "kilogram": "kilogram",
+    "kg": "kilogram",
+    "gram": "gram",
+    "g": "gram",
+    "electron_mass": "electron_mass",
+    "m_e": "electron_mass",
+    "eV_fs2_per_angstrom5": "eV_fs2_per_angstrom5",
+    "gram_per_cubic_centimeter": "gram_per_cubic_centimeter",
+    "kilogram_per_cubic_meter": "kilogram_per_cubic_meter",
+    "electron_mass_per_bohr_cubed": "electron_mass_per_bohr_cubed",
+    "eV_fs_per_angstrom": "eV_fs_per_angstrom",
+    "eV_ps_per_angstrom": "eV_ps_per_angstrom",
+    "kcal_per_mol_fs_per_angstrom": "kcal_per_mol_fs_per_angstrom",
+    "kilogram_meter_per_second": "kilogram_meter_per_second",
+    "gram_centimeter_per_second": "gram_centimeter_per_second",
+    "atomic_momentum": "atomic_momentum",
+    "angstrom_per_fs2": "angstrom_per_fs2",
+    "angstrom_per_ps2": "angstrom_per_ps2",
+    "meter_per_second_squared": "meter_per_second_squared",
+    "centimeter_per_second_squared": "centimeter_per_second_squared",
+    "atomic_acceleration": "atomic_acceleration",
+    "elementary_charge": "elementary_charge",
+    "e": "elementary_charge",
+    "coulomb": "coulomb",
+    "C": "coulomb",
+    "statcoulomb": "statcoulomb",
+    "statC": "statcoulomb",
+    "volt": "volt",
+    "V": "volt",
+    "kcal_per_mol_per_e": "kcal_per_mol_per_e",
+    "statvolt": "statvolt",
+    "statV": "statvolt",
+    "hartree_per_e": "hartree_per_e",
+    "volt_per_angstrom": "volt_per_angstrom",
+    "volt_per_meter": "volt_per_meter",
+    "statvolt_per_centimeter": "statvolt_per_centimeter",
+    "atomic_electric_field": "atomic_electric_field",
+    "e_angstrom": "e_angstrom",
+    "debye": "debye",
+    "D": "debye",
+    "coulomb_meter": "coulomb_meter",
+    "statcoulomb_centimeter": "statcoulomb_centimeter",
+    "e_bohr": "e_bohr",
+    "eV_per_kelvin": "eV_per_kelvin",
+    "joule_per_kelvin": "joule_per_kelvin",
+    "erg_per_kelvin": "erg_per_kelvin",
+    "kcal_per_mol_per_kelvin": "kcal_per_mol_per_kelvin",
+    "hartree_per_kelvin": "hartree_per_kelvin",
+    "eV_fs": "eV_fs",
+    "eV_ps": "eV_ps",
+    "kcal_per_mol_fs": "kcal_per_mol_fs",
+    "joule_second": "joule_second",
+    "erg_second": "erg_second",
+    "atomic_action": "atomic_action",
 }
 
 
@@ -197,6 +293,18 @@ class _LengthNamespace:
     @property
     def bohr(self) -> Unit[LengthKind]:
         return cast("Unit[LengthKind]", get_unit("bohr"))
+
+    @property
+    def millimeter(self) -> Unit[LengthKind]:
+        return cast("Unit[LengthKind]", get_unit("millimeter"))
+
+    @property
+    def micrometer(self) -> Unit[LengthKind]:
+        return cast("Unit[LengthKind]", get_unit("micrometer"))
+
+    @property
+    def picometer(self) -> Unit[LengthKind]:
+        return cast("Unit[LengthKind]", get_unit("picometer"))
 
 
 length = _LengthNamespace()
@@ -261,6 +369,18 @@ class _TimeNamespace:
     def atomic_time(self) -> Unit[TimeKind]:
         return cast("Unit[TimeKind]", get_unit("atomic_time"))
 
+    @property
+    def nanosecond(self) -> Unit[TimeKind]:
+        return cast("Unit[TimeKind]", get_unit("nanosecond"))
+
+    @property
+    def microsecond(self) -> Unit[TimeKind]:
+        return cast("Unit[TimeKind]", get_unit("microsecond"))
+
+    @property
+    def millisecond(self) -> Unit[TimeKind]:
+        return cast("Unit[TimeKind]", get_unit("millisecond"))
+
 
 time = _TimeNamespace()
 
@@ -318,6 +438,18 @@ class _EnergyNamespace:
     @property
     def erg(self) -> Unit[EnergyKind]:
         return cast("Unit[EnergyKind]", get_unit("erg"))
+
+    @property
+    def kilojoule(self) -> Unit[EnergyKind]:
+        return cast("Unit[EnergyKind]", get_unit("kilojoule"))
+
+    @property
+    def kilocalorie(self) -> Unit[EnergyKind]:
+        return cast("Unit[EnergyKind]", get_unit("kilocalorie"))
+
+    @property
+    def kJ_per_mol(self) -> Unit[EnergyKind]:
+        return cast("Unit[EnergyKind]", get_unit("kJ_per_mol"))
 
 
 energy = _EnergyNamespace()
@@ -424,6 +556,22 @@ class _PressureNamespace:
     @property
     def barye(self) -> Unit[PressureKind]:
         return cast("Unit[PressureKind]", get_unit("barye"))
+
+    @property
+    def bar(self) -> Unit[PressureKind]:
+        return cast("Unit[PressureKind]", get_unit("bar"))
+
+    @property
+    def kilobar(self) -> Unit[PressureKind]:
+        return cast("Unit[PressureKind]", get_unit("kilobar"))
+
+    @property
+    def atmosphere(self) -> Unit[PressureKind]:
+        return cast("Unit[PressureKind]", get_unit("atmosphere"))
+
+    @property
+    def megapascal(self) -> Unit[PressureKind]:
+        return cast("Unit[PressureKind]", get_unit("megapascal"))
 
 
 pressure = _PressureNamespace()
@@ -670,6 +818,10 @@ class _FrequencyNamespace:
     def frequency_per_atomic_time(self) -> Unit[FrequencyKind]:
         return cast("Unit[FrequencyKind]", get_unit("frequency_per_atomic_time"))
 
+    @property
+    def inverse_centimeter(self) -> Unit[FrequencyKind]:
+        return cast("Unit[FrequencyKind]", get_unit("inverse_centimeter"))
+
 
 frequency = _FrequencyNamespace()
 
@@ -712,38 +864,299 @@ class _ElectronCountNamespace:
 
 electron_count = _ElectronCountNamespace()
 
+
+class _MassNamespace:
+    @property
+    def eV_fs2_per_angstrom2(self) -> Unit[MassKind]:
+        return cast("Unit[MassKind]", get_unit("eV_fs2_per_angstrom2"))
+
+    @property
+    def dalton(self) -> Unit[MassKind]:
+        return cast("Unit[MassKind]", get_unit("dalton"))
+
+    @property
+    def gram_per_mole(self) -> Unit[MassKind]:
+        return cast("Unit[MassKind]", get_unit("gram_per_mole"))
+
+    @property
+    def kilogram(self) -> Unit[MassKind]:
+        return cast("Unit[MassKind]", get_unit("kilogram"))
+
+    @property
+    def gram(self) -> Unit[MassKind]:
+        return cast("Unit[MassKind]", get_unit("gram"))
+
+    @property
+    def electron_mass(self) -> Unit[MassKind]:
+        return cast("Unit[MassKind]", get_unit("electron_mass"))
+
+
+mass = _MassNamespace()
+
+
+class _MassDensityNamespace:
+    @property
+    def eV_fs2_per_angstrom5(self) -> Unit[MassDensityKind]:
+        return cast("Unit[MassDensityKind]", get_unit("eV_fs2_per_angstrom5"))
+
+    @property
+    def gram_per_cubic_centimeter(self) -> Unit[MassDensityKind]:
+        return cast("Unit[MassDensityKind]", get_unit("gram_per_cubic_centimeter"))
+
+    @property
+    def kilogram_per_cubic_meter(self) -> Unit[MassDensityKind]:
+        return cast("Unit[MassDensityKind]", get_unit("kilogram_per_cubic_meter"))
+
+    @property
+    def electron_mass_per_bohr_cubed(self) -> Unit[MassDensityKind]:
+        return cast("Unit[MassDensityKind]", get_unit("electron_mass_per_bohr_cubed"))
+
+
+mass_density = _MassDensityNamespace()
+
+
+class _MomentumNamespace:
+    @property
+    def eV_fs_per_angstrom(self) -> Unit[MomentumKind]:
+        return cast("Unit[MomentumKind]", get_unit("eV_fs_per_angstrom"))
+
+    @property
+    def eV_ps_per_angstrom(self) -> Unit[MomentumKind]:
+        return cast("Unit[MomentumKind]", get_unit("eV_ps_per_angstrom"))
+
+    @property
+    def kcal_per_mol_fs_per_angstrom(self) -> Unit[MomentumKind]:
+        return cast("Unit[MomentumKind]", get_unit("kcal_per_mol_fs_per_angstrom"))
+
+    @property
+    def kilogram_meter_per_second(self) -> Unit[MomentumKind]:
+        return cast("Unit[MomentumKind]", get_unit("kilogram_meter_per_second"))
+
+    @property
+    def gram_centimeter_per_second(self) -> Unit[MomentumKind]:
+        return cast("Unit[MomentumKind]", get_unit("gram_centimeter_per_second"))
+
+    @property
+    def atomic_momentum(self) -> Unit[MomentumKind]:
+        return cast("Unit[MomentumKind]", get_unit("atomic_momentum"))
+
+
+momentum = _MomentumNamespace()
+
+
+class _AccelerationNamespace:
+    @property
+    def angstrom_per_fs2(self) -> Unit[AccelerationKind]:
+        return cast("Unit[AccelerationKind]", get_unit("angstrom_per_fs2"))
+
+    @property
+    def angstrom_per_ps2(self) -> Unit[AccelerationKind]:
+        return cast("Unit[AccelerationKind]", get_unit("angstrom_per_ps2"))
+
+    @property
+    def meter_per_second_squared(self) -> Unit[AccelerationKind]:
+        return cast("Unit[AccelerationKind]", get_unit("meter_per_second_squared"))
+
+    @property
+    def centimeter_per_second_squared(self) -> Unit[AccelerationKind]:
+        return cast("Unit[AccelerationKind]", get_unit("centimeter_per_second_squared"))
+
+    @property
+    def atomic_acceleration(self) -> Unit[AccelerationKind]:
+        return cast("Unit[AccelerationKind]", get_unit("atomic_acceleration"))
+
+
+acceleration = _AccelerationNamespace()
+
+
+class _ChargeNamespace:
+    @property
+    def elementary_charge(self) -> Unit[ChargeKind]:
+        return cast("Unit[ChargeKind]", get_unit("elementary_charge"))
+
+    @property
+    def coulomb(self) -> Unit[ChargeKind]:
+        return cast("Unit[ChargeKind]", get_unit("coulomb"))
+
+    @property
+    def statcoulomb(self) -> Unit[ChargeKind]:
+        return cast("Unit[ChargeKind]", get_unit("statcoulomb"))
+
+
+charge = _ChargeNamespace()
+
+
+class _ElectricPotentialNamespace:
+    @property
+    def volt(self) -> Unit[ElectricPotentialKind]:
+        return cast("Unit[ElectricPotentialKind]", get_unit("volt"))
+
+    @property
+    def kcal_per_mol_per_e(self) -> Unit[ElectricPotentialKind]:
+        return cast("Unit[ElectricPotentialKind]", get_unit("kcal_per_mol_per_e"))
+
+    @property
+    def statvolt(self) -> Unit[ElectricPotentialKind]:
+        return cast("Unit[ElectricPotentialKind]", get_unit("statvolt"))
+
+    @property
+    def hartree_per_e(self) -> Unit[ElectricPotentialKind]:
+        return cast("Unit[ElectricPotentialKind]", get_unit("hartree_per_e"))
+
+
+electric_potential = _ElectricPotentialNamespace()
+
+
+class _ElectricFieldNamespace:
+    @property
+    def volt_per_angstrom(self) -> Unit[ElectricFieldKind]:
+        return cast("Unit[ElectricFieldKind]", get_unit("volt_per_angstrom"))
+
+    @property
+    def volt_per_meter(self) -> Unit[ElectricFieldKind]:
+        return cast("Unit[ElectricFieldKind]", get_unit("volt_per_meter"))
+
+    @property
+    def statvolt_per_centimeter(self) -> Unit[ElectricFieldKind]:
+        return cast("Unit[ElectricFieldKind]", get_unit("statvolt_per_centimeter"))
+
+    @property
+    def atomic_electric_field(self) -> Unit[ElectricFieldKind]:
+        return cast("Unit[ElectricFieldKind]", get_unit("atomic_electric_field"))
+
+
+electric_field = _ElectricFieldNamespace()
+
+
+class _DipoleMomentNamespace:
+    @property
+    def e_angstrom(self) -> Unit[DipoleMomentKind]:
+        return cast("Unit[DipoleMomentKind]", get_unit("e_angstrom"))
+
+    @property
+    def debye(self) -> Unit[DipoleMomentKind]:
+        return cast("Unit[DipoleMomentKind]", get_unit("debye"))
+
+    @property
+    def coulomb_meter(self) -> Unit[DipoleMomentKind]:
+        return cast("Unit[DipoleMomentKind]", get_unit("coulomb_meter"))
+
+    @property
+    def statcoulomb_centimeter(self) -> Unit[DipoleMomentKind]:
+        return cast("Unit[DipoleMomentKind]", get_unit("statcoulomb_centimeter"))
+
+    @property
+    def e_bohr(self) -> Unit[DipoleMomentKind]:
+        return cast("Unit[DipoleMomentKind]", get_unit("e_bohr"))
+
+
+dipole_moment = _DipoleMomentNamespace()
+
+
+class _EntropyNamespace:
+    @property
+    def eV_per_kelvin(self) -> Unit[EntropyKind]:
+        return cast("Unit[EntropyKind]", get_unit("eV_per_kelvin"))
+
+    @property
+    def joule_per_kelvin(self) -> Unit[EntropyKind]:
+        return cast("Unit[EntropyKind]", get_unit("joule_per_kelvin"))
+
+    @property
+    def erg_per_kelvin(self) -> Unit[EntropyKind]:
+        return cast("Unit[EntropyKind]", get_unit("erg_per_kelvin"))
+
+    @property
+    def kcal_per_mol_per_kelvin(self) -> Unit[EntropyKind]:
+        return cast("Unit[EntropyKind]", get_unit("kcal_per_mol_per_kelvin"))
+
+    @property
+    def hartree_per_kelvin(self) -> Unit[EntropyKind]:
+        return cast("Unit[EntropyKind]", get_unit("hartree_per_kelvin"))
+
+
+entropy = _EntropyNamespace()
+
+
+class _ActionNamespace:
+    @property
+    def eV_fs(self) -> Unit[ActionKind]:
+        return cast("Unit[ActionKind]", get_unit("eV_fs"))
+
+    @property
+    def eV_ps(self) -> Unit[ActionKind]:
+        return cast("Unit[ActionKind]", get_unit("eV_ps"))
+
+    @property
+    def kcal_per_mol_fs(self) -> Unit[ActionKind]:
+        return cast("Unit[ActionKind]", get_unit("kcal_per_mol_fs"))
+
+    @property
+    def joule_second(self) -> Unit[ActionKind]:
+        return cast("Unit[ActionKind]", get_unit("joule_second"))
+
+    @property
+    def erg_second(self) -> Unit[ActionKind]:
+        return cast("Unit[ActionKind]", get_unit("erg_second"))
+
+    @property
+    def atomic_action(self) -> Unit[ActionKind]:
+        return cast("Unit[ActionKind]", get_unit("atomic_action"))
+
+
+action = _ActionNamespace()
+
 __all__ = [
+    "Ang",
+    "Angstrom",
+    "C",
+    "D",
+    "Da",
     "GPa",
     "Ha",
     "Hz",
     "J",
     "J_per_atom",
     "K",
+    "MPa",
     "N",
     "Pa",
     "Ry",
     "THz",
+    "V",
+    "acceleration",
+    "action",
     "ampere_meter_squared",
     "ampere_per_meter",
+    "amu",
     "angle",
     "angstrom",
     "angstrom2",
     "angstrom3",
     "angstrom_cubed",
     "angstrom_per_fs",
+    "angstrom_per_fs2",
     "angstrom_per_ps",
+    "angstrom_per_ps2",
     "angstrom_squared",
     "area",
+    "atm",
+    "atmosphere",
     "atom",
     "atom_count",
     "atom_per_angstrom_cubed",
     "atom_per_bohr_cubed",
     "atom_per_cubic_centimeter",
     "atom_per_cubic_meter",
+    "atomic_acceleration",
+    "atomic_action",
+    "atomic_electric_field",
     "atomic_magnetic_moment",
     "atomic_magnetization",
+    "atomic_momentum",
     "atomic_time",
     "atomic_velocity",
+    "bar",
     "barye",
     "bohr",
     "bohr_cubed",
@@ -753,9 +1166,15 @@ __all__ = [
     "celsius",
     "centimeter",
     "centimeter_per_second",
+    "centimeter_per_second_squared",
+    "charge",
     "cm",
+    "coulomb",
+    "coulomb_meter",
     "cubic_centimeter",
     "cubic_meter",
+    "dalton",
+    "debye",
     "deg",
     "degC",
     "degree",
@@ -764,22 +1183,38 @@ __all__ = [
     "delta_degC",
     "delta_kelvin",
     "dimensionless",
+    "dipole_moment",
     "dyn",
     "dyne",
     "dyne_per_centimeter",
+    "e",
     "eV",
+    "eV_fs",
+    "eV_fs2_per_angstrom2",
+    "eV_fs2_per_angstrom5",
+    "eV_fs_per_angstrom",
     "eV_per_angstrom",
     "eV_per_angstrom_cubed",
     "eV_per_angstrom_squared",
     "eV_per_atom",
+    "eV_per_kelvin",
+    "eV_ps",
+    "eV_ps_per_angstrom",
+    "e_angstrom",
+    "e_bohr",
+    "electric_field",
+    "electric_potential",
     "electron",
     "electron_count",
     "electron_density",
+    "electron_mass",
+    "electron_mass_per_bohr_cubed",
     "electron_per_angstrom_cubed",
     "electron_per_bohr_cubed",
     "electron_per_cubic_centimeter",
     "electron_per_cubic_meter",
     "electron_volt",
+    "elementary_charge",
     "emu_per_cubic_centimeter",
     "energy",
     "energy_density",
@@ -793,9 +1228,12 @@ __all__ = [
     "energy_per_volume_hartree_per_bohr_cubed",
     "energy_per_volume_joule_per_cubic_meter",
     "energy_per_volume_kcal_per_mol_per_angstrom_cubed",
+    "entropy",
     "erg",
     "erg_per_atom",
     "erg_per_gauss",
+    "erg_per_kelvin",
+    "erg_second",
     "exp",
     "femtosecond",
     "force",
@@ -804,39 +1242,78 @@ __all__ = [
     "frequency_per_atomic_time",
     "frequency_per_fs",
     "fs",
+    "g",
     "gigapascal",
+    "gram",
+    "gram_centimeter_per_second",
+    "gram_per_cubic_centimeter",
+    "gram_per_mole",
     "hartree",
     "hartree_per_atom",
     "hartree_per_bohr",
     "hartree_per_bohr_cubed",
     "hartree_per_bohr_squared",
+    "hartree_per_e",
+    "hartree_per_kelvin",
     "hertz",
+    "inverse_centimeter",
     "inverse_time",
     "joule",
+    "joule_per_kelvin",
+    "joule_second",
+    "kJ",
+    "kJ_per_mol",
+    "kbar",
+    "kcal",
     "kcal_per_mol",
+    "kcal_per_mol_fs",
+    "kcal_per_mol_fs_per_angstrom",
     "kcal_per_mol_per_angstrom",
     "kcal_per_mol_per_angstrom_cubed",
     "kcal_per_mol_per_angstrom_squared",
     "kcal_per_mol_per_atom",
+    "kcal_per_mol_per_e",
+    "kcal_per_mol_per_kelvin",
     "kelvin",
     "kelvin_per_atomic_time",
     "kelvin_per_fs",
     "kelvin_per_ps",
     "kelvin_per_second",
+    "kg",
+    "kilobar",
+    "kilocalorie",
+    "kilogram",
+    "kilogram_meter_per_second",
+    "kilogram_per_cubic_meter",
+    "kilojoule",
     "length",
     "m",
+    "m_e",
     "magnetic_moment",
     "magnetization",
+    "mass",
+    "mass_density",
     "meV",
+    "megapascal",
     "meter",
     "meter_per_second",
+    "meter_per_second_squared",
     "metre",
+    "micrometer",
+    "microsecond",
     "millielectron_volt",
+    "millimeter",
+    "millisecond",
+    "mm",
+    "momentum",
+    "ms",
     "mu_B",
     "nanometer",
+    "nanosecond",
     "newton",
     "newton_per_meter",
     "nm",
+    "ns",
     "one",
     "particle_density",
     "pascal",
@@ -844,7 +1321,9 @@ __all__ = [
     "per_fs",
     "per_ps",
     "per_second",
+    "picometer",
     "picosecond",
+    "pm",
     "pressure",
     "ps",
     "rad",
@@ -856,11 +1335,22 @@ __all__ = [
     "sqrt",
     "square_centimeter",
     "square_meter",
+    "statC",
+    "statV",
+    "statcoulomb",
+    "statcoulomb_centimeter",
+    "statvolt",
+    "statvolt_per_centimeter",
     "temperature",
     "temperature_difference",
     "temperature_rate",
     "terahertz",
     "time",
+    "um",
+    "us",
     "velocity",
+    "volt",
+    "volt_per_angstrom",
+    "volt_per_meter",
     "volume",
 ]

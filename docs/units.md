@@ -81,16 +81,18 @@ available. Where a flat name conflicts with a namespace, the namespace wins: use
 
 A unit system names one unit per base axis. Every kind's unit is the product of
 those units raised to the kind's dimensions, so arithmetic inside one system
-never converts. Import the built-in systems from `quantype.systems`:
+does not convert. A system may store a few kinds in units of their own instead,
+as LAMMPS does; only arithmetic producing or consuming those kinds rescales, by
+a constant factor. Import the built-in systems from `quantype.systems`:
 
-| System | Length | Energy | Time | Magnetic moment |
-| --- | --- | --- | --- | --- |
-| `Atomistic` (default) | Å | eV | fs | μB |
-| `Metal` (LAMMPS) | Å | eV | ps | μB |
-| `Real` (LAMMPS) | Å | kcal/mol | fs | μB |
-| `SI` | m | J | s | A·m² |
-| `CGS` | cm | erg | s | erg/G |
-| `Atomic` (Hartree) | a0 | Ha | ħ/Eₕ | eħ/mₑ |
+| System | Length | Energy | Time | Charge | Magnetic moment | Own units |
+| --- | --- | --- | --- | --- | --- | --- |
+| `Atomistic` (default) | Å | eV | fs | e | μB | |
+| `Metal` (LAMMPS) | Å | eV | ps | e | μB | mass g/mol, pressure bar, density g/cm³ |
+| `Real` (LAMMPS) | Å | kcal/mol | fs | e | μB | mass g/mol, pressure atm, electric field V/Å, density g/cm³ |
+| `SI` | m | J | s | C | A·m² | |
+| `CGS` | cm | erg | s | statC | erg/G | |
+| `Atomic` (Hartree) | a0 | Ha | ħ/Eₕ | e | eħ/mₑ | |
 
 Temperature is kelvin in every built-in system, and atom and electron counts are
 1. For each built-in system and kind, `System.unit_for(Kind)` is a named
@@ -115,6 +117,33 @@ assert (x + metal.to_system(SI)).magnitude(u.nm) == pytest.approx(2.5)
 kernel_input = (2 * u.nm).to_system(Real)  # LAMMPS real units
 assert kernel_input.value == pytest.approx(20.0)
 ```
+
+`Metal` and `Real` store every quantity LAMMPS documents for `units metal` and
+`units real` in LAMMPS's units, so its raw numbers wrap directly. Torque and
+dynamic viscosity have no quantype kinds.
+
+```python
+import pytest
+
+from quantype import Area, Force, Mass, Pressure, Velocity, u
+from quantype.systems import Metal
+
+assert Metal.unit_for(Pressure) is u.bar
+assert Metal.unit_for(Mass) is u.gram_per_mole
+stress = Force[float, Metal](1, u.eV_per_angstrom) / Area[float, Metal](
+    1, u.angstrom_squared
+)
+assert stress.value == pytest.approx(1.602176634e6)  # bar, as LAMMPS stores it
+
+mass = Mass[float, Metal](1, u.gram_per_mole)
+speed = Velocity[float, Metal](1, u.angstrom_per_ps)
+assert (mass * speed * speed).value == pytest.approx(1.0364269e-4)  # LAMMPS mvv2e
+```
+
+LAMMPS converts internally with its own constants, rounded to about seven
+digits from older CODATA values (in `metal`, `boltz = 8.617343e-5`). Values it
+derives with them, such as a temperature from kinetic energy, can differ from
+quantype's in the seventh significant figure.
 
 Systems never mix implicitly. Combining quantities from two systems is a type
 error in mypy, Pyright, Pyrefly, and ty, and a `TypeError` at runtime.
@@ -201,6 +230,16 @@ distinct despite equal dimensions. `Force / Area` yields `Pressure`;
 `Energy / Volume` yields `EnergyDensity`. Incompatible operations are rejected
 both by the supported type checkers and at runtime.
 
+Each declared product also names the divisions that undo it: because
+`Force * Length` is `Energy`, `Energy / Force` is `Length` and `Energy / Length`
+is `Force`. A declared division takes precedence, so `Energy / Volume` stays
+`EnergyDensity` although `Pressure * Volume` is `Energy`.
+
+Beyond lengths, energies and times, the catalogue covers mechanics (`Mass`,
+`Momentum`, `Acceleration`, `MassDensity`), electrostatics (`Charge`,
+`ElectricPotential`, `ElectricField`, `DipoleMoment`), and `Entropy` and
+`Action`, the kinds of the Boltzmann and Planck constants.
+
 Unlisted products retain structural types such as
 `Quantity[Mul[LengthKind, TimeKind], float]`, not `Any`. These quantities
 support arithmetic and reductions while retaining their structural kinds.
@@ -211,21 +250,50 @@ scalar reciprocals are ambiguous and raise `TypeError`; supply an explicit
 dimensionless quantity numerator instead. There is no arbitrary symbolic
 cancellation or inference of physical meaning from dimensions alone.
 
-Absolute temperatures are affine points:
+Absolute temperatures are points: subtracting two gives a difference, and adding
+or summing them is rejected, though their mean is valid. Every system stores
+temperatures on a kelvin scale, so they multiply, divide, and scale like other
+quantities:
 
 ```python
 from typing import assert_type
 
-from quantype import Temperature, TemperatureDifference, u
+from quantype import Energy, Temperature, TemperatureDifference, constants, u
 
 cold = Temperature[float](0, u.temperature.celsius)
 warm = Temperature[float](300, u.temperature.kelvin)
 assert_type(warm - cold, TemperatureDifference[float])
+assert_type(constants.k_B * warm, Energy[float])
+assert repr(2 * (20 * u.celsius)) == "Temperature(586.3 K)"
 ```
 
-Differences can be scaled; absolute temperatures cannot be added together,
-multiplied, scaled, or exponentiated. Means of absolute temperatures are valid;
-sums are not.
+Scaling drops a Celsius display: twice 20 °C is 586.3 K, which would read as
+313.15 °C.
+
+## Physical constants
+
+`quantype.constants` provides `k_B`, `h`, `hbar`, `e`, `m_e`, `m_u`, `c`,
+`epsilon_0`, and `k_e`, from the process's CODATA edition. A constant is exact in
+every unit system, so it has none of its own: arithmetic with a quantity adopts
+that quantity's system.
+
+```python
+import pytest
+
+from quantype import Energy, Temperature, constants, u
+from quantype.systems import SI, Metal
+
+thermal = constants.k_B * Temperature[float, SI](300, u.K)
+assert isinstance(thermal, Energy)
+assert thermal.system is SI
+assert repr(constants.k_B) == "Constant(k_B = 8.617333262145179e-05 eV/K)"
+assert repr(constants.k_B.to_system(SI)) == "Entropy(1.380649e-23 J/K, SI)"
+assert constants.hbar.magnitude(u.joule_second) == pytest.approx(1.0545718e-34)
+assert constants.m_u.to_system(Metal).magnitude() == pytest.approx(1.0)  # g/mol
+```
+
+`epsilon_0` and `k_e` have structural kinds, as do their products:
+`constants.k_e * q1 * q2 / r` has an energy's dimensions but no declared name.
 
 ## Comparisons, indexing, and reductions
 
@@ -275,8 +343,8 @@ superscript ² means only the squares leave the range.
 | `Atomistic` | safe | safe |
 | `Metal` | safe | safe |
 | `Real` | safe | safe |
-| `SI` | Area², ElectronDensity², EnergyPerAtom², Energy², MagneticMoment², ParticleDensity², Volume² | safe |
-| `CGS` | Area², ElectronDensity², MagneticMoment², ParticleDensity², Volume² | safe |
+| `SI` | Acceleration², Action², Area², Charge², DipoleMoment², ElectronDensity², EnergyPerAtom², Energy², Entropy², MagneticMoment², Mass², Momentum², ParticleDensity², Volume² | safe |
+| `CGS` | Acceleration², Action², Area², DipoleMoment², ElectronDensity², MagneticMoment², Mass², Momentum², ParticleDensity², Volume² | safe |
 | `Atomic` | safe | safe |
 
 float16 cannot hold typical magnitudes of most kinds in any system. Constructing

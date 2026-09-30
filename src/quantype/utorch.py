@@ -9,8 +9,10 @@ except ModuleNotFoundError as exc:
         raise
     raise ModuleNotFoundError("Install quantype[torch] to use quantype.utorch") from exc
 
+from quantype._internal._systems import coherence
 from quantype.core import (
     Quantity,
+    _rescaled,  # pyright: ignore[reportPrivateUsage]
     _wrap,  # pyright: ignore[reportPrivateUsage]
     result_kind,
 )
@@ -45,4 +47,11 @@ def grad(
         retain_graph=retain_graph,
     )
     kind = result_kind("div", output._semantic, inputs._semantic)  # noqa: SLF001
-    return _wrap(kind, value, inputs.system)
+    # Raw derivatives are coherent, except where the system overrides a kind.
+    system = inputs.system
+    scale = (
+        coherence(system, output._semantic)  # noqa: SLF001
+        / coherence(system, inputs._semantic)  # noqa: SLF001
+        / coherence(system, kind)
+    )
+    return _wrap(kind, _rescaled(value, scale), system)

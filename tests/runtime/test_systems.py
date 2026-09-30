@@ -24,8 +24,9 @@ from quantype import (
     Time,
     u,
 )
-from quantype._internal._registry import RELATIONS
-from quantype._internal._systems import range_table
+from quantype._internal._registry import RELATIONS, close_relations
+from quantype._internal._semantics import KINDS
+from quantype._internal._systems import coherence, range_table
 from quantype._internal._unit import known_kinds
 from quantype.core import get_unit
 from quantype.serialization import load_npz, save_npz
@@ -69,11 +70,14 @@ SYSTEMS = (*BUILTIN, Gromacs, GromacsFs)
 
 @pytest.mark.parametrize("system", SYSTEMS, ids=lambda s: s.__name__)
 def test_systems_are_coherent(system: type[UnitSystem]) -> None:
-    for (operation, left, right), result in RELATIONS.items():
-        lhs = system.unit_for(left).scale
-        rhs = system.unit_for(right).scale
+    def coherent(kind: str) -> float:
+        # Overridden kinds (LAMMPS pressure in bar) are not coherent by design.
+        return system.unit_for(kind).scale / coherence(system, KINDS[kind])
+
+    for (operation, left, right), result in close_relations(RELATIONS).items():
+        lhs, rhs = coherent(left), coherent(right)
         expected = lhs * rhs if operation == "mul" else lhs / rhs
-        assert math.isclose(system.unit_for(result).scale, expected, rel_tol=1e-9), (
+        assert math.isclose(coherent(result), expected, rel_tol=1e-9), (
             operation,
             left,
             right,

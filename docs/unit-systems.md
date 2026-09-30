@@ -12,40 +12,38 @@ need. Nothing is registered globally: the class is usable as soon as it is
 defined, as custom units are.
 
 ```python
-from quantype import Energy, u
+from quantype import u
 from quantype.systems import UnitSystem
-
-# GROMACS uses kJ/mol, which is not a catalogue unit: define it first.
-kJ_per_mol = Energy.define_unit(
-    "gromacs:kJ_per_mol", reference=u.joule, scale=1e3 / 6.02214076e23, symbol="kJ/mol"
-)
 
 
 class Gromacs(UnitSystem, name="gromacs"):
     length = u.nanometer
-    energy = kJ_per_mol
+    energy = u.kJ_per_mol
     time = u.picosecond
-    # Temperature (K), magnetic moment (μB) and the atom/electron counts are
-    # inherited from UnitSystem's defaults unless overridden.
+    # GROMACS reports pressure in bar, not in kJ/mol/nm³.
+    overrides = (u.bar,)
+    # Temperature (K), charge (e), magnetic moment (μB) and the atom and
+    # electron counts are inherited from UnitSystem's defaults.
 ```
+
+A base unit can be any unit of its axis's kind, including one you define with
+`Kind.define_unit`. `overrides` lists units that replace the derived unit of
+their kind; arithmetic producing or consuming those kinds rescales.
 
 Using it looks the same as using a built-in system:
 
 ```python
 import numpy as np
 import numpy.typing as npt
-from quantype import Energy, Force, Length, u
+from quantype import Force, Length, u
 from quantype.systems import Atomistic, UnitSystem
-
-kJ_per_mol = Energy.define_unit(
-    "gromacs:kJ_per_mol", reference=u.joule, scale=1e3 / 6.02214076e23, symbol="kJ/mol"
-)
 
 
 class Gromacs(UnitSystem, name="gromacs"):
     length = u.nanometer
-    energy = kJ_per_mol
+    energy = u.kJ_per_mol
     time = u.picosecond
+    overrides = (u.bar,)
 
 
 cutoff = Length[float, Gromacs](1.2, u.nm)
@@ -66,6 +64,7 @@ than mid-calculation:
 | Each base unit has the kind of its axis. | `Gromacs.energy must be an Energy unit; received Length (nanometer)` |
 | The temperature base is kelvin-scaled, because affine units (°C) aren't coherent. | `Temperature base must not have an offset; use kelvin` |
 | Every derived scale for every catalogue kind is finite and non-zero in float64. | `Huge gives Area a scale that overflows float64` |
+| `overrides` holds units of non-axis kinds, at most one per kind, without offsets. | `Gromacs overrides Length, a base axis; set its base unit instead` |
 
 A system is used as a class, never instantiated. The class name does not appear
 on the wire, so renaming the class never changes stored data; only `name=`

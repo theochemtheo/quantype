@@ -204,8 +204,9 @@ assert isclose(typed.value, point.value)
 
 Absolute temperatures are points, not differences: subtracting two gives a
 `TemperatureDifference`. Use difference units (`u.delta_celsius`,
-`u.delta_kelvin`) for differences. Adding two absolute temperatures or scaling
-one is rejected; their mean is valid but their sum is not.
+`u.delta_kelvin`) for differences. Adding or summing absolute temperatures is
+rejected, but their mean is valid, and they multiply like other quantities:
+`constants.k_B * warm` is an energy.
 
 Custom units need no global registration. Supply definitions again when decoding:
 `units=(...)` for direct parsing, or `context={"units": (...)}` for Pydantic

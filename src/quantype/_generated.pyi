@@ -15,19 +15,26 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype import units as _units
-from quantype.core import Quantity, Unit
+from quantype.core import Constant, Quantity, Unit, _Operand
 from quantype.kinds import (
+    AccelerationKind,
+    ActionKind,
     AngleKind,
     AreaKind,
     AtomCountKind,
+    ChargeKind,
     DimensionlessKind,
+    DipoleMomentKind,
     Div,
+    ElectricFieldKind,
+    ElectricPotentialKind,
     ElectronCountKind,
     ElectronDensityKind,
     EnergyDensityKind,
     EnergyKind,
     EnergyPerAtomKind,
     EnergyPerVolumeKind,
+    EntropyKind,
     ForceConstantKind,
     ForceKind,
     FrequencyKind,
@@ -35,8 +42,10 @@ from quantype.kinds import (
     LengthKind,
     MagneticMomentKind,
     MagnetizationKind,
+    MassDensityKind,
+    MassKind,
+    MomentumKind,
     Mul,
-    NonAffineKind,
     ParticleDensityKind,
     Pow,
     PressureKind,
@@ -207,6 +216,14 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     def __mul__(self, other: EnergyPerVolume[V, S], /) -> EnergyPerVolume[V, S]: ...
     @overload
     def __mul__[W](
+        self: Dimensionless[float, S], other: Temperature[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __mul__(self, other: Temperature[float, S], /) -> Temperature[V, S]: ...
+    @overload
+    def __mul__(self, other: Temperature[V, S], /) -> Temperature[V, S]: ...
+    @overload
+    def __mul__[W](
         self: Dimensionless[float, S], other: TemperatureDifference[W, S], /
     ) -> TemperatureDifference[W, S]: ...
     @overload
@@ -298,17 +315,99 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     @overload
     def __mul__(self, other: ElectronCount[V, S], /) -> ElectronCount[V, S]: ...
     @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: Mass[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __mul__(self, other: Mass[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __mul__(self, other: Mass[V, S], /) -> Mass[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: MassDensity[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __mul__(self, other: MassDensity[float, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __mul__(self, other: MassDensity[V, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: Momentum[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __mul__(self, other: Momentum[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__(self, other: Momentum[V, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: Acceleration[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __mul__(self, other: Acceleration[float, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __mul__(self, other: Acceleration[V, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: Charge[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __mul__(self, other: Charge[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __mul__(self, other: Charge[V, S], /) -> Charge[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: ElectricPotential[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __mul__(
+        self, other: ElectricPotential[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__(self, other: ElectricPotential[V, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: ElectricField[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __mul__(self, other: ElectricField[float, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __mul__(self, other: ElectricField[V, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: DipoleMoment[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __mul__(self, other: DipoleMoment[float, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__(self, other: DipoleMoment[V, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: Entropy[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __mul__(self, other: Entropy[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __mul__(self, other: Entropy[V, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Dimensionless[float, S], other: Action[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __mul__(self, other: Action[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __mul__(self, other: Action[V, S], /) -> Action[V, S]: ...
+    @overload
     def __mul__(self, other: float, /) -> Dimensionless[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Dimensionless[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[DimensionlessKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[DimensionlessKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[DimensionlessKind, K], V, S]: ...
     @overload
@@ -329,17 +428,33 @@ class Dimensionless(Quantity[DimensionlessKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Dimensionless[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: Dimensionless[float, S], other: Frequency[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __truediv__(self, other: Frequency[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__(self, other: Frequency[V, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Dimensionless[float, S], other: InverseTime[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __truediv__(self, other: InverseTime[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__(self, other: InverseTime[V, S], /) -> Time[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> Dimensionless[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Dimensionless[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[DimensionlessKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[DimensionlessKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[DimensionlessKind, K], V, S]: ...
     @override
@@ -424,6 +539,22 @@ class Length(Quantity[LengthKind, V, S]):
     def __mul__(self, other: ForceConstant[V, S], /) -> Force[V, S]: ...
     @overload
     def __mul__[W](
+        self: Length[float, S], other: ElectricField[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __mul__(self, other: ElectricField[float, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__(self, other: ElectricField[V, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Length[float, S], other: Charge[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __mul__(self, other: Charge[float, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__(self, other: Charge[V, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__[W](
         self: Length[float, S], other: Dimensionless[W, S], /
     ) -> Length[W, S]: ...
     @overload
@@ -433,27 +564,19 @@ class Length(Quantity[LengthKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Length[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Length[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[LengthKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[LengthKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[LengthKind, K], V, S]: ...
     @overload
     @override
-    def __truediv__[W](
-        self: Length[float, S], other: Time[W, S], /
-    ) -> Velocity[W, S]: ...
-    @overload
-    def __truediv__(self, other: Time[float, S], /) -> Velocity[V, S]: ...
-    @overload
-    def __truediv__(self, other: Time[V, S], /) -> Velocity[V, S]: ...
-    @overload
     def __truediv__[W](
         self: Length[float, S], other: Length[W, S], /
     ) -> Dimensionless[W, S]: ...
@@ -470,17 +593,33 @@ class Length(Quantity[LengthKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Length[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: Length[float, S], other: Velocity[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __truediv__(self, other: Velocity[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__(self, other: Velocity[V, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Length[float, S], other: Time[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __truediv__(self, other: Time[float, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __truediv__(self, other: Time[V, S], /) -> Velocity[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> Length[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Length[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[LengthKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[LengthKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[LengthKind, K], V, S]: ...
     @override
@@ -567,27 +706,19 @@ class Area(Quantity[AreaKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Area[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Area[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[AreaKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[AreaKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[AreaKind, K], V, S]: ...
     @overload
     @override
-    def __truediv__[W](
-        self: Area[float, S], other: Length[W, S], /
-    ) -> Length[W, S]: ...
-    @overload
-    def __truediv__(self, other: Length[float, S], /) -> Length[V, S]: ...
-    @overload
-    def __truediv__(self, other: Length[V, S], /) -> Length[V, S]: ...
-    @overload
     def __truediv__[W](
         self: Area[float, S], other: Area[W, S], /
     ) -> Dimensionless[W, S]: ...
@@ -604,17 +735,25 @@ class Area(Quantity[AreaKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Area[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: Area[float, S], other: Length[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __truediv__(self, other: Length[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__(self, other: Length[V, S], /) -> Length[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> Area[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Area[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[AreaKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[AreaKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[AreaKind, K], V, S]: ...
     @override
@@ -673,6 +812,22 @@ class Volume(Quantity[VolumeKind, V, S]):
     @overload
     @override
     def __mul__[W](
+        self: Volume[float, S], other: Pressure[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: Pressure[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: Pressure[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Volume[float, S], other: MassDensity[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __mul__(self, other: MassDensity[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __mul__(self, other: MassDensity[V, S], /) -> Mass[V, S]: ...
+    @overload
+    def __mul__[W](
         self: Volume[float, S], other: ParticleDensity[W, S], /
     ) -> AtomCount[W, S]: ...
     @overload
@@ -706,35 +861,19 @@ class Volume(Quantity[VolumeKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Volume[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Volume[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[VolumeKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[VolumeKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[VolumeKind, K], V, S]: ...
     @overload
     @override
-    def __truediv__[W](
-        self: Volume[float, S], other: Length[W, S], /
-    ) -> Area[W, S]: ...
-    @overload
-    def __truediv__(self, other: Length[float, S], /) -> Area[V, S]: ...
-    @overload
-    def __truediv__(self, other: Length[V, S], /) -> Area[V, S]: ...
-    @overload
-    def __truediv__[W](
-        self: Volume[float, S], other: Area[W, S], /
-    ) -> Length[W, S]: ...
-    @overload
-    def __truediv__(self, other: Area[float, S], /) -> Length[V, S]: ...
-    @overload
-    def __truediv__(self, other: Area[V, S], /) -> Length[V, S]: ...
-    @overload
     def __truediv__[W](
         self: Volume[float, S], other: Volume[W, S], /
     ) -> Dimensionless[W, S]: ...
@@ -751,17 +890,33 @@ class Volume(Quantity[VolumeKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Volume[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: Volume[float, S], other: Area[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __truediv__(self, other: Area[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__(self, other: Area[V, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Volume[float, S], other: Length[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __truediv__(self, other: Length[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __truediv__(self, other: Length[V, S], /) -> Area[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> Volume[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Volume[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[VolumeKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[VolumeKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[VolumeKind, K], V, S]: ...
     @override
@@ -826,6 +981,20 @@ class Time(Quantity[TimeKind, V, S]):
     def __mul__(self, other: Velocity[V, S], /) -> Length[V, S]: ...
     @overload
     def __mul__[W](
+        self: Time[float, S], other: Acceleration[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __mul__(self, other: Acceleration[float, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __mul__(self, other: Acceleration[V, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __mul__[W](self: Time[float, S], other: Force[W, S], /) -> Momentum[W, S]: ...
+    @overload
+    def __mul__(self, other: Force[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__(self, other: Force[V, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__[W](
         self: Time[float, S], other: TemperatureRate[W, S], /
     ) -> TemperatureDifference[W, S]: ...
     @overload
@@ -837,6 +1006,28 @@ class Time(Quantity[TimeKind, V, S]):
         self, other: TemperatureRate[V, S], /
     ) -> TemperatureDifference[V, S]: ...
     @overload
+    def __mul__[W](self: Time[float, S], other: Energy[W, S], /) -> Action[W, S]: ...
+    @overload
+    def __mul__(self, other: Energy[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __mul__(self, other: Energy[V, S], /) -> Action[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Time[float, S], other: Frequency[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __mul__(self, other: Frequency[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __mul__(self, other: Frequency[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Time[float, S], other: InverseTime[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __mul__(self, other: InverseTime[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __mul__(self, other: InverseTime[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
     def __mul__[W](
         self: Time[float, S], other: Dimensionless[W, S], /
     ) -> Time[W, S]: ...
@@ -847,15 +1038,15 @@ class Time(Quantity[TimeKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Time[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Time[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[TimeKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[TimeKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[TimeKind, K], V, S]: ...
     @overload
@@ -878,15 +1069,15 @@ class Time(Quantity[TimeKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> Time[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Time[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[TimeKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[TimeKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[TimeKind, K], V, S]: ...
     @override
@@ -953,6 +1144,22 @@ class Velocity(Quantity[VelocityKind, V, S]):
     def __mul__(self, other: Time[V, S], /) -> Length[V, S]: ...
     @overload
     def __mul__[W](
+        self: Velocity[float, S], other: Mass[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __mul__(self, other: Mass[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__(self, other: Mass[V, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Velocity[float, S], other: Momentum[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: Momentum[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: Momentum[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
         self: Velocity[float, S], other: Dimensionless[W, S], /
     ) -> Velocity[W, S]: ...
     @overload
@@ -962,15 +1169,15 @@ class Velocity(Quantity[VelocityKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Velocity[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Velocity[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[VelocityKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[VelocityKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[VelocityKind, K], V, S]: ...
     @overload
@@ -991,17 +1198,33 @@ class Velocity(Quantity[VelocityKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Velocity[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: Velocity[float, S], other: Acceleration[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __truediv__(self, other: Acceleration[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__(self, other: Acceleration[V, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Velocity[float, S], other: Time[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __truediv__(self, other: Time[float, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __truediv__(self, other: Time[V, S], /) -> Acceleration[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> Velocity[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Velocity[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[VelocityKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[VelocityKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[VelocityKind, K], V, S]: ...
     @override
@@ -1061,6 +1284,12 @@ class Energy(Quantity[EnergyKind, V, S]):
     ) -> Energy[V, S]: ...
     @overload
     @override
+    def __mul__[W](self: Energy[float, S], other: Time[W, S], /) -> Action[W, S]: ...
+    @overload
+    def __mul__(self, other: Time[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __mul__(self, other: Time[V, S], /) -> Action[V, S]: ...
+    @overload
     def __mul__[W](
         self: Energy[float, S], other: Dimensionless[W, S], /
     ) -> Energy[W, S]: ...
@@ -1071,27 +1300,19 @@ class Energy(Quantity[EnergyKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Energy[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Energy[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[EnergyKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[EnergyKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[EnergyKind, K], V, S]: ...
     @overload
     @override
-    def __truediv__[W](
-        self: Energy[float, S], other: Length[W, S], /
-    ) -> Force[W, S]: ...
-    @overload
-    def __truediv__(self, other: Length[float, S], /) -> Force[V, S]: ...
-    @overload
-    def __truediv__(self, other: Length[V, S], /) -> Force[V, S]: ...
-    @overload
     def __truediv__[W](
         self: Energy[float, S], other: Area[W, S], /
     ) -> ForceConstant[W, S]: ...
@@ -1117,6 +1338,14 @@ class Energy(Quantity[EnergyKind, V, S]):
     def __truediv__(self, other: AtomCount[V, S], /) -> EnergyPerAtom[V, S]: ...
     @overload
     def __truediv__[W](
+        self: Energy[float, S], other: Entropy[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __truediv__(self, other: Entropy[float, S], /) -> Temperature[V, S]: ...
+    @overload
+    def __truediv__(self, other: Entropy[V, S], /) -> Temperature[V, S]: ...
+    @overload
+    def __truediv__[W](
         self: Energy[float, S], other: Energy[W, S], /
     ) -> Dimensionless[W, S]: ...
     @overload
@@ -1132,17 +1361,139 @@ class Energy(Quantity[EnergyKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Energy[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: Force[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __truediv__(self, other: Force[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__(self, other: Force[V, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: Length[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __truediv__(self, other: Length[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __truediv__(self, other: Length[V, S], /) -> Force[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: ForceConstant[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __truediv__(self, other: ForceConstant[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __truediv__(self, other: ForceConstant[V, S], /) -> Area[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: Pressure[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __truediv__(self, other: Pressure[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __truediv__(self, other: Pressure[V, S], /) -> Volume[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: Momentum[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __truediv__(self, other: Momentum[float, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __truediv__(self, other: Momentum[V, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: Velocity[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __truediv__(self, other: Velocity[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __truediv__(self, other: Velocity[V, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: EnergyPerAtom[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __truediv__(self, other: EnergyPerAtom[float, S], /) -> AtomCount[V, S]: ...
+    @overload
+    def __truediv__(self, other: EnergyPerAtom[V, S], /) -> AtomCount[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: Temperature[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __truediv__(self, other: Temperature[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __truediv__(self, other: Temperature[V, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: TemperatureDifference[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __truediv__(
+        self, other: TemperatureDifference[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __truediv__(self, other: TemperatureDifference[V, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: Charge[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __truediv__(self, other: Charge[float, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __truediv__(self, other: Charge[V, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: ElectricPotential[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricPotential[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricPotential[V, S], /) -> Charge[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: DipoleMoment[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __truediv__(self, other: DipoleMoment[float, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__(self, other: DipoleMoment[V, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: ElectricField[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricField[float, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricField[V, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: Action[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __truediv__(self, other: Action[float, S], /) -> InverseTime[V, S]: ...
+    @overload
+    def __truediv__(self, other: Action[V, S], /) -> InverseTime[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Energy[float, S], other: InverseTime[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __truediv__(self, other: InverseTime[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __truediv__(self, other: InverseTime[V, S], /) -> Action[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> Energy[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Energy[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[EnergyKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[EnergyKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[EnergyKind, K], V, S]: ...
     @override
@@ -1222,15 +1573,15 @@ class EnergyPerAtom(Quantity[EnergyPerAtomKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> EnergyPerAtom[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: EnergyPerAtom[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[EnergyPerAtomKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[EnergyPerAtomKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[EnergyPerAtomKind, K], V, S]: ...
     @overload
@@ -1253,15 +1604,15 @@ class EnergyPerAtom(Quantity[EnergyPerAtomKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> EnergyPerAtom[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: EnergyPerAtom[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[EnergyPerAtomKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[EnergyPerAtomKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[EnergyPerAtomKind, K], V, S]: ...
     @override
@@ -1327,6 +1678,12 @@ class Force(Quantity[ForceKind, V, S]):
     @overload
     def __mul__(self, other: Length[V, S], /) -> Energy[V, S]: ...
     @overload
+    def __mul__[W](self: Force[float, S], other: Time[W, S], /) -> Momentum[W, S]: ...
+    @overload
+    def __mul__(self, other: Time[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__(self, other: Time[V, S], /) -> Momentum[V, S]: ...
+    @overload
     def __mul__[W](
         self: Force[float, S], other: Dimensionless[W, S], /
     ) -> Force[W, S]: ...
@@ -1337,15 +1694,15 @@ class Force(Quantity[ForceKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Force[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Force[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[ForceKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[ForceKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[ForceKind, K], V, S]: ...
     @overload
@@ -1382,17 +1739,57 @@ class Force(Quantity[ForceKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> Force[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: Force[float, S], other: ForceConstant[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __truediv__(self, other: ForceConstant[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__(self, other: ForceConstant[V, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Force[float, S], other: Mass[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __truediv__(self, other: Mass[float, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __truediv__(self, other: Mass[V, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Force[float, S], other: Acceleration[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __truediv__(self, other: Acceleration[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __truediv__(self, other: Acceleration[V, S], /) -> Mass[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Force[float, S], other: Charge[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __truediv__(self, other: Charge[float, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__(self, other: Charge[V, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Force[float, S], other: ElectricField[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricField[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricField[V, S], /) -> Charge[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> Force[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Force[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[ForceKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[ForceKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ForceKind, K], V, S]: ...
     @override
@@ -1480,15 +1877,15 @@ class ForceConstant(Quantity[ForceConstantKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> ForceConstant[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: ForceConstant[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[ForceConstantKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[ForceConstantKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[ForceConstantKind, K], V, S]: ...
     @overload
@@ -1511,15 +1908,15 @@ class ForceConstant(Quantity[ForceConstantKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> ForceConstant[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: ForceConstant[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[ForceConstantKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[ForceConstantKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ForceConstantKind, K], V, S]: ...
     @override
@@ -1584,6 +1981,14 @@ class Pressure(Quantity[PressureKind, V, S]):
     @overload
     @override
     def __mul__[W](
+        self: Pressure[float, S], other: Volume[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: Volume[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: Volume[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
         self: Pressure[float, S], other: Dimensionless[W, S], /
     ) -> Pressure[W, S]: ...
     @overload
@@ -1593,15 +1998,15 @@ class Pressure(Quantity[PressureKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Pressure[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Pressure[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[PressureKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[PressureKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[PressureKind, K], V, S]: ...
     @overload
@@ -1624,15 +2029,15 @@ class Pressure(Quantity[PressureKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> Pressure[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Pressure[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[PressureKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[PressureKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[PressureKind, K], V, S]: ...
     @override
@@ -1706,15 +2111,15 @@ class EnergyDensity(Quantity[EnergyDensityKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> EnergyDensity[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: EnergyDensity[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[EnergyDensityKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[EnergyDensityKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[EnergyDensityKind, K], V, S]: ...
     @overload
@@ -1737,15 +2142,15 @@ class EnergyDensity(Quantity[EnergyDensityKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> EnergyDensity[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: EnergyDensity[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[EnergyDensityKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[EnergyDensityKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[EnergyDensityKind, K], V, S]: ...
     @override
@@ -1819,15 +2224,15 @@ class EnergyPerVolume(Quantity[EnergyPerVolumeKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> EnergyPerVolume[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: EnergyPerVolume[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[EnergyPerVolumeKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[EnergyPerVolumeKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[EnergyPerVolumeKind, K], V, S]: ...
     @overload
@@ -1854,15 +2259,15 @@ class EnergyPerVolume(Quantity[EnergyPerVolumeKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> EnergyPerVolume[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: EnergyPerVolume[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[EnergyPerVolumeKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[EnergyPerVolumeKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[EnergyPerVolumeKind, K], V, S]: ...
     @override
@@ -1930,7 +2335,82 @@ class Temperature(Quantity[TemperatureKind, V, S]):
     ) -> TemperatureDifference[V, S]: ...
     @overload
     def __sub__(self, other: Temperature[V, S], /) -> TemperatureDifference[V, S]: ...
-    __abs__: None  # type: ignore[assignment]
+    @override
+    def __neg__(self) -> Temperature[V, S]: ...
+    @override
+    def __abs__(self) -> Temperature[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: Temperature[float, S], other: Entropy[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: Entropy[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: Entropy[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Temperature[float, S], other: Dimensionless[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> Temperature[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> Temperature[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> Temperature[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: Temperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[TemperatureKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[TemperatureKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[TemperatureKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: Temperature[float, S], other: Temperature[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: Temperature[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: Temperature[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Temperature[float, S], other: Dimensionless[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> Temperature[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> Temperature[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> Temperature[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: Temperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[TemperatureKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[TemperatureKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[TemperatureKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> Temperature[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, TemperatureKind], V, S]: ...
+    @override
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Quantity[Pow[TemperatureKind, N], V, S]: ...
 
 class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
     @classmethod
@@ -2001,6 +2481,14 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
     @overload
     @override
     def __mul__[W](
+        self: TemperatureDifference[float, S], other: Entropy[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: Entropy[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: Entropy[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
         self: TemperatureDifference[float, S], other: Dimensionless[W, S], /
     ) -> TemperatureDifference[W, S]: ...
     @overload
@@ -2012,15 +2500,15 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> TemperatureDifference[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: TemperatureDifference[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[TemperatureDifferenceKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[TemperatureDifferenceKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[TemperatureDifferenceKind, K], V, S]: ...
     @overload
@@ -2057,17 +2545,25 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind, V, S]):
         self, other: Dimensionless[V, S], /
     ) -> TemperatureDifference[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: TemperatureDifference[float, S], other: TemperatureRate[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __truediv__(self, other: TemperatureRate[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__(self, other: TemperatureRate[V, S], /) -> Time[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> TemperatureDifference[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: TemperatureDifference[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[TemperatureDifferenceKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[TemperatureDifferenceKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[TemperatureDifferenceKind, K], V, S]: ...
     @override
@@ -2149,15 +2645,15 @@ class TemperatureRate(Quantity[TemperatureRateKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> TemperatureRate[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: TemperatureRate[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[TemperatureRateKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[TemperatureRateKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[TemperatureRateKind, K], V, S]: ...
     @overload
@@ -2184,15 +2680,15 @@ class TemperatureRate(Quantity[TemperatureRateKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> TemperatureRate[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: TemperatureRate[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[TemperatureRateKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[TemperatureRateKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[TemperatureRateKind, K], V, S]: ...
     @override
@@ -2266,15 +2762,15 @@ class MagneticMoment(Quantity[MagneticMomentKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> MagneticMoment[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: MagneticMoment[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[MagneticMomentKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[MagneticMomentKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[MagneticMomentKind, K], V, S]: ...
     @overload
@@ -2307,17 +2803,25 @@ class MagneticMoment(Quantity[MagneticMomentKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> MagneticMoment[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: MagneticMoment[float, S], other: Magnetization[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __truediv__(self, other: Magnetization[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __truediv__(self, other: Magnetization[V, S], /) -> Volume[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> MagneticMoment[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: MagneticMoment[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[MagneticMomentKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[MagneticMomentKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[MagneticMomentKind, K], V, S]: ...
     @override
@@ -2399,15 +2903,15 @@ class Magnetization(Quantity[MagnetizationKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Magnetization[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Magnetization[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[MagnetizationKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[MagnetizationKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[MagnetizationKind, K], V, S]: ...
     @overload
@@ -2430,15 +2934,15 @@ class Magnetization(Quantity[MagnetizationKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> Magnetization[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Magnetization[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[MagnetizationKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[MagnetizationKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[MagnetizationKind, K], V, S]: ...
     @override
@@ -2520,15 +3024,15 @@ class ParticleDensity(Quantity[ParticleDensityKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> ParticleDensity[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: ParticleDensity[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[ParticleDensityKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[ParticleDensityKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[ParticleDensityKind, K], V, S]: ...
     @overload
@@ -2555,15 +3059,15 @@ class ParticleDensity(Quantity[ParticleDensityKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> ParticleDensity[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: ParticleDensity[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[ParticleDensityKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[ParticleDensityKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ParticleDensityKind, K], V, S]: ...
     @override
@@ -2645,15 +3149,15 @@ class ElectronDensity(Quantity[ElectronDensityKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> ElectronDensity[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: ElectronDensity[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[ElectronDensityKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[ElectronDensityKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[ElectronDensityKind, K], V, S]: ...
     @overload
@@ -2680,15 +3184,15 @@ class ElectronDensity(Quantity[ElectronDensityKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> ElectronDensity[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: ElectronDensity[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[ElectronDensityKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[ElectronDensityKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ElectronDensityKind, K], V, S]: ...
     @override
@@ -2758,15 +3262,15 @@ class Angle(Quantity[AngleKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Angle[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Angle[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[AngleKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[AngleKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[AngleKind, K], V, S]: ...
     @overload
@@ -2789,15 +3293,15 @@ class Angle(Quantity[AngleKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> Angle[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Angle[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[AngleKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[AngleKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[AngleKind, K], V, S]: ...
     @override
@@ -2860,6 +3364,14 @@ class Frequency(Quantity[FrequencyKind, V, S]):
     @overload
     @override
     def __mul__[W](
+        self: Frequency[float, S], other: Time[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __mul__(self, other: Time[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __mul__(self, other: Time[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __mul__[W](
         self: Frequency[float, S], other: Dimensionless[W, S], /
     ) -> Frequency[W, S]: ...
     @overload
@@ -2869,15 +3381,15 @@ class Frequency(Quantity[FrequencyKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> Frequency[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: Frequency[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[FrequencyKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[FrequencyKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[FrequencyKind, K], V, S]: ...
     @overload
@@ -2900,23 +3412,21 @@ class Frequency(Quantity[FrequencyKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> Frequency[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: Frequency[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[FrequencyKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[FrequencyKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[FrequencyKind, K], V, S]: ...
     @override
     def __rmul__(self, other: float, /) -> Frequency[V, S]: ...
     @override
-    def __rtruediv__(
-        self, other: float, /
-    ) -> Quantity[Div[DimensionlessKind, FrequencyKind], V, S]: ...
+    def __rtruediv__(self, other: float, /) -> Time[V, S]: ...  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]
     @override
     def __pow__[N: int](
         self, exponent: N, /
@@ -2973,6 +3483,22 @@ class InverseTime(Quantity[InverseTimeKind, V, S]):
     @overload
     @override
     def __mul__[W](
+        self: InverseTime[float, S], other: Time[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __mul__(self, other: Time[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __mul__(self, other: Time[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: InverseTime[float, S], other: Action[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: Action[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: Action[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
         self: InverseTime[float, S], other: Dimensionless[W, S], /
     ) -> InverseTime[W, S]: ...
     @overload
@@ -2982,15 +3508,15 @@ class InverseTime(Quantity[InverseTimeKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> InverseTime[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: InverseTime[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[InverseTimeKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[InverseTimeKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[InverseTimeKind, K], V, S]: ...
     @overload
@@ -3013,23 +3539,21 @@ class InverseTime(Quantity[InverseTimeKind, V, S]):
     @overload
     def __truediv__(self, other: float, /) -> InverseTime[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: InverseTime[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[InverseTimeKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[InverseTimeKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[InverseTimeKind, K], V, S]: ...
     @override
     def __rmul__(self, other: float, /) -> InverseTime[V, S]: ...
     @override
-    def __rtruediv__(
-        self, other: float, /
-    ) -> Quantity[Div[DimensionlessKind, InverseTimeKind], V, S]: ...
+    def __rtruediv__(self, other: float, /) -> Time[V, S]: ...  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]
     @override
     def __pow__[N: int](
         self, exponent: N, /
@@ -3103,15 +3627,15 @@ class AtomCount(Quantity[AtomCountKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> AtomCount[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: AtomCount[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[AtomCountKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[AtomCountKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[AtomCountKind, K], V, S]: ...
     @overload
@@ -3140,17 +3664,25 @@ class AtomCount(Quantity[AtomCountKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> AtomCount[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: AtomCount[float, S], other: ParticleDensity[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __truediv__(self, other: ParticleDensity[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __truediv__(self, other: ParticleDensity[V, S], /) -> Volume[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> AtomCount[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: AtomCount[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[AtomCountKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[AtomCountKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[AtomCountKind, K], V, S]: ...
     @override
@@ -3224,15 +3756,15 @@ class ElectronCount(Quantity[ElectronCountKind, V, S]):
     @overload
     def __mul__(self, other: float, /) -> ElectronCount[V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind, W](
+    def __mul__[K, W](
         self: ElectronCount[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Mul[ElectronCountKind, K], W, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Mul[ElectronCountKind, K], V, S]: ...
     @overload
-    def __mul__[K: NonAffineKind](
+    def __mul__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Mul[ElectronCountKind, K], V, S]: ...
     @overload
@@ -3261,17 +3793,25 @@ class ElectronCount(Quantity[ElectronCountKind, V, S]):
     @overload
     def __truediv__(self, other: Dimensionless[V, S], /) -> ElectronCount[V, S]: ...
     @overload
+    def __truediv__[W](
+        self: ElectronCount[float, S], other: ElectronDensity[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __truediv__(self, other: ElectronDensity[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __truediv__(self, other: ElectronDensity[V, S], /) -> Volume[V, S]: ...
+    @overload
     def __truediv__(self, other: float, /) -> ElectronCount[V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind, W](
+    def __truediv__[K, W](
         self: ElectronCount[float, S], other: Quantity[K, W, S], /
     ) -> Quantity[Div[ElectronCountKind, K], W, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, float, S], /
     ) -> Quantity[Div[ElectronCountKind, K], V, S]: ...
     @overload
-    def __truediv__[K: NonAffineKind](
+    def __truediv__[K](
         self, other: Quantity[K, V, S], /
     ) -> Quantity[Div[ElectronCountKind, K], V, S]: ...
     @override
@@ -3284,3 +3824,4849 @@ class ElectronCount(Quantity[ElectronCountKind, V, S]):
     def __pow__[N: int](
         self, exponent: N, /
     ) -> Quantity[Pow[ElectronCountKind, N], V, S]: ...
+
+class Mass(Quantity[MassKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[MassKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._MassUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> Mass[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Mass[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Mass[V, T]: ...
+    @overload
+    @override
+    def __add__[W](self: Mass[float, S], other: Mass[W, S], /) -> Mass[W, S]: ...
+    @overload
+    def __add__(self, other: Mass[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __add__(self, other: Mass[V, S], /) -> Mass[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](self: Mass[float, S], other: Mass[W, S], /) -> Mass[W, S]: ...
+    @overload
+    def __sub__(self, other: Mass[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __sub__(self, other: Mass[V, S], /) -> Mass[V, S]: ...
+    @override
+    def __neg__(self) -> Mass[V, S]: ...
+    @override
+    def __abs__(self) -> Mass[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> Mass[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: Mass[float, S], other: Velocity[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __mul__(self, other: Velocity[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__(self, other: Velocity[V, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Mass[float, S], other: Acceleration[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __mul__(self, other: Acceleration[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __mul__(self, other: Acceleration[V, S], /) -> Force[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Mass[float, S], other: Dimensionless[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> Mass[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> Mass[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: Mass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[MassKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[MassKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[MassKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: Mass[float, S], other: Mass[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: Mass[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: Mass[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Mass[float, S], other: Dimensionless[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> Mass[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Mass[float, S], other: MassDensity[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __truediv__(self, other: MassDensity[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __truediv__(self, other: MassDensity[V, S], /) -> Volume[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Mass[float, S], other: Volume[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __truediv__(self, other: Volume[float, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __truediv__(self, other: Volume[V, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> Mass[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: Mass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[MassKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[MassKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[MassKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> Mass[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, MassKind], V, S]: ...
+    @override
+    def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[MassKind, N], V, S]: ...
+
+class MassDensity(Quantity[MassDensityKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[MassDensityKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._MassDensityUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> MassDensity[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> MassDensity[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> MassDensity[V, T]: ...
+    @overload
+    @override
+    def __add__[W](
+        self: MassDensity[float, S], other: MassDensity[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __add__(self, other: MassDensity[float, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __add__(self, other: MassDensity[V, S], /) -> MassDensity[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](
+        self: MassDensity[float, S], other: MassDensity[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __sub__(self, other: MassDensity[float, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __sub__(self, other: MassDensity[V, S], /) -> MassDensity[V, S]: ...
+    @override
+    def __neg__(self) -> MassDensity[V, S]: ...
+    @override
+    def __abs__(self) -> MassDensity[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> MassDensity[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: MassDensity[float, S], other: Volume[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __mul__(self, other: Volume[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __mul__(self, other: Volume[V, S], /) -> Mass[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: MassDensity[float, S], other: Dimensionless[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> MassDensity[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: MassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[MassDensityKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[MassDensityKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[MassDensityKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: MassDensity[float, S], other: MassDensity[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: MassDensity[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: MassDensity[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: MassDensity[float, S], other: Dimensionless[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> MassDensity[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> MassDensity[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: MassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[MassDensityKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[MassDensityKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[MassDensityKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> MassDensity[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, MassDensityKind], V, S]: ...
+    @override
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Quantity[Pow[MassDensityKind, N], V, S]: ...
+
+class Momentum(Quantity[MomentumKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[MomentumKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._MomentumUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> Momentum[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Momentum[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Momentum[V, T]: ...
+    @overload
+    @override
+    def __add__[W](
+        self: Momentum[float, S], other: Momentum[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __add__(self, other: Momentum[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __add__(self, other: Momentum[V, S], /) -> Momentum[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](
+        self: Momentum[float, S], other: Momentum[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __sub__(self, other: Momentum[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __sub__(self, other: Momentum[V, S], /) -> Momentum[V, S]: ...
+    @override
+    def __neg__(self) -> Momentum[V, S]: ...
+    @override
+    def __abs__(self) -> Momentum[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> Momentum[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: Momentum[float, S], other: Velocity[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: Velocity[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: Velocity[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Momentum[float, S], other: Dimensionless[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> Momentum[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: Momentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[MomentumKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[MomentumKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[MomentumKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: Momentum[float, S], other: Momentum[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: Momentum[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: Momentum[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Momentum[float, S], other: Dimensionless[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Momentum[float, S], other: Mass[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __truediv__(self, other: Mass[float, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __truediv__(self, other: Mass[V, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Momentum[float, S], other: Velocity[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __truediv__(self, other: Velocity[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __truediv__(self, other: Velocity[V, S], /) -> Mass[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Momentum[float, S], other: Force[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __truediv__(self, other: Force[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__(self, other: Force[V, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Momentum[float, S], other: Time[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __truediv__(self, other: Time[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __truediv__(self, other: Time[V, S], /) -> Force[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> Momentum[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: Momentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[MomentumKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[MomentumKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[MomentumKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> Momentum[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, MomentumKind], V, S]: ...
+    @override
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Quantity[Pow[MomentumKind, N], V, S]: ...
+
+class Acceleration(Quantity[AccelerationKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[AccelerationKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._AccelerationUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> Acceleration[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Acceleration[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Acceleration[V, T]: ...
+    @overload
+    @override
+    def __add__[W](
+        self: Acceleration[float, S], other: Acceleration[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __add__(self, other: Acceleration[float, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __add__(self, other: Acceleration[V, S], /) -> Acceleration[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](
+        self: Acceleration[float, S], other: Acceleration[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __sub__(self, other: Acceleration[float, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __sub__(self, other: Acceleration[V, S], /) -> Acceleration[V, S]: ...
+    @override
+    def __neg__(self) -> Acceleration[V, S]: ...
+    @override
+    def __abs__(self) -> Acceleration[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> Acceleration[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: Acceleration[float, S], other: Time[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __mul__(self, other: Time[float, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __mul__(self, other: Time[V, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Acceleration[float, S], other: Mass[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __mul__(self, other: Mass[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __mul__(self, other: Mass[V, S], /) -> Force[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Acceleration[float, S], other: Dimensionless[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> Acceleration[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: Acceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[AccelerationKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[AccelerationKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[AccelerationKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: Acceleration[float, S], other: Acceleration[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: Acceleration[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: Acceleration[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Acceleration[float, S], other: Dimensionless[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> Acceleration[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> Acceleration[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: Acceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[AccelerationKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[AccelerationKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[AccelerationKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> Acceleration[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, AccelerationKind], V, S]: ...
+    @override
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Quantity[Pow[AccelerationKind, N], V, S]: ...
+
+class Charge(Quantity[ChargeKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[ChargeKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._ChargeUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> Charge[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Charge[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Charge[V, T]: ...
+    @overload
+    @override
+    def __add__[W](self: Charge[float, S], other: Charge[W, S], /) -> Charge[W, S]: ...
+    @overload
+    def __add__(self, other: Charge[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __add__(self, other: Charge[V, S], /) -> Charge[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](self: Charge[float, S], other: Charge[W, S], /) -> Charge[W, S]: ...
+    @overload
+    def __sub__(self, other: Charge[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __sub__(self, other: Charge[V, S], /) -> Charge[V, S]: ...
+    @override
+    def __neg__(self) -> Charge[V, S]: ...
+    @override
+    def __abs__(self) -> Charge[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> Charge[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: Charge[float, S], other: ElectricPotential[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: ElectricPotential[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: ElectricPotential[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Charge[float, S], other: ElectricField[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __mul__(self, other: ElectricField[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __mul__(self, other: ElectricField[V, S], /) -> Force[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Charge[float, S], other: Length[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __mul__(self, other: Length[float, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__(self, other: Length[V, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Charge[float, S], other: Dimensionless[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> Charge[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> Charge[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: Charge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[ChargeKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[ChargeKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[ChargeKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: Charge[float, S], other: Charge[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: Charge[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: Charge[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Charge[float, S], other: Dimensionless[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> Charge[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> Charge[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: Charge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[ChargeKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[ChargeKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[ChargeKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> Charge[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, ChargeKind], V, S]: ...
+    @override
+    def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[ChargeKind, N], V, S]: ...
+
+class ElectricPotential(Quantity[ElectricPotentialKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[ElectricPotentialKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._ElectricPotentialUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> ElectricPotential[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> ElectricPotential[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ElectricPotential[V, T]: ...
+    @overload
+    @override
+    def __add__[W](
+        self: ElectricPotential[float, S], other: ElectricPotential[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __add__(
+        self, other: ElectricPotential[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __add__(self, other: ElectricPotential[V, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](
+        self: ElectricPotential[float, S], other: ElectricPotential[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __sub__(
+        self, other: ElectricPotential[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __sub__(self, other: ElectricPotential[V, S], /) -> ElectricPotential[V, S]: ...
+    @override
+    def __neg__(self) -> ElectricPotential[V, S]: ...
+    @override
+    def __abs__(self) -> ElectricPotential[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: ElectricPotential[float, S], other: Charge[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: Charge[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: Charge[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: ElectricPotential[float, S], other: Dimensionless[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: ElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[ElectricPotentialKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[ElectricPotentialKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[ElectricPotentialKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: ElectricPotential[float, S], other: ElectricPotential[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(
+        self, other: ElectricPotential[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricPotential[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: ElectricPotential[float, S], other: Dimensionless[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __truediv__(
+        self, other: Dimensionless[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: ElectricPotential[float, S], other: ElectricField[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricField[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricField[V, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: ElectricPotential[float, S], other: Length[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __truediv__(self, other: Length[float, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__(self, other: Length[V, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: ElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[ElectricPotentialKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[ElectricPotentialKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[ElectricPotentialKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> ElectricPotential[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, ElectricPotentialKind], V, S]: ...
+    @override
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Quantity[Pow[ElectricPotentialKind, N], V, S]: ...
+
+class ElectricField(Quantity[ElectricFieldKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[ElectricFieldKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._ElectricFieldUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> ElectricField[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> ElectricField[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ElectricField[V, T]: ...
+    @overload
+    @override
+    def __add__[W](
+        self: ElectricField[float, S], other: ElectricField[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __add__(self, other: ElectricField[float, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __add__(self, other: ElectricField[V, S], /) -> ElectricField[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](
+        self: ElectricField[float, S], other: ElectricField[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __sub__(self, other: ElectricField[float, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __sub__(self, other: ElectricField[V, S], /) -> ElectricField[V, S]: ...
+    @override
+    def __neg__(self) -> ElectricField[V, S]: ...
+    @override
+    def __abs__(self) -> ElectricField[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> ElectricField[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: ElectricField[float, S], other: Length[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __mul__(self, other: Length[float, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__(self, other: Length[V, S], /) -> ElectricPotential[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: ElectricField[float, S], other: Charge[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __mul__(self, other: Charge[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __mul__(self, other: Charge[V, S], /) -> Force[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: ElectricField[float, S], other: DipoleMoment[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: DipoleMoment[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: DipoleMoment[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: ElectricField[float, S], other: Dimensionless[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> ElectricField[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: ElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[ElectricFieldKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[ElectricFieldKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[ElectricFieldKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: ElectricField[float, S], other: ElectricField[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricField[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: ElectricField[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: ElectricField[float, S], other: Dimensionless[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> ElectricField[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: ElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[ElectricFieldKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[ElectricFieldKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[ElectricFieldKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> ElectricField[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, ElectricFieldKind], V, S]: ...
+    @override
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Quantity[Pow[ElectricFieldKind, N], V, S]: ...
+
+class DipoleMoment(Quantity[DipoleMomentKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[DipoleMomentKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._DipoleMomentUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> DipoleMoment[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> DipoleMoment[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> DipoleMoment[V, T]: ...
+    @overload
+    @override
+    def __add__[W](
+        self: DipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __add__(self, other: DipoleMoment[float, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __add__(self, other: DipoleMoment[V, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](
+        self: DipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __sub__(self, other: DipoleMoment[float, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __sub__(self, other: DipoleMoment[V, S], /) -> DipoleMoment[V, S]: ...
+    @override
+    def __neg__(self) -> DipoleMoment[V, S]: ...
+    @override
+    def __abs__(self) -> DipoleMoment[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: DipoleMoment[float, S], other: ElectricField[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: ElectricField[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: ElectricField[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: DipoleMoment[float, S], other: Dimensionless[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: DipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[DipoleMomentKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[DipoleMomentKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[DipoleMomentKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: DipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: DipoleMoment[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: DipoleMoment[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: DipoleMoment[float, S], other: Dimensionless[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: DipoleMoment[float, S], other: Charge[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __truediv__(self, other: Charge[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__(self, other: Charge[V, S], /) -> Length[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: DipoleMoment[float, S], other: Length[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __truediv__(self, other: Length[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __truediv__(self, other: Length[V, S], /) -> Charge[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> DipoleMoment[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: DipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[DipoleMomentKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[DipoleMomentKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[DipoleMomentKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> DipoleMoment[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, DipoleMomentKind], V, S]: ...
+    @override
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Quantity[Pow[DipoleMomentKind, N], V, S]: ...
+
+class Entropy(Quantity[EntropyKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[EntropyKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._EntropyUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> Entropy[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Entropy[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Entropy[V, T]: ...
+    @overload
+    @override
+    def __add__[W](
+        self: Entropy[float, S], other: Entropy[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __add__(self, other: Entropy[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __add__(self, other: Entropy[V, S], /) -> Entropy[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](
+        self: Entropy[float, S], other: Entropy[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __sub__(self, other: Entropy[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __sub__(self, other: Entropy[V, S], /) -> Entropy[V, S]: ...
+    @override
+    def __neg__(self) -> Entropy[V, S]: ...
+    @override
+    def __abs__(self) -> Entropy[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> Entropy[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: Entropy[float, S], other: Temperature[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: Temperature[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: Temperature[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Entropy[float, S], other: TemperatureDifference[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: TemperatureDifference[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: TemperatureDifference[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Entropy[float, S], other: Dimensionless[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> Entropy[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: Entropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[EntropyKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[EntropyKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[EntropyKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: Entropy[float, S], other: Entropy[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: Entropy[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: Entropy[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Entropy[float, S], other: Dimensionless[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> Entropy[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: Entropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[EntropyKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[EntropyKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[EntropyKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> Entropy[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, EntropyKind], V, S]: ...
+    @override
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Quantity[Pow[EntropyKind, N], V, S]: ...
+
+class Action(Quantity[ActionKind, V, S]):
+    @classmethod
+    @override
+    def define_unit(
+        cls,
+        name: str,
+        *,
+        reference: Unit[ActionKind],
+        scale: float = 1.0,
+        offset: float = 0.0,
+        symbol: str | None = None,
+    ) -> _units._ActionUnit: ...
+    @classmethod
+    @override
+    def from_value[W](cls, value: W) -> Action[W, S]: ...
+    @classmethod
+    @override
+    def parse(
+        cls, data: object, *, units: tuple[Unit[Any], ...] = ()
+    ) -> Action[float | npt.NDArray[np.float64], S]: ...
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Action[V, T]: ...
+    @overload
+    @override
+    def __add__[W](self: Action[float, S], other: Action[W, S], /) -> Action[W, S]: ...
+    @overload
+    def __add__(self, other: Action[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __add__(self, other: Action[V, S], /) -> Action[V, S]: ...
+    @overload
+    @override
+    def __sub__[W](self: Action[float, S], other: Action[W, S], /) -> Action[W, S]: ...
+    @overload
+    def __sub__(self, other: Action[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __sub__(self, other: Action[V, S], /) -> Action[V, S]: ...
+    @override
+    def __neg__(self) -> Action[V, S]: ...
+    @override
+    def __abs__(self) -> Action[V, S]: ...
+    @override
+    def sum(
+        self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False
+    ) -> Action[V, S]: ...
+    @overload
+    @override
+    def __mul__[W](
+        self: Action[float, S], other: InverseTime[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __mul__(self, other: InverseTime[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__(self, other: InverseTime[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __mul__[W](
+        self: Action[float, S], other: Dimensionless[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __mul__(self, other: Dimensionless[V, S], /) -> Action[V, S]: ...
+    @overload
+    def __mul__(self, other: float, /) -> Action[V, S]: ...
+    @overload
+    def __mul__[K, W](
+        self: Action[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[ActionKind, K], W, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Mul[ActionKind, K], V, S]: ...
+    @overload
+    def __mul__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Mul[ActionKind, K], V, S]: ...
+    @overload
+    @override
+    def __truediv__[W](
+        self: Action[float, S], other: Action[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __truediv__(self, other: Action[float, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__(self, other: Action[V, S], /) -> Dimensionless[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Action[float, S], other: Dimensionless[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __truediv__(self, other: Dimensionless[V, S], /) -> Action[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Action[float, S], other: Energy[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __truediv__(self, other: Energy[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__(self, other: Energy[V, S], /) -> Time[V, S]: ...
+    @overload
+    def __truediv__[W](
+        self: Action[float, S], other: Time[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __truediv__(self, other: Time[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __truediv__(self, other: Time[V, S], /) -> Energy[V, S]: ...
+    @overload
+    def __truediv__(self, other: float, /) -> Action[V, S]: ...
+    @overload
+    def __truediv__[K, W](
+        self: Action[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Div[ActionKind, K], W, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, float, S], /
+    ) -> Quantity[Div[ActionKind, K], V, S]: ...
+    @overload
+    def __truediv__[K](
+        self, other: Quantity[K, V, S], /
+    ) -> Quantity[Div[ActionKind, K], V, S]: ...
+    @override
+    def __rmul__(self, other: float, /) -> Action[V, S]: ...
+    @override
+    def __rtruediv__(
+        self, other: float, /
+    ) -> Quantity[Div[DimensionlessKind, ActionKind], V, S]: ...
+    @override
+    def __pow__[N: int](self, exponent: N, /) -> Quantity[Pow[ActionKind, N], V, S]: ...
+
+class _DimensionlessConstant(Constant[DimensionlessKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Dimensionless[float, T]: ...
+    @override
+    def to(self, unit: Unit[DimensionlessKind]) -> Dimensionless[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Area[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Velocity[W, T], /) -> Velocity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Force[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Pressure[W, T], /) -> Pressure[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Momentum[W, T], /) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Entropy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Action[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[DimensionlessKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[DimensionlessKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Area[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Force[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Entropy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Action[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, DimensionlessKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[DimensionlessKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[DimensionlessKind, L]]: ...
+    @overload
+    @override
+    # pyrefly: ignore[bad-override]
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Time[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, DimensionlessKind], W, T]: ...  # ty: ignore[invalid-method-override]
+
+class _LengthConstant(Constant[LengthKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Length[float, T]: ...
+    @override
+    def to(self, unit: Unit[LengthKind]) -> Length[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Area[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Force[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[LengthKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[LengthKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Area[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Force[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, LengthKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Velocity[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Time[W, T], /) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[LengthKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[LengthKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, LengthKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, LengthKind], W, T]: ...
+
+class _AreaConstant(Constant[AreaKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Area[float, T]: ...
+    @override
+    def to(self, unit: Unit[AreaKind]) -> Area[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Area[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[AreaKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[AreaKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Area[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, AreaKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Length[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[AreaKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[AreaKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, AreaKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, AreaKind], W, T]: ...
+
+class _VolumeConstant(Constant[VolumeKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Volume[float, T]: ...
+    @override
+    def to(self, unit: Unit[VolumeKind]) -> Volume[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Pressure[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: MassDensity[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[VolumeKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[VolumeKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Pressure[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: MassDensity[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, VolumeKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Length[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[VolumeKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[VolumeKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, VolumeKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, VolumeKind], W, T]: ...
+
+class _TimeConstant(Constant[TimeKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Time[float, T]: ...
+    @override
+    def to(self, unit: Unit[TimeKind]) -> Time[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Velocity[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Force[W, T], /) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[TimeKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[TimeKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Velocity[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Force[W, T], /) -> Momentum[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, TimeKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[TimeKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[TimeKind, L]]: ...
+    @overload
+    @override
+    # pyrefly: ignore[bad-override]
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeConstant: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, TimeKind], W, T]: ...  # ty: ignore[invalid-method-override]
+
+class _VelocityConstant(Constant[VelocityKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Velocity[float, T]: ...
+    @override
+    def to(self, unit: Unit[VelocityKind]) -> Velocity[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Momentum[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[VelocityKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[VelocityKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Momentum[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Momentum[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, VelocityKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[VelocityKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[VelocityKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Length[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Mass[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, VelocityKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, VelocityKind], W, T]: ...
+
+class _EnergyConstant(Constant[EnergyKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Energy[float, T]: ...
+    @override
+    def to(self, unit: Unit[EnergyKind]) -> Energy[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[EnergyKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[EnergyKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, EnergyKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Length[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[EnergyKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[EnergyKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Action[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, EnergyKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, EnergyKind], W, T]: ...
+
+class _EnergyPerAtomConstant(Constant[EnergyPerAtomKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> EnergyPerAtom[float, T]: ...
+    @override
+    def to(self, unit: Unit[EnergyPerAtomKind]) -> EnergyPerAtom[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: AtomCount[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[EnergyPerAtomKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[EnergyPerAtomKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: AtomCount[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, EnergyPerAtomKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[EnergyPerAtomKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[EnergyPerAtomKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, EnergyPerAtomKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, EnergyPerAtomKind], W, T]: ...
+
+class _ForceConstant(Constant[ForceKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Force[float, T]: ...
+    @override
+    def to(self, unit: Unit[ForceKind]) -> Force[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[ForceKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[ForceKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Momentum[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, ForceKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Pressure[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Mass[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[ForceKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[ForceKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, ForceKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, ForceKind], W, T]: ...
+
+class _ForceConstantConstant(Constant[ForceConstantKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ForceConstant[float, T]: ...
+    @override
+    def to(self, unit: Unit[ForceConstantKind]) -> ForceConstant[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Area[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstantConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[ForceConstantKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[ForceConstantKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Area[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstantConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, ForceConstantKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstantConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[ForceConstantKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[ForceConstantKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, ForceConstantKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, ForceConstantKind], W, T]: ...
+
+class _PressureConstant(Constant[PressureKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Pressure[float, T]: ...
+    @override
+    def to(self, unit: Unit[PressureKind]) -> Pressure[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[PressureKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[PressureKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, PressureKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[PressureKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[PressureKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, PressureKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, PressureKind], W, T]: ...
+
+class _EnergyDensityConstant(Constant[EnergyDensityKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> EnergyDensity[float, T]: ...
+    @override
+    def to(self, unit: Unit[EnergyDensityKind]) -> EnergyDensity[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[EnergyDensityKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[EnergyDensityKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, EnergyDensityKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyDensityConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[EnergyDensityKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[EnergyDensityKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, EnergyDensityKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, EnergyDensityKind], W, T]: ...
+
+class _EnergyPerVolumeConstant(Constant[EnergyPerVolumeKind]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerVolume[float, T]: ...
+    @override
+    def to(self, unit: Unit[EnergyPerVolumeKind]) -> EnergyPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumeConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[EnergyPerVolumeKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[EnergyPerVolumeKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, EnergyPerVolumeKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumeConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[EnergyPerVolumeKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[EnergyPerVolumeKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, EnergyPerVolumeKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, EnergyPerVolumeKind], W, T]: ...
+
+class _TemperatureConstant(Constant[TemperatureKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Temperature[float, T]: ...
+    @override
+    def to(self, unit: Unit[TemperatureKind]) -> Temperature[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[TemperatureKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[TemperatureKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, TemperatureKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[TemperatureKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[TemperatureKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, TemperatureKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, TemperatureKind], W, T]: ...
+
+class _TemperatureDifferenceConstant(Constant[TemperatureDifferenceKind]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureDifference[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[TemperatureDifferenceKind]
+    ) -> TemperatureDifference[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[TemperatureDifferenceKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[TemperatureDifferenceKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, TemperatureDifferenceKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[TemperatureDifferenceKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[TemperatureDifferenceKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, TemperatureDifferenceKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, TemperatureDifferenceKind], W, T]: ...
+
+class _TemperatureRateConstant(Constant[TemperatureRateKind]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureRate[float, T]: ...
+    @override
+    def to(self, unit: Unit[TemperatureRateKind]) -> TemperatureRate[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureRateConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[TemperatureRateKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[TemperatureRateKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureRateConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, TemperatureRateKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureRateConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[TemperatureRateKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[TemperatureRateKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, TemperatureRateKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, TemperatureRateKind], W, T]: ...
+
+class _MagneticMomentConstant(Constant[MagneticMomentKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> MagneticMoment[float, T]: ...
+    @override
+    def to(self, unit: Unit[MagneticMomentKind]) -> MagneticMoment[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[MagneticMomentKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[MagneticMomentKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, MagneticMomentKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[MagneticMomentKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[MagneticMomentKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, MagneticMomentKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, MagneticMomentKind], W, T]: ...
+
+class _MagnetizationConstant(Constant[MagnetizationKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Magnetization[float, T]: ...
+    @override
+    def to(self, unit: Unit[MagnetizationKind]) -> Magnetization[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[MagnetizationKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[MagnetizationKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, MagnetizationKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[MagnetizationKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[MagnetizationKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, MagnetizationKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, MagnetizationKind], W, T]: ...
+
+class _ParticleDensityConstant(Constant[ParticleDensityKind]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ParticleDensity[float, T]: ...
+    @override
+    def to(self, unit: Unit[ParticleDensityKind]) -> ParticleDensity[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[ParticleDensityKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[ParticleDensityKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> AtomCount[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, ParticleDensityKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[ParticleDensityKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[ParticleDensityKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, ParticleDensityKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, ParticleDensityKind], W, T]: ...
+
+class _ElectronDensityConstant(Constant[ElectronDensityKind]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronDensity[float, T]: ...
+    @override
+    def to(self, unit: Unit[ElectronDensityKind]) -> ElectronDensity[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[ElectronDensityKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[ElectronDensityKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, ElectronDensityKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[ElectronDensityKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[ElectronDensityKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, ElectronDensityKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, ElectronDensityKind], W, T]: ...
+
+class _AngleConstant(Constant[AngleKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Angle[float, T]: ...
+    @override
+    def to(self, unit: Unit[AngleKind]) -> Angle[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Angle[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[AngleKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[AngleKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Angle[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, AngleKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Angle[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[AngleKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[AngleKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, AngleKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, AngleKind], W, T]: ...
+
+class _FrequencyConstant(Constant[FrequencyKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Frequency[float, T]: ...
+    @override
+    def to(self, unit: Unit[FrequencyKind]) -> Frequency[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[FrequencyKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[FrequencyKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, FrequencyKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[FrequencyKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[FrequencyKind, L]]: ...
+    @overload
+    @override
+    # pyrefly: ignore[bad-override]
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeConstant: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, FrequencyKind], W, T]: ...  # ty: ignore[invalid-method-override]
+
+class _InverseTimeConstant(Constant[InverseTimeKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> InverseTime[float, T]: ...
+    @override
+    def to(self, unit: Unit[InverseTimeKind]) -> InverseTime[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Action[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[InverseTimeKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[InverseTimeKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Action[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, InverseTimeKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[InverseTimeKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[InverseTimeKind, L]]: ...
+    @overload
+    @override
+    # pyrefly: ignore[bad-override]
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeConstant: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, InverseTimeKind], W, T]: ...  # ty: ignore[invalid-method-override]
+
+class _AtomCountConstant(Constant[AtomCountKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AtomCount[float, T]: ...
+    @override
+    def to(self, unit: Unit[AtomCountKind]) -> AtomCount[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[AtomCountKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[AtomCountKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, AtomCountKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[AtomCountKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[AtomCountKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, AtomCountKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, AtomCountKind], W, T]: ...
+
+class _ElectronCountConstant(Constant[ElectronCountKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ElectronCount[float, T]: ...
+    @override
+    def to(self, unit: Unit[ElectronCountKind]) -> ElectronCount[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[ElectronCountKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[ElectronCountKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, ElectronCountKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[ElectronCountKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[ElectronCountKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, ElectronCountKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, ElectronCountKind], W, T]: ...
+
+class _MassConstant(Constant[MassKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Mass[float, T]: ...
+    @override
+    def to(self, unit: Unit[MassKind]) -> Mass[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Velocity[W, T], /) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Mass[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[MassKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[MassKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Mass[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, MassKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Mass[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[MassKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[MassKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, MassKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, MassKind], W, T]: ...
+
+class _MassDensityConstant(Constant[MassDensityKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> MassDensity[float, T]: ...
+    @override
+    def to(self, unit: Unit[MassDensityKind]) -> MassDensity[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[MassDensityKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[MassDensityKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, MassDensityKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[MassDensityKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[MassDensityKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, MassDensityKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, MassDensityKind], W, T]: ...
+
+class _MomentumConstant(Constant[MomentumKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Momentum[float, T]: ...
+    @override
+    def to(self, unit: Unit[MomentumKind]) -> Momentum[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Velocity[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[MomentumKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[MomentumKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Velocity[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, MomentumKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Velocity[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Time[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[MomentumKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[MomentumKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, MomentumKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, MomentumKind], W, T]: ...
+
+class _AccelerationConstant(Constant[AccelerationKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Acceleration[float, T]: ...
+    @override
+    def to(self, unit: Unit[AccelerationKind]) -> Acceleration[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Velocity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[AccelerationKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[AccelerationKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Velocity[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, AccelerationKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[AccelerationKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[AccelerationKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, AccelerationKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, AccelerationKind], W, T]: ...
+
+class _ChargeConstant(Constant[ChargeKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Charge[float, T]: ...
+    @override
+    def to(self, unit: Unit[ChargeKind]) -> Charge[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[ChargeKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[ChargeKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, ChargeKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[ChargeKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[ChargeKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, ChargeKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, ChargeKind], W, T]: ...
+
+class _ElectricPotentialConstant(Constant[ElectricPotentialKind]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectricPotential[float, T]: ...
+    @override
+    def to(self, unit: Unit[ElectricPotentialKind]) -> ElectricPotential[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[ElectricPotentialKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[ElectricPotentialKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, ElectricPotentialKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[ElectricPotentialKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[ElectricPotentialKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, ElectricPotentialKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, ElectricPotentialKind], W, T]: ...
+
+class _ElectricFieldConstant(Constant[ElectricFieldKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ElectricField[float, T]: ...
+    @override
+    def to(self, unit: Unit[ElectricFieldKind]) -> ElectricField[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[ElectricFieldKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[ElectricFieldKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, ElectricFieldKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[ElectricFieldKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[ElectricFieldKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, ElectricFieldKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, ElectricFieldKind], W, T]: ...
+
+class _DipoleMomentConstant(Constant[DipoleMomentKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> DipoleMoment[float, T]: ...
+    @override
+    def to(self, unit: Unit[DipoleMomentKind]) -> DipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[DipoleMomentKind, L], W, T]: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[DipoleMomentKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, DipoleMomentKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Length[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[DipoleMomentKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[DipoleMomentKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, DipoleMomentKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, DipoleMomentKind], W, T]: ...
+
+class _EntropyConstant(Constant[EntropyKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Entropy[float, T]: ...
+    @override
+    def to(self, unit: Unit[EntropyKind]) -> Entropy[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[EntropyKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[EntropyKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, EntropyKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[EntropyKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[EntropyKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, EntropyKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, EntropyKind], W, T]: ...
+
+class _ActionConstant(Constant[ActionKind]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> Action[float, T]: ...
+    @override
+    def to(self, unit: Unit[ActionKind]) -> Action[float]: ...
+    @overload
+    @override
+    def __mul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ActionConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[ActionKind, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[ActionKind, L]]: ...
+    @overload
+    @override
+    def __rmul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __rmul__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, ActionKind], W, T]: ...
+    @overload
+    @override
+    def __truediv__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Dimensionless[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Time[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ActionConstant: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[ActionKind, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[ActionKind, L]]: ...
+    @overload
+    @override
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __rtruediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, ActionKind]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, ActionKind], W, T]: ...

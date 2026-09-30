@@ -7,16 +7,23 @@ from typing import Any, overload
 import numpy as np
 
 from quantype._generated import (
+    Acceleration,
+    Action,
     Angle,
     Area,
     AtomCount,
+    Charge,
     Dimensionless,
+    DipoleMoment,
+    ElectricField,
+    ElectricPotential,
     ElectronCount,
     ElectronDensity,
     Energy,
     EnergyDensity,
     EnergyPerAtom,
     EnergyPerVolume,
+    Entropy,
     Force,
     ForceConstant,
     Frequency,
@@ -24,6 +31,9 @@ from quantype._generated import (
     Length,
     MagneticMoment,
     Magnetization,
+    Mass,
+    MassDensity,
+    Momentum,
     ParticleDensity,
     Pressure,
     Temperature,
@@ -38,16 +48,23 @@ from quantype._internal._math import sin as sin
 from quantype._internal._math import sqrt as sqrt
 from quantype.core import Unit
 from quantype.kinds import (
+    AccelerationKind,
+    ActionKind,
     AngleKind,
     AreaKind,
     AtomCountKind,
+    ChargeKind,
     DimensionlessKind,
+    DipoleMomentKind,
+    ElectricFieldKind,
+    ElectricPotentialKind,
     ElectronCountKind,
     ElectronDensityKind,
     EnergyDensityKind,
     EnergyKind,
     EnergyPerAtomKind,
     EnergyPerVolumeKind,
+    EntropyKind,
     ForceConstantKind,
     ForceKind,
     FrequencyKind,
@@ -55,6 +72,9 @@ from quantype.kinds import (
     LengthKind,
     MagneticMomentKind,
     MagnetizationKind,
+    MassDensityKind,
+    MassKind,
+    MomentumKind,
     ParticleDensityKind,
     PressureKind,
     TemperatureDifferenceKind,
@@ -569,8 +589,210 @@ class _ElectronCountUnit(Unit[ElectronCountKind]):
     @overload
     def __rmul__[V](self, value: V, /) -> ElectronCount[V]: ...
 
+class _MassUnit(Unit[MassKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> Mass[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> Mass[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> Mass[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> Mass[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> Mass[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> Mass[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> Mass[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> Mass[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> Mass[V]: ...
+
+class _MassDensityUnit(Unit[MassDensityKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> MassDensity[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> MassDensity[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> MassDensity[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> MassDensity[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> MassDensity[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> MassDensity[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> MassDensity[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> MassDensity[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> MassDensity[V]: ...
+
+class _MomentumUnit(Unit[MomentumKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> Momentum[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> Momentum[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> Momentum[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> Momentum[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> Momentum[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> Momentum[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> Momentum[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> Momentum[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> Momentum[V]: ...
+
+class _AccelerationUnit(Unit[AccelerationKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> Acceleration[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> Acceleration[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> Acceleration[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> Acceleration[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> Acceleration[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> Acceleration[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> Acceleration[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> Acceleration[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> Acceleration[V]: ...
+
+class _ChargeUnit(Unit[ChargeKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> Charge[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> Charge[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> Charge[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> Charge[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> Charge[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> Charge[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> Charge[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> Charge[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> Charge[V]: ...
+
+class _ElectricPotentialUnit(Unit[ElectricPotentialKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> ElectricPotential[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> ElectricPotential[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> ElectricPotential[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> ElectricPotential[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> ElectricPotential[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> ElectricPotential[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> ElectricPotential[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> ElectricPotential[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> ElectricPotential[V]: ...
+
+class _ElectricFieldUnit(Unit[ElectricFieldKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> ElectricField[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> ElectricField[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> ElectricField[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> ElectricField[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> ElectricField[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> ElectricField[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> ElectricField[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> ElectricField[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> ElectricField[V]: ...
+
+class _DipoleMomentUnit(Unit[DipoleMomentKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> DipoleMoment[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> DipoleMoment[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> DipoleMoment[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> DipoleMoment[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> DipoleMoment[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> DipoleMoment[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> DipoleMoment[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> DipoleMoment[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> DipoleMoment[V]: ...
+
+class _EntropyUnit(Unit[EntropyKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> Entropy[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> Entropy[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> Entropy[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> Entropy[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> Entropy[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> Entropy[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> Entropy[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> Entropy[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> Entropy[V]: ...
+
+class _ActionUnit(Unit[ActionKind]):
+    @overload
+    def __call__[S: np.floating[Any]](self, value: S, /) -> Action[S]: ...
+    @overload
+    def __call__(self, value: float, /) -> Action[float]: ...
+    @overload
+    def __call__[V](self, value: V, /) -> Action[V]: ...
+    @overload
+    def __mul__[S: np.floating[Any]](self, value: S, /) -> Action[S]: ...
+    @overload
+    def __mul__(self, value: float, /) -> Action[float]: ...
+    @overload
+    def __mul__[V](self, value: V, /) -> Action[V]: ...
+    @overload
+    def __rmul__[S: np.floating[Any]](self, value: S, /) -> Action[S]: ...
+    @overload
+    def __rmul__(self, value: float, /) -> Action[float]: ...
+    @overload
+    def __rmul__[V](self, value: V, /) -> Action[V]: ...
+
 one: _DimensionlessUnit
 angstrom: _LengthUnit
+Angstrom: _LengthUnit
+Ang: _LengthUnit
 meter: _LengthUnit
 m: _LengthUnit
 metre: _LengthUnit
@@ -691,6 +913,90 @@ energy_per_volume_kcal_per_mol_per_angstrom_cubed: _EnergyPerVolumeUnit
 energy_per_volume_joule_per_cubic_meter: _EnergyPerVolumeUnit
 energy_per_volume_erg_per_cubic_centimeter: _EnergyPerVolumeUnit
 energy_per_volume_hartree_per_bohr_cubed: _EnergyPerVolumeUnit
+millimeter: _LengthUnit
+mm: _LengthUnit
+micrometer: _LengthUnit
+um: _LengthUnit
+picometer: _LengthUnit
+pm: _LengthUnit
+nanosecond: _TimeUnit
+ns: _TimeUnit
+microsecond: _TimeUnit
+us: _TimeUnit
+millisecond: _TimeUnit
+ms: _TimeUnit
+kilojoule: _EnergyUnit
+kJ: _EnergyUnit
+kilocalorie: _EnergyUnit
+kcal: _EnergyUnit
+kJ_per_mol: _EnergyUnit
+bar: _PressureUnit
+kilobar: _PressureUnit
+kbar: _PressureUnit
+atmosphere: _PressureUnit
+atm: _PressureUnit
+megapascal: _PressureUnit
+MPa: _PressureUnit
+inverse_centimeter: _FrequencyUnit
+eV_fs2_per_angstrom2: _MassUnit
+dalton: _MassUnit
+Da: _MassUnit
+amu: _MassUnit
+gram_per_mole: _MassUnit
+kilogram: _MassUnit
+kg: _MassUnit
+gram: _MassUnit
+g: _MassUnit
+electron_mass: _MassUnit
+m_e: _MassUnit
+eV_fs2_per_angstrom5: _MassDensityUnit
+gram_per_cubic_centimeter: _MassDensityUnit
+kilogram_per_cubic_meter: _MassDensityUnit
+electron_mass_per_bohr_cubed: _MassDensityUnit
+eV_fs_per_angstrom: _MomentumUnit
+eV_ps_per_angstrom: _MomentumUnit
+kcal_per_mol_fs_per_angstrom: _MomentumUnit
+kilogram_meter_per_second: _MomentumUnit
+gram_centimeter_per_second: _MomentumUnit
+atomic_momentum: _MomentumUnit
+angstrom_per_fs2: _AccelerationUnit
+angstrom_per_ps2: _AccelerationUnit
+meter_per_second_squared: _AccelerationUnit
+centimeter_per_second_squared: _AccelerationUnit
+atomic_acceleration: _AccelerationUnit
+elementary_charge: _ChargeUnit
+e: _ChargeUnit
+coulomb: _ChargeUnit
+C: _ChargeUnit
+statcoulomb: _ChargeUnit
+statC: _ChargeUnit
+volt: _ElectricPotentialUnit
+V: _ElectricPotentialUnit
+kcal_per_mol_per_e: _ElectricPotentialUnit
+statvolt: _ElectricPotentialUnit
+statV: _ElectricPotentialUnit
+hartree_per_e: _ElectricPotentialUnit
+volt_per_angstrom: _ElectricFieldUnit
+volt_per_meter: _ElectricFieldUnit
+statvolt_per_centimeter: _ElectricFieldUnit
+atomic_electric_field: _ElectricFieldUnit
+e_angstrom: _DipoleMomentUnit
+debye: _DipoleMomentUnit
+D: _DipoleMomentUnit
+coulomb_meter: _DipoleMomentUnit
+statcoulomb_centimeter: _DipoleMomentUnit
+e_bohr: _DipoleMomentUnit
+eV_per_kelvin: _EntropyUnit
+joule_per_kelvin: _EntropyUnit
+erg_per_kelvin: _EntropyUnit
+kcal_per_mol_per_kelvin: _EntropyUnit
+hartree_per_kelvin: _EntropyUnit
+eV_fs: _ActionUnit
+eV_ps: _ActionUnit
+kcal_per_mol_fs: _ActionUnit
+joule_second: _ActionUnit
+erg_second: _ActionUnit
+atomic_action: _ActionUnit
 
 class _DimensionlessNamespace:
     @property
@@ -709,6 +1015,12 @@ class _LengthNamespace:
     def nanometer(self) -> _LengthUnit: ...
     @property
     def bohr(self) -> _LengthUnit: ...
+    @property
+    def millimeter(self) -> _LengthUnit: ...
+    @property
+    def micrometer(self) -> _LengthUnit: ...
+    @property
+    def picometer(self) -> _LengthUnit: ...
 
 length: _LengthNamespace
 
@@ -745,6 +1057,12 @@ class _TimeNamespace:
     def second(self) -> _TimeUnit: ...
     @property
     def atomic_time(self) -> _TimeUnit: ...
+    @property
+    def nanosecond(self) -> _TimeUnit: ...
+    @property
+    def microsecond(self) -> _TimeUnit: ...
+    @property
+    def millisecond(self) -> _TimeUnit: ...
 
 time: _TimeNamespace
 
@@ -777,6 +1095,12 @@ class _EnergyNamespace:
     def kcal_per_mol(self) -> _EnergyUnit: ...
     @property
     def erg(self) -> _EnergyUnit: ...
+    @property
+    def kilojoule(self) -> _EnergyUnit: ...
+    @property
+    def kilocalorie(self) -> _EnergyUnit: ...
+    @property
+    def kJ_per_mol(self) -> _EnergyUnit: ...
 
 energy: _EnergyNamespace
 
@@ -835,6 +1159,14 @@ class _PressureNamespace:
     def kcal_per_mol_per_angstrom_cubed(self) -> _PressureUnit: ...
     @property
     def barye(self) -> _PressureUnit: ...
+    @property
+    def bar(self) -> _PressureUnit: ...
+    @property
+    def kilobar(self) -> _PressureUnit: ...
+    @property
+    def atmosphere(self) -> _PressureUnit: ...
+    @property
+    def megapascal(self) -> _PressureUnit: ...
 
 pressure: _PressureNamespace
 
@@ -961,6 +1293,8 @@ class _FrequencyNamespace:
     def hertz(self) -> _FrequencyUnit: ...
     @property
     def frequency_per_atomic_time(self) -> _FrequencyUnit: ...
+    @property
+    def inverse_centimeter(self) -> _FrequencyUnit: ...
 
 frequency: _FrequencyNamespace
 
@@ -988,38 +1322,193 @@ class _ElectronCountNamespace:
 
 electron_count: _ElectronCountNamespace
 
+class _MassNamespace:
+    @property
+    def eV_fs2_per_angstrom2(self) -> _MassUnit: ...
+    @property
+    def dalton(self) -> _MassUnit: ...
+    @property
+    def gram_per_mole(self) -> _MassUnit: ...
+    @property
+    def kilogram(self) -> _MassUnit: ...
+    @property
+    def gram(self) -> _MassUnit: ...
+    @property
+    def electron_mass(self) -> _MassUnit: ...
+
+mass: _MassNamespace
+
+class _MassDensityNamespace:
+    @property
+    def eV_fs2_per_angstrom5(self) -> _MassDensityUnit: ...
+    @property
+    def gram_per_cubic_centimeter(self) -> _MassDensityUnit: ...
+    @property
+    def kilogram_per_cubic_meter(self) -> _MassDensityUnit: ...
+    @property
+    def electron_mass_per_bohr_cubed(self) -> _MassDensityUnit: ...
+
+mass_density: _MassDensityNamespace
+
+class _MomentumNamespace:
+    @property
+    def eV_fs_per_angstrom(self) -> _MomentumUnit: ...
+    @property
+    def eV_ps_per_angstrom(self) -> _MomentumUnit: ...
+    @property
+    def kcal_per_mol_fs_per_angstrom(self) -> _MomentumUnit: ...
+    @property
+    def kilogram_meter_per_second(self) -> _MomentumUnit: ...
+    @property
+    def gram_centimeter_per_second(self) -> _MomentumUnit: ...
+    @property
+    def atomic_momentum(self) -> _MomentumUnit: ...
+
+momentum: _MomentumNamespace
+
+class _AccelerationNamespace:
+    @property
+    def angstrom_per_fs2(self) -> _AccelerationUnit: ...
+    @property
+    def angstrom_per_ps2(self) -> _AccelerationUnit: ...
+    @property
+    def meter_per_second_squared(self) -> _AccelerationUnit: ...
+    @property
+    def centimeter_per_second_squared(self) -> _AccelerationUnit: ...
+    @property
+    def atomic_acceleration(self) -> _AccelerationUnit: ...
+
+acceleration: _AccelerationNamespace
+
+class _ChargeNamespace:
+    @property
+    def elementary_charge(self) -> _ChargeUnit: ...
+    @property
+    def coulomb(self) -> _ChargeUnit: ...
+    @property
+    def statcoulomb(self) -> _ChargeUnit: ...
+
+charge: _ChargeNamespace
+
+class _ElectricPotentialNamespace:
+    @property
+    def volt(self) -> _ElectricPotentialUnit: ...
+    @property
+    def kcal_per_mol_per_e(self) -> _ElectricPotentialUnit: ...
+    @property
+    def statvolt(self) -> _ElectricPotentialUnit: ...
+    @property
+    def hartree_per_e(self) -> _ElectricPotentialUnit: ...
+
+electric_potential: _ElectricPotentialNamespace
+
+class _ElectricFieldNamespace:
+    @property
+    def volt_per_angstrom(self) -> _ElectricFieldUnit: ...
+    @property
+    def volt_per_meter(self) -> _ElectricFieldUnit: ...
+    @property
+    def statvolt_per_centimeter(self) -> _ElectricFieldUnit: ...
+    @property
+    def atomic_electric_field(self) -> _ElectricFieldUnit: ...
+
+electric_field: _ElectricFieldNamespace
+
+class _DipoleMomentNamespace:
+    @property
+    def e_angstrom(self) -> _DipoleMomentUnit: ...
+    @property
+    def debye(self) -> _DipoleMomentUnit: ...
+    @property
+    def coulomb_meter(self) -> _DipoleMomentUnit: ...
+    @property
+    def statcoulomb_centimeter(self) -> _DipoleMomentUnit: ...
+    @property
+    def e_bohr(self) -> _DipoleMomentUnit: ...
+
+dipole_moment: _DipoleMomentNamespace
+
+class _EntropyNamespace:
+    @property
+    def eV_per_kelvin(self) -> _EntropyUnit: ...
+    @property
+    def joule_per_kelvin(self) -> _EntropyUnit: ...
+    @property
+    def erg_per_kelvin(self) -> _EntropyUnit: ...
+    @property
+    def kcal_per_mol_per_kelvin(self) -> _EntropyUnit: ...
+    @property
+    def hartree_per_kelvin(self) -> _EntropyUnit: ...
+
+entropy: _EntropyNamespace
+
+class _ActionNamespace:
+    @property
+    def eV_fs(self) -> _ActionUnit: ...
+    @property
+    def eV_ps(self) -> _ActionUnit: ...
+    @property
+    def kcal_per_mol_fs(self) -> _ActionUnit: ...
+    @property
+    def joule_second(self) -> _ActionUnit: ...
+    @property
+    def erg_second(self) -> _ActionUnit: ...
+    @property
+    def atomic_action(self) -> _ActionUnit: ...
+
+action: _ActionNamespace
+
 __all__ = [
+    "Ang",
+    "Angstrom",
+    "C",
+    "D",
+    "Da",
     "GPa",
     "Ha",
     "Hz",
     "J",
     "J_per_atom",
     "K",
+    "MPa",
     "N",
     "Pa",
     "Ry",
     "THz",
+    "V",
+    "acceleration",
+    "action",
     "ampere_meter_squared",
     "ampere_per_meter",
+    "amu",
     "angle",
     "angstrom",
     "angstrom2",
     "angstrom3",
     "angstrom_cubed",
     "angstrom_per_fs",
+    "angstrom_per_fs2",
     "angstrom_per_ps",
+    "angstrom_per_ps2",
     "angstrom_squared",
     "area",
+    "atm",
+    "atmosphere",
     "atom",
     "atom_count",
     "atom_per_angstrom_cubed",
     "atom_per_bohr_cubed",
     "atom_per_cubic_centimeter",
     "atom_per_cubic_meter",
+    "atomic_acceleration",
+    "atomic_action",
+    "atomic_electric_field",
     "atomic_magnetic_moment",
     "atomic_magnetization",
+    "atomic_momentum",
     "atomic_time",
     "atomic_velocity",
+    "bar",
     "barye",
     "bohr",
     "bohr_cubed",
@@ -1029,9 +1518,15 @@ __all__ = [
     "celsius",
     "centimeter",
     "centimeter_per_second",
+    "centimeter_per_second_squared",
+    "charge",
     "cm",
+    "coulomb",
+    "coulomb_meter",
     "cubic_centimeter",
     "cubic_meter",
+    "dalton",
+    "debye",
     "deg",
     "degC",
     "degree",
@@ -1040,22 +1535,38 @@ __all__ = [
     "delta_degC",
     "delta_kelvin",
     "dimensionless",
+    "dipole_moment",
     "dyn",
     "dyne",
     "dyne_per_centimeter",
+    "e",
     "eV",
+    "eV_fs",
+    "eV_fs2_per_angstrom2",
+    "eV_fs2_per_angstrom5",
+    "eV_fs_per_angstrom",
     "eV_per_angstrom",
     "eV_per_angstrom_cubed",
     "eV_per_angstrom_squared",
     "eV_per_atom",
+    "eV_per_kelvin",
+    "eV_ps",
+    "eV_ps_per_angstrom",
+    "e_angstrom",
+    "e_bohr",
+    "electric_field",
+    "electric_potential",
     "electron",
     "electron_count",
     "electron_density",
+    "electron_mass",
+    "electron_mass_per_bohr_cubed",
     "electron_per_angstrom_cubed",
     "electron_per_bohr_cubed",
     "electron_per_cubic_centimeter",
     "electron_per_cubic_meter",
     "electron_volt",
+    "elementary_charge",
     "emu_per_cubic_centimeter",
     "energy",
     "energy_density",
@@ -1069,9 +1580,12 @@ __all__ = [
     "energy_per_volume_hartree_per_bohr_cubed",
     "energy_per_volume_joule_per_cubic_meter",
     "energy_per_volume_kcal_per_mol_per_angstrom_cubed",
+    "entropy",
     "erg",
     "erg_per_atom",
     "erg_per_gauss",
+    "erg_per_kelvin",
+    "erg_second",
     "exp",
     "femtosecond",
     "force",
@@ -1080,39 +1594,78 @@ __all__ = [
     "frequency_per_atomic_time",
     "frequency_per_fs",
     "fs",
+    "g",
     "gigapascal",
+    "gram",
+    "gram_centimeter_per_second",
+    "gram_per_cubic_centimeter",
+    "gram_per_mole",
     "hartree",
     "hartree_per_atom",
     "hartree_per_bohr",
     "hartree_per_bohr_cubed",
     "hartree_per_bohr_squared",
+    "hartree_per_e",
+    "hartree_per_kelvin",
     "hertz",
+    "inverse_centimeter",
     "inverse_time",
     "joule",
+    "joule_per_kelvin",
+    "joule_second",
+    "kJ",
+    "kJ_per_mol",
+    "kbar",
+    "kcal",
     "kcal_per_mol",
+    "kcal_per_mol_fs",
+    "kcal_per_mol_fs_per_angstrom",
     "kcal_per_mol_per_angstrom",
     "kcal_per_mol_per_angstrom_cubed",
     "kcal_per_mol_per_angstrom_squared",
     "kcal_per_mol_per_atom",
+    "kcal_per_mol_per_e",
+    "kcal_per_mol_per_kelvin",
     "kelvin",
     "kelvin_per_atomic_time",
     "kelvin_per_fs",
     "kelvin_per_ps",
     "kelvin_per_second",
+    "kg",
+    "kilobar",
+    "kilocalorie",
+    "kilogram",
+    "kilogram_meter_per_second",
+    "kilogram_per_cubic_meter",
+    "kilojoule",
     "length",
     "m",
+    "m_e",
     "magnetic_moment",
     "magnetization",
+    "mass",
+    "mass_density",
     "meV",
+    "megapascal",
     "meter",
     "meter_per_second",
+    "meter_per_second_squared",
     "metre",
+    "micrometer",
+    "microsecond",
     "millielectron_volt",
+    "millimeter",
+    "millisecond",
+    "mm",
+    "momentum",
+    "ms",
     "mu_B",
     "nanometer",
+    "nanosecond",
     "newton",
     "newton_per_meter",
     "nm",
+    "ns",
     "one",
     "particle_density",
     "pascal",
@@ -1120,7 +1673,9 @@ __all__ = [
     "per_fs",
     "per_ps",
     "per_second",
+    "picometer",
     "picosecond",
+    "pm",
     "pressure",
     "ps",
     "rad",
@@ -1132,11 +1687,22 @@ __all__ = [
     "sqrt",
     "square_centimeter",
     "square_meter",
+    "statC",
+    "statV",
+    "statcoulomb",
+    "statcoulomb_centimeter",
+    "statvolt",
+    "statvolt_per_centimeter",
     "temperature",
     "temperature_difference",
     "temperature_rate",
     "terahertz",
     "time",
+    "um",
+    "us",
     "velocity",
+    "volt",
+    "volt_per_angstrom",
+    "volt_per_meter",
     "volume",
 ]

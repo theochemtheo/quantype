@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Literal, override
 
-from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS
+from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS, close_relations
 
 
 @dataclass(frozen=True, eq=False)
@@ -97,7 +97,7 @@ def addition(left: Semantic, right: Semantic, *, subtract: bool) -> Semantic:
 
 PRODUCTS = {
     (op, KINDS[left], KINDS[right]): KINDS[result]
-    for (op, left, right), result in RELATIONS.items()
+    for (op, left, right), result in close_relations(RELATIONS).items()
 }
 EXPONENTS = {
     (KINDS[name], power): KINDS[result] for (name, power), result in POWERS.items()
@@ -107,8 +107,8 @@ EXPONENTS = {
 def product(
     operation: Literal["mul", "div"], left: Semantic, right: Semantic
 ) -> Semantic:
-    if any(isinstance(kind, Kind) and kind.affine for kind in (left, right)):
-        raise TypeError("Absolute Temperature cannot participate in products or ratios")
+    # Absolute temperatures are stored kelvin-scaled in every system, so their
+    # products and ratios are well defined; only their sums are not.
     if isinstance(left, Kind) and isinstance(right, Kind):
         known = PRODUCTS.get((operation, left, right))
         if known is not None:
@@ -118,8 +118,6 @@ def product(
 
 def power(kind: Semantic, exponent: int) -> Semantic:
     if isinstance(kind, Kind):
-        if kind.affine:
-            raise TypeError("Absolute Temperature cannot be exponentiated")
         known = EXPONENTS.get((kind, exponent))
         if known is not None:
             return known

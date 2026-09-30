@@ -31,25 +31,12 @@ bad_definition = Temperature.define_unit("bleb", reference=u.nm)  # error
 missing_unit = Length[float](2)  # error
 
 point = 300 * u.K
-bad_point_scale = point * 2  # error
-bad_point_reverse_scale = 2 * point  # error
-bad_point_division = point / 2  # error
-bad_point_ratio = point / point  # error
-bad_point_inverse = 1.0 / point  # error
-bad_point_power = point**2  # error
 bad_point_sum = point.sum()  # error
-bad_point_negation = -point  # error
-bad_point_absolute = abs(point)  # error
-bad_point_left_product = point * (2 * u.angstrom)  # error
-bad_point_right_product = (2 * u.angstrom) * point  # error
-bad_point_right_ratio = (2 * u.angstrom) / point  # error
 
 product = (2 * u.angstrom) * (3 * u.fs)
 ratio = (2 * u.eV) / (3 * u.fs)
 bad_structural_sum = product + ratio  # error
 bad_structural_nominal_sum = product + ((3 * u.fs) * (2 * u.angstrom))  # error
-bad_structural_point_product = product * point  # error
-bad_structural_point_ratio = product / point  # error
 
 # Unit systems never mix; .to_system(...) is the explicit bridge.
 x_si = Length[float, SI](2.0, u.nm)

@@ -6,16 +6,23 @@ from typing import overload
 from torch import Tensor
 
 from quantype._generated import (
+    Acceleration,
+    Action,
     Angle,
     Area,
     AtomCount,
+    Charge,
     Dimensionless,
+    DipoleMoment,
+    ElectricField,
+    ElectricPotential,
     ElectronCount,
     ElectronDensity,
     Energy,
     EnergyDensity,
     EnergyPerAtom,
     EnergyPerVolume,
+    Entropy,
     Force,
     ForceConstant,
     Frequency,
@@ -23,8 +30,12 @@ from quantype._generated import (
     Length,
     MagneticMoment,
     Magnetization,
+    Mass,
+    MassDensity,
+    Momentum,
     ParticleDensity,
     Pressure,
+    Temperature,
     TemperatureDifference,
     TemperatureRate,
     Time,
@@ -35,46 +46,6 @@ from quantype.core import Quantity
 from quantype.kinds import Div
 from quantype.systems import UnitSystem
 
-@overload
-def grad[S: UnitSystem](
-    output: Length[Tensor, S],
-    inputs: Time[Tensor, S],
-    *,
-    create_graph: bool = False,
-    retain_graph: bool | None = None,
-) -> Velocity[Tensor, S]: ...
-@overload
-def grad[S: UnitSystem](
-    output: Area[Tensor, S],
-    inputs: Length[Tensor, S],
-    *,
-    create_graph: bool = False,
-    retain_graph: bool | None = None,
-) -> Length[Tensor, S]: ...
-@overload
-def grad[S: UnitSystem](
-    output: Volume[Tensor, S],
-    inputs: Length[Tensor, S],
-    *,
-    create_graph: bool = False,
-    retain_graph: bool | None = None,
-) -> Area[Tensor, S]: ...
-@overload
-def grad[S: UnitSystem](
-    output: Volume[Tensor, S],
-    inputs: Area[Tensor, S],
-    *,
-    create_graph: bool = False,
-    retain_graph: bool | None = None,
-) -> Length[Tensor, S]: ...
-@overload
-def grad[S: UnitSystem](
-    output: Energy[Tensor, S],
-    inputs: Length[Tensor, S],
-    *,
-    create_graph: bool = False,
-    retain_graph: bool | None = None,
-) -> Force[Tensor, S]: ...
 @overload
 def grad[S: UnitSystem](
     output: Energy[Tensor, S],
@@ -155,6 +126,14 @@ def grad[S: UnitSystem](
     create_graph: bool = False,
     retain_graph: bool | None = None,
 ) -> InverseTime[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: Entropy[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Temperature[Tensor, S]: ...
 @overload
 def grad[S: UnitSystem](
     output: Dimensionless[Tensor, S],
@@ -357,6 +336,22 @@ def grad[S: UnitSystem](
 ) -> EnergyPerVolume[Tensor, S]: ...
 @overload
 def grad[S: UnitSystem](
+    output: Temperature[Tensor, S],
+    inputs: Temperature[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Temperature[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Temperature[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
     output: TemperatureDifference[Tensor, S],
     inputs: TemperatureDifference[Tensor, S],
     *,
@@ -531,6 +526,526 @@ def grad[S: UnitSystem](
     create_graph: bool = False,
     retain_graph: bool | None = None,
 ) -> ElectronCount[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Mass[Tensor, S],
+    inputs: Mass[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Mass[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Mass[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: MassDensity[Tensor, S],
+    inputs: MassDensity[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: MassDensity[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> MassDensity[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Momentum[Tensor, S],
+    inputs: Momentum[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Momentum[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Momentum[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Acceleration[Tensor, S],
+    inputs: Acceleration[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Acceleration[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Acceleration[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Charge[Tensor, S],
+    inputs: Charge[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Charge[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Charge[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: ElectricPotential[Tensor, S],
+    inputs: ElectricPotential[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: ElectricPotential[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> ElectricPotential[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: ElectricField[Tensor, S],
+    inputs: ElectricField[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: ElectricField[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> ElectricField[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: DipoleMoment[Tensor, S],
+    inputs: DipoleMoment[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: DipoleMoment[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> DipoleMoment[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Entropy[Tensor, S],
+    inputs: Entropy[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Entropy[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Entropy[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Action[Tensor, S],
+    inputs: Action[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Dimensionless[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Action[Tensor, S],
+    inputs: Dimensionless[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Action[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Area[Tensor, S],
+    inputs: Length[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Length[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Volume[Tensor, S],
+    inputs: Area[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Length[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Volume[Tensor, S],
+    inputs: Length[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Area[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: Force[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Length[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: Length[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Force[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Force[Tensor, S],
+    inputs: ForceConstant[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Length[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: ForceConstant[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Area[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: Pressure[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Volume[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Length[Tensor, S],
+    inputs: Velocity[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Time[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Length[Tensor, S],
+    inputs: Time[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Velocity[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Velocity[Tensor, S],
+    inputs: Acceleration[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Time[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Velocity[Tensor, S],
+    inputs: Time[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Acceleration[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Momentum[Tensor, S],
+    inputs: Mass[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Velocity[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Momentum[Tensor, S],
+    inputs: Velocity[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Mass[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Force[Tensor, S],
+    inputs: Mass[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Acceleration[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Force[Tensor, S],
+    inputs: Acceleration[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Mass[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: Momentum[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Velocity[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: Velocity[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Momentum[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Momentum[Tensor, S],
+    inputs: Force[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Time[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Momentum[Tensor, S],
+    inputs: Time[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Force[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Mass[Tensor, S],
+    inputs: MassDensity[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Volume[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Mass[Tensor, S],
+    inputs: Volume[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> MassDensity[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: EnergyPerAtom[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> AtomCount[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: AtomCount[Tensor, S],
+    inputs: ParticleDensity[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Volume[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: ElectronCount[Tensor, S],
+    inputs: ElectronDensity[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Volume[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: MagneticMoment[Tensor, S],
+    inputs: Magnetization[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Volume[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: TemperatureDifference[Tensor, S],
+    inputs: TemperatureRate[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Time[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: Temperature[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Entropy[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: TemperatureDifference[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Entropy[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: Charge[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> ElectricPotential[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: ElectricPotential[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Charge[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Force[Tensor, S],
+    inputs: Charge[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> ElectricField[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Force[Tensor, S],
+    inputs: ElectricField[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Charge[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: ElectricPotential[Tensor, S],
+    inputs: ElectricField[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Length[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: ElectricPotential[Tensor, S],
+    inputs: Length[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> ElectricField[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: DipoleMoment[Tensor, S],
+    inputs: Charge[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Length[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: DipoleMoment[Tensor, S],
+    inputs: Length[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Charge[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: DipoleMoment[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> ElectricField[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: ElectricField[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> DipoleMoment[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Action[Tensor, S],
+    inputs: Energy[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Time[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Action[Tensor, S],
+    inputs: Time[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Energy[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: Action[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> InverseTime[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Energy[Tensor, S],
+    inputs: InverseTime[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Action[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Dimensionless[Tensor, S],
+    inputs: Frequency[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Time[Tensor, S]: ...
+@overload
+def grad[S: UnitSystem](
+    output: Dimensionless[Tensor, S],
+    inputs: InverseTime[Tensor, S],
+    *,
+    create_graph: bool = False,
+    retain_graph: bool | None = None,
+) -> Time[Tensor, S]: ...
 @overload
 def grad[I, O, S: UnitSystem](
     output: Quantity[O, Tensor, S],

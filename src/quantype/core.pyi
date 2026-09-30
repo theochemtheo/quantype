@@ -1,13 +1,13 @@
 # mypy: disable-error-code=overload-overlap
 # pyright: reportOverlappingOverload=false
 from collections.abc import Iterator
-from typing import Any, Generic, Self, overload, override
+from typing import Any, ClassVar, Generic, Protocol, Self, overload, override
 
 import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
-from quantype._internal._kind_types import Div, Mul, NonAffineKind, Pow
+from quantype._internal._kind_types import Div, Mul, Pow
 from quantype._internal._semantics import Semantic
 from quantype._internal._systems import Atomistic, UnitSystem
 from quantype._internal._unit import Unit as Unit
@@ -15,6 +15,7 @@ from quantype._internal._unit import get_unit as get_unit
 from quantype.kinds import DimensionlessKind
 
 __all__ = [
+    "Constant",
     "Quantity",
     "Unit",
     "dimensions",
@@ -124,7 +125,7 @@ class Quantity(Generic[K, V, S]):
     @overload
     def __ge__(self, other: Quantity[K, Any, S], /) -> Any: ...
     # Named quantities have catalogue-generated operators. Restrict base
-    # arithmetic to structural trees so affine points cannot inherit it.
+    # arithmetic to structural trees, so each named kind's own operators apply.
     # K remains anchored to the class, preserving nominal tree equality.
     @overload
     def __add__[A, B, W](
@@ -155,15 +156,15 @@ class Quantity(Generic[K, V, S]):
         self: _StructuralQuantity[A, B, V, S], other: float, /
     ) -> Quantity[K, V, S]: ...
     @overload
-    def __mul__[A, B, L: NonAffineKind, W](
+    def __mul__[A, B, L, W](
         self: _StructuralQuantity[A, B, float, S], other: Quantity[L, W, S], /
     ) -> Quantity[Mul[K, L], W, S]: ...
     @overload
-    def __mul__[A, B, L: NonAffineKind](
+    def __mul__[A, B, L](
         self: _StructuralQuantity[A, B, V, S], other: Quantity[L, float, S], /
     ) -> Quantity[Mul[K, L], V, S]: ...
     @overload
-    def __mul__[A, B, L: NonAffineKind](
+    def __mul__[A, B, L](
         self: _StructuralQuantity[A, B, V, S], other: Quantity[L, V, S], /
     ) -> Quantity[Mul[K, L], V, S]: ...
     @overload
@@ -171,15 +172,15 @@ class Quantity(Generic[K, V, S]):
         self: _StructuralQuantity[A, B, V, S], other: float, /
     ) -> Quantity[K, V, S]: ...
     @overload
-    def __truediv__[A, B, L: NonAffineKind, W](
+    def __truediv__[A, B, L, W](
         self: _StructuralQuantity[A, B, float, S], other: Quantity[L, W, S], /
     ) -> Quantity[Div[K, L], W, S]: ...
     @overload
-    def __truediv__[A, B, L: NonAffineKind](
+    def __truediv__[A, B, L](
         self: _StructuralQuantity[A, B, V, S], other: Quantity[L, float, S], /
     ) -> Quantity[Div[K, L], V, S]: ...
     @overload
-    def __truediv__[A, B, L: NonAffineKind](
+    def __truediv__[A, B, L](
         self: _StructuralQuantity[A, B, V, S], other: Quantity[L, V, S], /
     ) -> Quantity[Div[K, L], V, S]: ...
     def __rmul__[A, B](
@@ -200,8 +201,69 @@ class Quantity(Generic[K, V, S]):
         keepdims: bool = ...,
     ) -> Quantity[K, V, S]: ...
 
+type _Scalar = float | np.floating[Any] | np.integer[Any]
+
+# A quantity as an operand of a constant. Typing it structurally, not as
+# Quantity, spares checkers from binding Quantity's structural-only __mul__,
+# and keeps it from competing with the named relations' overloads.
+class _Operand[K, V, S: UnitSystem](Protocol):
+    @property
+    def value(self) -> V: ...
+    @property
+    def system(self) -> type[S]: ...
+    def magnitude(self, unit: Unit[K] | None = ..., /) -> V: ...
+
+# System-free: arithmetic with a quantity adopts that quantity's unit system.
+# Generated per-kind subclasses add the catalogue's named relations.
+class Constant[K]:
+    name: str
+    __array_ufunc__: None
+    _constant_kind: ClassVar[str]
+    def __init__(self, name: str, semantic: Semantic, reference: float) -> None: ...
+    @property
+    def kind(self) -> str: ...
+    @property
+    def dimensions(self) -> tuple[int, ...]: ...
+    def to_system[T: UnitSystem](self, system: type[T]) -> Quantity[K, float, T]: ...
+    def magnitude(self, unit: Unit[K]) -> float: ...
+    def to(self, unit: Unit[K]) -> Quantity[K, float, Atomistic]: ...
+    @overload
+    def __mul__(self, other: _Scalar, /) -> Self: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[K, L], W, T]: ...
+    @overload
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[K, L]]: ...
+    @overload
+    def __rmul__(self, other: _Scalar, /) -> Self: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, K], W, T]: ...
+    @overload
+    def __truediv__(self, other: _Scalar, /) -> Self: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[K, L], W, T]: ...
+    @overload
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[K, L]]: ...
+    @overload
+    def __rtruediv__(
+        self, other: _Scalar, /
+    ) -> Constant[Div[DimensionlessKind, K]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, K], W, T]: ...
+    def __pow__[N: int](self, exponent: N, /) -> Constant[Pow[K, N]]: ...
+    def __neg__(self) -> Self: ...
+
 def result_kind(op: str, left: Semantic, right: Semantic) -> Semantic: ...
 def dimensions(kind: str | Semantic) -> tuple[int, ...]: ...
+def _rescaled(raw: Any, scale: float) -> Any: ...
+def _constant(name: str, semantic: Semantic, reference: float) -> Constant[Any]: ...
 def _wrap(
     kind: str | Semantic,
     value: Any,

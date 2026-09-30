@@ -12,7 +12,9 @@ physical kind, the system, and optionally the unit it was given in (display).
 
 from __future__ import annotations
 
+import numbers
 import operator
+import sys
 from typing import TYPE_CHECKING, Any, ClassVar, Self, cast, override
 
 from quantype._internal._semantics import (
@@ -29,13 +31,17 @@ from quantype._internal._semantics import (
 from quantype._internal._systems import (
     Atomistic,
     UnitSystem,
+    coherence,
+    coherent_symbol,
     factor,
     into_system,
+    is_coherent,
     require_system,
 )
 from quantype._internal._unit import Unit, get_unit
 
 __all__ = [
+    "Constant",
     "Quantity",
     "Unit",
     "dimensions",
@@ -60,13 +66,35 @@ def dimensions(kind: str | Semantic) -> tuple[int, ...]:
 
 
 def _symbol(kind: Semantic, system: type[UnitSystem]) -> str:
+    """A structural quantity's symbol: its leaves in their coherent units."""
     if isinstance(kind, Kind):
-        return system.unit_for(kind).symbol
+        return coherent_symbol(system, kind)
     if isinstance(kind.right, int):
         return f"({_symbol(kind.left, system)})^{kind.right}"
     operator_symbol = "*" if kind.operation == "mul" else "/"
     left, right = _symbol(kind.left, system), _symbol(kind.right, system)
     return f"({left} {operator_symbol} {right})"
+
+
+def _numpy_bool() -> type:
+    """NumPy's boolean scalar type when NumPy is loaded; it is not a Python bool."""
+    numpy = sys.modules.get("numpy")
+    return bool if numpy is None else cast("type", numpy.bool_)
+
+
+def _rescaled(raw: Any, scale: float) -> Any:
+    """Apply a coherence factor; the usual factor of 1 leaves storage untouched."""
+    return raw if scale == 1.0 else raw * scale
+
+
+def _product_scale(
+    system: type[UnitSystem], left: Semantic, right: Semantic, result: Semantic, op: str
+) -> float:
+    """The factor taking raw operands' product or ratio to the result's storage."""
+    if is_coherent(system):
+        return 1.0
+    lhs, rhs = coherence(system, left), coherence(system, right)
+    return (lhs * rhs if op == "mul" else lhs / rhs) / coherence(system, result)
 
 
 _CLASSES: dict[Kind, type[Quantity[Any, Any, Any]]] = {}
@@ -297,6 +325,14 @@ class Quantity[K, V, S: UnitSystem]:
                 "with .to_system(...)"
             )
 
+    def _scaled(self, raw: Any) -> Self:
+        """Scaling keeps the display unit, unless it has an offset (°C).
+
+        Twice 20 °C is 586.3 K, which a Celsius display would show as 313.15 °C.
+        """
+        display = self._display is None or not self._display.offset
+        return self._with(raw, display=display)
+
     def _with(self, raw: Any, *, display: bool = True) -> Self:
         """Same kind and system; same-kind operations keep the display unit."""
         return cast(
@@ -331,9 +367,14 @@ class Quantity[K, V, S: UnitSystem]:
             rhs = cast("Quantity[Any, Any, Any]", other)
             self._same_system(rhs)
             kind = product("mul", self._semantic, rhs._semantic)
-            return _wrap(kind, lhs * rhs._value, self._system)
+            scale = _product_scale(
+                self._system, self._semantic, rhs._semantic, kind, "mul"
+            )
+            return _wrap(kind, _rescaled(lhs * rhs._value, scale), self._system)
+        if isinstance(other, Constant):
+            return NotImplemented  # the constant adopts this quantity's system
         self._check_scalar(other)
-        return self._with(lhs * other)
+        return self._scaled(lhs * other)
 
     def __rmul__(self, other: Any) -> Quantity[Any, Any, Any]:
         return self * other
@@ -344,21 +385,23 @@ class Quantity[K, V, S: UnitSystem]:
             rhs = cast("Quantity[Any, Any, Any]", other)
             self._same_system(rhs)
             kind = product("div", self._semantic, rhs._semantic)
-            return _wrap(kind, lhs / rhs._value, self._system)
+            scale = _product_scale(
+                self._system, self._semantic, rhs._semantic, kind, "div"
+            )
+            return _wrap(kind, _rescaled(lhs / rhs._value, scale), self._system)
+        if isinstance(other, Constant):
+            return NotImplemented  # the constant adopts this quantity's system
         self._check_scalar(other)
-        return self._with(lhs / other)
+        return self._scaled(lhs / other)
 
     def __rtruediv__(self, other: Any) -> Quantity[Any, Any, Any]:
         self._check_scalar(other)
         numerator = dimensionless_kind(self._semantic)
         kind = product("div", numerator, self._semantic)
-        return _wrap(kind, other / self._value, self._system)
+        scale = _product_scale(self._system, numerator, self._semantic, kind, "div")
+        return _wrap(kind, _rescaled(other / self._value, scale), self._system)
 
     def _check_scalar(self, value: object) -> None:
-        if isinstance(self._semantic, Kind) and self._semantic.affine:
-            raise TypeError(
-                "Scale a TemperatureDifference, not an absolute Temperature"
-            )
         if not isinstance(value, (int, float)) or isinstance(value, bool):
             raise TypeError("Quantity scaling requires a real scalar")
 
@@ -367,20 +410,20 @@ class Quantity[K, V, S: UnitSystem]:
             raise TypeError("Only integer quantity powers are supported")
         kind = power(self._semantic, exponent)
         raw: Any = self._value
-        return _wrap(kind, raw**exponent, self._system)
+        base = coherence(self._system, self._semantic)
+        scale = base**exponent / coherence(self._system, kind)
+        return _wrap(kind, _rescaled(raw**exponent, scale), self._system)
 
     def __neg__(self) -> Self:
-        self._check_scalar(-1)
         raw: Any = self._value
-        return self._with(-raw)
+        return self._scaled(-raw)
 
     def __pos__(self) -> Self:
         return self
 
     def __abs__(self) -> Self:
-        self._check_scalar(1)
         raw: Any = self._value
-        return self._with(abs(raw))
+        return self._scaled(abs(raw))
 
     def _compare(self, other: object, compare: Callable[[Any, Any], Any]) -> Any:
         if not isinstance(other, Quantity):
@@ -531,6 +574,8 @@ class Quantity[K, V, S: UnitSystem]:
     def _presentation(self) -> str:
         if self._display is not None:
             symbol = self._display.symbol
+        elif isinstance(self._semantic, Kind):
+            symbol = self._system.unit_for(self._semantic).symbol
         else:
             symbol = _symbol(self._semantic, self._system)
         return f"{self.magnitude()!s} {symbol}"
@@ -544,6 +589,129 @@ class Quantity[K, V, S: UnitSystem]:
         name = type(self).__name__ if isinstance(self._semantic, Kind) else "Quantity"
         system = "" if self._system is Atomistic else f", {self._system.__name__}"
         return f"{name}({self._presentation()}{system})"
+
+
+class Constant[K]:
+    """A physical constant: exact in every unit system, so it has none of its own.
+
+    Arithmetic with a quantity adopts that quantity's system, so ``k_B * T`` is
+    an energy in ``T``'s system. ``to_system``, ``magnitude`` and ``to`` show
+    its value in a particular system or unit.
+    """
+
+    # NumPy scalars defer to the constant's reflected operators.
+    __array_ufunc__: ClassVar[None] = None
+    __slots__ = ("_reference", "_semantic", "name")
+    #: Generated per-kind subclasses name their kind, so results keep their class.
+    #: Application catalogues give the kind object itself, as their quantities do.
+    _constant_kind: ClassVar[str] = ""
+
+    def __init_subclass__(cls) -> None:
+        super().__init_subclass__()
+        semantic = cls.__dict__.get("_constant_semantic")
+        if semantic is None and cls.__dict__.get("_constant_kind"):
+            semantic = KINDS[cls._constant_kind]
+        if semantic is not None:
+            _CONSTANT_CLASSES[semantic] = cls
+
+    def __init__(self, name: str, semantic: Semantic, reference: float) -> None:
+        #: The conventional symbol, such as ``k_B``.
+        self.name = name
+        self._semantic = semantic
+        # Coherent value in the reference (default-system) units.
+        self._reference = reference
+
+    @property
+    def kind(self) -> str:
+        return str(self._semantic)
+
+    @property
+    def dimensions(self) -> tuple[int, ...]:
+        return self._semantic.dimensions
+
+    def to_system(self, system: type[UnitSystem]) -> Quantity[K, float, Any]:
+        """The constant's value in ``system``, as a quantity of that system."""
+        target = require_system(system)
+        raw = self._reference / factor(target, self._semantic)
+        return cast("Quantity[K, float, Any]", _wrap(self._semantic, raw, target))
+
+    def magnitude(self, unit: Unit[K]) -> float:
+        """The constant's value in a compatible unit."""
+        return self.to_system(Atomistic).magnitude(unit)
+
+    def to(self, unit: Unit[K]) -> Quantity[K, float, Any]:
+        """The constant as a default-system quantity presented in ``unit``."""
+        return self.to_system(Atomistic).to(unit)
+
+    def _combine(self, other: object, op: str, *, reflected: bool = False) -> Any:
+        if isinstance(other, Quantity):
+            quantity = cast("Quantity[Any, Any, Any]", other)
+            own = self.to_system(quantity._system)
+            left, right = (quantity, own) if reflected else (own, quantity)
+            return left * right if op == "mul" else left / right
+        if isinstance(other, Constant):
+            constant = cast("Constant[Any]", other)
+            left, right = (constant, self) if reflected else (self, constant)
+            kind = product(cast("Any", op), left._semantic, right._semantic)
+            value = (
+                left._reference * right._reference
+                if op == "mul"
+                else left._reference / right._reference
+            )
+            symbol = " " if op == "mul" else "/"
+            return _constant(f"{left.name}{symbol}{right.name}", kind, value)
+        if not isinstance(other, numbers.Real) or isinstance(
+            other, (bool, _numpy_bool())
+        ):
+            return NotImplemented
+        other = float(other)
+        if op == "mul":
+            return _constant(
+                f"{other} {self.name}", self._semantic, self._reference * other
+            )
+        if not reflected:
+            return _constant(
+                f"{self.name}/{other}", self._semantic, self._reference / other
+            )
+        kind = product("div", dimensionless_kind(self._semantic), self._semantic)
+        return _constant(f"{other}/{self.name}", kind, other / self._reference)
+
+    def __mul__(self, other: object) -> Any:
+        return self._combine(other, "mul")
+
+    def __rmul__(self, other: object) -> Any:
+        return self._combine(other, "mul", reflected=True)
+
+    def __truediv__(self, other: object) -> Any:
+        return self._combine(other, "div")
+
+    def __rtruediv__(self, other: object) -> Any:
+        return self._combine(other, "div", reflected=True)
+
+    def __pow__(self, exponent: object) -> Constant[Any]:
+        if not isinstance(exponent, int) or isinstance(exponent, bool):
+            raise TypeError("Only integer constant powers are supported")
+        kind = power(self._semantic, exponent)
+        return _constant(f"{self.name}^{exponent}", kind, self._reference**exponent)
+
+    def __neg__(self) -> Self:
+        return type(self)(f"-{self.name}", self._semantic, -self._reference)
+
+    @override
+    def __str__(self) -> str:
+        return str(self.to_system(Atomistic))
+
+    @override
+    def __repr__(self) -> str:
+        return f"Constant({self.name} = {self})"
+
+
+_CONSTANT_CLASSES: dict[Semantic, type[Constant[Any]]] = {}
+
+
+def _constant(name: str, semantic: Semantic, reference: float) -> Constant[Any]:
+    """A constant of its kind's generated class, or the structural base class."""
+    return _CONSTANT_CLASSES.get(semantic, Constant)(name, semantic, reference)
 
 
 def _parse(

@@ -27,7 +27,7 @@ PROJECT_FIXTURE = Path(__file__).parents[1] / "fixtures" / "generated_catalogue"
 def catalogue() -> Catalogue:
     return builtin_catalogue().extend(
         quantities={
-            "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0), "surface_tension")
+            "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0, 0), "surface_tension")
         },
         units={
             "surface_tension": UnitSpec("SurfaceTension"),
@@ -120,7 +120,7 @@ def test_unit_identifiers_cannot_shadow_generated_bindings(
 def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None:
     with pytest.raises(ValueError, match="Conflicting quantity namespace"):
         builtin_catalogue().extend(
-            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
+            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), "lab_unit")},
             units={"lab_unit": UnitSpec(kind)},
         )
 
@@ -139,7 +139,6 @@ def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None
         "_BaseQuantity",
         "_StructuralQuantity",
         "Quantity",
-        "NonAffineKind",
         "units",
         "kinds",
         "ujax",
@@ -161,7 +160,7 @@ def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None
 def test_quantity_names_cannot_shadow_generated_bindings(kind: str) -> None:
     with pytest.raises(ValueError, match="Invalid quantity definition"):
         builtin_catalogue().extend(
-            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
+            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), "lab_unit")},
             units={"lab_unit": UnitSpec(kind)},
         )
 
@@ -173,7 +172,7 @@ def test_quantity_marker_collision_is_order_independent() -> None:
         ):
             builtin_catalogue().extend(
                 quantities={
-                    name: QuantitySpec((1, 0, 0, 0, 0, 0, 0), f"lab_{name}")
+                    name: QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), f"lab_{name}")
                     for name in names
                 },
                 units={f"lab_{name}": UnitSpec(name) for name in names},
@@ -183,7 +182,7 @@ def test_quantity_marker_collision_is_order_independent() -> None:
 def test_quantity_namespaces_are_unique() -> None:
     with pytest.raises(ValueError, match="Conflicting quantity namespace 'length'"):
         builtin_catalogue().extend(
-            quantities={"length": QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
+            quantities={"length": QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), "lab_unit")},
             units={"lab_unit": UnitSpec("length")},
         )
 
@@ -191,7 +190,7 @@ def test_quantity_namespaces_are_unique() -> None:
 def test_canonical_unit_cannot_override_namespace_constructor() -> None:
     with pytest.raises(ValueError, match="conflicts with a generated API binding"):
         builtin_catalogue().extend(
-            quantities={"Sample": QuantitySpec((0, 0, 0, 0, 0, 0, 0), "__init__")},
+            quantities={"Sample": QuantitySpec((0, 0, 0, 0, 0, 0, 0, 0), "__init__")},
             units={"__init__": UnitSpec("Sample")},
         )
 

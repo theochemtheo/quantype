@@ -12,6 +12,7 @@ Inside one unit system the raw derivative is already in that system's units.
 # pyright: reportPrivateUsage=false
 # ruff: noqa: SLF001
 
+import math
 from collections.abc import Callable
 from typing import Any, Protocol, TypeGuard, cast
 
@@ -24,8 +25,8 @@ except ModuleNotFoundError as exc:
 
 from quantype import _generated
 from quantype._internal._semantics import Semantic
-from quantype._internal._systems import UnitSystem
-from quantype.core import Quantity, _wrap, result_kind
+from quantype._internal._systems import UnitSystem, coherence
+from quantype.core import Quantity, _rescaled, _wrap, result_kind
 
 # These aliases describe the intentionally dynamic backend integration boundary.
 type _Quantity = Quantity[Any, Any, Any]
@@ -127,6 +128,15 @@ def _raw_function(
     return evaluate
 
 
+def _derivative_scale(
+    argument: _Quantity, output: _Quantity, kind: Semantic, *, order: int
+) -> float:
+    """Raw derivatives are coherent, except where the system overrides a kind."""
+    system = argument._system
+    inputs = math.pow(coherence(system, argument._semantic), order)
+    return coherence(system, output._semantic) / inputs / coherence(system, kind)
+
+
 def grad(
     function: Callable[[_Quantity], _Quantity],
 ) -> Callable[[_Quantity], _Quantity]:
@@ -137,7 +147,8 @@ def grad(
             argument.value
         )
         kind = result_kind("div", output._semantic, argument._semantic)
-        return _wrap(kind, value, argument._system)
+        scale = _derivative_scale(argument, output, kind, order=1)
+        return _wrap(kind, _rescaled(value, scale), argument._system)
 
     return derivative
 
@@ -152,6 +163,7 @@ def hessian(
         value, output = _jax.jacfwd(first, has_aux=True)(argument.value)
         first_kind = result_kind("div", output._semantic, argument._semantic)
         kind = result_kind("div", first_kind, argument._semantic)
-        return _wrap(kind, value, argument._system)
+        scale = _derivative_scale(argument, output, kind, order=2)
+        return _wrap(kind, _rescaled(value, scale), argument._system)
 
     return derivative

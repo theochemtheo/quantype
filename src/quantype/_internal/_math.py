@@ -9,7 +9,8 @@ import math
 from typing import Any
 
 from quantype._internal._semantics import KINDS
-from quantype.core import Quantity, _wrap
+from quantype._internal._systems import coherence
+from quantype.core import Quantity, _rescaled, _wrap
 
 
 def _unary(name: str, value: Any) -> Any:
@@ -33,7 +34,12 @@ def _unary(name: str, value: Any) -> Any:
 def sqrt(quantity: Quantity[Any, Any, Any]) -> Quantity[Any, Any, Any]:
     if quantity._semantic is not KINDS["Area"]:  # noqa: SLF001
         raise TypeError(f"sqrt expects Area, received {quantity.kind}")
-    return _wrap("Length", _unary("sqrt", quantity.value), quantity.system)
+    system = quantity.system
+    area = _rescaled(quantity.value, coherence(system, KINDS["Area"]))
+    root = _unary("sqrt", area)
+    return _wrap(
+        "Length", _rescaled(root, 1 / coherence(system, KINDS["Length"])), system
+    )
 
 
 def sin(quantity: Quantity[Any, Any, Any]) -> Quantity[Any, Any, Any]:

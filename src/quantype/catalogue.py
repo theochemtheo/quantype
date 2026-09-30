@@ -5,10 +5,16 @@ from __future__ import annotations
 import keyword
 import math
 from dataclasses import dataclass, field
+from functools import cached_property
 from types import MappingProxyType
 from typing import TYPE_CHECKING
 
-from quantype._internal._registry import BASIS, QuantitySpec, UnitSpec
+from quantype._internal._registry import (
+    BASIS,
+    QuantitySpec,
+    UnitSpec,
+    close_relations,
+)
 
 __all__ = ["Catalogue", "QuantitySpec", "UnitSpec", "builtin_catalogue"]
 
@@ -54,7 +60,6 @@ _QUANTITY_BINDINGS = _UNIT_MODULE_BINDINGS | frozenset(
         "Mul",
         "Div",
         "Pow",
-        "NonAffineKind",
         "Literal",
         "override",
         "np",
@@ -117,6 +122,12 @@ class Catalogue:
         self._validate_quantities()
         self._validate_units()
         self._validate_algebra()
+        close_relations(self.relations)
+
+    @cached_property
+    def algebra(self) -> Mapping[tuple[str, str, str], str]:
+        """Declared relations, plus the symmetric products and undoing divisions."""
+        return MappingProxyType(close_relations(self.relations))
 
     def _validate_quantities(self) -> None:
         reserved = _QUANTITY_BINDINGS | {
@@ -195,8 +206,8 @@ class Catalogue:
         for (operation, left, right), result in self.relations.items():
             if not {left, right, result} <= self.quantities.keys():
                 raise ValueError("Unknown quantity in relation")
-            if operation not in {"mul", "div"} or "Temperature" in (left, right):
-                raise ValueError("Invalid or affine multiplicative relationship")
+            if operation not in {"mul", "div"}:
+                raise ValueError(f"Invalid relation operation {operation!r}")
             sign = 1 if operation == "mul" else -1
             expected = tuple(
                 a + sign * b
@@ -222,8 +233,7 @@ class Catalogue:
             ):
                 raise ValueError("Unknown quantity or invalid exponent in power")
             if (
-                name == "Temperature"
-                or tuple(n * exponent for n in self.quantities[name].dimensions)
+                tuple(n * exponent for n in self.quantities[name].dimensions)
                 != self.quantities[result].dimensions
             ):
                 raise ValueError(f"Invalid power {name} ** {exponent}")

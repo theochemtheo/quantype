@@ -94,14 +94,7 @@ def additive_stubs(name: str) -> str:
 
 
 def multiplicative_stubs(name: str, catalogue: Catalogue) -> str:
-    relations = dict(catalogue.relations)
-    relations.update(
-        {
-            (op, right, left): result
-            for (op, left, right), result in catalogue.relations.items()
-            if op == "mul"
-        }
-    )
+    relations = catalogue.algebra
     text = ""
     for op, method, expression in (
         ("mul", "__mul__", "Mul"),
@@ -113,9 +106,9 @@ def multiplicative_stubs(name: str, catalogue: Catalogue) -> str:
                 signatures += binary(method, name, right, result)
         signatures += [
             f"def {method}(self, other: float, /) -> {name}[V, S]: ...",
-            f"def {method}[K: NonAffineKind, W](self: {name}[float, S], other: Quantity[K, W, S], /) -> Quantity[{expression}[{name}Kind, K], W, S]: ...",
-            f"def {method}[K: NonAffineKind](self, other: Quantity[K, float, S], /) -> Quantity[{expression}[{name}Kind, K], V, S]: ...",
-            f"def {method}[K: NonAffineKind](self, other: Quantity[K, V, S], /) -> Quantity[{expression}[{name}Kind, K], V, S]: ...",
+            f"def {method}[K, W](self: {name}[float, S], other: Quantity[K, W, S], /) -> Quantity[{expression}[{name}Kind, K], W, S]: ...",
+            f"def {method}[K](self, other: Quantity[K, float, S], /) -> Quantity[{expression}[{name}Kind, K], V, S]: ...",
+            f"def {method}[K](self, other: Quantity[K, V, S], /) -> Quantity[{expression}[{name}Kind, K], V, S]: ...",
         ]
         text += method_overloads(method, signatures)
     return text
@@ -127,18 +120,16 @@ def quantity_methods(name: str, catalogue: Catalogue) -> str:
     text += f"    @classmethod\n    @override\n    def parse(cls, data: object, *, units: tuple[Unit[Any], ...] = ()) -> {name}[float | npt.NDArray[np.float64], S]: ...\n"
     text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[V, T]: ...\n"
     text += additive_stubs(name)
-    if name == "Temperature":
-        # Mypy does not enforce overloaded self restrictions through SupportsAbs.
-        # Explicitly mark this always-raising runtime operation as unavailable.
-        return text + "    __abs__: None  # type: ignore[assignment]\n"
     for method in ("__neg__", "__abs__"):
         text += f"    @override\n    def {method}(self) -> {name}[V, S]: ...\n"
-    text += f"    @override\n    def sum(self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False) -> {name}[V, S]: ...\n"
+    # Absolute temperatures scale and multiply, but a sum of them is meaningless.
+    if name != "Temperature":
+        text += f"    @override\n    def sum(self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False) -> {name}[V, S]: ...\n"
     text += multiplicative_stubs(name, catalogue)
     text += (
         f"    @override\n    def __rmul__(self, other: float, /) -> {name}[V, S]: ...\n"
     )
-    reciprocal = catalogue.relations.get(("div", "Dimensionless", name))
+    reciprocal = catalogue.algebra.get(("div", "Dimensionless", name))
     result = (
         f"{reciprocal}[V, S]"
         if reciprocal is not None
@@ -163,6 +154,67 @@ def quantity_methods(name: str, catalogue: Catalogue) -> str:
     return text + overloads(powers, overrides=True)
 
 
+def constant_stub(name: str, catalogue: Catalogue) -> str:
+    """A kind's constant: system-free, adopting each quantity operand's system.
+
+    A reflected operand is typed structurally (see ``_Operand`` in core.pyi), and
+    a constant on the left handles products of constants.
+    """
+    own = f"_{name}Constant"
+    scalar_types = "float | np.floating[Any] | np.integer[Any]"
+    text = f"\nclass {own}(Constant[{name}Kind]):\n"
+    text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[float, T]: ...\n"
+    text += f"    @override\n    def to(self, unit: Unit[{name}Kind]) -> {name}[float]: ...\n"
+    algebra = catalogue.algebra
+    for method, op, expression, reflected in (
+        ("__mul__", "mul", "Mul", False),
+        ("__rmul__", "mul", "Mul", True),
+        ("__truediv__", "div", "Div", False),
+        ("__rtruediv__", "div", "Div", True),
+    ):
+        signatures = [
+            f"def {method}[W, T: UnitSystem](self, other: {other}[W, T], /) -> {result}[W, T]: ..."
+            for (operation, left, right), result in algebra.items()
+            if operation == op
+            for other in [left if reflected else right]
+            if (right if reflected else left) == name
+        ]
+        # A named reciprocal refines the base's structural return type, as the
+        # quantity classes' __rtruediv__ does; checkers compare it as an override.
+        suppression = ""
+        if method == "__rtruediv__":
+            reciprocal = algebra.get(("div", "Dimensionless", name))
+            scalar = (
+                f"_{reciprocal}Constant"
+                if reciprocal is not None
+                else f"Constant[Div[DimensionlessKind, {name}Kind]]"
+            )
+            if reciprocal is not None:
+                suppression = "  # ty: ignore[invalid-method-override]"
+        else:
+            scalar = own
+        pair = f"L, {name}Kind" if reflected else f"{name}Kind, L"
+        signatures += [
+            f"def {method}(self, other: {scalar_types}, /) -> {scalar}: ...",
+            f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{pair}], W, T]: ...",
+        ]
+        if not reflected:
+            signatures.append(
+                f"def {method}[L](self, other: Constant[L], /) -> Constant[{expression}[{pair}]]: ..."
+            )
+        # ty reports an overloaded override at its last signature; pyrefly at
+        # its first, which a wrapped signature leaves no room to annotate.
+        signatures[-1] += suppression
+        block = overloads(signatures, overrides=True)
+        if suppression:
+            first = block.index("    def ")
+            block = (
+                block[:first] + "    # pyrefly: ignore[bad-override]\n" + block[first:]
+            )
+        text += block
+    return text
+
+
 def structural_quantity_stub() -> str:
     """A generated base carries its own dimensionless marker through trees."""
     text = "K = TypeVar('K')\n"
@@ -181,9 +233,9 @@ def structural_quantity_stub() -> str:
         text += overloads(
             [
                 f"def {method}[A, B](self: _StructuralQuantity[A, B, V, S], other: float, /) -> Quantity[K, V, S]: ...",
-                f"def {method}[A, B, L: NonAffineKind, W](self: _StructuralQuantity[A, B, float, S], other: Quantity[L, W, S], /) -> Quantity[{expression}[K, L], W, S]: ...",
-                f"def {method}[A, B, L: NonAffineKind](self: _StructuralQuantity[A, B, V, S], other: Quantity[L, float, S], /) -> Quantity[{expression}[K, L], V, S]: ...",
-                f"def {method}[A, B, L: NonAffineKind](self: _StructuralQuantity[A, B, V, S], other: Quantity[L, V, S], /) -> Quantity[{expression}[K, L], V, S]: ...",
+                f"def {method}[A, B, L, W](self: _StructuralQuantity[A, B, float, S], other: Quantity[L, W, S], /) -> Quantity[{expression}[K, L], W, S]: ...",
+                f"def {method}[A, B, L](self: _StructuralQuantity[A, B, V, S], other: Quantity[L, float, S], /) -> Quantity[{expression}[K, L], V, S]: ...",
+                f"def {method}[A, B, L](self: _StructuralQuantity[A, B, V, S], other: Quantity[L, V, S], /) -> Quantity[{expression}[K, L], V, S]: ...",
             ],
             overrides=True,
         )
@@ -200,22 +252,22 @@ def structural_quantity_stub() -> str:
 
 def quantity_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
     kinds = HEADER + '"""Nominal and structural semantic markers."""\n\n'
-    kinds += (
-        "from quantype._internal._kind_types import Div, Mul, NonAffineKind, Pow\n\n"
-    )
-    exports = ["Div", "Mul", "NonAffineKind", "Pow"]
+    kinds += "from quantype._internal._kind_types import Div, Mul, Pow\n\n"
+    exports = ["Div", "Mul", "Pow"]
     exports += [f"{name}Kind" for name in catalogue.quantities]
     kinds += f"__all__ = {sorted(exports)!r}\n\n"
     for name in catalogue.quantities:
-        base = "" if name == "Temperature" else "(NonAffineKind)"
-        kinds += f"class {name}Kind{base}:\n    pass\n\n"
+        kinds += f"class {name}Kind:\n    pass\n\n"
     markers = (
         f"from {package}.kinds import ("
         + ", ".join(f"{name}Kind" for name in catalogue.quantities)
         + ")\n"
     )
-    runtime = HEADER + markers
-    runtime += "from quantype.systems import UnitSystem\n"
+    # Constant classes register themselves by kind; nothing names them here.
+    runtime = HEADER + "# pyright: reportUnusedClass=false\n" + markers
+    runtime += (
+        "from quantype.systems import UnitSystem\nfrom quantype.core import Constant\n"
+    )
     if package == "quantype":
         runtime += "from quantype.core import Quantity\n"
     else:
@@ -225,7 +277,7 @@ def quantity_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
     stub = (
         HEADER + OVERLAPS + QUANTITY_OVERRIDES + "# pyright: reportPrivateUsage=false\n"
     )
-    stub += "from typing import Any, Literal, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Unit\n"
+    stub += "from typing import Any, Literal, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Constant, Unit, _Operand\n"
     stub += (
         "from quantype.core import Quantity\n"
         if package == "quantype"
@@ -233,7 +285,7 @@ def quantity_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
     )
     stub += (
         markers
-        + f"from {package}.kinds import Div, Mul, NonAffineKind, Pow\nfrom {package} import units as _units\n"
+        + f"from {package}.kinds import Div, Mul, Pow\nfrom {package} import units as _units\n"
         + TYPE_VARIABLES
     )
     if package != "quantype":
@@ -245,6 +297,11 @@ def quantity_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         stub += f"\nclass {name}(Quantity[{name}Kind, V, S]):\n" + quantity_methods(
             name, catalogue
         )
+    for name in catalogue.quantities:
+        runtime += f"\nclass _{name}Constant(Constant[{name}Kind]):\n    _constant_kind = {name!r}\n"
+        if package != "quantype":
+            runtime += f"    _constant_semantic = runtime.kinds[{name!r}]\n"
+        stub += constant_stub(name, catalogue)
     return {"kinds.py": kinds, "_generated.py": runtime, "_generated.pyi": stub}
 
 
@@ -338,7 +395,7 @@ def unit_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
 
 def gradient_signatures(catalogue: Catalogue, backend: str, array: str) -> list[str]:
     signatures: list[str] = []
-    for (operation, output, input_), result in catalogue.relations.items():
+    for (operation, output, input_), result in catalogue.algebra.items():
         if operation != "div":
             continue
         if backend == "ujax":
@@ -362,8 +419,8 @@ def gradient_signatures(catalogue: Catalogue, backend: str, array: str) -> list[
 
 def hessian_signatures(catalogue: Catalogue) -> list[str]:
     signatures: list[str] = []
-    for (operation, output, input_), result in catalogue.relations.items():
-        second = catalogue.relations.get(("div", result, input_))
+    for (operation, output, input_), result in catalogue.algebra.items():
+        second = catalogue.algebra.get(("div", result, input_))
         if operation == "div" and second is not None:
             signatures.append(
                 f"def hessian[S: UnitSystem](function: Callable[[{input_}[Array, S]], {output}[Array, S]]) -> Callable[[{input_}[Array, S]], {second}[Array, S]]: ..."
@@ -392,7 +449,7 @@ def adapter_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
             text += "from typing import Any\n"
         derivative_kinds = {
             kind
-            for (op, left, right), result in catalogue.relations.items()
+            for (op, left, right), result in catalogue.algebra.items()
             if op == "div"
             for kind in (left, right, result)
         }

@@ -5,12 +5,14 @@ from typing import TYPE_CHECKING, Any
 # Runtime boundary tests deliberately inspect the internal algebra.
 # pyright: reportPrivateUsage=false
 import numpy as np
+import numpy.typing as npt
 import pytest
 
 from quantype import (
     Area,
     Energy,
     EnergyDensity,
+    Entropy,
     Force,
     Length,
     Pressure,
@@ -98,14 +100,36 @@ def test_temperature_affine_algebra() -> None:
     assert (warm - difference).value == pytest.approx(cold.value)
     assert isinstance(difference / (2 * u.s), TemperatureRate)
     untyped: Any = warm
-    operations: tuple[Callable[[], Any], ...] = (
-        lambda: untyped + warm,
-        lambda: untyped * 2,
-        lambda: untyped**2,
-    )
-    for operation in operations:
-        with pytest.raises(TypeError, match="Temperature"):
-            operation()
+    with pytest.raises(TypeError, match="Cannot add two absolute Temperatures"):
+        _ = untyped + warm
+    array: Any = Temperature[npt.NDArray[np.float64]]([280, 300], u.K)
+    with pytest.raises(TypeError, match="Cannot sum absolute Temperatures"):
+        array.sum()
+    assert array.mean().value == pytest.approx(290)
+
+
+def test_absolute_temperatures_multiply_and_scale() -> None:
+    # Kelvin-scaled storage makes products of absolute temperatures meaningful.
+    warm = 300 * u.K
+    assert (2 * warm).value == 600
+    assert (warm / warm).value == 1
+    assert (warm**2).value == 90000
+    assert (-warm).value == -300
+    boltzmann = Entropy[float](8.617333262e-5, u.eV_per_kelvin)
+    thermal = boltzmann * warm
+    assert isinstance(thermal, Energy)
+    assert thermal.value == pytest.approx(0.025852, rel=1e-4)
+    assert isinstance(thermal / boltzmann, Temperature)
+    assert isinstance(thermal / warm, Entropy)
+
+
+def test_scaling_drops_an_offset_display_unit() -> None:
+    # Twice 20 °C is 586.3 K; shown in °C it would read as a misleading 313.15.
+    doubled = 2 * (20 * u.celsius)
+    assert doubled.value == pytest.approx(586.3)
+    assert repr(doubled) == "Temperature(586.3 K)"
+    assert repr(2 * (300 * u.K).to(u.kelvin)) == "Temperature(600.0 K)"
+    assert repr(-(1 * u.delta_celsius)) == "TemperatureDifference(-1.0 Δ°C)"
 
 
 def test_semantic_dimensions() -> None:
@@ -134,11 +158,11 @@ def test_structural_arithmetic_keeps_dimensions() -> None:
     assert isinstance(uncommon, Quantity)
     assert uncommon.kind == "Mul[Length,Time]"
     assert uncommon.value == 6
-    assert uncommon.dimensions == (1, 0, 1, 0, 0, 0, 0)
+    assert uncommon.dimensions == (1, 0, 1, 0, 0, 0, 0, 0)
     # No global dimensional simplification invents a semantic named kind.
     again: Any = uncommon
     quotient = again / (2 * u.angstrom)
-    assert quotient.dimensions == (0, 0, 1, 0, 0, 0, 0)
+    assert quotient.dimensions == (0, 0, 1, 0, 0, 0, 0, 0)
     assert "Å" in repr(uncommon)
     assert "Mul" not in repr(uncommon)
 

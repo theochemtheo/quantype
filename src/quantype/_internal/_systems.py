@@ -3,7 +3,11 @@
 A system is a class. The same object is the static type parameter
 (``Length[float, SI]``) and the runtime value (``q.to_system(SI)``). It names
 one unit per base axis. Every kind's unit is the product of those units raised
-to the kind's dimensions, so arithmetic inside one system never converts.
+to the kind's dimensions, so arithmetic inside one system does not convert.
+
+A system may also store a few kinds in units of their own (``overrides``), as
+LAMMPS stores pressure in bar. Only arithmetic producing or consuming those
+kinds rescales, and only by a constant factor (see ``coherence``).
 
 Systems are defined over the base axes, not over a list of kinds, so a kind
 from a generated catalogue has a unit in every system automatically.
@@ -20,6 +24,7 @@ from quantype._internal._semantics import KINDS, Kind
 from quantype._internal._unit import Unit, get_unit, known_kinds, units_of
 from quantype.kinds import (
     AtomCountKind,
+    ChargeKind,
     ElectronCountKind,
     EnergyKind,
     LengthKind,
@@ -46,8 +51,10 @@ __all__ = [
     "RangeIssue",
     "Real",
     "UnitSystem",
+    "coherence",
     "factor",
     "into_system",
+    "is_coherent",
     "require_system",
 ]
 
@@ -62,6 +69,7 @@ AXIS_KINDS = dict(
             "MagneticMoment",
             "AtomCount",
             "ElectronCount",
+            "Charge",
         ),
         strict=True,
     )
@@ -83,6 +91,23 @@ class _CatalogueUnit:
         return get_unit(self.name)
 
 
+class _CatalogueUnits:
+    """Built-in overriding units, resolved on first use like ``_CatalogueUnit``."""
+
+    def __init__(self, names: tuple[str, ...]) -> None:
+        self.names = names
+
+    def __get__(
+        self, instance: object, owner: type | None = None
+    ) -> tuple[Unit[Any], ...]:
+        return tuple(get_unit(name) for name in self.names)
+
+
+def _catalogue_overrides(*names: str) -> tuple[Unit[Any], ...]:
+    """A class-body placeholder that the class attribute resolves to units."""
+    return cast("tuple[Unit[Any], ...]", _CatalogueUnits(names))
+
+
 def _catalogue[K](name: str, kind: type[K]) -> Unit[K]:
     """A class-body placeholder that the class attribute resolves to a unit."""
     del kind
@@ -99,6 +124,7 @@ class _SystemUnits:
             return ()
         defined = [
             *_resolve(owner).values(),
+            *_overrides(owner).values(),
             *(owner.unit_for(kind) for kind in known_kinds()),
         ]
         return tuple(
@@ -122,9 +148,13 @@ class UnitSystem:
     """Base class for unit systems.
 
     Subclass it with ``name=`` and a base unit for ``length``, ``energy`` and
-    ``time``. Temperature (kelvin), magnetic moment (μB) and the atom and
-    electron counts have defaults. Nothing is registered globally: the class is
-    usable as soon as it is defined, and it is checked when it is defined.
+    ``time``. Temperature (kelvin), magnetic moment (μB), charge (e) and the
+    atom and electron counts have defaults. Nothing is registered globally: the
+    class is usable as soon as it is defined, and it is checked when it is
+    defined.
+
+    ``overrides`` lists units that replace the derived unit of their kind, for
+    codes that store some kinds outside the base units' coherent products.
     """
 
     name: ClassVar[str]
@@ -135,14 +165,18 @@ class UnitSystem:
     magnetic_moment: ClassVar[Unit[MagneticMomentKind]] = _catalogue(
         "bohr_magneton", MagneticMomentKind
     )
+    charge: ClassVar[Unit[ChargeKind]] = _catalogue("elementary_charge", ChargeKind)
     atom: ClassVar[Unit[AtomCountKind]] = _catalogue("atom", AtomCountKind)
     electron: ClassVar[Unit[ElectronCountKind]] = _catalogue(
         "electron", ElectronCountKind
     )
+    #: Units that replace the derived unit of their kind in this system.
+    overrides: ClassVar[tuple[Unit[Any], ...]] = ()
     #: Units to pass to decoders (``units=``) that the catalogue cannot name.
     units = _SystemUnits()
 
     _bases: ClassVar[dict[str, Unit[Any]] | None] = None
+    _overridden: ClassVar[dict[Kind, Unit[Any]] | None] = None
     _derived: ClassVar[dict[Kind, Unit[Any]]]
 
     if TYPE_CHECKING:
@@ -248,9 +282,11 @@ def _define(cls: type[UnitSystem], name: object) -> None:
             )
     cls.name = name
     cls._bases = None
+    cls._overridden = None
     cls._derived = {}
     if not _deferred_validation:
         _resolve(cls)
+        _overrides(cls)
 
 
 def _resolve(cls: type[UnitSystem]) -> dict[str, Unit[Any]]:
@@ -283,6 +319,59 @@ def _resolve(cls: type[UnitSystem]) -> dict[str, Unit[Any]]:
         _checked_scale(cls, bases, kind)
     cls._bases = bases
     return bases
+
+
+def _overrides(cls: type[UnitSystem]) -> dict[Kind, Unit[Any]]:
+    """Validate and return the overriding units: at definition, or on first use."""
+    resolved: dict[Kind, Unit[Any]] | None = cls.__dict__.get("_overridden")
+    if resolved is not None:
+        return resolved
+    overridden: dict[Kind, Unit[Any]] = {}
+    for unit in cls.overrides:
+        if not isinstance(unit, Unit):  # pyright: ignore[reportUnnecessaryIsInstance]
+            raise TypeError(
+                f"{cls.__name__}.overrides must contain units; "
+                f"received {type(unit).__name__}"
+            )
+        if unit.kind in AXIS_KINDS.values():
+            raise TypeError(
+                f"{cls.__name__} overrides {unit.kind}, a base axis; "
+                f"set its base unit instead"
+            )
+        if unit.offset:
+            raise ValueError(f"{cls.__name__} overrides {unit.kind} with an offset")
+        if unit.semantic in overridden:
+            raise TypeError(f"{cls.__name__} overrides {unit.kind} twice")
+        overridden[unit.semantic] = unit
+    cls._overridden = overridden
+    return overridden
+
+
+def is_coherent(system: type[UnitSystem]) -> bool:
+    """Whether every kind is stored in its base-derived unit (no overrides)."""
+    return not _overrides(system)
+
+
+def coherence(system: type[UnitSystem], semantic: Semantic) -> float:
+    """Coherent units per stored unit of ``semantic``: 1 unless it is overridden.
+
+    Arithmetic works in coherent units: a product's raw numbers are the
+    operands' raw numbers times their coherence, divided by the result's.
+    Structural (unnamed) quantities are always stored coherently.
+    """
+    if not isinstance(semantic, Kind):
+        return 1.0
+    unit = _overrides(system).get(semantic)
+    if unit is None:
+        return 1.0
+    return unit.scale / _scale(_resolve(system), semantic.dimensions)
+
+
+def coherent_symbol(system: type[UnitSystem], kind: Kind) -> str:
+    """The symbol of a kind's coherent unit, which structural quantities use."""
+    if kind in _overrides(system):
+        return _compose(_resolve(system), kind.dimensions)
+    return system.unit_for(kind).symbol
 
 
 def _scale(bases: dict[str, Unit[Any]], dimensions: Sequence[int]) -> float:
@@ -323,6 +412,9 @@ def _kind_of(kind: Kind | str | type[Any]) -> Kind:
 def _derive(cls: type[UnitSystem], kind: Kind) -> Unit[Any]:
     bases = _resolve(cls)
     scale = _checked_scale(cls, bases, kind)
+    override = _overrides(cls).get(kind)
+    if override is not None:
+        return override
     for base in bases.values():
         if base.semantic is kind:
             return base
@@ -410,6 +502,19 @@ _TYPICAL: dict[str, tuple[float, float]] = {
     "InverseTime": (1e-9, 1.0),
     "AtomCount": (1.0, 1e8),
     "ElectronCount": (1.0, 1e9),
+    # An electron (0.057) to a protein (1e8); 1 Da is 103.6 eV fs²/Å².
+    "Mass": (1e-2, 1e8),
+    # Gases to dense metals; 1 g/cm³ is 62.4 eV fs²/Å⁵.
+    "MassDensity": (1e-2, 1e4),
+    "Momentum": (1e-6, 1e4),
+    "Acceleration": (1e-10, 1e2),
+    "Charge": (1e-4, 1e3),
+    "ElectricPotential": (1e-4, 1e4),
+    "ElectricField": (1e-6, 10.0),
+    "DipoleMoment": (1e-4, 1e3),
+    # k_B is 8.6e-5 eV/K; ħ is 0.66 eV fs.
+    "Entropy": (1e-6, 1e3),
+    "Action": (1e-2, 1e6),
 }
 _AXIS_TYPICAL = (
     (1e-2, 1e4),
@@ -419,6 +524,7 @@ _AXIS_TYPICAL = (
     (1e-3, 1e3),
     (1.0, 1e8),
     (1.0, 1e9),
+    (1e-3, 1e3),
 )
 
 
@@ -464,7 +570,7 @@ _deferred_validation = True
 
 
 class Atomistic(UnitSystem, name="atomistic"):
-    """Å, eV, fs, K, μB: the reference units, and the default system."""
+    """Å, eV, fs, K, μB, e: the reference units, and the default system."""
 
     length = _catalogue("angstrom", LengthKind)
     energy = _catalogue("electron_volt", EnergyKind)
@@ -472,41 +578,49 @@ class Atomistic(UnitSystem, name="atomistic"):
 
 
 class Metal(UnitSystem, name="metal"):
-    """LAMMPS ``units metal``: Å, eV, ps."""
+    """LAMMPS ``units metal``: Å, eV, ps, e; mass g/mol, pressure bar, g/cm³."""
 
     length = _catalogue("angstrom", LengthKind)
     energy = _catalogue("electron_volt", EnergyKind)
     time = _catalogue("picosecond", TimeKind)
+    overrides = _catalogue_overrides(
+        "gram_per_mole", "bar", "gram_per_cubic_centimeter"
+    )
 
 
 class Real(UnitSystem, name="real"):
-    """LAMMPS ``units real``: Å, kcal/mol, fs."""
+    """LAMMPS ``units real``: Å, kcal/mol, fs, e; g/mol, atm, V/Å, g/cm³."""
 
     length = _catalogue("angstrom", LengthKind)
     energy = _catalogue("kcal_per_mol", EnergyKind)
     time = _catalogue("femtosecond", TimeKind)
+    overrides = _catalogue_overrides(
+        "gram_per_mole", "atmosphere", "volt_per_angstrom", "gram_per_cubic_centimeter"
+    )
 
 
 class SI(UnitSystem, name="si"):
-    """m, J, s, A·m²."""
+    """m, J, s, A·m², C."""
 
     length = _catalogue("meter", LengthKind)
     energy = _catalogue("joule", EnergyKind)
     time = _catalogue("second", TimeKind)
     magnetic_moment = _catalogue("ampere_meter_squared", MagneticMomentKind)
+    charge = _catalogue("coulomb", ChargeKind)
 
 
 class CGS(UnitSystem, name="cgs"):
-    """cm, erg, s, erg/G."""
+    """cm, erg, s, erg/G, statC."""
 
     length = _catalogue("centimeter", LengthKind)
     energy = _catalogue("erg", EnergyKind)
     time = _catalogue("second", TimeKind)
     magnetic_moment = _catalogue("erg_per_gauss", MagneticMomentKind)
+    charge = _catalogue("statcoulomb", ChargeKind)
 
 
 class Atomic(UnitSystem, name="atomic"):
-    """Hartree atomic units: a0, Ha, ħ/Eh, eħ/me."""
+    """Hartree atomic units: a0, Ha, ħ/Eh, eħ/me, e."""
 
     length = _catalogue("bohr", LengthKind)
     energy = _catalogue("hartree", EnergyKind)

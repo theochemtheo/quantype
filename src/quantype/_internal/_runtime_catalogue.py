@@ -48,10 +48,8 @@ class RuntimeCatalogue:
         for kind, units in by_kind.items():
             _UNIT_LOOKUPS[kind] = self.get_unit
             _CATALOGUE_UNITS[kind] = tuple(units)
-        for (op, left, right), result in catalogue.relations.items():
+        for (op, left, right), result in catalogue.algebra.items():
             PRODUCTS[op, self.kinds[left], self.kinds[right]] = self.kinds[result]
-            if op == "mul":
-                PRODUCTS[op, self.kinds[right], self.kinds[left]] = self.kinds[result]
         for (name, exponent), result in catalogue.powers.items():
             EXPONENTS[self.kinds[name], exponent] = self.kinds[result]
 
