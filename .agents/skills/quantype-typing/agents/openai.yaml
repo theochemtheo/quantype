@@ -1,0 +1,3 @@
+interface:
+  display_name: "Quantype Typing"
+  short_description: "Maintain static contracts across four type checkers"

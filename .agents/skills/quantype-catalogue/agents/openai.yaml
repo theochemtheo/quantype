@@ -1,0 +1,3 @@
+interface:
+  display_name: "Quantype Catalogue"
+  short_description: "Extend catalogues and regenerate typed public APIs"

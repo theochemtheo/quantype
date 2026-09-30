@@ -1,0 +1,3 @@
+interface:
+  display_name: "Quantype Autodiff"
+  short_description: "Preserve physical kinds through JAX and Torch derivatives"

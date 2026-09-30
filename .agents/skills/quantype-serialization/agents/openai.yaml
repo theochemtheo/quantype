@@ -1,0 +1,3 @@
+interface:
+  display_name: "Quantype Serialization"
+  short_description: "Maintain JSON, Pydantic, and pickle-free array boundaries"

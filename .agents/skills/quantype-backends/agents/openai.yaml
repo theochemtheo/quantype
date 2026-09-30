@@ -1,0 +1,3 @@
+interface:
+  display_name: "Quantype Backends"
+  short_description: "Maintain numerical storage and optional backend isolation"

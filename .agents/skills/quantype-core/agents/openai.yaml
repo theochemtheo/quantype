@@ -1,0 +1,3 @@
+interface:
+  display_name: "Quantype Core"
+  short_description: "Maintain canonical units and nominal physical algebra"
