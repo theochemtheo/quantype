@@ -43,12 +43,19 @@ Generation includes runtime classes, stubs, units, numerical helpers, and
 optional autodiff adapters. `generate(..., check=True)` returns stale file names
 without writing; `render(...)` returns source strings without invoking tools.
 Names and aliases that collide with generated API bindings (such as `sqrt` or
-`get_unit`) are rejected, as are conflicting quantity namespaces.
+`get_unit`) are rejected, as are conflicting quantity namespaces. Quantity
+names also reserve imported typing bindings, package aliases such as `u`, and
+all generated kind-marker names (for example, `LengthKind`). Unit scales and
+offsets are emitted as Python float literals; NumPy-derived factors are supported,
+with binary64 rounding. Factors outside binary64's range are rejected.
 
 A generated catalogue is a separate, combined API, not an extension of the
 installed classes. Its `Length` is a distinct nominal type from
 `quantype.Length`; import quantities consistently from the generated package.
-Generating a package does not change `quantype`'s operator overloads.
+Generating a package does not change `quantype`'s operator overloads. Generated
+structural results use the package's own `Quantity` subclass; import that class
+for structural annotations so reciprocal types retain the catalogue's
+`DimensionlessKind`. It remains a subclass of `quantype.core.Quantity`.
 
 To define a new unit for an existing physical kind instead, see
 [custom units](units.md#define-a-unit-without-global-registration).

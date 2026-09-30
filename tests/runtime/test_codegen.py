@@ -11,6 +11,7 @@ import sys
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import numpy as np
 import pytest
 
 from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
@@ -28,7 +29,11 @@ def catalogue() -> Catalogue:
         quantities={
             "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0), "surface_tension")
         },
-        units={"surface_tension": UnitSpec("SurfaceTension")},
+        units={
+            "surface_tension": UnitSpec("SurfaceTension"),
+            "lab_sqrt2": UnitSpec("Length", scale=np.sqrt(2.0)),
+            "lab_point": UnitSpec("Temperature", offset=np.float64(1.5)),
+        },
         relations={("mul", "Pressure", "Length"): "SurfaceTension"},
     )
 
@@ -120,6 +125,61 @@ def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None
         )
 
 
+@pytest.mark.parametrize(
+    "kind",
+    [
+        "u",
+        "LengthKind",
+        "Any",
+        "Literal",
+        "override",
+        "np",
+        "npt",
+        "_units",
+        "_BaseQuantity",
+        "_StructuralQuantity",
+        "Quantity",
+        "NonAffineKind",
+        "units",
+        "kinds",
+        "ujax",
+        "utorch",
+        "_generated",
+        "_catalogue",
+        "_math",
+        "Callable",
+        "Array",
+        "Tensor",
+        "__name__",
+        "__init__",
+        "V",
+        "W",
+        "_LengthUnit",
+        "_LengthNamespace",
+    ],
+)
+def test_quantity_names_cannot_shadow_generated_bindings(kind: str) -> None:
+    with pytest.raises(ValueError, match="Invalid quantity definition"):
+        builtin_catalogue().extend(
+            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
+            units={"lab_unit": UnitSpec(kind)},
+        )
+
+
+def test_quantity_marker_collision_is_order_independent() -> None:
+    for names in (("Sample", "SampleKind"), ("SampleKind", "Sample")):
+        with pytest.raises(
+            ValueError, match="Invalid quantity definition 'SampleKind'"
+        ):
+            builtin_catalogue().extend(
+                quantities={
+                    name: QuantitySpec((1, 0, 0, 0, 0, 0, 0), f"lab_{name}")
+                    for name in names
+                },
+                units={f"lab_{name}": UnitSpec(name) for name in names},
+            )
+
+
 def test_quantity_namespaces_are_unique() -> None:
     with pytest.raises(ValueError, match="Conflicting quantity namespace 'length'"):
         builtin_catalogue().extend(
@@ -133,6 +193,20 @@ def test_canonical_unit_cannot_override_namespace_constructor() -> None:
         builtin_catalogue().extend(
             quantities={"Sample": QuantitySpec((0, 0, 0, 0, 0, 0, 0), "__init__")},
             units={"__init__": UnitSpec("Sample")},
+        )
+
+
+@pytest.mark.parametrize(
+    ("scale", "offset"),
+    [(True, 0.0), (1.0, True), (float("inf"), 0.0), (1.0, float("nan"))],
+)
+def test_unit_factors_require_portable_real_numbers(
+    scale: float, offset: float
+) -> None:
+    with pytest.raises(ValueError, match="Invalid conversion"):
+        builtin_catalogue().extend(
+            quantities={},
+            units={"lab_point": UnitSpec("Temperature", scale=scale, offset=offset)},
         )
 
 
@@ -176,6 +250,8 @@ def test_stale_check_does_not_rewrite_files(
         "serialization_roundtrip",
         "math_preserves_catalogue",
         "temperature_difference",
+        "structural_reciprocals",
+        "portable_unit_factors",
     ],
 )
 def test_generated_runtime(generated_project: Path, case: str) -> None:

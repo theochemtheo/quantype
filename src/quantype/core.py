@@ -17,6 +17,7 @@ from quantype._internal._semantics import (
     Kind,
     Semantic,
     addition,
+    dimensionless_kind,
     power,
     product,
 )
@@ -56,12 +57,22 @@ def _symbol(kind: Semantic) -> str:
 
 
 _CLASSES: dict[Kind, type[Quantity[Any, Any]]] = {}
+_STRUCTURAL_CLASSES: dict[Kind, type[Quantity[Any, Any]]] = {}
 
 
 def _wrap(kind: str | Semantic, value: Any) -> Quantity[Any, Any]:
     # No coercion: JAX reconstruction also supplies sentinel leaves.
     semantic = KINDS[kind] if isinstance(kind, str) else kind
-    cls = _CLASSES[semantic] if isinstance(semantic, Kind) else Quantity
+    if isinstance(semantic, Kind):
+        cls = _CLASSES[semantic]
+    else:
+        # The leftmost kind owns the result API; reciprocal inference separately
+        # checks all leaves so mixed-catalogue scalar numerators stay ambiguous.
+        leaf = semantic.left
+        while not isinstance(leaf, Kind):
+            leaf = leaf.left
+        owner = DIMENSIONLESS_KINDS.get(leaf)
+        cls = Quantity if owner is None else _STRUCTURAL_CLASSES.get(owner, Quantity)
     result = cast("Any", object.__new__(cls))
     result._value = value
     result._semantic = semantic
@@ -78,6 +89,8 @@ class Quantity[K, V]:
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
+        if "_catalogue_dimensionless" in cls.__dict__:
+            _STRUCTURAL_CLASSES[cls.__dict__["_catalogue_dimensionless"]] = cls
         if cls.__dict__.get("_kind"):
             if "_semantic" not in cls.__dict__:
                 cls._semantic = KINDS[cls._kind]
@@ -175,12 +188,11 @@ class Quantity[K, V]:
                 return self.value
             unit = self._display
         self._check_unit(unit)
-        raw: Any = self.value
-        if unit.offset != 0:
-            raw = raw - unit.offset
-        if unit.scale != 1:
-            raw = raw / unit.scale
-        return cast("V", raw)
+        from quantype._internal._storage import unit_conversion
+
+        return cast(
+            "V", unit_conversion(self.value, unit.scale, unit.offset, inverse=True)
+        )
 
     def to(self, unit: Unit[K]) -> Self:
         self._check_unit(unit)
@@ -228,9 +240,7 @@ class Quantity[K, V]:
 
     def __rtruediv__(self, other: Any) -> Quantity[Any, Any]:
         self._check_scalar(other)
-        numerator = KINDS["Dimensionless"]
-        if isinstance(self._semantic, Kind):
-            numerator = DIMENSIONLESS_KINDS.get(self._semantic, numerator)
+        numerator = dimensionless_kind(self._semantic)
         return _wrap(product("div", numerator, self._semantic), other / self.value)
 
     def _check_scalar(self, value: object) -> None:

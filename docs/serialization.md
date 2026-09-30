@@ -60,6 +60,11 @@ Bare quantity annotations work at runtime; strict static code should specify
 storage. `Length.parse(...)` intentionally returns scalar-or-float64-array
 storage; use a typed constructor or `TypeAdapter` for a particular target.
 
+JSON number leaves are Python floats (binary64), including values from NumPy
+`longdouble` storage. Extra precision is rounded; finite extended-range values
+that would become infinity or round to zero are rejected with `ValueError`.
+Use NPZ when dtype and extended precision must be preserved.
+
 JSON stores values, not backend/device/dtype metadata. Torch tensors are detached
 and copied to CPU at serialization, never inside arithmetic or differentiation.
 

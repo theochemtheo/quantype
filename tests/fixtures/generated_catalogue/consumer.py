@@ -3,7 +3,15 @@
 from typing import assert_type
 
 import numpy as np
-from labquantities import InverseTime, Length, Pressure, SurfaceTension, Temperature, u
+from labquantities import (
+    InverseTime,
+    Length,
+    Pressure,
+    Quantity,
+    SurfaceTension,
+    Temperature,
+    u,
+)
 from labquantities.kinds import (
     DimensionlessKind,
     Div,
@@ -12,8 +20,6 @@ from labquantities.kinds import (
     SurfaceTensionKind,
     TimeKind,
 )
-
-from quantype.core import Quantity
 
 length = Length[float](2, u.length.angstrom)
 pressure = Pressure[float](3, u.pressure.pascal)
@@ -25,6 +31,14 @@ product = length * (3 * u.fs)
 assert_type(product + product, Quantity[Mul[LengthKind, TimeKind], float])
 assert_type(product * 2, Quantity[Mul[LengthKind, TimeKind], float])
 assert_type(product.mean(), Quantity[Mul[LengthKind, TimeKind], float])
+assert_type(
+    1 / product,
+    Quantity[Div[DimensionlessKind, Mul[LengthKind, TimeKind]], float],
+)
+assert_type(
+    1 / product + u.one(1) / product,
+    Quantity[Div[DimensionlessKind, Mul[LengthKind, TimeKind]], float],
+)
 assert_type(1.0 / (2 * u.fs), InverseTime[float])
 assert_type(
     1.0 / (length * pressure),

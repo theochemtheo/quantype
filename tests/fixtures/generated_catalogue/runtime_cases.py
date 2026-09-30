@@ -5,6 +5,7 @@ from labquantities import (
     InverseTime,
     Length,
     Pressure,
+    Quantity,
     SurfaceTension,
     TemperatureDifference,
     u,
@@ -31,6 +32,35 @@ def test_physical_algebra() -> None:
     inverse_tension = 1.0 / (length * pressure)
     assert inverse_tension.kind == "Div[Dimensionless,SurfaceTension]"
     assert inverse_tension.value == 1.0 / (length * pressure).value
+
+
+def test_structural_reciprocals() -> None:
+    quantities = (
+        (2 * u.angstrom) * (3 * u.fs),
+        (2 * u.angstrom) / (3 * u.bohr_magneton),
+        (2 * u.angstrom) ** 4,
+    )
+    for q in quantities:
+        assert type(q) is Quantity
+        scalar_inverse = 1 / q
+        assert type(scalar_inverse) is Quantity
+        explicit_inverse = u.one(1) / q
+        assert (scalar_inverse + explicit_inverse).value == 2 / q.value
+        assert (1 / (1 / q)).kind == (u.one(1) / scalar_inverse).kind
+    mixed = (2 * u.angstrom) * (3 * original_units.fs)
+    with pytest.raises(TypeError, match="mixed-catalogue"):
+        1 / mixed
+    # An explicit numerator remains usable without merging nominal identities.
+    explicit = u.one(1) / mixed
+    assert explicit.value == 1 / mixed.value
+    other = original_units.one(1) / quantities[0]
+    with pytest.raises(TypeError, match="Cannot add"):
+        other + 1 / quantities[0]
+
+
+def test_portable_unit_factors() -> None:
+    assert u.lab_sqrt2(2).value == 2 * 2**0.5
+    assert u.lab_point(1).value == 2.5
 
 
 def test_serialization_roundtrip() -> None:

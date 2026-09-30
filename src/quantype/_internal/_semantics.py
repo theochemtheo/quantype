@@ -54,6 +54,30 @@ TEMPERATURE_DIFFERENCES = {KINDS["Temperature"]: KINDS["TemperatureDifference"]}
 DIMENSIONLESS_KINDS = dict.fromkeys(KINDS.values(), KINDS["Dimensionless"])
 
 
+def dimensionless_kind(semantic: Semantic) -> Kind:
+    """Resolve a reciprocal's numerator without importing another catalogue.
+
+    An expression spanning different catalogues has no unambiguous implicit
+    scalar identity. Its caller can supply an explicit dimensionless numerator.
+    """
+    if isinstance(semantic, Kind):
+        try:
+            return DIMENSIONLESS_KINDS[semantic]
+        except KeyError as exc:
+            raise TypeError(
+                "Scalar reciprocal requires a catalogue dimensionless kind"
+            ) from exc
+    left = dimensionless_kind(semantic.left)
+    if not isinstance(semantic.right, int) and left is not dimensionless_kind(
+        semantic.right
+    ):
+        raise TypeError(
+            "Scalar reciprocal of a mixed-catalogue expression requires "
+            "an explicit dimensionless quantity numerator"
+        )
+    return left
+
+
 def addition(left: Semantic, right: Semantic, *, subtract: bool) -> Semantic:
     if isinstance(left, Kind) and left.affine:
         if left is right:

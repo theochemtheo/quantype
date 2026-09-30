@@ -84,11 +84,9 @@ class Unit[K]:
         return cast("Quantity[K, V]", _wrap(self.semantic, self.canonical(raw)))
 
     def canonical(self, raw: Any) -> Any:
-        if self.scale != 1:
-            raw = raw * self.scale
-        if self.offset != 0:
-            raw = raw + self.offset
-        return raw
+        from quantype._internal._storage import unit_conversion
+
+        return unit_conversion(raw, self.scale, self.offset)
 
     def __mul__(self, value: Any) -> Quantity[K, Any]:
         return self(value)

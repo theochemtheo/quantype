@@ -27,7 +27,12 @@ floating storage rejects boolean, complex, and non-numerical magnitudes.
 
 Units describe input magnitudes, not the resulting quantity type. Construction
 converts into canonical units and defaults to canonical presentation. Shape and
-symmetry are the caller's responsibility.
+symmetry are the caller's responsibility. Noncanonical conversion uses wider
+working precision before rounding into the requested storage; presentation
+conversion also widens intermediates and retains the stored dtype. Existing
+low-precision input rounding cannot be undone. Working precision is limited by
+the backend (for example, JAX without x64); conversion factors outside its range
+raise `ValueError`.
 
 Units can also construct quantities directly:
 
@@ -79,6 +84,9 @@ Unlisted products retain structural types such as
 structured trees, not parsed strings. These quantities support arithmetic and
 reductions while retaining their structural kinds. Scalar reciprocals use declared
 relations, such as `1 / Time` yielding `InverseTime`, or retain a structural ratio.
+Structural reciprocals use the dimensionless identity of their catalogue.
+For expressions mixing catalogues, scalar reciprocals are ambiguous and raise
+`TypeError`; supply an explicit dimensionless quantity numerator instead.
 There is no arbitrary symbolic cancellation or inference of physical meaning from
 dimensions alone.
 

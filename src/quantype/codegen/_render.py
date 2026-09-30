@@ -147,6 +147,40 @@ def quantity_methods(name: str, catalogue: Catalogue) -> str:
     return text + overloads(powers, overrides=True)
 
 
+def structural_quantity_stub() -> str:
+    """A generated base carries its own dimensionless marker through trees."""
+    text = "type _StructuralQuantity[A, B, V] = Quantity[Mul[A, B], V] | Quantity[Div[A, B], V] | Quantity[Pow[A, B], V]\n"
+    text += "class Quantity[K, V](_BaseQuantity[K, V]):\n"
+    for method in ("__add__", "__sub__"):
+        text += overloads(
+            [
+                f"def {method}[A, B, W](self: _StructuralQuantity[A, B, float], other: Quantity[K, W], /) -> Quantity[K, W]: ...",
+                f"def {method}[A, B](self: _StructuralQuantity[A, B, V], other: Quantity[K, float], /) -> Quantity[K, V]: ...",
+                f"def {method}[A, B](self: _StructuralQuantity[A, B, V], other: Quantity[K, V], /) -> Quantity[K, V]: ...",
+            ],
+            overrides=True,
+        )
+    for method, expression in (("__mul__", "Mul"), ("__truediv__", "Div")):
+        text += overloads(
+            [
+                f"def {method}[A, B](self: _StructuralQuantity[A, B, V], other: float, /) -> Quantity[K, V]: ...",
+                f"def {method}[A, B, L: NonAffineKind, W](self: _StructuralQuantity[A, B, float], other: Quantity[L, W], /) -> Quantity[{expression}[K, L], W]: ...",
+                f"def {method}[A, B, L: NonAffineKind](self: _StructuralQuantity[A, B, V], other: Quantity[L, float], /) -> Quantity[{expression}[K, L], V]: ...",
+                f"def {method}[A, B, L: NonAffineKind](self: _StructuralQuantity[A, B, V], other: Quantity[L, V], /) -> Quantity[{expression}[K, L], V]: ...",
+            ],
+            overrides=True,
+        )
+    text += "    @override\n    def __rmul__[A, B](self: _StructuralQuantity[A, B, V], other: float, /) -> Quantity[K, V]: ...\n"
+    # The shared base necessarily uses the builtin marker. This refinement is
+    # nominal, not a widening; each catalogue has its own structural base.
+    text += "    @override\n    def __rtruediv__[A, B](self: _StructuralQuantity[A, B, V], other: float, /) -> Quantity[Div[DimensionlessKind, K], V]: ...  # pyrefly: ignore[bad-override]  # ty: ignore[invalid-method-override]\n"
+    text += "    @override\n    def __pow__[A, B, N: int](self: _StructuralQuantity[A, B, V], exponent: N, /) -> Quantity[Pow[K, N], V]: ...\n"
+    for method in ("__neg__", "__abs__"):
+        text += f"    @override\n    def {method}[A, B](self: _StructuralQuantity[A, B, V]) -> Quantity[K, V]: ...\n"
+    text += "    @override\n    def sum[A, B](self: _StructuralQuantity[A, B, V], axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False) -> Quantity[K, V]: ...\n"
+    return text
+
+
 def quantity_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
     kinds = HEADER + '"""Nominal and structural semantic markers."""\n\n'
     kinds += (
@@ -163,17 +197,28 @@ def quantity_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         + ", ".join(f"{name}Kind" for name in catalogue.quantities)
         + ")\n"
     )
-    runtime = HEADER + "from quantype.core import Quantity\n" + markers
-    if package != "quantype":
+    runtime = HEADER + markers
+    if package == "quantype":
+        runtime += "from quantype.core import Quantity\n"
+    else:
+        runtime += "from quantype.core import Quantity as _BaseQuantity\n"
         runtime += f"from {package}._catalogue import runtime\n"
+        runtime += "class Quantity[K, V](_BaseQuantity[K, V]):\n    _catalogue_dimensionless = runtime.kinds['Dimensionless']\n"
     stub = (
         HEADER + OVERLAPS + QUANTITY_OVERRIDES + "# pyright: reportPrivateUsage=false\n"
     )
-    stub += "from typing import Any, Literal, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Quantity, Unit\n"
+    stub += "from typing import Any, Literal, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Unit\n"
+    stub += (
+        "from quantype.core import Quantity\n"
+        if package == "quantype"
+        else "from quantype.core import Quantity as _BaseQuantity\n"
+    )
     stub += (
         markers
         + f"from {package}.kinds import Div, Mul, NonAffineKind, Pow\nfrom {package} import units as _units\n"
     )
+    if package != "quantype":
+        stub += structural_quantity_stub()
     for name in catalogue.quantities:
         runtime += (
             f"\nclass {name}[V](Quantity[{name}Kind, V]):\n    _kind = {name!r}\n"
@@ -341,7 +386,10 @@ def adapter_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
                 )
                 + ")\n"
             )
-        text += f"from quantype.core import Quantity\nfrom {package}.kinds import Div\n"
+        quantity_module = "quantype.core" if package == "quantype" else package
+        text += (
+            f"from {quantity_module} import Quantity\nfrom {package}.kinds import Div\n"
+        )
         text += overloads(gradient_signatures(catalogue, backend, array), indent="")
         if backend == "ujax":
             text += overloads(hessian_signatures(catalogue), indent="")

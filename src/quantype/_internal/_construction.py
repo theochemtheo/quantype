@@ -30,6 +30,7 @@ class StorageAlias(GenericAlias):
         if unit.semantic is not cls._semantic:
             raise ValueError(f"Expected {cls._kind}; received {unit.kind}")
         storage = self.__args__[-1]
-        raw = convert(value, storage, dtype=dtype)
-        canonical = unit.canonical(raw)
-        return _wrap(cls._semantic, convert(canonical, storage, dtype=dtype))
+        canonical = convert(
+            value, storage, dtype=dtype, scale=unit.scale, offset=unit.offset
+        )
+        return _wrap(cls._semantic, canonical)

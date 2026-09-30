@@ -46,6 +46,43 @@ _UNIT_MODULE_BINDINGS = frozenset(
 )
 
 
+# Names imported or assigned by the runtime/stub renderers and package scaffold.
+# Keep this shared validation contract aligned when adding generated bindings.
+_QUANTITY_BINDINGS = _UNIT_MODULE_BINDINGS | frozenset(
+    {
+        "Quantity",
+        "Mul",
+        "Div",
+        "Pow",
+        "NonAffineKind",
+        "Literal",
+        "override",
+        "np",
+        "npt",
+        "_units",
+        "_BaseQuantity",
+        "_StructuralQuantity",
+        "u",
+        "Callable",
+        "Array",
+        "Tensor",
+        "_generated",
+        "_catalogue",
+        "_math",
+        "units",
+        "kinds",
+        "ujax",
+        "utorch",
+        # These generic parameters occur alongside named-class references in
+        # generated methods, so they cannot also name a quantity class.
+        "V",
+        "W",
+        "K",
+        "S",
+    }
+)
+
+
 def _namespace_name(kind: str) -> str:
     return "".join(
         ("_" + char.lower()) if char.isupper() else char for char in kind
@@ -76,13 +113,18 @@ class Catalogue:
         self._validate_algebra()
 
     def _validate_quantities(self) -> None:
-        reserved = {"Quantity", "Unit", "Mul", "Div", "Pow", "NonAffineKind"}
+        reserved = _QUANTITY_BINDINGS | {
+            binding
+            for kind in self.quantities
+            for binding in (f"{kind}Kind", f"_{kind}Namespace", f"_{kind}Unit")
+        }
         namespaces: set[str] = set()
         for name, spec in self.quantities.items():
             if (
                 not name.isidentifier()
                 or keyword.iskeyword(name)
                 or name in reserved
+                or (name.startswith("__") and name.endswith("__"))
                 or len(spec.dimensions) != len(BASIS)
             ):
                 raise ValueError(f"Invalid quantity definition {name!r}")
@@ -121,9 +163,12 @@ class Catalogue:
             ):
                 raise ValueError(f"Invalid unit definition {name!r}")
             if (
-                not math.isfinite(unit.scale)
-                or unit.scale <= 0
-                or not math.isfinite(unit.offset)
+                isinstance(unit.scale, bool)
+                or isinstance(unit.offset, bool)
+                or not math.isfinite(float(unit.scale))
+                or float(unit.scale) <= 0
+                or not math.isfinite(float(unit.offset))
+                or (unit.offset != 0 and float(unit.offset) == 0)
             ):
                 raise ValueError(f"Invalid conversion for {name}")
             if unit.offset and unit.kind != "Temperature":

@@ -66,9 +66,24 @@ def to_dict(
     selected = selected_unit(quantity, unit)
     return {
         "kind": quantity.kind,
-        "magnitude": host_array(quantity.magnitude(selected)).tolist(),
+        "magnitude": _json_numbers(host_array(quantity.magnitude(selected)).tolist()),
         "unit": selected.name,
     }
+
+
+def _json_numbers(value: object) -> object:
+    """JSON uses binary64 numbers; extended-range values must not become infinity."""
+    if isinstance(value, list):
+        return [_json_numbers(item) for item in cast("list[object]", value)]
+    if isinstance(value, np.floating):
+        scalar = cast("Any", value)
+        number = float(scalar)
+        if np.isfinite(scalar) and (
+            not np.isfinite(number) or (scalar != 0 and number == 0)
+        ):
+            raise ValueError("Magnitude exceeds the range of JSON binary64 numbers")
+        return number
+    return value
 
 
 def _is_quantity(value: object) -> TypeGuard[Quantity[Any, Any]]:
@@ -191,6 +206,7 @@ def load_npz[Q](
         array = archive[entry["array"]]
         if array.dtype.kind not in "iuf":
             raise ValueError("Archive magnitude must have a real numerical dtype")
-        raw = convert(array, storage[-1], dtype=dtype)
-        canonical = convert(unit.canonical(raw), storage[-1], dtype=dtype)
+        canonical = convert(
+            array, storage[-1], dtype=dtype, scale=unit.scale, offset=unit.offset
+        )
         return cast("Q", _wrap(cls._semantic, canonical))
