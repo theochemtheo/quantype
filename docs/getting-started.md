@@ -123,7 +123,8 @@ Indexing, iteration, `len()`, `.shape`, `.max()`, `.min()`, `.reshape(...)`,
 `.T`, `.squeeze()`, `.cumsum()`, and `.std()` all keep the kind. `<` and `>` need
 the same kind and unit system, and return backend booleans. `==` compares
 values, element-wise for arrays, and quantities of different kinds or systems
-compare unequal.
+compare unequal. A plain number needs a unit to compare with a quantity:
+`q == 0` raises, and `q == 0 * u.nm` works.
 
 For any other array operation, apply it to `.value` and give the result back
 with `with_value`, which keeps the kind, unit system, and display unit:
@@ -230,10 +231,10 @@ input, and `TypeAdapter` comes from `pydantic`.
 
 `Length.parse` gives a Python float or a float64 NumPy array.
 `Length[float, SI].parse(...)` chooses the unit system but not the storage; for
-float32, use a `TypeAdapter`. A JSON quantity object must have exactly `kind`,
-`magnitude`, and `unit`. A string takes a unit's name, alias, or printed symbol,
-so `"25 °C"` and `"1 eV/Å^2"` parse as printed. A number needs a unit, except for
-`Dimensionless` values, which print as a bare number.
+float32, use a `TypeAdapter`. A JSON quantity object has `magnitude` and
+`unit`, and may name its `kind`. A string takes a unit's name, alias, or
+printed symbol, so `"25 °C"` and `"1 eV/Å^2"` parse as printed. A number needs a
+unit, except for `Dimensionless` values, which print as a bare number.
 
 ## Temperatures and custom units
 
@@ -288,6 +289,7 @@ Serialization saves values; device placement and autodiff graphs are lost.
 | `Implicit array coercion drops units` | In tests, compare with `quantype.testing.assert_allclose`. Elsewhere, pass `.value` or `.magnitude(unit)`. |
 | `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists can't scale a quantity. Convert lists with `np.asarray`. |
 | `Cannot add int and Length; give it a unit` | Plain numbers can only be added to `Dimensionless` values, and zero to anything (so `sum()` works). Give the number a unit. |
+| `Cannot compare Length and int; give it a unit` | Compare with a quantity, as in `q > 0 * u.nm`. Plain numbers compare only with `Dimensionless` values. |
 | `The truth value of a Length quantity is ambiguous` | Compare against a value, as in `q > 0 * u.nm`, or test `q is not None`. |
 | An `EnergyDensity` where a `Pressure` is expected | Rename it with `Pressure.reinterpret(q)`. |
 | `Cannot combine SI and Atomistic quantities` | Convert one operand with `.to_system(...)`. |

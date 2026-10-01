@@ -556,9 +556,23 @@ class Quantity[K, V, S: UnitSystem]:
         raw: Any = self._value
         return self._scaled(abs(raw))
 
+    def _number(self, other: object) -> Quantity[Any, Any, Any] | None:
+        """``other`` as a quantity to compare with, or None for a non-number.
+
+        Dimensionless values compare with plain numbers. Any other kind refuses
+        them, as ordering already does: ``2 * u.nm == 2`` raises, while ``None``
+        and other objects are simply unequal.
+        """
+        plain = self._plain(other)
+        if plain is None and real_operand(other) is not None:
+            raise TypeError(
+                f"Cannot compare {self.kind} and {type(other).__name__}; give it a unit"
+            )
+        return plain
+
     def _compare(self, other: object, compare: Callable[[Any, Any], Any]) -> Any:
         if not isinstance(other, Quantity):
-            plain = self._plain(other)
+            plain = self._number(other)
             if plain is None:
                 return NotImplemented
             other = plain
@@ -573,10 +587,10 @@ class Quantity[K, V, S: UnitSystem]:
         """Value equality within a kind and system; otherwise simply unequal.
 
         As with naive and aware datetimes, quantities that cannot be compared
-        are unequal, while ordering them raises.
+        are unequal, while ordering them raises. A plain number raises for both.
         """
         if not isinstance(other, Quantity):
-            plain = self._plain(other)
+            plain = self._number(other)
             return (
                 NotImplemented if plain is None else self._compare(plain, operator.eq)
             )
@@ -588,7 +602,7 @@ class Quantity[K, V, S: UnitSystem]:
     @override
     def __ne__(self, other: object) -> Any:
         if not isinstance(other, Quantity):
-            plain = self._plain(other)
+            plain = self._number(other)
             return (
                 NotImplemented if plain is None else self._compare(plain, operator.ne)
             )

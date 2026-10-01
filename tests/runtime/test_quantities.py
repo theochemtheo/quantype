@@ -134,7 +134,8 @@ def test_value_equality() -> None:
     assert a == b
     assert a != 2 * u.nm
     assert a != 1 * u.eV
-    assert a != 1.0
+    with pytest.raises(TypeError, match="give it a unit"):
+        _ = a != 1.0
     arrays = Length[npt.NDArray[np.float64]]([1.0, 2.0], u.nm)
     np.testing.assert_array_equal(arrays == arrays.to(u.angstrom), [True, True])
     np.testing.assert_array_equal(arrays != 1 * u.nm, [False, True])
@@ -176,7 +177,7 @@ def test_ordering_comparisons() -> None:
     wrong: Any = positions
     with pytest.raises(TypeError, match="Cannot compare Length and Energy"):
         _ = wrong < 1 * u.eV
-    with pytest.raises(TypeError, match="not supported"):
+    with pytest.raises(TypeError, match="Cannot compare Length and float"):
         _ = wrong < 1.0
 
 

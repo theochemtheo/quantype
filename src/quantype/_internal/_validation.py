@@ -69,18 +69,24 @@ def pydantic_schema(
     value_schema = (
         number if scalar_storage else core_schema.union_schema([number, array])
     )
-    payload = core_schema.typed_dict_schema(
-        {
-            "kind": core_schema.typed_dict_field(
-                core_schema.literal_schema([cls._kind])
-            ),
-            "magnitude": core_schema.typed_dict_field(value_schema),
-            # A context may supply custom units, so a fixed builtin enum would
-            # falsely reject valid schema inputs.
-            "unit": core_schema.typed_dict_field(core_schema.str_schema()),
-        },
-        extra_behavior="forbid",
-    )
+
+    def payload_schema(*, kind_required: bool) -> core_schema.TypedDictSchema:
+        return core_schema.typed_dict_schema(
+            {
+                "kind": core_schema.typed_dict_field(
+                    core_schema.literal_schema([cls._kind]), required=kind_required
+                ),
+                "magnitude": core_schema.typed_dict_field(value_schema),
+                # A context may supply custom units, so a fixed builtin enum would
+                # falsely reject valid schema inputs.
+                "unit": core_schema.typed_dict_field(core_schema.str_schema()),
+            },
+            extra_behavior="forbid",
+        )
+
+    # Input may leave out "kind", which the field's type names; output has it.
+    payload = payload_schema(kind_required=False)
+    written = payload_schema(kind_required=True)
 
     def validate_input(
         data: object,
@@ -102,11 +108,15 @@ def pydantic_schema(
         "core_schema.CoreSchema",
         wrapper(
             validate_input,
+            # Python-mode dumps pass quantities through this inner schema.
             schema=core_schema.union_schema(
-                [payload, core_schema.str_schema(pattern=pattern)]
+                [payload, core_schema.str_schema(pattern=pattern)],
+                serialization=core_schema.simple_ser_schema("any"),
             ),
+            # Python-mode dumps keep quantities, as they keep datetimes; JSON
+            # mode writes the kind/magnitude/unit object.
             serialization=core_schema.plain_serializer_function_ser_schema(
-                to_dict, return_schema=payload
+                to_dict, return_schema=written, when_used="json"
             ),
             metadata={"quantity_kind": cls._kind},
         ),

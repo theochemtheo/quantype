@@ -370,6 +370,9 @@ systems compare unequal, as naive and aware datetimes do. Scalar quantities hash
 by value, so they work as dict keys and in sets. Quantities with array storage
 are unhashable, like NumPy arrays. `<` and the other orderings need the same
 kind and system, statically and at runtime, and return backend booleans.
+Comparing a quantity with a plain number, as in `2 * u.nm == 2`, raises
+`TypeError` for `==` and the orderings alike, except for `Dimensionless`
+values. `None` and other non-numbers compare unequal.
 
 Indexing, iteration, `.shape`, `.ndim`, `len()`, `.sum()`, `.mean()`, `.max()`,
 and `.min()` keep the kind, system, and display unit. With

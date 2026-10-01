@@ -61,8 +61,32 @@ def test_schema_and_bare_annotation() -> None:
     adapter: TypeAdapter[Any] = TypeAdapter(Length)
     assert adapter.validate_python("5 angstrom").value == 5
     schema = Simulation.model_json_schema()["properties"]["cutoff"]["anyOf"][0]
-    assert set(schema["required"]) == {"kind", "magnitude", "unit"}
+    assert set(schema["required"]) == {"magnitude", "unit"}  # the field names the kind
     assert schema["properties"]["magnitude"]["type"] == "number"
+    written = Simulation.model_json_schema(mode="serialization")["properties"]
+    assert set(written["cutoff"]["required"]) == {"kind", "magnitude", "unit"}
+
+
+def test_objects_may_leave_out_the_kind_their_field_names() -> None:
+    assert Length.parse({"magnitude": 2, "unit": "nm"}) == 2 * u.nm
+    adapter = TypeAdapter(Length[float])
+    assert adapter.validate_python({"magnitude": 2, "unit": "nm"}) == 2 * u.nm
+    with pytest.raises(ValidationError, match="Expected Length; received Energy"):
+        adapter.validate_python({"kind": "Energy", "magnitude": 2, "unit": "eV"})
+    with pytest.raises(ValidationError, match="and optionally 'kind'"):
+        adapter.validate_python({"magnitude": 2})
+
+
+def test_python_mode_dumps_keep_quantities() -> None:
+    adapter = TypeAdapter(Length[float])
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        assert adapter.dump_python(2 * u.nm) == 2 * u.nm
+        assert adapter.dump_python(2 * u.nm, mode="json") == {
+            "kind": "Length",
+            "magnitude": 2.0,
+            "unit": "nanometer",
+        }
 
 
 @pytest.mark.parametrize("storage", [float, np.float16, np.float32, np.float64])

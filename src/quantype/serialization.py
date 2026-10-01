@@ -184,12 +184,14 @@ def _wire_fields(data: object, expected: str) -> tuple[object, str]:
         value: object = float(match[1])
         name: object = match[2]
     elif isinstance(data, Mapping):
+        # The target names the kind, so "kind" may be left out, as it is from a
+        # string; written data always includes it, and it must then match.
         payload = cast("Mapping[object, object]", data)
-        if set(payload) != {"kind", "magnitude", "unit"}:
+        if set(payload) - {"kind"} != {"magnitude", "unit"}:
             raise ValueError(
-                "Quantity objects require exactly 'kind', 'magnitude', and 'unit'"
+                "Quantity objects have 'magnitude' and 'unit', and optionally 'kind'"
             )
-        if payload["kind"] != expected:
+        if payload.get("kind", expected) != expected:
             raise ValueError(f"Expected {expected}; received {payload['kind']}")
         value, name = payload["magnitude"], payload["unit"]
     else:

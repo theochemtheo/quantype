@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import operator
 from fractions import Fraction
 from typing import TYPE_CHECKING, Any, cast
 
@@ -198,3 +199,24 @@ def test_string_units_get_a_type_error_naming_the_unit_object(
 def test_a_device_passed_to_to_explains_display_units() -> None:
     with pytest.raises(TypeError, match="to move a tensor to another device"):
         (2 * u.nm).to(cast("Any", "cpu"))
+
+
+@pytest.mark.parametrize("number", [0, 2, 2.0, np.float64(2), np.array([2.0])])
+def test_comparing_with_a_plain_number_needs_a_unit(number: object) -> None:
+    length: Any = 2 * u.nm
+    other: Any = number
+    for compare in (operator.eq, operator.ne, operator.lt, operator.ge):
+        with pytest.raises(TypeError, match=r"Cannot compare Length and .*; give it a"):
+            compare(length, other)
+    with pytest.raises(TypeError, match="give it a unit"):
+        operator.eq(other, length)
+
+
+def test_non_numbers_are_unequal_and_dimensionless_values_take_numbers() -> None:
+    length: Any = 2 * u.nm
+    assert length != None  # noqa: E711 -- the comparison under test
+    assert length != "2 nm"
+    assert length in [None, 2 * u.nm]
+    ratio = (1 * u.nm) / (4 * u.nm)
+    assert ratio == 0.25
+    assert ratio < 1

@@ -25,9 +25,12 @@ system-qualified identifier such as `gromacs:Force` for
 written back as `0.5 nanometer` in every system, and `"20.1 degC"` as exactly
 `20.1 celsius`.
 
-A quantity object must have exactly `kind`, `magnitude`, and `unit`. A string
-such as `"5 angstrom"` is accepted wherever the target kind is known, as in a
-Pydantic field or `Length.parse`.
+A quantity object has `magnitude` and `unit`, and `kind` if it names its kind,
+which must then match: written objects always include it, and hand-written ones
+can leave it out where the target kind is known, as in a Pydantic field or
+`Length.parse`. A string such as `"5 angstrom"` is accepted there too.
+`model_dump()` keeps quantities, as it keeps datetimes, and
+`model_dump(mode="json")` and `model_dump_json()` write the objects.
 
 ```python
 import numpy as np
