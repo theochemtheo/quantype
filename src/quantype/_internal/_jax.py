@@ -22,6 +22,7 @@ from typing import Any, Protocol, TypeGuard, cast
 import jax
 
 from quantype import _generated
+from quantype._internal import _products
 from quantype._internal._semantics import Semantic
 from quantype._internal._systems import UnitSystem, coherence
 from quantype.core import Quantity, _rescaled, _wrap, result_kind
@@ -94,12 +95,14 @@ def register_quantity(cls: type[_Quantity]) -> None:
 
 
 def _register_pytrees() -> None:
-    classes: set[type[_Quantity]] = {Quantity}
+    classes: set[type[_Quantity]] = {Quantity, *_products.created()}
     for candidate in vars(_generated).values():
         if _is_quantity_class(candidate):
             classes.add(candidate)
     for cls in classes:
         register_quantity(cls)
+    # Product classes are created on first use; register those as they appear.
+    _products.CLASS_HOOKS.append(register_quantity)
 
 
 _register_pytrees()

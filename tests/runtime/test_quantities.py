@@ -78,7 +78,7 @@ def test_products_ratios_and_powers_fall_back_to_the_system() -> None:
     assert repr(Energy[float, SI](3, u.eV) / x).startswith("Force(")
     assert repr((2 * u.nm) * (3 * u.nm)) == "Area(600.0 Å^2)"
     structural = (2 * u.angstrom) * (3 * u.fs)
-    assert repr(structural) == "Quantity(6.0 (Å * fs))"
+    assert repr(structural) == "LengthTime(6.0 (Å * fs))"
     assert "Mul" not in repr(structural)
 
 

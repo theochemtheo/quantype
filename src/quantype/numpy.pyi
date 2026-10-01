@@ -45,10 +45,115 @@ from quantype._generated import (
     Time,
     Velocity,
     Volume,
+    _RMulAcceleration,
+    _RMulAccelerationF,
+    _RMulAction,
+    _RMulActionF,
+    _RMulAngle,
+    _RMulAngleF,
+    _RMulArea,
+    _RMulAreaF,
+    _RMulAtomCount,
+    _RMulAtomCountF,
+    _RMulCharge,
+    _RMulChargeF,
+    _RMulDimensionless,
+    _RMulDimensionlessF,
+    _RMulDipoleMoment,
+    _RMulDipoleMomentF,
+    _RMulElectricField,
+    _RMulElectricFieldF,
+    _RMulElectricPotential,
+    _RMulElectricPotentialF,
+    _RMulElectronCount,
+    _RMulElectronCountF,
+    _RMulElectronDensity,
+    _RMulElectronDensityF,
+    _RMulEnergy,
+    _RMulEnergyDensity,
+    _RMulEnergyDensityF,
+    _RMulEnergyF,
+    _RMulEnergyPerAtom,
+    _RMulEnergyPerAtomF,
+    _RMulEnergyPerVolume,
+    _RMulEnergyPerVolumeF,
+    _RMulEntropy,
+    _RMulEntropyF,
+    _RMulForce,
+    _RMulForceConstant,
+    _RMulForceConstantF,
+    _RMulForceF,
+    _RMulFrequency,
+    _RMulFrequencyF,
+    _RMulInverseTime,
+    _RMulInverseTimeF,
+    _RMulLength,
+    _RMulLengthF,
+    _RMulMagneticMoment,
+    _RMulMagneticMomentF,
+    _RMulMagnetization,
+    _RMulMagnetizationF,
+    _RMulMass,
+    _RMulMassDensity,
+    _RMulMassDensityF,
+    _RMulMassF,
+    _RMulMomentum,
+    _RMulMomentumF,
+    _RMulParticleDensity,
+    _RMulParticleDensityF,
+    _RMulPressure,
+    _RMulPressureF,
+    _RMulTemperature,
+    _RMulTemperatureDifference,
+    _RMulTemperatureDifferenceF,
+    _RMulTemperatureF,
+    _RMulTemperatureRate,
+    _RMulTemperatureRateF,
+    _RMulTime,
+    _RMulTimeF,
+    _RMulVelocity,
+    _RMulVelocityF,
+    _RMulVolume,
+    _RMulVolumeF,
 )
 from quantype.core import Quantity, _Numerical
 from quantype.core import Quantity as _BaseQuantity
 from quantype.kinds import Mul
+from quantype.products import (
+    AccelerationSquared,
+    ActionSquared,
+    AngleSquared,
+    AreaSquared,
+    AtomCountSquared,
+    ChargeSquared,
+    DipoleMomentSquared,
+    ElectricFieldSquared,
+    ElectricPotentialSquared,
+    ElectronCountSquared,
+    ElectronDensitySquared,
+    EnergyDensitySquared,
+    EnergyPerAtomSquared,
+    EnergyPerVolumeSquared,
+    EnergySquared,
+    EntropySquared,
+    ForceConstantSquared,
+    ForceSquared,
+    FrequencySquared,
+    InverseTimeSquared,
+    MagneticMomentSquared,
+    MagnetizationSquared,
+    MassDensitySquared,
+    MassSquared,
+    MomentumSquared,
+    ParticleDensitySquared,
+    PressureSquared,
+    TemperatureDifferenceSquared,
+    TemperatureRateSquared,
+    TemperatureSquared,
+    TimeSquared,
+    VelocitySquared,
+    VolumeSquared,
+)
 from quantype.systems import UnitSystem
 
 __all__ = [
@@ -222,6 +327,86 @@ def tanh[A: _Numerical](x: A, /) -> A: ...
 @overload
 def sqrt[V, S: UnitSystem](x: Area[V, S], /) -> Length[V, S]: ...
 @overload
+def sqrt[V, S: UnitSystem](x: AccelerationSquared[V, S], /) -> Acceleration[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: ActionSquared[V, S], /) -> Action[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: AngleSquared[V, S], /) -> Angle[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: AreaSquared[V, S], /) -> Area[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: AtomCountSquared[V, S], /) -> AtomCount[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: ChargeSquared[V, S], /) -> Charge[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: DipoleMomentSquared[V, S], /) -> DipoleMoment[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: ElectricFieldSquared[V, S], /) -> ElectricField[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](
+    x: ElectricPotentialSquared[V, S], /
+) -> ElectricPotential[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: ElectronCountSquared[V, S], /) -> ElectronCount[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](
+    x: ElectronDensitySquared[V, S], /
+) -> ElectronDensity[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: EnergyDensitySquared[V, S], /) -> EnergyDensity[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: EnergyPerAtomSquared[V, S], /) -> EnergyPerAtom[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](
+    x: EnergyPerVolumeSquared[V, S], /
+) -> EnergyPerVolume[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: EnergySquared[V, S], /) -> Energy[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: EntropySquared[V, S], /) -> Entropy[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: ForceConstantSquared[V, S], /) -> ForceConstant[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: ForceSquared[V, S], /) -> Force[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: FrequencySquared[V, S], /) -> Frequency[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: InverseTimeSquared[V, S], /) -> InverseTime[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](
+    x: MagneticMomentSquared[V, S], /
+) -> MagneticMoment[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: MagnetizationSquared[V, S], /) -> Magnetization[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: MassDensitySquared[V, S], /) -> MassDensity[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: MassSquared[V, S], /) -> Mass[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: MomentumSquared[V, S], /) -> Momentum[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](
+    x: ParticleDensitySquared[V, S], /
+) -> ParticleDensity[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: PressureSquared[V, S], /) -> Pressure[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](
+    x: TemperatureDifferenceSquared[V, S], /
+) -> TemperatureDifference[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](
+    x: TemperatureRateSquared[V, S], /
+) -> TemperatureRate[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: TemperatureSquared[V, S], /) -> Temperature[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: TimeSquared[V, S], /) -> Time[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: VelocitySquared[V, S], /) -> Velocity[V, S]: ...
+@overload
+def sqrt[V, S: UnitSystem](x: VolumeSquared[V, S], /) -> Volume[V, S]: ...
+@overload
 def sqrt[V, S: UnitSystem](x: Dimensionless[V, S], /) -> Dimensionless[V, S]: ...
 @overload
 def sqrt(x: float, /) -> float: ...
@@ -291,439 +476,245 @@ def allclose[A: _Numerical](
     a: A, b: A, *, rtol: float = ..., atol: float = ..., equal_nan: bool = ...
 ) -> bool: ...
 @overload
-def dot[V, S: UnitSystem](a: Length[V, S], b: Length[V, S], /) -> Area[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: Dimensionless[float, S], b: _RMulDimensionlessF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Area[V, S], b: Length[V, S], /) -> Volume[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Dimensionless[V, S], b: _RMulDimensionless[Dimensionless[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Force[V, S], b: Length[V, S], /) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](a: Length[float, S], b: _RMulLengthF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: ForceConstant[V, S], b: Length[V, S], /
-) -> Force[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Length[V, S], b: _RMulLength[Length[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: ForceConstant[V, S], b: Area[V, S], /) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](a: Area[float, S], b: _RMulAreaF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Pressure[V, S], b: Volume[V, S], /) -> Energy[V, S]: ...
+def dot[V, S: UnitSystem, R](a: Area[V, S], b: _RMulArea[Area[V, S], R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Velocity[V, S], b: Time[V, S], /) -> Length[V, S]: ...
+def dot[S: UnitSystem, R](a: Volume[float, S], b: _RMulVolumeF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Acceleration[V, S], b: Time[V, S], /
-) -> Velocity[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Volume[V, S], b: _RMulVolume[Volume[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Mass[V, S], b: Velocity[V, S], /) -> Momentum[V, S]: ...
+def dot[S: UnitSystem, R](a: Time[float, S], b: _RMulTimeF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Mass[V, S], b: Acceleration[V, S], /) -> Force[V, S]: ...
+def dot[V, S: UnitSystem, R](a: Time[V, S], b: _RMulTime[Time[V, S], R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Momentum[V, S], b: Velocity[V, S], /) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](a: Velocity[float, S], b: _RMulVelocityF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Force[V, S], b: Time[V, S], /) -> Momentum[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Velocity[V, S], b: _RMulVelocity[Velocity[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: MassDensity[V, S], b: Volume[V, S], /) -> Mass[V, S]: ...
+def dot[S: UnitSystem, R](a: Energy[float, S], b: _RMulEnergyF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: EnergyPerAtom[V, S], b: AtomCount[V, S], /
-) -> Energy[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Energy[V, S], b: _RMulEnergy[Energy[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: ParticleDensity[V, S], b: Volume[V, S], /
-) -> AtomCount[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: EnergyPerAtom[float, S], b: _RMulEnergyPerAtomF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: ElectronDensity[V, S], b: Volume[V, S], /
-) -> ElectronCount[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: EnergyPerAtom[V, S], b: _RMulEnergyPerAtom[EnergyPerAtom[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Magnetization[V, S], b: Volume[V, S], /
-) -> MagneticMoment[V, S]: ...
+def dot[S: UnitSystem, R](a: Force[float, S], b: _RMulForceF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: TemperatureRate[V, S], b: Time[V, S], /
-) -> TemperatureDifference[V, S]: ...
+def dot[V, S: UnitSystem, R](a: Force[V, S], b: _RMulForce[Force[V, S], R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Entropy[V, S], b: Temperature[V, S], /
-) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: ForceConstant[float, S], b: _RMulForceConstantF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Entropy[V, S], b: TemperatureDifference[V, S], /
-) -> Energy[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: ForceConstant[V, S], b: _RMulForceConstant[ForceConstant[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Charge[V, S], b: ElectricPotential[V, S], /
-) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](a: Pressure[float, S], b: _RMulPressureF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Charge[V, S], b: ElectricField[V, S], /
-) -> Force[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Pressure[V, S], b: _RMulPressure[Pressure[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: ElectricField[V, S], b: Length[V, S], /
-) -> ElectricPotential[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: EnergyDensity[float, S], b: _RMulEnergyDensityF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Charge[V, S], b: Length[V, S], /
-) -> DipoleMoment[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: EnergyDensity[V, S], b: _RMulEnergyDensity[EnergyDensity[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: DipoleMoment[V, S], b: ElectricField[V, S], /
-) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: EnergyPerVolume[float, S], b: _RMulEnergyPerVolumeF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Energy[V, S], b: Time[V, S], /) -> Action[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: EnergyPerVolume[V, S], b: _RMulEnergyPerVolume[EnergyPerVolume[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Action[V, S], b: InverseTime[V, S], /) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: Temperature[float, S], b: _RMulTemperatureF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Frequency[V, S], b: Time[V, S], /
-) -> Dimensionless[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Temperature[V, S], b: _RMulTemperature[Temperature[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: InverseTime[V, S], b: Time[V, S], /
-) -> Dimensionless[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: TemperatureDifference[float, S], b: _RMulTemperatureDifferenceF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Length[V, S], b: Area[V, S], /) -> Volume[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: TemperatureDifference[V, S],
+    b: _RMulTemperatureDifference[TemperatureDifference[V, S], R],
+    /,
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Length[V, S], b: Force[V, S], /) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: TemperatureRate[float, S], b: _RMulTemperatureRateF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Length[V, S], b: ForceConstant[V, S], /
-) -> Force[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: TemperatureRate[V, S], b: _RMulTemperatureRate[TemperatureRate[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Area[V, S], b: ForceConstant[V, S], /) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: MagneticMoment[float, S], b: _RMulMagneticMomentF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Volume[V, S], b: Pressure[V, S], /) -> Energy[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: MagneticMoment[V, S], b: _RMulMagneticMoment[MagneticMoment[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Time[V, S], b: Velocity[V, S], /) -> Length[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: Magnetization[float, S], b: _RMulMagnetizationF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Time[V, S], b: Acceleration[V, S], /
-) -> Velocity[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Magnetization[V, S], b: _RMulMagnetization[Magnetization[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Velocity[V, S], b: Mass[V, S], /) -> Momentum[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: ParticleDensity[float, S], b: _RMulParticleDensityF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Acceleration[V, S], b: Mass[V, S], /) -> Force[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: ParticleDensity[V, S], b: _RMulParticleDensity[ParticleDensity[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Velocity[V, S], b: Momentum[V, S], /) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: ElectronDensity[float, S], b: _RMulElectronDensityF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Time[V, S], b: Force[V, S], /) -> Momentum[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: ElectronDensity[V, S], b: _RMulElectronDensity[ElectronDensity[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Volume[V, S], b: MassDensity[V, S], /) -> Mass[V, S]: ...
+def dot[S: UnitSystem, R](a: Angle[float, S], b: _RMulAngleF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: AtomCount[V, S], b: EnergyPerAtom[V, S], /
-) -> Energy[V, S]: ...
+def dot[V, S: UnitSystem, R](a: Angle[V, S], b: _RMulAngle[Angle[V, S], R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Volume[V, S], b: ParticleDensity[V, S], /
-) -> AtomCount[V, S]: ...
+def dot[S: UnitSystem, R](a: Frequency[float, S], b: _RMulFrequencyF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Volume[V, S], b: ElectronDensity[V, S], /
-) -> ElectronCount[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Frequency[V, S], b: _RMulFrequency[Frequency[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Volume[V, S], b: Magnetization[V, S], /
-) -> MagneticMoment[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: InverseTime[float, S], b: _RMulInverseTimeF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Time[V, S], b: TemperatureRate[V, S], /
-) -> TemperatureDifference[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: InverseTime[V, S], b: _RMulInverseTime[InverseTime[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Temperature[V, S], b: Entropy[V, S], /
-) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](a: AtomCount[float, S], b: _RMulAtomCountF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: TemperatureDifference[V, S], b: Entropy[V, S], /
-) -> Energy[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: AtomCount[V, S], b: _RMulAtomCount[AtomCount[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: ElectricPotential[V, S], b: Charge[V, S], /
-) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: ElectronCount[float, S], b: _RMulElectronCountF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: ElectricField[V, S], b: Charge[V, S], /
-) -> Force[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: ElectronCount[V, S], b: _RMulElectronCount[ElectronCount[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Length[V, S], b: ElectricField[V, S], /
-) -> ElectricPotential[V, S]: ...
+def dot[S: UnitSystem, R](a: Mass[float, S], b: _RMulMassF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Length[V, S], b: Charge[V, S], /
-) -> DipoleMoment[V, S]: ...
+def dot[V, S: UnitSystem, R](a: Mass[V, S], b: _RMulMass[Mass[V, S], R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: ElectricField[V, S], b: DipoleMoment[V, S], /
-) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: MassDensity[float, S], b: _RMulMassDensityF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Time[V, S], b: Energy[V, S], /) -> Action[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: MassDensity[V, S], b: _RMulMassDensity[MassDensity[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: InverseTime[V, S], b: Action[V, S], /) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](a: Momentum[float, S], b: _RMulMomentumF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Time[V, S], b: Frequency[V, S], /
-) -> Dimensionless[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Momentum[V, S], b: _RMulMomentum[Momentum[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Time[V, S], b: InverseTime[V, S], /
-) -> Dimensionless[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: Acceleration[float, S], b: _RMulAccelerationF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Dimensionless[V, S], /
-) -> Dimensionless[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Acceleration[V, S], b: _RMulAcceleration[Acceleration[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Length[V, S], b: Dimensionless[V, S], /
-) -> Length[V, S]: ...
+def dot[S: UnitSystem, R](a: Charge[float, S], b: _RMulChargeF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Length[V, S], /
-) -> Length[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Charge[V, S], b: _RMulCharge[Charge[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Area[V, S], b: Dimensionless[V, S], /) -> Area[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: ElectricPotential[float, S], b: _RMulElectricPotentialF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Dimensionless[V, S], b: Area[V, S], /) -> Area[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: ElectricPotential[V, S], b: _RMulElectricPotential[ElectricPotential[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Volume[V, S], b: Dimensionless[V, S], /
-) -> Volume[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: ElectricField[float, S], b: _RMulElectricFieldF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Volume[V, S], /
-) -> Volume[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: ElectricField[V, S], b: _RMulElectricField[ElectricField[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Time[V, S], b: Dimensionless[V, S], /) -> Time[V, S]: ...
+def dot[S: UnitSystem, R](
+    a: DipoleMoment[float, S], b: _RMulDipoleMomentF[S, R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](a: Dimensionless[V, S], b: Time[V, S], /) -> Time[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: DipoleMoment[V, S], b: _RMulDipoleMoment[DipoleMoment[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Velocity[V, S], b: Dimensionless[V, S], /
-) -> Velocity[V, S]: ...
+def dot[S: UnitSystem, R](a: Entropy[float, S], b: _RMulEntropyF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Velocity[V, S], /
-) -> Velocity[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Entropy[V, S], b: _RMulEntropy[Entropy[V, S], R], /
+) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Energy[V, S], b: Dimensionless[V, S], /
-) -> Energy[V, S]: ...
+def dot[S: UnitSystem, R](a: Action[float, S], b: _RMulActionF[S, R], /) -> R: ...
 @overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Energy[V, S], /
-) -> Energy[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: EnergyPerAtom[V, S], b: Dimensionless[V, S], /
-) -> EnergyPerAtom[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: EnergyPerAtom[V, S], /
-) -> EnergyPerAtom[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](a: Force[V, S], b: Dimensionless[V, S], /) -> Force[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](a: Dimensionless[V, S], b: Force[V, S], /) -> Force[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: ForceConstant[V, S], b: Dimensionless[V, S], /
-) -> ForceConstant[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: ForceConstant[V, S], /
-) -> ForceConstant[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Pressure[V, S], b: Dimensionless[V, S], /
-) -> Pressure[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Pressure[V, S], /
-) -> Pressure[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: EnergyDensity[V, S], b: Dimensionless[V, S], /
-) -> EnergyDensity[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: EnergyDensity[V, S], /
-) -> EnergyDensity[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: EnergyPerVolume[V, S], b: Dimensionless[V, S], /
-) -> EnergyPerVolume[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: EnergyPerVolume[V, S], /
-) -> EnergyPerVolume[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Temperature[V, S], b: Dimensionless[V, S], /
-) -> Temperature[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Temperature[V, S], /
-) -> Temperature[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: TemperatureDifference[V, S], b: Dimensionless[V, S], /
-) -> TemperatureDifference[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: TemperatureDifference[V, S], /
-) -> TemperatureDifference[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: TemperatureRate[V, S], b: Dimensionless[V, S], /
-) -> TemperatureRate[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: TemperatureRate[V, S], /
-) -> TemperatureRate[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: MagneticMoment[V, S], b: Dimensionless[V, S], /
-) -> MagneticMoment[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: MagneticMoment[V, S], /
-) -> MagneticMoment[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Magnetization[V, S], b: Dimensionless[V, S], /
-) -> Magnetization[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Magnetization[V, S], /
-) -> Magnetization[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: ParticleDensity[V, S], b: Dimensionless[V, S], /
-) -> ParticleDensity[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: ParticleDensity[V, S], /
-) -> ParticleDensity[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: ElectronDensity[V, S], b: Dimensionless[V, S], /
-) -> ElectronDensity[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: ElectronDensity[V, S], /
-) -> ElectronDensity[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](a: Angle[V, S], b: Dimensionless[V, S], /) -> Angle[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](a: Dimensionless[V, S], b: Angle[V, S], /) -> Angle[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Frequency[V, S], b: Dimensionless[V, S], /
-) -> Frequency[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Frequency[V, S], /
-) -> Frequency[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: InverseTime[V, S], b: Dimensionless[V, S], /
-) -> InverseTime[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: InverseTime[V, S], /
-) -> InverseTime[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: AtomCount[V, S], b: Dimensionless[V, S], /
-) -> AtomCount[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: AtomCount[V, S], /
-) -> AtomCount[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: ElectronCount[V, S], b: Dimensionless[V, S], /
-) -> ElectronCount[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: ElectronCount[V, S], /
-) -> ElectronCount[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](a: Mass[V, S], b: Dimensionless[V, S], /) -> Mass[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](a: Dimensionless[V, S], b: Mass[V, S], /) -> Mass[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: MassDensity[V, S], b: Dimensionless[V, S], /
-) -> MassDensity[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: MassDensity[V, S], /
-) -> MassDensity[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Momentum[V, S], b: Dimensionless[V, S], /
-) -> Momentum[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Momentum[V, S], /
-) -> Momentum[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Acceleration[V, S], b: Dimensionless[V, S], /
-) -> Acceleration[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Acceleration[V, S], /
-) -> Acceleration[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Charge[V, S], b: Dimensionless[V, S], /
-) -> Charge[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Charge[V, S], /
-) -> Charge[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: ElectricPotential[V, S], b: Dimensionless[V, S], /
-) -> ElectricPotential[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: ElectricPotential[V, S], /
-) -> ElectricPotential[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: ElectricField[V, S], b: Dimensionless[V, S], /
-) -> ElectricField[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: ElectricField[V, S], /
-) -> ElectricField[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: DipoleMoment[V, S], b: Dimensionless[V, S], /
-) -> DipoleMoment[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: DipoleMoment[V, S], /
-) -> DipoleMoment[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Entropy[V, S], b: Dimensionless[V, S], /
-) -> Entropy[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Entropy[V, S], /
-) -> Entropy[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Action[V, S], b: Dimensionless[V, S], /
-) -> Action[V, S]: ...
-@overload
-def dot[V, S: UnitSystem](
-    a: Dimensionless[V, S], b: Action[V, S], /
-) -> Action[V, S]: ...
+def dot[V, S: UnitSystem, R](
+    a: Action[V, S], b: _RMulAction[Action[V, S], R], /
+) -> R: ...
 @overload
 def dot[K, L, V, S: UnitSystem](
     a: _BaseQuantity[K, V, S], b: _BaseQuantity[L, V, S], /

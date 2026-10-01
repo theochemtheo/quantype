@@ -74,7 +74,8 @@ def _relations() -> str:
             quotients.append(f"`{left}` / `{right}` = `{result}`")
     return (
         "Each product also names the quotients that undo it. Any other product or "
-        "quotient has a structural type, and `Kind.reinterpret(q)` can name it.\n\n"
+        "quotient of two kinds is a product class from `quantype.products`, such as "
+        "`LengthTime`; see [physical algebra](units.md#physical-algebra).\n\n"
         "**Products**\n\n"
         + "\n".join(f"- {line}" for line in sorted(products))
         + "\n\n**Quotients**\n\n"

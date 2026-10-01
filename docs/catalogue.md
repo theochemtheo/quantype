@@ -48,7 +48,7 @@ declared name, and the unit each built-in system stores it in. Each unit is on
 
 ## Named products and quotients
 
-Each product also names the quotients that undo it. Any other product or quotient has a structural type, and `Kind.reinterpret(q)` can name it.
+Each product also names the quotients that undo it. Any other product or quotient of two kinds is a product class from `quantype.products`, such as `LengthTime`; see [physical algebra](units.md#physical-algebra).
 
 **Products**
 

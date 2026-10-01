@@ -20,6 +20,7 @@ from quantype import (
     u,
     ujax,
 )
+from quantype.products import LengthEnergy
 from quantype.systems import CGS, SI, Atomic, Atomistic, Metal, Real, UnitSystem
 
 
@@ -103,13 +104,14 @@ def test_jax_pytree_keeps_kind_and_system_but_not_display() -> None:
     _, presented = _trees.tree_flatten(quantity)
     _, plain = _trees.tree_flatten(u.angstrom(_jnp.array([1.0, 2.0])))
     assert presented == plain
+    # A product class is created on first use, then registered as a pytree.
     structural = quantity * u.eV(_jnp.array([3.0, 4.0]))
-    assert type(structural) is Quantity
+    assert type(structural) is LengthEnergy
     leaves, tree = _trees.tree_flatten(structural)
     assert len(leaves) == 1
     assert leaves[0] is structural.value
     rebuilt = _trees.tree_unflatten(tree, leaves)
-    assert type(rebuilt) is Quantity
+    assert type(rebuilt) is LengthEnergy
     assert rebuilt.kind == structural.kind
     mapped = _jax.vmap(_identity)(structural)
     assert mapped.kind == structural.kind

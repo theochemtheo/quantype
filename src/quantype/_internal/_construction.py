@@ -78,7 +78,7 @@ class StorageAlias(GenericAlias):
         from quantype.core import _wrap
 
         cls = cast("Any", self.__origin__)
-        if not cls._kind:
+        if getattr(cls, "_semantic", None) is None:
             raise TypeError("from_value requires a named quantity class")
         return _wrap(cls._semantic, value, self.unit_system)
 

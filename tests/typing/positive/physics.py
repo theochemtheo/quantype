@@ -18,13 +18,12 @@ from quantype import (
     MassDensity,
     Momentum,
     Pressure,
-    Quantity,
     Temperature,
     Time,
     Volume,
     u,
 )
-from quantype.kinds import Pow, TemperatureKind
+from quantype.products import TemperatureSquared
 from quantype.systems import SI, Metal
 
 energy = 2 * u.eV
@@ -71,7 +70,7 @@ assert_type(point / 2, Temperature[float])
 assert_type(-point, Temperature[float])
 assert_type(abs(point), Temperature[float])
 assert_type(point / point, Dimensionless[float])
-assert_type(point**2, Quantity[Pow[TemperatureKind, int], float])
+assert_type(point**2, TemperatureSquared[float])
 
 # Planck's constant relates energy and angular frequency.
 assert_type(energy * time, Action[float])

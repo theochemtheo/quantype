@@ -242,6 +242,22 @@ def test_stale_check_does_not_rewrite_files(
     assert stale_file.read_text() == stale_source
 
 
+def test_unrendered_product_modules_are_stale_and_removed(
+    tmp_path: Path, generated_project: Path, catalogue: Catalogue
+) -> None:
+    package = tmp_path / "labquantities"
+    shutil.copytree(generated_project / "labquantities", package)
+    leftover = package / "_products" / "RenamedQuantityTime.pyi"
+    leftover.write_text("# A product class from an older catalogue.\n")
+
+    assert generate(catalogue, package, package="labquantities", check=True) == [
+        "_products/RenamedQuantityTime.pyi"
+    ]
+    assert leftover.exists()
+    generate(catalogue, package, package="labquantities")
+    assert not leftover.exists()
+
+
 @pytest.mark.parametrize(
     "case",
     [

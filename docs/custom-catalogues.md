@@ -77,7 +77,10 @@ it doesn't extend quantype's own classes. Its `Length` is a different type from
 quantype's own operators are unchanged. Structural results use the package's
 own `Quantity` subclass, so import that class for structural annotations, and
 reciprocals keep the catalogue's `DimensionlessKind`. It is still a subclass of
-`quantype.core.Quantity`.
+`quantype.core.Quantity`. The package has its own `products` module, with a
+product class for each unnamed product of two of its kinds, named as quantype
+names them (`LengthTime`, `SurfaceTensionPerTime`); generation fails if one of
+those names is also a quantity's name.
 
 Generated quantities take a unit system parameter like the built-in ones, and
 `Length[float, SI]` works with no extra definitions. Systems are defined by base

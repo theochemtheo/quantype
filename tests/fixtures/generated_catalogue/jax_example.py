@@ -25,7 +25,8 @@ def test_structural_transforms() -> None:
     doubled = ujax.jit(lambda value: value + value)(q)
     inverse = ujax.jit(lambda value: 1 / value)(q)
     mapped = ujax.vmap(lambda value: 1 / value)(q)
-    assert type(doubled) is Quantity
+    assert type(doubled) is type(q)  # a product class keeps its class
+    assert isinstance(q, Quantity)
     assert type(inverse) is Quantity
     assert type(mapped) is Quantity
     np.testing.assert_array_equal(doubled.value, [12, 18])

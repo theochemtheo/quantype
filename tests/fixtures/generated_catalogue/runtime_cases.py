@@ -32,7 +32,7 @@ def test_physical_algebra() -> None:
     assert isinstance(inverse, InverseTime)
     assert inverse.value == 0.5
     inverse_tension = 1.0 / (length * pressure)
-    assert inverse_tension.kind == "Div[Dimensionless,SurfaceTension]"
+    assert inverse_tension.kind == "Pow[SurfaceTension,-1]"  # as tension ** -1
     assert inverse_tension.value == 1.0 / (length * pressure).value
 
 
@@ -43,7 +43,8 @@ def test_structural_reciprocals() -> None:
         (2 * u.angstrom) ** 4,
     )
     for q in quantities:
-        assert type(q) is Quantity
+        # Product classes belong to this catalogue's structural base.
+        assert isinstance(q, Quantity)
         scalar_inverse = 1 / q
         assert type(scalar_inverse) is Quantity
         explicit_inverse = u.one(1) / q

@@ -14,6 +14,8 @@
 ^quantype\._internal\._codata\.Edition$
 ^quantype\._internal\._registry\.Relations$
 ^quantype\._internal\._(jax|numpy|torch)\._(Argnums|Metadata|Quantity|RawFunction)$
+^quantype\._internal\._products\.(EntryRow|PairRow)$
+^quantype\.codegen\._table\.(Monomial|Operation|Product)$
 
 # functools.cache exposes a variadic checker signature but preserves runtime __wrapped__.
 ^quantype\._internal\._registry\._unit_specs$
@@ -48,3 +50,10 @@
 # The stub types qnp.linalg's functions with its catalogue's classes; at runtime
 # every catalogue shares one namespace object.
 ^quantype\.numpy\.linalg$
+
+# Products dispatch through protocol members that exist only in the stubs: each
+# class's _rmul_*/_rtruediv_* members, and the stub-only modules
+# holding one product or constant class each (the runtime defines those classes
+# in quantype.products and quantype._generated).
+^quantype\.(_generated|products)\.\w+\._r(mul|truediv)_\w+$
+^quantype\.(_products|_constants)(\..*)?$

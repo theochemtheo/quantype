@@ -37,7 +37,11 @@ bad_point_sum = point.sum()  # error
 product = (2 * u.angstrom) * (3 * u.fs)
 ratio = (2 * u.eV) / (3 * u.fs)
 bad_structural_sum = product + ratio  # error
-bad_structural_nominal_sum = product + ((3 * u.fs) * (2 * u.angstrom))  # error
+# Length * Time and Time * Length are one product class, but products of
+# more factors keep the order they were written in.
+bad_structural_nominal_sum = product * ratio + ratio * product  # error
+speed = 2 * u.angstrom_per_fs
+bad_power_sum = speed**2 + speed**3  # error
 
 # Unit systems never mix; .to_system(...) is the explicit bridge.
 x_si = Length[float, SI](2.0, u.nm)

@@ -1,7 +1,7 @@
 """Generated Torch adapters return quantities from the application catalogue."""
 
 import torch
-from labquantities import Energy, Force, Length, Quantity, u, utorch
+from labquantities import Energy, Force, Length, Quantity, Time, u, utorch
 
 
 def test_gradient() -> None:
@@ -18,6 +18,7 @@ def test_structural_gradient() -> None:
     x = Length[torch.Tensor](torch.tensor([1.0, 2.0], requires_grad=True), u.angstrom)
     q = x * (3 * u.fs)
     gradient = utorch.grad(q.sum(), x)
-    assert type(q) is Quantity
-    assert type(gradient) is Quantity
+    assert isinstance(q, Quantity)
+    # A product class over one of its factors is the other factor.
+    assert type(gradient) is Time
     torch.testing.assert_close(gradient.value, torch.tensor([3.0, 3.0]))

@@ -35,8 +35,9 @@ GitHub Actions workflows; the pre-commit hook checks workflow changes too.
 
 The top-level `quantype` import provides quantities and `u`; `quantype.units`
 holds the unit namespaces. `quantype.numpy` has NumPy's names with unit rules,
-`quantype.constants` the physical constants, `quantype.systems` the unit
-systems, and `quantype.codata` the CODATA edition. Use `quantype.serialization`
+`quantype.constants` the physical constants, `quantype.products` the classes
+for unnamed products of two kinds, `quantype.systems` the unit systems, and
+`quantype.codata` the CODATA edition. Use `quantype.serialization`
 for JSON/NPZ boundaries, `quantype.ujax` or `quantype.utorch` for optional
 autodiff, and `quantype.catalogue` with `quantype.codegen` for application
 catalogues. `quantype.core` and `quantype.kinds` expose base types and

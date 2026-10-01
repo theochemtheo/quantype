@@ -259,14 +259,47 @@ Beyond lengths, energies and times, the catalogue covers mechanics (`Mass`,
 `ElectricPotential`, `ElectricField`, `DipoleMoment`), and `Entropy` and
 `Action`, the kinds of the Boltzmann and Planck constants.
 
-A product with no declared name keeps a structural type, such as
-`Quantity[Mul[LengthKind, TimeKind], float]`, and supports arithmetic and
-reductions like any other quantity. `1 / Time` is `InverseTime` because that
-relation is declared; other reciprocals of a number give a structural ratio,
-built on the catalogue's `Dimensionless`. When an expression mixes catalogues,
-dividing a plain number by it is ambiguous and raises `TypeError`, so divide a
-`Dimensionless` quantity instead. quantype doesn't cancel dimensions to guess a
-kind.
+A product is named by its factors, in any order or grouping:
+
+```python
+from typing import assert_type
+
+from quantype import Energy, Length, Mass, Momentum, Time, Velocity, u
+from quantype.products import LengthTime, VelocitySquared
+
+m = Mass[float](1, u.Da)
+v = Velocity[float](2, u.angstrom_per_fs)
+length = Length[float](3, u.angstrom)
+t = Time[float](4, u.fs)
+
+assert_type(0.5 * m * v**2, Energy[float])
+assert_type(m * (v * v), Energy[float])
+assert_type((m * v) ** 2 / m, Energy[float])
+assert_type(m * length / t, Momentum[float])
+assert_type(length * t, LengthTime[float])
+assert_type(t * length, LengthTime[float])
+assert_type(length * t / t, Length[float])
+assert_type(v * v, VelocitySquared[float])
+```
+
+A product of two kinds with no relation of its own is a product class, named
+after its factors in catalogue order: `LengthTime`, `EnergyPerTime`,
+`VelocitySquared`, `PerLength`. `x * x` is `x ** 2` and `1 / x` is `x ** -1`, so
+`t ** -1` is an `InverseTime`. A product class times or over another kind is
+named when the relations that apply to its factors agree on one kind. Addition,
+scaling, negation, reductions, and `to_system` keep a product class, and
+`quantype.products` exports them all for annotations.
+
+When the groupings disagree, the product stays unnamed. `force * (length /
+volume)` is an `EnergyDensity` grouped as `(force * length) / volume`, and a
+`Pressure` grouped as `force / (volume / length)`, so it keeps a structural type
+and `reinterpret` names it. Any other unnamed product keeps a structural type
+too, such as `Quantity[Mul[Mul[LengthKind, TimeKind], ChargeKind], float]` for
+`length * t * charge`, and supports arithmetic and reductions like any other
+quantity.
+
+When an expression mixes catalogues, dividing a plain number by it is ambiguous
+and raises `TypeError`, so divide a `Dimensionless` quantity instead.
 
 Subtracting two absolute temperatures gives a difference. You can't add or sum
 them, but you can take their mean. Every system stores temperatures on a kelvin

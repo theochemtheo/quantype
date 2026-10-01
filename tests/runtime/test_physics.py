@@ -28,6 +28,7 @@ from quantype import (
 )
 from quantype._internal._registry import close_relations
 from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
+from quantype.products import LengthMass
 from quantype.serialization import load_npz, save_npz
 from quantype.systems import SI, Atomistic, Metal, Real, UnitSystem
 
@@ -114,8 +115,8 @@ def test_overridden_kinds_agree_with_the_default_system() -> None:
 def test_structural_results_are_stored_coherently() -> None:
     mass = Mass[float, Metal](1, u.gram_per_mole)
     moment = mass * Length[float, Metal](1, u.angstrom)
-    assert type(moment) is Quantity
-    assert repr(moment).endswith("(eV ps^2/Å^2 * Å), Metal)")
+    assert type(moment) is LengthMass  # factors in catalogue order
+    assert repr(moment).endswith("(Å * eV ps^2/Å^2), Metal)")
     assert moment.value == pytest.approx(LAMMPS_METAL["mvv2e"], rel=LAMMPS_DIGITS)
 
 

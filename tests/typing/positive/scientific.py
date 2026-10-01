@@ -19,7 +19,6 @@ from quantype import (
     ForceConstant,
     Length,
     Pressure,
-    Quantity,
     Temperature,
     TemperatureDifference,
     TemperatureRate,
@@ -29,7 +28,7 @@ from quantype import (
     utorch,
 )
 from quantype import units as u
-from quantype.kinds import Div, EnergyKind, LengthKind, Mul, TimeKind
+from quantype.products import EnergyPerTime, LengthTime
 
 r = 2.0 * u.angstrom
 t = 4.0 * u.fs
@@ -48,8 +47,8 @@ assert_type(e / r, Force[float])
 assert_type((e / r) * r, Energy[float])
 assert_type((e / r) / (r**2), Pressure[float])
 assert_type(e / (r**3), EnergyDensity[float])
-assert_type(r * t, Quantity[Mul[LengthKind, TimeKind], float])
-assert_type(e / t, Quantity[Div[EnergyKind, TimeKind], float])
+assert_type(r * t, LengthTime[float])
+assert_type(e / t, EnergyPerTime[float])
 
 t1 = 300 * u.K
 t2 = 280 * u.K

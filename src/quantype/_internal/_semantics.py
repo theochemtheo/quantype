@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Literal, override
+from typing import TYPE_CHECKING, Literal, override
 
 from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS, close_relations
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @dataclass(frozen=True, eq=False)
@@ -116,6 +119,27 @@ EXPONENTS = {
 }
 
 
+# The naming table (quantype.codegen._table), loaded from each catalogue's
+# generated products module on first need. An unnamed product of two named kinds
+# is a canonical pair: every spelling of it finds the same expression.
+PAIRS: dict[tuple[str, Kind, Kind | int], Expression] = {}
+# Each pair's runtime class, as (module, class name).
+PAIR_CLASSES: dict[Expression, tuple[str, str]] = {}
+# A named kind times or over a pair, from either side, when that is named.
+ENTRIES: dict[tuple[str, Semantic, Semantic], Kind] = {}
+_LOADERS: list[Callable[[], object]] = []
+
+
+def defer_table(loader: Callable[[], object]) -> None:
+    """Load a catalogue's naming table when a product first needs it."""
+    _LOADERS.append(loader)
+
+
+def _load_tables() -> None:
+    while _LOADERS:
+        _LOADERS.pop()()
+
+
 def product(
     operation: Literal["mul", "div"], left: Semantic, right: Semantic
 ) -> Semantic:
@@ -125,12 +149,33 @@ def product(
         known = PRODUCTS.get((operation, left, right))
         if known is not None:
             return known
+        _load_tables()
+        pair = PAIRS.get((operation, left, right))
+        if pair is not None:
+            return pair
+        return Expression(operation, left, right)
+    _load_tables()
+    named = ENTRIES.get((operation, left, right))
+    if named is not None:
+        return named
+    if operation == "div" and left == right and left in PAIR_CLASSES:
+        return dimensionless_kind(left)
     return Expression(operation, left, right)
 
 
 def power(kind: Semantic, exponent: int) -> Semantic:
     if isinstance(kind, Kind):
         known = EXPONENTS.get((kind, exponent))
+        # x ** 2 is x * x, and x ** -1 is 1 / x, wherever those are named.
+        if known is None and exponent == 2:  # noqa: PLR2004
+            known = PRODUCTS.get(("mul", kind, kind))
+        dimensionless = DIMENSIONLESS_KINDS.get(kind)
+        if known is None and exponent == -1 and dimensionless is not None:
+            known = PRODUCTS.get(("div", dimensionless, kind))
         if known is not None:
             return known
+        _load_tables()
+        pair = PAIRS.get(("pow", kind, exponent))
+        if pair is not None:
+            return pair
     return Expression("pow", kind, exponent)

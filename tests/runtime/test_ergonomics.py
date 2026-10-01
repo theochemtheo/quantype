@@ -146,7 +146,9 @@ def test_reinterpret_names_equal_dimensions_explicitly() -> None:
     assert isinstance(pressure, Pressure)
     assert pressure.magnitude(u.GPa) == pytest.approx(160.2176634)
     assert Frequency.reinterpret(1 / (1 * u.ps)).magnitude(u.THz) == pytest.approx(1)
-    structural = (2 * u.eV) * (3 * u.angstrom) / (1 * u.eV)
+    # Three factors whose relations agree are named, however they are grouped.
+    assert isinstance((2 * u.eV) * (3 * u.angstrom) / (1 * u.eV), Length)
+    structural = (2 * u.angstrom) * (3 * u.fs) * (1 * u.eV) / ((1 * u.eV) * (1 * u.fs))
     assert type(structural) is Quantity
     assert Length.reinterpret(structural).magnitude(u.angstrom) == pytest.approx(6)
     same = Length.reinterpret(2 * u.nm)

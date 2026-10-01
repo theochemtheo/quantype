@@ -17,6 +17,7 @@ import operator
 import sys
 from typing import TYPE_CHECKING, Any, ClassVar, Self, cast, override
 
+from quantype._internal._products import class_for
 from quantype._internal._semantics import (
     DIMENSIONLESS_KINDS,
     KINDS,
@@ -115,6 +116,8 @@ def _wrap(
     semantic = KINDS[kind] if isinstance(kind, str) else kind
     if isinstance(semantic, Kind):
         cls = _CLASSES[semantic]
+    elif (pair := class_for(semantic)) is not None:
+        cls = pair
     else:
         # The leftmost kind owns the result API; reciprocal inference separately
         # checks all leaves so mixed-catalogue scalar numerators stay ambiguous.
@@ -254,7 +257,7 @@ class Quantity[K, V, S: UnitSystem]:
     @classmethod
     def from_value[W](cls, value: W) -> Quantity[K, W, Any]:
         """Trusted wrap of raw numbers already in the default system's units."""
-        if not cls._kind:
+        if getattr(cls, "_semantic", None) is None:
             raise TypeError("from_value requires a named quantity class")
         return cast("Quantity[K, W, Any]", _wrap(cls._semantic, value, None))
 
@@ -791,9 +794,8 @@ class Quantity[K, V, S: UnitSystem]:
 
     @override
     def __repr__(self) -> str:
-        name = type(self).__name__ if isinstance(self._semantic, Kind) else "Quantity"
         system = "" if self._system is Atomistic else f", {self._system.__name__}"
-        return f"{name}({self._presentation()}{system})"
+        return f"{type(self).__name__}({self._presentation()}{system})"
 
 
 class Constant[K]:

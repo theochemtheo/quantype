@@ -175,8 +175,10 @@ relations.
   they were given in, so a configuration's `"0.5 nm"` is saved as 0.5 nanometres.
 - Temperatures: 30 °C minus 20 °C is a `TemperatureDifference` of 10 Δ°C, and
   `k_B * T` is an energy.
-- Unnamed products get structural types, such as
-  `Quantity[Mul[LengthKind, TimeKind], float]`, instead of `Any`.
+- A product is named by its factors, in any order or grouping: `m * v**2`,
+  `m * v * v`, and `(m * v)**2 / m` are all an `Energy`. A product of two kinds
+  with no relation is a product class such as `LengthTime`, from
+  `quantype.products`.
 - Custom units, defined locally with no global registry.
 
 ## Documentation

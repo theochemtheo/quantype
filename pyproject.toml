@@ -108,6 +108,7 @@ strict = true
 extra_checks = true
 warn_unused_configs = true
 pretty = true
+exclude = ["^notes/"]
 
 [tool.pyrefly]
 python-version = "3.12"
@@ -129,10 +130,17 @@ include = [
   "tests/runtime",
   "tests/typing/positive",
 ]
+exclude = [
+  "**/node_modules",
+  "**/__pycache__",
+  "**/.*",
+  "notes",
+]
 
 [tool.ruff]
 target-version = "py312"
 respect-gitignore = false
+extend-exclude = ["notes"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -158,7 +166,9 @@ flake8-tidy-imports = { "ban-relative-imports" = "all" }
 "scripts/check_typing.py" = ["INP001", "T201"]
 # Numerical dispatch is deliberately dynamic and backend imports stay lazy.
 "src/quantype/core.py" = ["ANN401", "PLC0415", "SLF001"]
-"src/quantype/core.pyi" = ["ANN401"]
+# Methods for unnamed products return the caller's class through a type variable
+# bound to structural kinds, which Self cannot express.
+"src/quantype/core.pyi" = ["ANN401", "PYI019"]
 "src/quantype/_generated.pyi" = ["ANN401"]
 "src/quantype/numpy.pyi" = ["ANN401"]
 "src/quantype/_internal/_numpy.py" = ["ANN401", "PLC0415", "SLF001"]
@@ -177,6 +187,7 @@ include = [
   "tests/runtime",
   "tests/typing/positive",
 ]
+exclude = ["notes"]
 
 [tool.ty.analysis]
 strict-equality-semantics = true

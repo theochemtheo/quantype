@@ -256,9 +256,12 @@ Serialization saves values; device placement and autodiff graphs are lost.
 | `Cannot combine SI and Atomistic quantities` | Convert one operand with `.to_system(...)`. |
 | An unnamed result cannot be serialized | Only named kinds have units on the wire. Name it with `reinterpret`, or declare the kind in an [application catalogue](custom-catalogues.md). |
 
-Result types come only from declared relations. quantype doesn't cancel
-dimensions to guess a kind, so a product with no declared name keeps a
-structural type such as `Quantity[Mul[LengthKind, TimeKind], float]`.
+Result types come from declared relations, whatever the order of the factors:
+`m * v**2` and `m * v * v` are both an `Energy`. A product of two kinds with no
+relation is a product class such as `LengthTime` from `quantype.products`, and
+a longer unnamed product keeps a structural type such as
+`Quantity[Mul[Mul[LengthKind, TimeKind], ChargeKind], float]`. See
+[physical algebra](units.md#physical-algebra).
 
 ## Next steps
 
