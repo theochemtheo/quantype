@@ -125,9 +125,21 @@ the same kind and unit system, and return backend booleans. `==` compares
 values, element-wise for arrays, and quantities of different kinds or systems
 compare unequal.
 
-For any other array operation, work on `.value` and wrap the result with
-`Length.from_value(...)` if it is still a length in the same system.
-`from_value` trusts its input: it doesn't check the shape or convert anything.
+For any other array operation, apply it to `.value` and give the result back
+with `with_value`, which keeps the kind, unit system, and display unit:
+
+```python
+import numpy as np
+
+from quantype import u
+
+positions = u.nm(np.array([3.0, 1.0, 2.0]))
+ordered = positions.with_value(np.sort(positions.value))
+assert ordered.unit is u.nm
+```
+
+`with_value` trusts its input, as `from_value` does: the numbers must already be
+in the unit system's units.
 
 A plain number or a NumPy, JAX, or Torch array scales a quantity without
 changing its dtype. Builtin `sum()`, format specs, and `reinterpret` work too:
@@ -150,6 +162,24 @@ assert stress.magnitude(u.GPa) == pytest.approx(160.2176634)
 
 `if q:` raises. Compare against a value, as in `q > 0 * u.nm`, or test
 `q is not None`.
+
+## Test with quantities
+
+```python
+import numpy as np
+
+from quantype import u
+from quantype.testing import assert_allclose
+
+assert_allclose(u.nm(np.array([1.0, 2.0])), u.angstrom(np.array([10.0, 20.0])))
+assert_allclose(300 * u.K, 300.05 * u.K, atol=0.1 * u.delta_K)
+```
+
+`assert_allclose` checks that both quantities have the same kind and unit
+system, then compares their numbers as `numpy.testing.assert_allclose` does.
+Their display units may differ. `numpy.testing` and `pytest.approx` convert
+their arguments to arrays, which quantities refuse; for one number,
+`q.magnitude(u.nm) == pytest.approx(2.0)` works too.
 
 ## Validate configuration and restore typed storage
 
@@ -255,6 +285,7 @@ Serialization saves values; device placement and autodiff graphs are lost.
 | `Units are objects, such as u.nm, not strings` | Pass a unit from `u`, or read the whole string with `Length.parse("2 nm")`. |
 | `u.length.nm` raises `AttributeError` | Namespaces use full names, as in `u.length.nanometer`. Abbreviations are flat, as in `u.nm`. |
 | `np.fft does not know the units of a quantity` | That function has no unit rule. Pass `.value` or `.magnitude(unit)`. `quantype.numpy` lists the functions that have one. |
+| `Implicit array coercion drops units` | In tests, compare with `quantype.testing.assert_allclose`. Elsewhere, pass `.value` or `.magnitude(unit)`. |
 | `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists can't scale a quantity. Convert lists with `np.asarray`. |
 | `Cannot add int and Length; give it a unit` | Plain numbers can only be added to `Dimensionless` values, and zero to anything (so `sum()` works). Give the number a unit. |
 | `The truth value of a Length quantity is ambiguous` | Compare against a value, as in `q > 0 * u.nm`, or test `q is not None`. |

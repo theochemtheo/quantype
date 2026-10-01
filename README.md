@@ -171,6 +171,8 @@ relations.
 
 ## Also included
 
+- `quantype.testing.assert_allclose`, which checks kind and unit system before
+  comparing numbers.
 - JSON, Pydantic, and NPZ serialization, with no pickle. Values keep the unit
   they were given in, so a configuration's `"0.5 nm"` is saved as 0.5 nanometres.
 - Temperatures: 30 °C minus 20 °C is a `TemperatureDifference` of 10 Δ°C, and

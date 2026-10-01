@@ -357,7 +357,7 @@ class Quantity[K, V, S: UnitSystem]:
         self._check_unit(
             unit,
             "`.to` sets the display unit; to move a tensor to another device, "
-            "move its `.value` and wrap it again with `from_value`.",
+            "use `q.with_value(q.value.to(device))`.",
         )
         return cast(
             "Self", _wrap(self._semantic, self._value, self._system, display=unit)
@@ -401,6 +401,20 @@ class Quantity[K, V, S: UnitSystem]:
                 f"{other._system.__name__} quantities; convert one explicitly "
                 "with .to_system(...)"
             )
+
+    def with_value(self, value: V, /) -> Self:
+        """New raw numbers with this quantity's kind, unit system and display unit.
+
+        The numbers are trusted, as for ``from_value``: they must already be in
+        the unit system's units. ``x.with_value(np.sort(x.value))`` or
+        ``x.with_value(x.value.detach())`` applies an operation quantype has no
+        rule for.
+        """
+        if isinstance(value, Quantity):
+            raise TypeError(
+                "with_value takes raw numbers, such as q.value, not a quantity"
+            )
+        return self._with(value)
 
     def _scaled(self, raw: Any) -> Self:
         """Scaling keeps the display unit, unless it has an offset (°C).

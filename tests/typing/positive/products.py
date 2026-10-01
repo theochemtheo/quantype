@@ -87,3 +87,7 @@ assert_type(length * t * q, Quantity[Mul[Mul[LengthKind, TimeKind], ChargeKind],
 assert_type(
     q * (length * t), Quantity[Mul[ChargeKind, Mul[LengthKind, TimeKind]], float]
 )
+
+# with_value keeps the quantity's own class, product classes included.
+assert_type(lengths.with_value(np.sort(lengths.value)), Length[Array])
+assert_type((length * t).with_value(2.0), LengthTime[float])
