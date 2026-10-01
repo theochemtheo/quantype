@@ -14,7 +14,6 @@
 ^quantype\._internal\._codata\.Edition$
 ^quantype\._internal\._registry\.Relations$
 ^quantype\._internal\._(jax|numpy|torch)\._(Argnums|Metadata|Quantity|RawFunction)$
-^quantype\._internal\._products\.(EntryRow|PairRow)$
 ^quantype\.codegen\._table\.(Monomial|Operation|Product)$
 
 # functools.cache exposes a variadic checker signature but preserves runtime __wrapped__.

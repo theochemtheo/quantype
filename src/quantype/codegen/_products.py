@@ -158,7 +158,6 @@ def _runtime(package: str, table: Table) -> str:
     text += "# ruff: noqa: F822\n"
     text += "# pyright: reportUnsupportedDunderAll=false\n"
     text += "from typing import Any\n"
-    text += "from quantype._internal._products import EntryRow, PairRow\n"
     text += "from quantype._internal._products import pair_class as _pair_class\n"
     text += "from quantype._internal._products import register as _register\n"
     if package == "quantype":
@@ -168,16 +167,18 @@ def _runtime(package: str, table: Table) -> str:
         text += f"from {package}._catalogue import runtime as _runtime\n"
         text += f"from {package}._generated import Quantity as _Quantity\n"
         text += "_KINDS = _runtime.kinds\n"
-    pairs = tuple(
-        (name, pair.operation, pair.left, pair.right)
+    # One row per line, as text: type checkers read a literal of this size far
+    # faster than the equivalent tuple of tuples.
+    pairs = "".join(
+        f"{name} {pair.operation} {pair.left} {pair.right}\n"
         for name, pair in sorted(table.pairs.items())
     )
-    entries = tuple(
-        (operation, left, right, result)
+    entries = "".join(
+        f"{operation} {left} {right} {result}\n"
         for (operation, left, right), result in sorted(table.entries.items())
     )
-    text += f"_PAIRS: tuple[PairRow, ...] = {pairs!r}\n"
-    text += f"_ENTRIES: tuple[EntryRow, ...] = {entries!r}\n"
+    text += f'# Product classes: name, operation, left, right.\n_PAIRS = """\\\n{pairs}"""\n'
+    text += f'# Named results: operation, left, right, result.\n_ENTRIES = """\\\n{entries}"""\n'
     text += "_register(_KINDS, _PAIRS, _ENTRIES, __name__)\n\n"
     text += "def __getattr__(name: str) -> type[_Quantity[Any, Any, Any]]:\n"
     text += "    return _pair_class(__name__, name, _Quantity)\n\n"

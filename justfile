@@ -18,10 +18,13 @@ format:
 typecheck:
     uv run --all-extras ty check
     uv run --all-extras scripts/check_mypy.py
-    uv run --all-extras python -m mypy.stubtest quantype --allowlist tests/typing/stubtest_allowlist.txt
     uv run --all-extras pyright
     uv run --all-extras pyrefly check
     uv run scripts/check_typing.py
+
+# Runtime/stub agreement via stubtest; slower, so separate from typecheck
+stubcheck:
+    uv run --all-extras python -m mypy.stubtest quantype --allowlist tests/typing/stubtest_allowlist.txt
 
 generate:
     uv run scripts/generate_codata.py

@@ -22,6 +22,7 @@ jobs:
       - run: uv run just check-generated
       - run: uv run just lint
       - run: uv run just typecheck
+      - run: uv run just stubcheck
       - run: uv run just test
         env:
           QUANTYPE_TEST_TIER: full

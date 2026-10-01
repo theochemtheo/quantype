@@ -25,7 +25,7 @@ Generic left-operand fallback can hide a custom right operand's `__rmul__`. `tes
 
 Use `assert_type` in `tests/typing/positive/` to specify the actual expected result (these files are also executed by `tests/runtime/test_typing_probes.py`), and marked expressions in `tests/typing/negative/invalid.py` to specify rejection. Every negative line must end with `# error`; `scripts/check_typing.py` checks that each checker reports every marked line. It is not enough for a fixture to fail elsewhere.
 
-`uv run just typecheck` runs ty, both mypy parsers, runtime/stub agreement via stubtest, Pyright, Pyrefly, and negative conformance. See [checks](../quantype/references/checks.md) for environment details and the dual-parser helper. A one-checker pass does not establish the supported static contract.
+`uv run just typecheck` runs ty, both mypy parsers, Pyright, Pyrefly, and negative conformance; `uv run just stubcheck` runs runtime/stub agreement via stubtest. See [checks](../quantype/references/checks.md) for environment details and the dual-parser helper. A one-checker pass does not establish the supported static contract.
 
 `tests/typing/stubtest_allowlist.txt` contains intentional runtime/stub differences. Diagnose a new mismatch before changing the allowlist; use a narrow justified entry only for an intentional difference.
 

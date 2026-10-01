@@ -23,26 +23,22 @@ if TYPE_CHECKING:
 
     from quantype.core import Quantity
 
-# Generated tables: (name, operation, left, right) and (operation, left, right,
-# result), where entry operands name kinds or pairs.
-type PairRow = tuple[str, str, str, str | int]
-type EntryRow = tuple[str, str, str, str]
-
 _CLASSES: dict[tuple[str, str], type[Quantity[Any, Any, Any]]] = {}
 _SEMANTICS: dict[tuple[str, str], Expression] = {}
 # Called with each pair class when it is created, so JAX can register it.
 CLASS_HOOKS: list[Callable[[type[Quantity[Any, Any, Any]]], None]] = []
 
 
-def register(
-    kinds: Mapping[str, Kind],
-    pairs: tuple[PairRow, ...],
-    entries: tuple[EntryRow, ...],
-    module: str,
-) -> None:
-    """Register a catalogue's pairs and entries with the physical engine."""
+def register(kinds: Mapping[str, Kind], pairs: str, entries: str, module: str) -> None:
+    """Register a catalogue's pairs and entries with the physical engine.
+
+    Each line of ``pairs`` is ``name operation left right`` and each line of
+    ``entries`` is ``operation left right result``, where an entry's operands
+    name kinds or pairs.
+    """
     by_name: dict[str, Semantic] = dict(kinds)
-    for name, operation, left, right in pairs:
+    for row in pairs.splitlines():
+        name, operation, left, right = row.split()
         first = kinds[left]
         if operation == "pow":
             exponent = int(right)
@@ -61,7 +57,8 @@ def register(
         PAIR_CLASSES[pair] = (module, name)
         _SEMANTICS[module, name] = pair
         by_name[name] = pair
-    for operation, left, right, result in entries:
+    for row in entries.splitlines():
+        operation, left, right, result = row.split()
         named = kinds[result]
         ENTRIES[operation, by_name[left], by_name[right]] = named
 

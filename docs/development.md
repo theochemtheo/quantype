@@ -15,6 +15,7 @@ uv run just generate
 uv run just check-generated
 uv run just test
 uv run just typecheck
+uv run just stubcheck
 uv run just lint
 uv build
 ```
@@ -25,7 +26,11 @@ most one backend, as CI's tier jobs do:
 `uv run --no-sync pytest tests/runtime` (optional-backend tests skip when
 unavailable). The `dev` group includes `test`, so a plain `uv sync` installs
 everything needed to develop.
-The `just test`, `just typecheck`, and `just lint` recipes request all extras.
+The `just test`, `just typecheck`, `just stubcheck`, and `just lint` recipes
+request all extras. `just typecheck` runs the type checkers and the negative
+conformance suite; `just stubcheck` runs mypy's stubtest, which compares every
+stub with the runtime and takes about a minute, so run it when stubs or the
+generator change. CI runs both.
 To install the repository's commit hooks, run `uv run just setup`.
 
 `just lint` runs [zizmor](https://github.com/zizmorcore/zizmor) offline against the

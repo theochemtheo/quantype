@@ -209,6 +209,7 @@ uv run just generate
 uv run just check-generated
 uv run just test
 uv run just typecheck
+uv run just stubcheck
 uv run just lint
 uv build
 ```
