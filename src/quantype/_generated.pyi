@@ -6,7 +6,7 @@
 # pyright: reportIncompatibleMethodOverride=false
 # pyright: reportPrivateUsage=false
 # ruff: noqa: N802
-from typing import Any, Literal, Protocol, overload, override
+from typing import Any, Literal, Never, Protocol, overload, override
 
 import numpy as np
 import numpy.typing as npt
@@ -13965,6 +13965,12 @@ class Temperature(Quantity[TemperatureKind, V, S]):
     def __sub__(
         self, other: Temperature[V, S] | Temperature[float, S], /
     ) -> TemperatureDifference[V, S]: ...
+    @override
+    # pyrefly: ignore[bad-override]
+    def __radd__(self, other: Never, /) -> Never: ...  # ty: ignore[invalid-method-override]
+    @override
+    # pyrefly: ignore[bad-override]
+    def __rsub__(self, other: Never, /) -> Never: ...  # ty: ignore[invalid-method-override]
     @override
     def __neg__(self) -> Temperature[V, S]: ...
     @override

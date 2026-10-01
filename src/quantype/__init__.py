@@ -1,4 +1,9 @@
-"""Physical meaning in Python types, with the unit system in the type too."""
+"""Physical quantities whose kinds and unit systems are part of their types.
+
+``Energy[float](3, u.eV) / Length[float](2, u.nm)`` is a ``Force[float]`` to
+mypy, Pyright, Pyrefly, and ty, and at runtime. Kinds are importable from here,
+units from ``u``, and the unnamed product classes from ``quantype.products``.
+"""
 
 from quantype import units as u
 from quantype import units as units

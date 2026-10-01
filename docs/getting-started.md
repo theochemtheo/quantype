@@ -250,6 +250,8 @@ Serialization saves values; device placement and autodiff graphs are lost.
 | `Expected Length; received Energy` | Check the input's kind and unit. An energy can't be converted to a length. |
 | `Unknown unit` for a custom identifier | Pass its definition when decoding. |
 | `'15' has no unit` | Write the unit, as in `"15 nm"`. |
+| `Cannot add two absolute Temperatures` | Shift a temperature by a difference, as in `T + 10 * u.delta_K`. |
+| `Gradient only defined for scalar-output functions. Output was 2.5 eV.`, or a quantity `is not a valid JAX type` | Use `ujax.grad`; `jax.grad` can't differentiate a quantity-valued function. |
 | `Units are objects, such as u.nm, not strings` | Pass a unit from `u`, or read the whole string with `Length.parse("2 nm")`. |
 | `u.length.nm` raises `AttributeError` | Namespaces use full names, as in `u.length.nanometer`. Abbreviations are flat, as in `u.nm`. |
 | `np.fft does not know the units of a quantity` | That function has no unit rule. Pass `.value` or `.magnitude(unit)`. `quantype.numpy` lists the functions that have one. |

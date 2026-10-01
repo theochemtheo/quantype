@@ -67,6 +67,12 @@ units. Results come back shown in the system's unit. Quantities in different
 systems have different pytree structures, just as they have different static
 types.
 
+Differentiate with `ujax.grad`, `ujax.value_and_grad`, and `ujax.hessian`.
+Before `ujax` is imported, JAX's own `jax.grad` rejects a quantity as "not a
+valid JAX type". After, it treats a quantity as a container, so for a function
+that returns an `Energy` it raises "Gradient only defined for scalar-output
+functions. Output was 2.5 eV.", although the energy is a scalar.
+
 JAX's `jnp` functions can't see quantities, and JAX has no hook to change that.
 In JAX code, use `quantype.numpy`, which works on traced values:
 

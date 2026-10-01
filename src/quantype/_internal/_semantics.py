@@ -97,7 +97,10 @@ def addition(left: Semantic, right: Semantic, *, subtract: bool) -> Semantic:
     if isinstance(left, Kind) and left.affine:
         if left is right:
             if not subtract:
-                raise TypeError("Cannot add two absolute Temperatures")
+                raise TypeError(
+                    "Cannot add two absolute Temperatures; to shift one, add a "
+                    "TemperatureDifference, such as 10 * u.delta_K"
+                )
             return TEMPERATURE_DIFFERENCES[left]
         if TEMPERATURE_DIFFERENCES[left] is right:
             return left

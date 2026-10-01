@@ -192,6 +192,11 @@ def additive_stubs(name: str) -> str:
         elif name != "Temperature":
             # sum() requires any int here; only zero is accepted at runtime.
             text += f"    @override\n    def {method}(self, other: int, /) -> {name}[V, S]: ...\n"
+        else:
+            # No int is a Never, so sum() of absolute temperatures and 0 - T are
+            # type errors, as they are runtime errors. Narrowing the inherited
+            # parameter is deliberate, and Pyrefly and ty report it.
+            text += f"    @override\n    # pyrefly: ignore[bad-override]\n    def {method}(self, other: Never, /) -> Never: ...  # ty: ignore[invalid-method-override]\n"
     return text
 
 
@@ -406,6 +411,28 @@ def structural_quantity_stub() -> str:
     return text
 
 
+def kind_docstring(name: str, catalogue: Catalogue) -> str:
+    """What ``help(Length)`` shows: storage, construction, and where units are."""
+    namespace = namespace_name(name)
+    canonical = catalogue.quantities[name].canonical_unit
+    spec = catalogue.units[canonical]
+    symbol = spec.symbol or canonical
+    namespaces = {namespace_name(kind) for kind in catalogue.quantities}
+    unit = (
+        f"u.{canonical}"
+        if canonical not in namespaces
+        else f"u.{namespace}.{canonical}"
+    )
+    words = namespace.replace("_", " ")
+    article = "An" if words[0] in "aeiou" else "A"
+    return (
+        f'    """{article} {words}, stored in {symbol} in the default Atomistic system.\n\n'
+        f"    Build one with ``{name}[float](2, {unit})``.\n"
+        f"    Its units are in ``u.{namespace}``.\n"
+        '    """\n\n'
+    )
+
+
 def quantity_outputs(
     catalogue: Catalogue, package: str, table: Table
 ) -> dict[str, str]:
@@ -441,7 +468,7 @@ def quantity_outputs(
         + "# pyright: reportPrivateUsage=false\n"
         + PROTOCOL_MEMBERS
     )
-    stub += "from typing import Any, Literal, Protocol, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Unit, _Numerical, _Scalar\n"
+    stub += "from typing import Any, Literal, Never, Protocol, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Unit, _Numerical, _Scalar\n"
     stub += (
         "from quantype.core import Quantity\n"
         if package == "quantype"
@@ -467,7 +494,8 @@ def quantity_outputs(
         stub += structural_quantity_stub()
     stub += protocol_stubs(catalogue)
     for name in catalogue.quantities:
-        runtime += f"\nclass {name}[V, S: UnitSystem](Quantity[{name}Kind, V, S]):\n    _kind = {name!r}\n"
+        runtime += f"\nclass {name}[V, S: UnitSystem](Quantity[{name}Kind, V, S]):\n"
+        runtime += kind_docstring(name, catalogue) + f"    _kind = {name!r}\n"
         if package != "quantype":
             runtime += f"    _semantic = runtime.kinds[{name!r}]\n"
         stub += f"\nclass {name}(Quantity[{name}Kind, V, S]):\n" + quantity_methods(

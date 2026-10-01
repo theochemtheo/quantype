@@ -85,7 +85,7 @@ def test_zero_is_the_additive_identity() -> None:
         with pytest.raises(TypeError, match="give it a unit"):
             _ = untyped + other
     points: list[Any] = [300 * u.K, 310 * u.K]
-    with pytest.raises(TypeError, match="Cannot add two absolute Temperatures"):
+    with pytest.raises(TypeError, match=r"such as 10 \* u\.delta_K"):
         sum(points)
 
 

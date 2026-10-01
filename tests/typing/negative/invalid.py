@@ -33,6 +33,8 @@ missing_unit = Length[float](2)  # error
 
 point = 300 * u.K
 bad_point_sum = point.sum()  # error
+bad_builtin_point_sum = sum([point, point])  # error
+bad_point_from_zero = 0 - point  # error
 
 product = (2 * u.angstrom) * (3 * u.fs)
 ratio = (2 * u.eV) / (3 * u.fs)
