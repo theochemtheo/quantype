@@ -162,6 +162,45 @@ class EnergyPerAtomPerDipoleMoment(
     ) -> AtomCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyPerAtomPerDipoleMoment[float, S], other: AtomCount[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EnergyPerAtomPerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyPerAtomPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerAtomPerDipoleMoment[float, S], other: W, /
+    ) -> EnergyPerAtomPerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> EnergyPerAtomPerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerAtomPerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerAtomPerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -175,6 +214,23 @@ class EnergyPerAtomPerDipoleMoment(
     ) -> EnergyPerAtomPerDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerAtomPerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerAtomPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerAtomPerDipoleMoment[float, S], other: W, /
+    ) -> EnergyPerAtomPerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> EnergyPerAtomPerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> EnergyPerAtomPerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

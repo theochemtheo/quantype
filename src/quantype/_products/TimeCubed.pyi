@@ -74,6 +74,25 @@ class TimeCubed(Quantity[Pow[TimeKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[TimeKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TimeCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeCubed[float, S], other: W, /
+    ) -> TimeCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[TimeKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[TimeKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class TimeCubed(Quantity[Pow[TimeKind, Literal[3]], V, S]):
     ) -> TimeCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeCubed[float, S], other: W, /
+    ) -> TimeCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeCubed[V, S]: ...
+    @override
+    def item(self) -> TimeCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

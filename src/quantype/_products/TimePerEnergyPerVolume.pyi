@@ -104,6 +104,33 @@ class TimePerEnergyPerVolume(Quantity[Div[TimeKind, EnergyPerVolumeKind], V, S])
     def _rtruediv_Time(self, other: Time[V, S], /) -> EnergyPerVolume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerEnergyPerVolume[float, S], other: EnergyPerVolume[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerVolume[V, S] | EnergyPerVolume[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerEnergyPerVolume[float, S], other: W, /
+    ) -> TimePerEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +142,19 @@ class TimePerEnergyPerVolume(Quantity[Div[TimeKind, EnergyPerVolumeKind], V, S])
     ) -> TimePerEnergyPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerEnergyPerVolume[float, S], other: W, /
+    ) -> TimePerEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> TimePerEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

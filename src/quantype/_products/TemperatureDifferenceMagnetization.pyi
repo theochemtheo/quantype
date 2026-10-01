@@ -127,6 +127,29 @@ class TemperatureDifferenceMagnetization(
     ) -> Quantity[Div[Mul[TemperatureDifferenceKind, MagnetizationKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureDifferenceMagnetization[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferenceMagnetization[float, S], other: W, /
+    ) -> TemperatureDifferenceMagnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferenceMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureDifferenceMagnetization[V, S]: ...
@@ -144,6 +167,23 @@ class TemperatureDifferenceMagnetization(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureDifferenceMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferenceMagnetization[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferenceMagnetization[float, S], other: W, /
+    ) -> TemperatureDifferenceMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceMagnetization[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferenceMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

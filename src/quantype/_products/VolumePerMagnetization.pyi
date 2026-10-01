@@ -102,6 +102,33 @@ class VolumePerMagnetization(Quantity[Div[VolumeKind, MagnetizationKind], V, S])
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> Magnetization[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerMagnetization[float, S], other: Magnetization[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerMagnetization[float, S], other: W, /
+    ) -> VolumePerMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class VolumePerMagnetization(Quantity[Div[VolumeKind, MagnetizationKind], V, S])
     ) -> VolumePerMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerMagnetization[float, S], other: W, /
+    ) -> VolumePerMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerMagnetization[V, S]: ...
+    @override
+    def item(self) -> VolumePerMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

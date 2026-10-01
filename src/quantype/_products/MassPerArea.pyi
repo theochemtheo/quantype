@@ -142,6 +142,39 @@ class MassPerArea(Quantity[Div[MassKind, AreaKind], V, S]):
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassPerArea[float, S], other: Area[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MassPerArea[float, S], other: Acceleration[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassPerArea[float, S], other: W, /
+    ) -> MassPerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassPerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassPerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassPerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -153,6 +186,19 @@ class MassPerArea(Quantity[Div[MassKind, AreaKind], V, S]):
     ) -> MassPerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassPerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassPerArea[float, S], other: W, /
+    ) -> MassPerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassPerArea[V, S]: ...
+    @override
+    def item(self) -> MassPerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

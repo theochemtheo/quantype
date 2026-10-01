@@ -124,6 +124,41 @@ class PerDipoleMoment(Quantity[Pow[DipoleMomentKind, Literal[-1]], V, S]):
     ) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerDipoleMoment[float, S], other: Energy[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerDipoleMoment[float, S], other: W, /
+    ) -> PerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[DipoleMomentKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[DipoleMomentKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -135,6 +170,19 @@ class PerDipoleMoment(Quantity[Pow[DipoleMomentKind, Literal[-1]], V, S]):
     ) -> PerDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerDipoleMoment[float, S], other: W, /
+    ) -> PerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> PerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

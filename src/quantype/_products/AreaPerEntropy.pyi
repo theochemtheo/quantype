@@ -149,6 +149,39 @@ class AreaPerEntropy(Quantity[Div[AreaKind, EntropyKind], V, S]):
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerEntropy[float, S], other: ForceConstant[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerEntropy[float, S], other: Entropy[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Entropy[V, S] | Entropy[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerEntropy[float, S], other: W, /
+    ) -> AreaPerEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -160,6 +193,19 @@ class AreaPerEntropy(Quantity[Div[AreaKind, EntropyKind], V, S]):
     ) -> AreaPerEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerEntropy[float, S], other: W, /
+    ) -> AreaPerEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerEntropy[V, S]: ...
+    @override
+    def item(self) -> AreaPerEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

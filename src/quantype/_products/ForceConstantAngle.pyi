@@ -94,6 +94,25 @@ class ForceConstantAngle(Quantity[Mul[ForceConstantKind, AngleKind], V, S]):
     ) -> Quantity[Div[Mul[ForceConstantKind, AngleKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceConstantAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantAngle[float, S], other: W, /
+    ) -> ForceConstantAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class ForceConstantAngle(Quantity[Mul[ForceConstantKind, AngleKind], V, S]):
     ) -> ForceConstantAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantAngle[float, S], other: W, /
+    ) -> ForceConstantAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantAngle[V, S]: ...
+    @override
+    def item(self) -> ForceConstantAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

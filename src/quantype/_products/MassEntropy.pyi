@@ -92,6 +92,25 @@ class MassEntropy(Quantity[Mul[MassKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[MassKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MassEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassEntropy[float, S], other: W, /
+    ) -> MassEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MassKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MassKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class MassEntropy(Quantity[Mul[MassKind, EntropyKind], V, S]):
     ) -> MassEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassEntropy[float, S], other: W, /
+    ) -> MassEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassEntropy[V, S]: ...
+    @override
+    def item(self) -> MassEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

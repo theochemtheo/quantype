@@ -102,6 +102,33 @@ class ParticleDensityPerArea(Quantity[Div[ParticleDensityKind, AreaKind], V, S])
     ) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ParticleDensityPerArea[float, S], other: Area[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ParticleDensityPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityPerArea[float, S], other: W, /
+    ) -> ParticleDensityPerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensityPerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityPerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityPerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class ParticleDensityPerArea(Quantity[Div[ParticleDensityKind, AreaKind], V, S])
     ) -> ParticleDensityPerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensityPerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityPerArea[float, S], other: W, /
+    ) -> ParticleDensityPerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ParticleDensityPerArea[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityPerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -181,6 +181,47 @@ class FrequencyMass(Quantity[Mul[FrequencyKind, MassKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyMass[float, S], other: Length[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyMass[float, S], other: Time[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyMass[float, S], other: Velocity[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyMass[float, S], other: W, /
+    ) -> FrequencyMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyMass[V, S]: ...
     @overload
     def __rmul__(
@@ -192,6 +233,19 @@ class FrequencyMass(Quantity[Mul[FrequencyKind, MassKind], V, S]):
     ) -> FrequencyMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyMass[float, S], other: W, /
+    ) -> FrequencyMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyMass[V, S]: ...
+    @override
+    def item(self) -> FrequencyMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

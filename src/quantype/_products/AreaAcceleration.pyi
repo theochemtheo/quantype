@@ -94,6 +94,25 @@ class AreaAcceleration(Quantity[Mul[AreaKind, AccelerationKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, AccelerationKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaAcceleration[float, S], other: W, /
+    ) -> AreaAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class AreaAcceleration(Quantity[Mul[AreaKind, AccelerationKind], V, S]):
     ) -> AreaAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaAcceleration[float, S], other: W, /
+    ) -> AreaAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaAcceleration[V, S]: ...
+    @override
+    def item(self) -> AreaAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

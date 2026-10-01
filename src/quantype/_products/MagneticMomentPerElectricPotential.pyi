@@ -141,6 +141,39 @@ class MagneticMomentPerElectricPotential(
     ) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MagneticMomentPerElectricPotential[float, S],
+        other: ElectricPotential[W, S],
+        /,
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> MagneticMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MagneticMomentPerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagneticMomentPerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagneticMomentPerElectricPotential[float, S], other: W, /
+    ) -> MagneticMomentPerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MagneticMomentPerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagneticMomentPerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MagneticMomentKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MagneticMomentKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> MagneticMomentPerElectricPotential[V, S]: ...
@@ -158,6 +191,23 @@ class MagneticMomentPerElectricPotential(
     def __rmul__(
         self, other: _Numerical, /
     ) -> MagneticMomentPerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagneticMomentPerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagneticMomentPerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagneticMomentPerElectricPotential[float, S], other: W, /
+    ) -> MagneticMomentPerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagneticMomentPerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> MagneticMomentPerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

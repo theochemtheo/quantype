@@ -129,6 +129,37 @@ class DipoleMomentPerMagneticMoment(
     ) -> MagneticMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: DipoleMomentPerMagneticMoment[float, S], other: MagneticMoment[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: DipoleMomentPerMagneticMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: DipoleMomentPerMagneticMoment[float, S], other: W, /
+    ) -> DipoleMomentPerMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: DipoleMomentPerMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> DipoleMomentPerMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -142,6 +173,23 @@ class DipoleMomentPerMagneticMoment(
     ) -> DipoleMomentPerMagneticMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> DipoleMomentPerMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: DipoleMomentPerMagneticMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: DipoleMomentPerMagneticMoment[float, S], other: W, /
+    ) -> DipoleMomentPerMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> DipoleMomentPerMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

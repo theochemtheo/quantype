@@ -141,6 +141,41 @@ class ForceConstantPerAction(Quantity[Div[ForceConstantKind, ActionKind], V, S])
     def _rtruediv_InverseTime(self, other: InverseTime[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerAction[float, S], other: Area[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerAction[float, S], other: Action[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerAction[float, S], other: W, /
+    ) -> ForceConstantPerAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantPerAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPerAction[V, S]: ...
     @overload
     def __rmul__(
@@ -152,6 +187,19 @@ class ForceConstantPerAction(Quantity[Div[ForceConstantKind, ActionKind], V, S])
     ) -> ForceConstantPerAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantPerAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerAction[float, S], other: W, /
+    ) -> ForceConstantPerAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantPerAction[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

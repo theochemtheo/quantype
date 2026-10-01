@@ -94,6 +94,25 @@ class MagnetizationEntropy(Quantity[Mul[MagnetizationKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[MagnetizationKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MagnetizationEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagnetizationEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationEntropy[float, S], other: W, /
+    ) -> MagnetizationEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MagnetizationEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class MagnetizationEntropy(Quantity[Mul[MagnetizationKind, EntropyKind], V, S]):
     ) -> MagnetizationEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagnetizationEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagnetizationEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationEntropy[float, S], other: W, /
+    ) -> MagnetizationEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MagnetizationEntropy[V, S]: ...
+    @override
+    def item(self) -> MagnetizationEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

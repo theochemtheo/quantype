@@ -11,11 +11,14 @@ import torch
 import quantype.numpy as qnp
 from quantype import (
     Angle,
+    Area,
     Dimensionless,
     Energy,
     Force,
     ForceConstant,
     Length,
+    Time,
+    Velocity,
     u,
     utorch,
 )
@@ -150,3 +153,37 @@ def test_quantype_numpy_on_tensors_uses_numpys_names() -> None:
     assert torch.equal(
         qnp.linalg.norm(positions, axis=-1).value, torch.tensor([1.0, 2.0])
     )
+
+
+def test_statistics_products_and_ranges_on_tensors() -> None:
+    lengths = Length[torch.Tensor](torch.tensor([3.0, 1.0, 2.0]), u.nm)
+    for result, expected in (
+        (qnp.sort(lengths), [1.0, 2.0, 3.0]),
+        (qnp.median(lengths), 2.0),
+        (qnp.quantile(lengths, 0.5), 2.0),
+        (qnp.percentile(lengths, 50), 2.0),
+        (qnp.nanmean(lengths), 2.0),
+        (qnp.nansum(lengths), 6.0),
+        (qnp.nanmedian(lengths), 2.0),
+    ):
+        assert isinstance(result, Length)
+        assert torch.allclose(result.magnitude(), torch.tensor(expected))
+    assert int(qnp.argmin(lengths)) == 1
+    assert int(qnp.argmax(lengths)) == 0
+    assert qnp.argsort(lengths).tolist() == [1, 2, 0]
+    assert isinstance(qnp.var(lengths), Area)
+    assert isinstance(qnp.square(lengths), Area)
+    start = Length[torch.Tensor](torch.tensor(0.0), u.nm)
+    grid = qnp.linspace(start, start + 1 * u.nm, 3)
+    assert isinstance(grid, Length)
+    assert torch.allclose(grid.magnitude(), torch.tensor([0.0, 0.5, 1.0]))
+    times = Time[torch.Tensor](torch.tensor([0.0, 1.0, 2.0]), u.fs)
+    speeds = Velocity[torch.Tensor](torch.ones(3), u.angstrom_per_fs)
+    assert float(qnp.trapezoid(speeds, times).magnitude(u.angstrom)) == 2.0
+    forces = Force[torch.Tensor](torch.eye(2), u.eV_per_angstrom)
+    work = forces @ Length[torch.Tensor](torch.tensor([3.0, 4.0]), u.angstrom)
+    assert isinstance(work, Energy)
+    assert torch.equal(work.magnitude(u.eV), torch.tensor([3.0, 4.0]))
+    assert lengths.size == 3
+    assert lengths.copy().value is not lengths.value
+    assert type(lengths[0].item().value) is float

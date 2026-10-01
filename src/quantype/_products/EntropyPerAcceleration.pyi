@@ -104,6 +104,33 @@ class EntropyPerAcceleration(Quantity[Div[EntropyKind, AccelerationKind], V, S])
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerAcceleration[float, S], other: W, /
+    ) -> EntropyPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +142,19 @@ class EntropyPerAcceleration(Quantity[Div[EntropyKind, AccelerationKind], V, S])
     ) -> EntropyPerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerAcceleration[float, S], other: W, /
+    ) -> EntropyPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> EntropyPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

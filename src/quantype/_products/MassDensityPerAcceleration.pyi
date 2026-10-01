@@ -122,6 +122,35 @@ class MassDensityPerAcceleration(
     ) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerAcceleration[float, S], other: W, /
+    ) -> MassDensityPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -135,6 +164,21 @@ class MassDensityPerAcceleration(
     ) -> MassDensityPerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerAcceleration[float, S], other: W, /
+    ) -> MassDensityPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

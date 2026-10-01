@@ -121,6 +121,41 @@ class PressurePerVelocity(Quantity[Div[PressureKind, VelocityKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressurePerVelocity[float, S], other: Volume[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PressurePerVelocity[float, S], other: Velocity[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressurePerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressurePerVelocity[float, S], other: W, /
+    ) -> PressurePerVelocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressurePerVelocity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressurePerVelocity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[PressureKind, VelocityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[PressureKind, VelocityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressurePerVelocity[V, S]: ...
     @overload
     def __rmul__(
@@ -132,6 +167,19 @@ class PressurePerVelocity(Quantity[Div[PressureKind, VelocityKind], V, S]):
     ) -> PressurePerVelocity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressurePerVelocity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressurePerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressurePerVelocity[float, S], other: W, /
+    ) -> PressurePerVelocity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressurePerVelocity[V, S]: ...
+    @override
+    def item(self) -> PressurePerVelocity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -126,6 +126,41 @@ class VolumePerElectronCount(Quantity[Div[VolumeKind, ElectronCountKind], V, S])
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerElectronCount[float, S], other: ElectronDensity[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronDensity[V, S] | ElectronDensity[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumePerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerElectronCount[float, S], other: W, /
+    ) -> VolumePerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -137,6 +172,19 @@ class VolumePerElectronCount(Quantity[Div[VolumeKind, ElectronCountKind], V, S])
     ) -> VolumePerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerElectronCount[float, S], other: W, /
+    ) -> VolumePerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerElectronCount[V, S]: ...
+    @override
+    def item(self) -> VolumePerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

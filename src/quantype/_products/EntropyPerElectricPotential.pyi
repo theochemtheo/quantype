@@ -185,6 +185,53 @@ class EntropyPerElectricPotential(
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerElectricPotential[float, S], other: Temperature[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerElectricPotential[float, S],
+        other: TemperatureDifference[W, S],
+        /,
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerElectricPotential[float, S], other: ElectricPotential[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EntropyPerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerElectricPotential[float, S], other: W, /
+    ) -> EntropyPerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -198,6 +245,23 @@ class EntropyPerElectricPotential(
     ) -> EntropyPerElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EntropyPerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerElectricPotential[float, S], other: W, /
+    ) -> EntropyPerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> EntropyPerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> EntropyPerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

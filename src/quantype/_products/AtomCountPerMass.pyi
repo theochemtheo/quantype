@@ -135,6 +135,39 @@ class AtomCountPerMass(Quantity[Div[AtomCountKind, MassKind], V, S]):
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AtomCountPerMass[float, S], other: Mass[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AtomCountPerMass[float, S], other: MassDensity[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MassDensity[V, S] | MassDensity[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AtomCountPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountPerMass[float, S], other: W, /
+    ) -> AtomCountPerMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountPerMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountPerMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountPerMass[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +179,19 @@ class AtomCountPerMass(Quantity[Div[AtomCountKind, MassKind], V, S]):
     ) -> AtomCountPerMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountPerMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountPerMass[float, S], other: W, /
+    ) -> AtomCountPerMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountPerMass[V, S]: ...
+    @override
+    def item(self) -> AtomCountPerMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

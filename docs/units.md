@@ -374,8 +374,10 @@ Comparing a quantity with a plain number, as in `2 * u.nm == 2`, raises
 `TypeError` for `==` and the orderings alike, except for `Dimensionless`
 values. `None` and other non-numbers compare unequal.
 
-Indexing, iteration, `.shape`, `.ndim`, `len()`, `.sum()`, `.mean()`, `.max()`,
-and `.min()` keep the kind, system, and display unit. With
+Indexing, iteration, `.shape`, `.ndim`, `.size`, `len()`, `.sum()`, `.mean()`,
+`.max()`, `.min()`, `.ravel()`, and `.copy()` keep the kind, system, and display
+unit. `.var()` and `qnp.square` give the squared kind, and `a @ b` multiplies
+kinds as `a * b` does. With
 `import quantype.numpy as qnp`, `qnp.sqrt(Area)`, `qnp.sin(Angle)`, and
 `qnp.exp(Dimensionless)` keep the system. A real number or numerical array
 multiplies or divides a quantity from either side, and the quantity keeps its

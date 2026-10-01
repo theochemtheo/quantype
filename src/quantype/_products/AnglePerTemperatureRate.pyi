@@ -106,6 +106,33 @@ class AnglePerTemperatureRate(Quantity[Div[AngleKind, TemperatureRateKind], V, S
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> TemperatureRate[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerTemperatureRate[float, S], other: TemperatureRate[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerTemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerTemperatureRate[float, S], other: W, /
+    ) -> AnglePerTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerTemperatureRate[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, TemperatureRateKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, TemperatureRateKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerTemperatureRate[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class AnglePerTemperatureRate(Quantity[Div[AngleKind, TemperatureRateKind], V, S
     ) -> AnglePerTemperatureRate[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerTemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerTemperatureRate[float, S], other: W, /
+    ) -> AnglePerTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> AnglePerTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

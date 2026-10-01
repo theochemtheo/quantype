@@ -130,6 +130,41 @@ class VolumePerMomentum(Quantity[Div[VolumeKind, MomentumKind], V, S]):
     def _rtruediv_Velocity(self, other: Velocity[V, S], /) -> EnergyDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerMomentum[float, S], other: Pressure[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumePerMomentum[float, S], other: Momentum[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerMomentum[float, S], other: W, /
+    ) -> VolumePerMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -141,6 +176,19 @@ class VolumePerMomentum(Quantity[Div[VolumeKind, MomentumKind], V, S]):
     ) -> VolumePerMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerMomentum[float, S], other: W, /
+    ) -> VolumePerMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerMomentum[V, S]: ...
+    @override
+    def item(self) -> VolumePerMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

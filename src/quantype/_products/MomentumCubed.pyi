@@ -74,6 +74,25 @@ class MomentumCubed(Quantity[Pow[MomentumKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[MomentumKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MomentumCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumCubed[float, S], other: W, /
+    ) -> MomentumCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MomentumKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MomentumKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class MomentumCubed(Quantity[Pow[MomentumKind, Literal[3]], V, S]):
     ) -> MomentumCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumCubed[float, S], other: W, /
+    ) -> MomentumCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumCubed[V, S]: ...
+    @override
+    def item(self) -> MomentumCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

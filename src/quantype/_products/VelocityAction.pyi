@@ -110,6 +110,25 @@ class VelocityAction(Quantity[Mul[VelocityKind, ActionKind], V, S]):
     ) -> Quantity[Div[Mul[VelocityKind, ActionKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VelocityAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityAction[float, S], other: W, /
+    ) -> VelocityAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityAction[V, S]: ...
     @overload
     def __rmul__(
@@ -121,6 +140,19 @@ class VelocityAction(Quantity[Mul[VelocityKind, ActionKind], V, S]):
     ) -> VelocityAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityAction[float, S], other: W, /
+    ) -> VelocityAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityAction[V, S]: ...
+    @override
+    def item(self) -> VelocityAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

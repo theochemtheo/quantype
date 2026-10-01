@@ -160,6 +160,45 @@ class DipoleMomentPerForceConstant(
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: DipoleMomentPerForceConstant[float, S], other: ForceConstant[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: DipoleMomentPerForceConstant[float, S], other: ElectricField[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: DipoleMomentPerForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: DipoleMomentPerForceConstant[float, S], other: W, /
+    ) -> DipoleMomentPerForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: DipoleMomentPerForceConstant[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> DipoleMomentPerForceConstant[V, S]: ...
     @overload
     def __rmul__(
@@ -173,6 +212,23 @@ class DipoleMomentPerForceConstant(
     ) -> DipoleMomentPerForceConstant[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> DipoleMomentPerForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: DipoleMomentPerForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: DipoleMomentPerForceConstant[float, S], other: W, /
+    ) -> DipoleMomentPerForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerForceConstant[V, S]: ...
+    @override
+    def item(self) -> DipoleMomentPerForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

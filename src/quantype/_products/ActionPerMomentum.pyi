@@ -192,6 +192,55 @@ class ActionPerMomentum(Quantity[Div[ActionKind, MomentumKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ActionPerMomentum[float, S], other: Force[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ActionPerMomentum[float, S], other: Frequency[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ActionPerMomentum[float, S], other: InverseTime[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ActionPerMomentum[float, S], other: Momentum[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ActionPerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ActionPerMomentum[float, S], other: W, /
+    ) -> ActionPerMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ActionPerMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ActionPerMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ActionKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ActionKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ActionPerMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -203,6 +252,19 @@ class ActionPerMomentum(Quantity[Div[ActionKind, MomentumKind], V, S]):
     ) -> ActionPerMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ActionPerMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ActionPerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ActionPerMomentum[float, S], other: W, /
+    ) -> ActionPerMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ActionPerMomentum[V, S]: ...
+    @override
+    def item(self) -> ActionPerMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

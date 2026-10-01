@@ -157,6 +157,47 @@ class LengthPerVolume(Quantity[Div[LengthKind, VolumeKind], V, S]):
     def _rtruediv_Pressure(self, other: Pressure[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthPerVolume[float, S], other: Area[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerVolume[float, S], other: Volume[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerVolume[float, S], other: Energy[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthPerVolume[float, S], other: W, /
+    ) -> LengthPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[LengthKind, VolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[LengthKind, VolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -168,6 +209,19 @@ class LengthPerVolume(Quantity[Div[LengthKind, VolumeKind], V, S]):
     ) -> LengthPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthPerVolume[float, S], other: W, /
+    ) -> LengthPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthPerVolume[V, S]: ...
+    @override
+    def item(self) -> LengthPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

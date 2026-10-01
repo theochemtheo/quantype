@@ -107,6 +107,33 @@ class InverseTimePerAngle(Quantity[Div[InverseTimeKind, AngleKind], V, S]):
     def _rtruediv_InverseTime(self, other: InverseTime[V, S], /) -> Angle[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimePerAngle[float, S], other: Angle[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Angle[V, S] | Angle[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimePerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimePerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimePerAngle[float, S], other: W, /
+    ) -> InverseTimePerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimePerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimePerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimePerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -118,6 +145,19 @@ class InverseTimePerAngle(Quantity[Div[InverseTimeKind, AngleKind], V, S]):
     ) -> InverseTimePerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimePerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimePerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimePerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimePerAngle[float, S], other: W, /
+    ) -> InverseTimePerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> InverseTimePerAngle[V, S]: ...
+    @override
+    def item(self) -> InverseTimePerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -106,6 +106,33 @@ class ForcePerParticleDensity(Quantity[Div[ForceKind, ParticleDensityKind], V, S
     def _rtruediv_Force(self, other: Force[V, S], /) -> ParticleDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForcePerParticleDensity[float, S], other: ParticleDensity[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForcePerParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForcePerParticleDensity[float, S], other: W, /
+    ) -> ForcePerParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForcePerParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForcePerParticleDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceKind, ParticleDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceKind, ParticleDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForcePerParticleDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class ForcePerParticleDensity(Quantity[Div[ForceKind, ParticleDensityKind], V, S
     ) -> ForcePerParticleDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForcePerParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForcePerParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForcePerParticleDensity[float, S], other: W, /
+    ) -> ForcePerParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForcePerParticleDensity[V, S]: ...
+    @override
+    def item(self) -> ForcePerParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

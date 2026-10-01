@@ -98,6 +98,33 @@ class AnglePerTemperature(Quantity[Div[AngleKind, TemperatureKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Temperature[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerTemperature[float, S], other: Temperature[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerTemperature[float, S], other: W, /
+    ) -> AnglePerTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +136,19 @@ class AnglePerTemperature(Quantity[Div[AngleKind, TemperatureKind], V, S]):
     ) -> AnglePerTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerTemperature[float, S], other: W, /
+    ) -> AnglePerTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerTemperature[V, S]: ...
+    @override
+    def item(self) -> AnglePerTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

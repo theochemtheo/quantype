@@ -112,6 +112,35 @@ class MassDensityPerTemperature(Quantity[Div[MassDensityKind, TemperatureKind], 
     ) -> Temperature[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerTemperature[float, S], other: Temperature[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerTemperature[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerTemperature[float, S], other: W, /
+    ) -> MassDensityPerTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityPerTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +154,21 @@ class MassDensityPerTemperature(Quantity[Div[MassDensityKind, TemperatureKind], 
     ) -> MassDensityPerTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerTemperature[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerTemperature[float, S], other: W, /
+    ) -> MassDensityPerTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityPerTemperature[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

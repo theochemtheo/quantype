@@ -175,6 +175,45 @@ class LengthPerMomentum(Quantity[Div[LengthKind, MomentumKind], V, S]):
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthPerMomentum[float, S], other: Force[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerMomentum[float, S], other: Mass[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerMomentum[float, S], other: Momentum[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthPerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthPerMomentum[float, S], other: W, /
+    ) -> LengthPerMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthPerMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthPerMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[LengthKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[LengthKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthPerMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -186,6 +225,19 @@ class LengthPerMomentum(Quantity[Div[LengthKind, MomentumKind], V, S]):
     ) -> LengthPerMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthPerMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthPerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthPerMomentum[float, S], other: W, /
+    ) -> LengthPerMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthPerMomentum[V, S]: ...
+    @override
+    def item(self) -> LengthPerMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

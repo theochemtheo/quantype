@@ -184,6 +184,51 @@ class ElectricFieldPerTemperatureDifference(
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> DipoleMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricFieldPerTemperatureDifference[float, S],
+        other: TemperatureDifference[W, S],
+        /,
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricFieldPerTemperatureDifference[float, S],
+        other: DipoleMoment[W, S],
+        /,
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricFieldPerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricFieldPerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricFieldPerTemperatureDifference[float, S], other: W, /
+    ) -> ElectricFieldPerTemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectricFieldPerTemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricFieldPerTemperatureDifference[float, S],
+        other: Quantity[K, W, S],
+        /,
+    ) -> Quantity[Mul[Div[ElectricFieldKind, TemperatureDifferenceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, TemperatureDifferenceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> ElectricFieldPerTemperatureDifference[V, S]: ...
@@ -201,6 +246,23 @@ class ElectricFieldPerTemperatureDifference(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ElectricFieldPerTemperatureDifference[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricFieldPerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricFieldPerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricFieldPerTemperatureDifference[float, S], other: W, /
+    ) -> ElectricFieldPerTemperatureDifference[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectricFieldPerTemperatureDifference[V, S]: ...
+    @override
+    def item(self) -> ElectricFieldPerTemperatureDifference[float, S]: ...
     @overload
     @override
     def __rtruediv__(

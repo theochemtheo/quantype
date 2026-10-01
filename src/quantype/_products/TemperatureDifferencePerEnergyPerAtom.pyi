@@ -172,6 +172,49 @@ class TemperatureDifferencePerEnergyPerAtom(
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Entropy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureDifferencePerEnergyPerAtom[float, S],
+        other: EnergyPerAtom[W, S],
+        /,
+    ) -> TemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> TemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TemperatureDifferencePerEnergyPerAtom[float, S], other: Entropy[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureDifferencePerEnergyPerAtom[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferencePerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferencePerEnergyPerAtom[float, S], other: W, /
+    ) -> TemperatureDifferencePerEnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferencePerEnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferencePerEnergyPerAtom[float, S],
+        other: Quantity[K, W, S],
+        /,
+    ) -> Quantity[Mul[Div[TemperatureDifferenceKind, EnergyPerAtomKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureDifferenceKind, EnergyPerAtomKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureDifferencePerEnergyPerAtom[V, S]: ...
@@ -189,6 +232,23 @@ class TemperatureDifferencePerEnergyPerAtom(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureDifferencePerEnergyPerAtom[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferencePerEnergyPerAtom[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferencePerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferencePerEnergyPerAtom[float, S], other: W, /
+    ) -> TemperatureDifferencePerEnergyPerAtom[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferencePerEnergyPerAtom[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferencePerEnergyPerAtom[float, S]: ...
     @overload
     @override
     def __rtruediv__(

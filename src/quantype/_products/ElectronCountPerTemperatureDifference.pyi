@@ -145,6 +145,41 @@ class ElectronCountPerTemperatureDifference(
     ) -> TemperatureDifference[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronCountPerTemperatureDifference[float, S],
+        other: TemperatureDifference[W, S],
+        /,
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronCountPerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronCountPerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountPerTemperatureDifference[float, S], other: W, /
+    ) -> ElectronCountPerTemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectronCountPerTemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountPerTemperatureDifference[float, S],
+        other: Quantity[K, W, S],
+        /,
+    ) -> Quantity[Mul[Div[ElectronCountKind, TemperatureDifferenceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, TemperatureDifferenceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> ElectronCountPerTemperatureDifference[V, S]: ...
@@ -162,6 +197,23 @@ class ElectronCountPerTemperatureDifference(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ElectronCountPerTemperatureDifference[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountPerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronCountPerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountPerTemperatureDifference[float, S], other: W, /
+    ) -> ElectronCountPerTemperatureDifference[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectronCountPerTemperatureDifference[V, S]: ...
+    @override
+    def item(self) -> ElectronCountPerTemperatureDifference[float, S]: ...
     @overload
     @override
     def __rtruediv__(

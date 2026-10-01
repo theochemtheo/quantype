@@ -153,6 +153,45 @@ class TemperatureDifferencePerParticleDensity(
     ) -> ParticleDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureDifferencePerParticleDensity[float, S],
+        other: ParticleDensity[W, S],
+        /,
+    ) -> TemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> TemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureDifferencePerParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferencePerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferencePerParticleDensity[float, S], other: W, /
+    ) -> TemperatureDifferencePerParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferencePerParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferencePerParticleDensity[float, S],
+        other: Quantity[K, W, S],
+        /,
+    ) -> Quantity[
+        Mul[Div[TemperatureDifferenceKind, ParticleDensityKind], K], W, S
+    ]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[
+        Mul[Div[TemperatureDifferenceKind, ParticleDensityKind], K], V, S
+    ]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureDifferencePerParticleDensity[V, S]: ...
@@ -170,6 +209,23 @@ class TemperatureDifferencePerParticleDensity(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureDifferencePerParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferencePerParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferencePerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferencePerParticleDensity[float, S], other: W, /
+    ) -> TemperatureDifferencePerParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferencePerParticleDensity[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferencePerParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

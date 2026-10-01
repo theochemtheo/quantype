@@ -92,6 +92,25 @@ class MassMomentum(Quantity[Mul[MassKind, MomentumKind], V, S]):
     ) -> Quantity[Div[Mul[MassKind, MomentumKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MassMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassMomentum[float, S], other: W, /
+    ) -> MassMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MassKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MassKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class MassMomentum(Quantity[Mul[MassKind, MomentumKind], V, S]):
     ) -> MassMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassMomentum[float, S], other: W, /
+    ) -> MassMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassMomentum[V, S]: ...
+    @override
+    def item(self) -> MassMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

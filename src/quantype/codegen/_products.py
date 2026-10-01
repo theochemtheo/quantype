@@ -76,10 +76,26 @@ def pair_class(pair: Pair, table: Table) -> str:
                         f"def {member}{left}(self, other: {left}[V, S], /) -> {result}[V, S]: ...",
                     ]
                 )
-    text += overloads(
-        scaling("__rmul__", name, lambda storage: f"{name}[{storage}, S]"),
-        overrides=True,
+    # `a @ b` multiplies kinds as `a * b` does; scalars have no matrix product.
+    signatures = [
+        signature
+        for (op, left, right), result in table.entries.items()
+        if op == "mul" and left == name
+        for signature in binary("__matmul__", name, right, result)
+    ]
+    signatures += scaling("__matmul__", name, lambda storage: f"{name}[{storage}, S]")[
+        1:
+    ]
+    signatures += structural_fallback(
+        "__matmul__", name, f"Quantity[Mul[{pair.marker}, K], {{}}, S]"
     )
+    text += method_overloads("__matmul__", signatures)
+    for method in ("__rmul__", "__rmatmul__"):
+        scaled = scaling(method, name, lambda storage: f"{name}[{storage}, S]")
+        text += overloads(
+            scaled[1:] if method == "__rmatmul__" else scaled, overrides=True
+        )
+    text += f"    @override\n    def item(self) -> {name}[float, S]: ...\n"
     text += overloads(
         scaling(
             "__rtruediv__",

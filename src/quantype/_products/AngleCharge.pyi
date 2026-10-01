@@ -92,6 +92,25 @@ class AngleCharge(Quantity[Mul[AngleKind, ChargeKind], V, S]):
     ) -> Quantity[Div[Mul[AngleKind, ChargeKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AngleCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AngleCharge[float, S], other: W, /
+    ) -> AngleCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AngleCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AngleCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AngleCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class AngleCharge(Quantity[Mul[AngleKind, ChargeKind], V, S]):
     ) -> AngleCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AngleCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AngleCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AngleCharge[float, S], other: W, /
+    ) -> AngleCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AngleCharge[V, S]: ...
+    @override
+    def item(self) -> AngleCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

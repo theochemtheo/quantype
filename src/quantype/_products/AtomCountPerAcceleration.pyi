@@ -108,6 +108,33 @@ class AtomCountPerAcceleration(Quantity[Div[AtomCountKind, AccelerationKind], V,
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AtomCountPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AtomCountPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountPerAcceleration[float, S], other: W, /
+    ) -> AtomCountPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -119,6 +146,19 @@ class AtomCountPerAcceleration(Quantity[Div[AtomCountKind, AccelerationKind], V,
     ) -> AtomCountPerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountPerAcceleration[float, S], other: W, /
+    ) -> AtomCountPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> AtomCountPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

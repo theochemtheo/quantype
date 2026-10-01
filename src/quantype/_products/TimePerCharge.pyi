@@ -98,6 +98,31 @@ class TimePerCharge(Quantity[Div[TimeKind, ChargeKind], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> Charge[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerCharge[float, S], other: Charge[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Charge[V, S] | Charge[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerCharge[float, S], other: W, /
+    ) -> TimePerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +134,19 @@ class TimePerCharge(Quantity[Div[TimeKind, ChargeKind], V, S]):
     ) -> TimePerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerCharge[float, S], other: W, /
+    ) -> TimePerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerCharge[V, S]: ...
+    @override
+    def item(self) -> TimePerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

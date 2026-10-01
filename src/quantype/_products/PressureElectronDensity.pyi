@@ -104,6 +104,25 @@ class PressureElectronDensity(Quantity[Mul[PressureKind, ElectronDensityKind], V
     ) -> Quantity[Div[Mul[PressureKind, ElectronDensityKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PressureElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressureElectronDensity[float, S], other: W, /
+    ) -> PressureElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressureElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressureElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressureElectronDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +134,19 @@ class PressureElectronDensity(Quantity[Mul[PressureKind, ElectronDensityKind], V
     ) -> PressureElectronDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressureElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressureElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressureElectronDensity[float, S], other: W, /
+    ) -> PressureElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressureElectronDensity[V, S]: ...
+    @override
+    def item(self) -> PressureElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -179,6 +179,57 @@ class LengthPerAcceleration(Quantity[Div[LengthKind, AccelerationKind], V, S]):
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthPerAcceleration[float, S], other: ForceConstant[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerAcceleration[float, S], other: Frequency[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerAcceleration[float, S], other: InverseTime[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthPerAcceleration[float, S], other: W, /
+    ) -> LengthPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[LengthKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[LengthKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -190,6 +241,19 @@ class LengthPerAcceleration(Quantity[Div[LengthKind, AccelerationKind], V, S]):
     ) -> LengthPerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthPerAcceleration[float, S], other: W, /
+    ) -> LengthPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> LengthPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

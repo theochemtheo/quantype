@@ -274,6 +274,71 @@ class VelocityPerLength(Quantity[Div[VelocityKind, LengthKind], V, S]):
     ) -> Velocity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityPerLength[float, S], other: Length[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerLength[float, S], other: Time[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerLength[float, S], other: Velocity[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerLength[float, S], other: TemperatureDifference[W, S], /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> TemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerLength[float, S], other: Momentum[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Force[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerLength[float, S], other: Action[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityPerLength[float, S], other: W, /
+    ) -> VelocityPerLength[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityPerLength[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityPerLength[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, LengthKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, LengthKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityPerLength[V, S]: ...
     @overload
     def __rmul__(
@@ -285,6 +350,19 @@ class VelocityPerLength(Quantity[Div[VelocityKind, LengthKind], V, S]):
     ) -> VelocityPerLength[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityPerLength[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityPerLength[float, S], other: W, /
+    ) -> VelocityPerLength[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityPerLength[V, S]: ...
+    @override
+    def item(self) -> VelocityPerLength[float, S]: ...
     @overload
     @override
     def __rtruediv__(

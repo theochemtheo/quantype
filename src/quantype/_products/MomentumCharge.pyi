@@ -92,6 +92,25 @@ class MomentumCharge(Quantity[Mul[MomentumKind, ChargeKind], V, S]):
     ) -> Quantity[Div[Mul[MomentumKind, ChargeKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MomentumCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumCharge[float, S], other: W, /
+    ) -> MomentumCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MomentumKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MomentumKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class MomentumCharge(Quantity[Mul[MomentumKind, ChargeKind], V, S]):
     ) -> MomentumCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumCharge[float, S], other: W, /
+    ) -> MomentumCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumCharge[V, S]: ...
+    @override
+    def item(self) -> MomentumCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

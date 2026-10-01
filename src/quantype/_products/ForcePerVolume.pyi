@@ -160,6 +160,39 @@ class ForcePerVolume(Quantity[Div[ForceKind, VolumeKind], V, S]):
     def _rtruediv_Pressure(self, other: Pressure[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForcePerVolume[float, S], other: Area[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForcePerVolume[float, S], other: Volume[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForcePerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForcePerVolume[float, S], other: W, /
+    ) -> ForcePerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForcePerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForcePerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceKind, VolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceKind, VolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForcePerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -171,6 +204,19 @@ class ForcePerVolume(Quantity[Div[ForceKind, VolumeKind], V, S]):
     ) -> ForcePerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForcePerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForcePerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForcePerVolume[float, S], other: W, /
+    ) -> ForcePerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForcePerVolume[V, S]: ...
+    @override
+    def item(self) -> ForcePerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

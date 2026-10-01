@@ -138,6 +138,41 @@ class PerMomentum(Quantity[Pow[MomentumKind, Literal[-1]], V, S]):
     def _rtruediv_InverseTime(self, other: InverseTime[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerMomentum[float, S], other: Energy[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerMomentum[float, S], other: Momentum[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerMomentum[float, S], other: W, /
+    ) -> PerMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MomentumKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MomentumKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -149,6 +184,19 @@ class PerMomentum(Quantity[Pow[MomentumKind, Literal[-1]], V, S]):
     ) -> PerMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerMomentum[float, S], other: W, /
+    ) -> PerMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerMomentum[V, S]: ...
+    @override
+    def item(self) -> PerMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

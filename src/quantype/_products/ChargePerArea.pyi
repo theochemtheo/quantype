@@ -188,6 +188,55 @@ class ChargePerArea(Quantity[Div[ChargeKind, AreaKind], V, S]):
     def _rtruediv_DipoleMoment(self, other: DipoleMoment[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerArea[float, S], other: Area[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerArea[float, S], other: Volume[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerArea[float, S], other: ElectricPotential[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerArea[float, S], other: ElectricField[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerArea[float, S], other: W, /
+    ) -> ChargePerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -199,6 +248,19 @@ class ChargePerArea(Quantity[Div[ChargeKind, AreaKind], V, S]):
     ) -> ChargePerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerArea[float, S], other: W, /
+    ) -> ChargePerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerArea[V, S]: ...
+    @override
+    def item(self) -> ChargePerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

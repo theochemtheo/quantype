@@ -139,6 +139,39 @@ class FrequencyPerPressure(Quantity[Div[FrequencyKind, PressureKind], V, S]):
     def _rtruediv_InverseTime(self, other: InverseTime[V, S], /) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerPressure[float, S], other: Pressure[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerPressure[float, S], other: Action[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerPressure[float, S], other: W, /
+    ) -> FrequencyPerPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -150,6 +183,19 @@ class FrequencyPerPressure(Quantity[Div[FrequencyKind, PressureKind], V, S]):
     ) -> FrequencyPerPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerPressure[float, S], other: W, /
+    ) -> FrequencyPerPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerPressure[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

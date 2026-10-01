@@ -104,6 +104,25 @@ class PressureParticleDensity(Quantity[Mul[PressureKind, ParticleDensityKind], V
     ) -> Quantity[Div[Mul[PressureKind, ParticleDensityKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PressureParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressureParticleDensity[float, S], other: W, /
+    ) -> PressureParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressureParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressureParticleDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, ParticleDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, ParticleDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressureParticleDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +134,19 @@ class PressureParticleDensity(Quantity[Mul[PressureKind, ParticleDensityKind], V
     ) -> PressureParticleDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressureParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressureParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressureParticleDensity[float, S], other: W, /
+    ) -> PressureParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressureParticleDensity[V, S]: ...
+    @override
+    def item(self) -> PressureParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

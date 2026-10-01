@@ -186,6 +186,57 @@ class ElectricFieldPerArea(Quantity[Div[ElectricFieldKind, AreaKind], V, S]):
     def _rtruediv_ElectricField(self, other: ElectricField[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricFieldPerArea[float, S], other: Area[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricFieldPerArea[float, S], other: Volume[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricFieldPerArea[float, S], other: Charge[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricFieldPerArea[float, S], other: DipoleMoment[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricFieldPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricFieldPerArea[float, S], other: W, /
+    ) -> ElectricFieldPerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricFieldPerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricFieldPerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricFieldPerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -197,6 +248,19 @@ class ElectricFieldPerArea(Quantity[Div[ElectricFieldKind, AreaKind], V, S]):
     ) -> ElectricFieldPerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricFieldPerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricFieldPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricFieldPerArea[float, S], other: W, /
+    ) -> ElectricFieldPerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricFieldPerArea[V, S]: ...
+    @override
+    def item(self) -> ElectricFieldPerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

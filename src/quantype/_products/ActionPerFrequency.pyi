@@ -132,6 +132,41 @@ class ActionPerFrequency(Quantity[Div[ActionKind, FrequencyKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> Frequency[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ActionPerFrequency[float, S], other: Frequency[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ActionPerFrequency[float, S], other: InverseTime[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ActionPerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ActionPerFrequency[float, S], other: W, /
+    ) -> ActionPerFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ActionPerFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ActionPerFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ActionKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ActionKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ActionPerFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -143,6 +178,19 @@ class ActionPerFrequency(Quantity[Div[ActionKind, FrequencyKind], V, S]):
     ) -> ActionPerFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ActionPerFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ActionPerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ActionPerFrequency[float, S], other: W, /
+    ) -> ActionPerFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ActionPerFrequency[V, S]: ...
+    @override
+    def item(self) -> ActionPerFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

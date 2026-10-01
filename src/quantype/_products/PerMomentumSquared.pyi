@@ -74,6 +74,25 @@ class PerMomentumSquared(Quantity[Pow[MomentumKind, Literal[-2]], V, S]):
     ) -> Quantity[Div[Pow[MomentumKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerMomentumSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMomentumSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerMomentumSquared[float, S], other: W, /
+    ) -> PerMomentumSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerMomentumSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerMomentumSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MomentumKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MomentumKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerMomentumSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerMomentumSquared(Quantity[Pow[MomentumKind, Literal[-2]], V, S]):
     ) -> PerMomentumSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerMomentumSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerMomentumSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMomentumSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerMomentumSquared[float, S], other: W, /
+    ) -> PerMomentumSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerMomentumSquared[V, S]: ...
+    @override
+    def item(self) -> PerMomentumSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

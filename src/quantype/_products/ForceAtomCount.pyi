@@ -92,6 +92,25 @@ class ForceAtomCount(Quantity[Mul[ForceKind, AtomCountKind], V, S]):
     ) -> Quantity[Div[Mul[ForceKind, AtomCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceAtomCount[float, S], other: W, /
+    ) -> ForceAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class ForceAtomCount(Quantity[Mul[ForceKind, AtomCountKind], V, S]):
     ) -> ForceAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceAtomCount[float, S], other: W, /
+    ) -> ForceAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceAtomCount[V, S]: ...
+    @override
+    def item(self) -> ForceAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

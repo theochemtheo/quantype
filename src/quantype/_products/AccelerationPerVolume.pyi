@@ -100,6 +100,33 @@ class AccelerationPerVolume(Quantity[Div[AccelerationKind, VolumeKind], V, S]):
     def _rtruediv_Acceleration(self, other: Acceleration[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AccelerationPerVolume[float, S], other: Volume[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AccelerationPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AccelerationPerVolume[float, S], other: W, /
+    ) -> AccelerationPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AccelerationPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AccelerationPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, VolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, VolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AccelerationPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class AccelerationPerVolume(Quantity[Div[AccelerationKind, VolumeKind], V, S]):
     ) -> AccelerationPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AccelerationPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AccelerationPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AccelerationPerVolume[float, S], other: W, /
+    ) -> AccelerationPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AccelerationPerVolume[V, S]: ...
+    @override
+    def item(self) -> AccelerationPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

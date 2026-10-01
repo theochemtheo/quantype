@@ -123,6 +123,35 @@ class FrequencyPerMagnetization(Quantity[Div[FrequencyKind, MagnetizationKind], 
     ) -> Magnetization[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerMagnetization[float, S], other: Magnetization[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerMagnetization[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerMagnetization[float, S], other: W, /
+    ) -> FrequencyPerMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +165,21 @@ class FrequencyPerMagnetization(Quantity[Div[FrequencyKind, MagnetizationKind], 
     ) -> FrequencyPerMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerMagnetization[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerMagnetization[float, S], other: W, /
+    ) -> FrequencyPerMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerMagnetization[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

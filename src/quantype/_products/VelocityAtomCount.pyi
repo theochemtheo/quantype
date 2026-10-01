@@ -92,6 +92,25 @@ class VelocityAtomCount(Quantity[Mul[VelocityKind, AtomCountKind], V, S]):
     ) -> Quantity[Div[Mul[VelocityKind, AtomCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VelocityAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityAtomCount[float, S], other: W, /
+    ) -> VelocityAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class VelocityAtomCount(Quantity[Mul[VelocityKind, AtomCountKind], V, S]):
     ) -> VelocityAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityAtomCount[float, S], other: W, /
+    ) -> VelocityAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityAtomCount[V, S]: ...
+    @override
+    def item(self) -> VelocityAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

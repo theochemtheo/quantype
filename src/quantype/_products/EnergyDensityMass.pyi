@@ -94,6 +94,25 @@ class EnergyDensityMass(Quantity[Mul[EnergyDensityKind, MassKind], V, S]):
     ) -> Quantity[Div[Mul[EnergyDensityKind, MassKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyDensityMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityMass[float, S], other: W, /
+    ) -> EnergyDensityMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyDensityMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyDensityMass[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class EnergyDensityMass(Quantity[Mul[EnergyDensityKind, MassKind], V, S]):
     ) -> EnergyDensityMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyDensityMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityMass[float, S], other: W, /
+    ) -> EnergyDensityMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyDensityMass[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

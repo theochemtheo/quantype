@@ -128,6 +128,33 @@ class LengthMagnetization(Quantity[Mul[LengthKind, MagnetizationKind], V, S]):
     ) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthMagnetization[float, S], other: Area[W, S], /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> MagneticMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthMagnetization[float, S], other: W, /
+    ) -> LengthMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -139,6 +166,19 @@ class LengthMagnetization(Quantity[Mul[LengthKind, MagnetizationKind], V, S]):
     ) -> LengthMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthMagnetization[float, S], other: W, /
+    ) -> LengthMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthMagnetization[V, S]: ...
+    @override
+    def item(self) -> LengthMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

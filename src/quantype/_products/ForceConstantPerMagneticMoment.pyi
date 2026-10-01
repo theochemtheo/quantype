@@ -131,6 +131,37 @@ class ForceConstantPerMagneticMoment(
     ) -> MagneticMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerMagneticMoment[float, S], other: MagneticMoment[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerMagneticMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerMagneticMoment[float, S], other: W, /
+    ) -> ForceConstantPerMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ForceConstantPerMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPerMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +177,23 @@ class ForceConstantPerMagneticMoment(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ForceConstantPerMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerMagneticMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerMagneticMoment[float, S], other: W, /
+    ) -> ForceConstantPerMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ForceConstantPerMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

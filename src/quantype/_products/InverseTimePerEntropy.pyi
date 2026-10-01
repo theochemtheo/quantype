@@ -164,6 +164,41 @@ class InverseTimePerEntropy(Quantity[Div[InverseTimeKind, EntropyKind], V, S]):
     def _rtruediv_InverseTime(self, other: InverseTime[V, S], /) -> Entropy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimePerEntropy[float, S], other: Entropy[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: InverseTimePerEntropy[float, S], other: Action[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimePerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimePerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimePerEntropy[float, S], other: W, /
+    ) -> InverseTimePerEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimePerEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimePerEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimePerEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -175,6 +210,19 @@ class InverseTimePerEntropy(Quantity[Div[InverseTimeKind, EntropyKind], V, S]):
     ) -> InverseTimePerEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimePerEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimePerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimePerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimePerEntropy[float, S], other: W, /
+    ) -> InverseTimePerEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> InverseTimePerEntropy[V, S]: ...
+    @override
+    def item(self) -> InverseTimePerEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -120,6 +120,35 @@ class TemperatureRatePerPressure(
     ) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureRatePerPressure[float, S], other: Pressure[W, S], /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> TemperatureRate[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureRatePerPressure[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRatePerPressure[float, S], other: W, /
+    ) -> TemperatureRatePerPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureRatePerPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRatePerPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureRatePerPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -133,6 +162,21 @@ class TemperatureRatePerPressure(
     ) -> TemperatureRatePerPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureRatePerPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRatePerPressure[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRatePerPressure[float, S], other: W, /
+    ) -> TemperatureRatePerPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureRatePerPressure[V, S]: ...
+    @override
+    def item(self) -> TemperatureRatePerPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

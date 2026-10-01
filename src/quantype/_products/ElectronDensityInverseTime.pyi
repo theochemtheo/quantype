@@ -155,6 +155,35 @@ class ElectronDensityInverseTime(
     ) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronDensityInverseTime[float, S], other: Time[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronDensityInverseTime[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronDensityInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityInverseTime[float, S], other: W, /
+    ) -> ElectronDensityInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronDensityInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ElectronDensityKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ElectronDensityKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -168,6 +197,21 @@ class ElectronDensityInverseTime(
     ) -> ElectronDensityInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronDensityInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityInverseTime[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronDensityInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityInverseTime[float, S], other: W, /
+    ) -> ElectronDensityInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronDensityInverseTime[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

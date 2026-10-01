@@ -145,6 +145,33 @@ class EnergyPerAtomInverseTime(Quantity[Mul[EnergyPerAtomKind, InverseTimeKind],
     def _rtruediv_EnergyPerAtom(self, other: EnergyPerAtom[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyPerAtomInverseTime[float, S], other: Time[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyPerAtomInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerAtomInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerAtomInverseTime[float, S], other: W, /
+    ) -> EnergyPerAtomInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerAtomInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerAtomInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerAtomKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerAtomKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerAtomInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -156,6 +183,19 @@ class EnergyPerAtomInverseTime(Quantity[Mul[EnergyPerAtomKind, InverseTimeKind],
     ) -> EnergyPerAtomInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerAtomInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerAtomInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerAtomInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerAtomInverseTime[float, S], other: W, /
+    ) -> EnergyPerAtomInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerAtomInverseTime[V, S]: ...
+    @override
+    def item(self) -> EnergyPerAtomInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

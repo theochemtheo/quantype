@@ -94,6 +94,25 @@ class DipoleMomentEntropy(Quantity[Mul[DipoleMomentKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[DipoleMomentKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: DipoleMomentEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMomentEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: DipoleMomentEntropy[float, S], other: W, /
+    ) -> DipoleMomentEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> DipoleMomentEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: DipoleMomentEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[DipoleMomentKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[DipoleMomentKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> DipoleMomentEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class DipoleMomentEntropy(Quantity[Mul[DipoleMomentKind, EntropyKind], V, S]):
     ) -> DipoleMomentEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> DipoleMomentEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: DipoleMomentEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMomentEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: DipoleMomentEntropy[float, S], other: W, /
+    ) -> DipoleMomentEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> DipoleMomentEntropy[V, S]: ...
+    @override
+    def item(self) -> DipoleMomentEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -169,6 +169,49 @@ class TimeTemperature(Quantity[Mul[TimeKind, TemperatureKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> Entropy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeTemperature[float, S], other: Frequency[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeTemperature[float, S], other: InverseTime[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeTemperature[float, S], other: Entropy[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeTemperature[float, S], other: W, /
+    ) -> TimeTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -180,6 +223,19 @@ class TimeTemperature(Quantity[Mul[TimeKind, TemperatureKind], V, S]):
     ) -> TimeTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeTemperature[float, S], other: W, /
+    ) -> TimeTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeTemperature[V, S]: ...
+    @override
+    def item(self) -> TimeTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

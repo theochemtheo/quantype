@@ -129,6 +129,37 @@ class ElectronDensityPerAcceleration(
     ) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronDensityPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronDensityPerAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronDensityPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityPerAcceleration[float, S], other: W, /
+    ) -> ElectronDensityPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectronDensityPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -144,6 +175,23 @@ class ElectronDensityPerAcceleration(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ElectronDensityPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityPerAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronDensityPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityPerAcceleration[float, S], other: W, /
+    ) -> ElectronDensityPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectronDensityPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

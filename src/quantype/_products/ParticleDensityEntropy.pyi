@@ -96,6 +96,25 @@ class ParticleDensityEntropy(Quantity[Mul[ParticleDensityKind, EntropyKind], V, 
     ) -> Quantity[Div[Mul[ParticleDensityKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ParticleDensityEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityEntropy[float, S], other: W, /
+    ) -> ParticleDensityEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensityEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class ParticleDensityEntropy(Quantity[Mul[ParticleDensityKind, EntropyKind], V, 
     ) -> ParticleDensityEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensityEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityEntropy[float, S], other: W, /
+    ) -> ParticleDensityEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ParticleDensityEntropy[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

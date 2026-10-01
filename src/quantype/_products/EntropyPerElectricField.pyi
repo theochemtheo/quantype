@@ -166,6 +166,49 @@ class EntropyPerElectricField(Quantity[Div[EntropyKind, ElectricFieldKind], V, S
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> ElectricField[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerElectricField[float, S], other: Temperature[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerElectricField[float, S], other: TemperatureDifference[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerElectricField[float, S], other: W, /
+    ) -> EntropyPerElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -177,6 +220,19 @@ class EntropyPerElectricField(Quantity[Div[EntropyKind, ElectricFieldKind], V, S
     ) -> EntropyPerElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerElectricField[float, S], other: W, /
+    ) -> EntropyPerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerElectricField[V, S]: ...
+    @override
+    def item(self) -> EntropyPerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

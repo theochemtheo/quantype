@@ -112,6 +112,39 @@ class PerEnergy(Quantity[Pow[EnergyKind, Literal[-1]], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerEnergy[float, S], other: Energy[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerEnergy[float, S], other: Action[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerEnergy[float, S], other: W, /
+    ) -> PerEnergy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerEnergy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerEnergy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[EnergyKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[EnergyKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerEnergy[V, S]: ...
     @overload
     def __rmul__(
@@ -123,6 +156,19 @@ class PerEnergy(Quantity[Pow[EnergyKind, Literal[-1]], V, S]):
     ) -> PerEnergy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerEnergy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerEnergy[float, S], other: W, /
+    ) -> PerEnergy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerEnergy[V, S]: ...
+    @override
+    def item(self) -> PerEnergy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

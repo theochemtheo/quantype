@@ -167,6 +167,43 @@ class MagnetizationPerInverseTime(
     ) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MagnetizationPerInverseTime[float, S], other: Frequency[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MagnetizationPerInverseTime[float, S], other: InverseTime[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MagnetizationPerInverseTime[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationPerInverseTime[float, S], other: W, /
+    ) -> MagnetizationPerInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MagnetizationPerInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationPerInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationPerInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -180,6 +217,23 @@ class MagnetizationPerInverseTime(
     ) -> MagnetizationPerInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagnetizationPerInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationPerInverseTime[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationPerInverseTime[float, S], other: W, /
+    ) -> MagnetizationPerInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerInverseTime[V, S]: ...
+    @override
+    def item(self) -> MagnetizationPerInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

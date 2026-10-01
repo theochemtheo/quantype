@@ -92,6 +92,25 @@ class VelocityPressure(Quantity[Mul[VelocityKind, PressureKind], V, S]):
     ) -> Quantity[Div[Mul[VelocityKind, PressureKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VelocityPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityPressure[float, S], other: W, /
+    ) -> VelocityPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class VelocityPressure(Quantity[Mul[VelocityKind, PressureKind], V, S]):
     ) -> VelocityPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityPressure[float, S], other: W, /
+    ) -> VelocityPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityPressure[V, S]: ...
+    @override
+    def item(self) -> VelocityPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -110,6 +110,33 @@ class TimePerElectricPotential(Quantity[Div[TimeKind, ElectricPotentialKind], V,
     def _rtruediv_Time(self, other: Time[V, S], /) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerElectricPotential[float, S], other: ElectricPotential[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerElectricPotential[float, S], other: W, /
+    ) -> TimePerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -121,6 +148,19 @@ class TimePerElectricPotential(Quantity[Div[TimeKind, ElectricPotentialKind], V,
     ) -> TimePerElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerElectricPotential[float, S], other: W, /
+    ) -> TimePerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> TimePerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

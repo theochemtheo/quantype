@@ -152,6 +152,41 @@ class TimeMagneticMoment(Quantity[Mul[TimeKind, MagneticMomentKind], V, S]):
     ) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeMagneticMoment[float, S], other: Frequency[W, S], /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> MagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeMagneticMoment[float, S], other: InverseTime[W, S], /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> MagneticMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeMagneticMoment[float, S], other: W, /
+    ) -> TimeMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -163,6 +198,19 @@ class TimeMagneticMoment(Quantity[Mul[TimeKind, MagneticMomentKind], V, S]):
     ) -> TimeMagneticMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeMagneticMoment[float, S], other: W, /
+    ) -> TimeMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> TimeMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

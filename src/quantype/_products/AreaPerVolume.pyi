@@ -313,6 +313,83 @@ class AreaPerVolume(Quantity[Div[AreaKind, VolumeKind], V, S]):
     ) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerVolume[float, S], other: Length[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerVolume[float, S], other: Area[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerVolume[float, S], other: Volume[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerVolume[float, S], other: Energy[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Energy[V, S] | Energy[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerVolume[float, S], other: Force[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Force[V, S] | Force[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerVolume[float, S], other: ForceConstant[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerVolume[float, S], other: ElectricPotential[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerVolume[float, S], other: DipoleMoment[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerVolume[float, S], other: W, /
+    ) -> AreaPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, VolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, VolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -324,6 +401,19 @@ class AreaPerVolume(Quantity[Div[AreaKind, VolumeKind], V, S]):
     ) -> AreaPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerVolume[float, S], other: W, /
+    ) -> AreaPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerVolume[V, S]: ...
+    @override
+    def item(self) -> AreaPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -99,6 +99,33 @@ class PerMagneticMoment(Quantity[Pow[MagneticMomentKind, Literal[-1]], V, S]):
     ) -> Quantity[Div[Pow[MagneticMomentKind, Literal[-1]], K], V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerMagneticMoment[float, S], other: MagneticMoment[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerMagneticMoment[float, S], other: W, /
+    ) -> PerMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MagneticMomentKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MagneticMomentKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -110,6 +137,19 @@ class PerMagneticMoment(Quantity[Pow[MagneticMomentKind, Literal[-1]], V, S]):
     ) -> PerMagneticMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerMagneticMoment[float, S], other: W, /
+    ) -> PerMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> PerMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

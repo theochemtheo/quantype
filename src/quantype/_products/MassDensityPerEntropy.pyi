@@ -100,6 +100,33 @@ class MassDensityPerEntropy(Quantity[Div[MassDensityKind, EntropyKind], V, S]):
     def _rtruediv_MassDensity(self, other: MassDensity[V, S], /) -> Entropy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerEntropy[float, S], other: Entropy[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerEntropy[float, S], other: W, /
+    ) -> MassDensityPerEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityPerEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class MassDensityPerEntropy(Quantity[Div[MassDensityKind, EntropyKind], V, S]):
     ) -> MassDensityPerEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerEntropy[float, S], other: W, /
+    ) -> MassDensityPerEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityPerEntropy[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

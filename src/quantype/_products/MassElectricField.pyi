@@ -94,6 +94,25 @@ class MassElectricField(Quantity[Mul[MassKind, ElectricFieldKind], V, S]):
     ) -> Quantity[Div[Mul[MassKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MassElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassElectricField[float, S], other: W, /
+    ) -> MassElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MassKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MassKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class MassElectricField(Quantity[Mul[MassKind, ElectricFieldKind], V, S]):
     ) -> MassElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassElectricField[float, S], other: W, /
+    ) -> MassElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassElectricField[V, S]: ...
+    @override
+    def item(self) -> MassElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

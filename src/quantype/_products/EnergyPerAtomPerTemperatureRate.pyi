@@ -133,6 +133,37 @@ class EnergyPerAtomPerTemperatureRate(
     ) -> TemperatureRate[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyPerAtomPerTemperatureRate[float, S], other: TemperatureRate[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyPerAtomPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerAtomPerTemperatureRate[float, S], other: W, /
+    ) -> EnergyPerAtomPerTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> EnergyPerAtomPerTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerAtomPerTemperatureRate[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, TemperatureRateKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, TemperatureRateKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerAtomPerTemperatureRate[V, S]: ...
     @overload
     def __rmul__(
@@ -148,6 +179,23 @@ class EnergyPerAtomPerTemperatureRate(
     def __rmul__(
         self, other: _Numerical, /
     ) -> EnergyPerAtomPerTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerAtomPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerAtomPerTemperatureRate[float, S], other: W, /
+    ) -> EnergyPerAtomPerTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> EnergyPerAtomPerTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> EnergyPerAtomPerTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

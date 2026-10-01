@@ -253,6 +253,61 @@ class LengthInverseTime(Quantity[Mul[LengthKind, InverseTimeKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthInverseTime[float, S], other: Time[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthInverseTime[float, S], other: Frequency[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthInverseTime[float, S], other: InverseTime[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthInverseTime[float, S], other: Mass[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthInverseTime[float, S], other: Momentum[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthInverseTime[float, S], other: W, /
+    ) -> LengthInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -264,6 +319,19 @@ class LengthInverseTime(Quantity[Mul[LengthKind, InverseTimeKind], V, S]):
     ) -> LengthInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthInverseTime[float, S], other: W, /
+    ) -> LengthInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthInverseTime[V, S]: ...
+    @override
+    def item(self) -> LengthInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

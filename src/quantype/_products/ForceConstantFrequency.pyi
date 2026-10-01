@@ -135,6 +135,33 @@ class ForceConstantFrequency(Quantity[Mul[ForceConstantKind, FrequencyKind], V, 
     def _rtruediv_ForceConstant(self, other: ForceConstant[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantFrequency[float, S], other: Time[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantFrequency[float, S], other: W, /
+    ) -> ForceConstantFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +173,19 @@ class ForceConstantFrequency(Quantity[Mul[ForceConstantKind, FrequencyKind], V, 
     ) -> ForceConstantFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantFrequency[float, S], other: W, /
+    ) -> ForceConstantFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantFrequency[V, S]: ...
+    @override
+    def item(self) -> ForceConstantFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -124,6 +124,35 @@ class ChargePerElectricPotential(
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerElectricPotential[float, S], other: ElectricPotential[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ChargePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerElectricPotential[float, S], other: W, /
+    ) -> ChargePerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -137,6 +166,21 @@ class ChargePerElectricPotential(
     ) -> ChargePerElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ChargePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerElectricPotential[float, S], other: W, /
+    ) -> ChargePerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> ChargePerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

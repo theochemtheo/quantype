@@ -100,6 +100,33 @@ class TemperaturePerMass(Quantity[Div[TemperatureKind, MassKind], V, S]):
     def _rtruediv_Temperature(self, other: Temperature[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperaturePerMass[float, S], other: Mass[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Mass[V, S] | Mass[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperaturePerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperaturePerMass[float, S], other: W, /
+    ) -> TemperaturePerMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperaturePerMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperaturePerMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperaturePerMass[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class TemperaturePerMass(Quantity[Div[TemperatureKind, MassKind], V, S]):
     ) -> TemperaturePerMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperaturePerMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperaturePerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperaturePerMass[float, S], other: W, /
+    ) -> TemperaturePerMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperaturePerMass[V, S]: ...
+    @override
+    def item(self) -> TemperaturePerMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -141,6 +141,35 @@ class TemperatureDifferenceParticleDensity(
     ]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureDifferenceParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferenceParticleDensity[float, S], other: W, /
+    ) -> TemperatureDifferenceParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferenceParticleDensity[float, S],
+        other: Quantity[K, W, S],
+        /,
+    ) -> Quantity[
+        Mul[Mul[TemperatureDifferenceKind, ParticleDensityKind], K], W, S
+    ]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[
+        Mul[Mul[TemperatureDifferenceKind, ParticleDensityKind], K], V, S
+    ]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureDifferenceParticleDensity[V, S]: ...
@@ -158,6 +187,23 @@ class TemperatureDifferenceParticleDensity(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureDifferenceParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferenceParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferenceParticleDensity[float, S], other: W, /
+    ) -> TemperatureDifferenceParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceParticleDensity[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferenceParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

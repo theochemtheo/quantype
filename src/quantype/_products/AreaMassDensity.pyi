@@ -116,6 +116,31 @@ class AreaMassDensity(Quantity[Mul[AreaKind, MassDensityKind], V, S]):
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaMassDensity[float, S], other: Length[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(self, other: Length[V, S] | Length[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaMassDensity[float, S], other: W, /
+    ) -> AreaMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, MassDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, MassDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -127,6 +152,19 @@ class AreaMassDensity(Quantity[Mul[AreaKind, MassDensityKind], V, S]):
     ) -> AreaMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaMassDensity[float, S], other: W, /
+    ) -> AreaMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaMassDensity[V, S]: ...
+    @override
+    def item(self) -> AreaMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

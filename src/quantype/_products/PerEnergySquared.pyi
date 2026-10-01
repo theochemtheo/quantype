@@ -74,6 +74,25 @@ class PerEnergySquared(Quantity[Pow[EnergyKind, Literal[-2]], V, S]):
     ) -> Quantity[Div[Pow[EnergyKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerEnergySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerEnergySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerEnergySquared[float, S], other: W, /
+    ) -> PerEnergySquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerEnergySquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerEnergySquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[EnergyKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[EnergyKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerEnergySquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerEnergySquared(Quantity[Pow[EnergyKind, Literal[-2]], V, S]):
     ) -> PerEnergySquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerEnergySquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerEnergySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerEnergySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerEnergySquared[float, S], other: W, /
+    ) -> PerEnergySquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerEnergySquared[V, S]: ...
+    @override
+    def item(self) -> PerEnergySquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

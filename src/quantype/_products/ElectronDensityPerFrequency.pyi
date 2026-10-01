@@ -171,6 +171,43 @@ class ElectronDensityPerFrequency(
     ) -> Frequency[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronDensityPerFrequency[float, S], other: Frequency[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectronDensityPerFrequency[float, S], other: InverseTime[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronDensityPerFrequency[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronDensityPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityPerFrequency[float, S], other: W, /
+    ) -> ElectronDensityPerFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronDensityPerFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityPerFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityPerFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -184,6 +221,23 @@ class ElectronDensityPerFrequency(
     ) -> ElectronDensityPerFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronDensityPerFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityPerFrequency[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronDensityPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityPerFrequency[float, S], other: W, /
+    ) -> ElectronDensityPerFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectronDensityPerFrequency[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityPerFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

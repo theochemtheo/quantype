@@ -136,6 +136,35 @@ class InverseTimePerMagnetization(
     ) -> Magnetization[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimePerMagnetization[float, S], other: Magnetization[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimePerMagnetization[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> InverseTimePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimePerMagnetization[float, S], other: W, /
+    ) -> InverseTimePerMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimePerMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimePerMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimePerMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -149,6 +178,23 @@ class InverseTimePerMagnetization(
     ) -> InverseTimePerMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimePerMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimePerMagnetization[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> InverseTimePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimePerMagnetization[float, S], other: W, /
+    ) -> InverseTimePerMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> InverseTimePerMagnetization[V, S]: ...
+    @override
+    def item(self) -> InverseTimePerMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -138,6 +138,25 @@ class VolumeForceConstant(Quantity[Mul[VolumeKind, ForceConstantKind], V, S]):
     ) -> Quantity[Div[Mul[VolumeKind, ForceConstantKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VolumeForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeForceConstant[float, S], other: W, /
+    ) -> VolumeForceConstant[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeForceConstant[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeForceConstant[V, S]: ...
     @overload
     def __rmul__(
@@ -149,6 +168,19 @@ class VolumeForceConstant(Quantity[Mul[VolumeKind, ForceConstantKind], V, S]):
     ) -> VolumeForceConstant[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeForceConstant[float, S], other: W, /
+    ) -> VolumeForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeForceConstant[V, S]: ...
+    @override
+    def item(self) -> VolumeForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

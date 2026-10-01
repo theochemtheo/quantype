@@ -135,6 +135,33 @@ class FrequencyAcceleration(Quantity[Mul[FrequencyKind, AccelerationKind], V, S]
     def _rtruediv_Acceleration(self, other: Acceleration[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyAcceleration[float, S], other: Time[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyAcceleration[float, S], other: W, /
+    ) -> FrequencyAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +173,19 @@ class FrequencyAcceleration(Quantity[Mul[FrequencyKind, AccelerationKind], V, S]
     ) -> FrequencyAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyAcceleration[float, S], other: W, /
+    ) -> FrequencyAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyAcceleration[V, S]: ...
+    @override
+    def item(self) -> FrequencyAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

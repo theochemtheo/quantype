@@ -121,6 +121,29 @@ class TemperatureTemperatureDifference(
     ) -> Quantity[Div[Mul[TemperatureKind, TemperatureDifferenceKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureTemperatureDifference[float, S], other: W, /
+    ) -> TemperatureTemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureTemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureTemperatureDifference[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, TemperatureDifferenceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, TemperatureDifferenceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureTemperatureDifference[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +159,23 @@ class TemperatureTemperatureDifference(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureTemperatureDifference[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureTemperatureDifference[float, S], other: W, /
+    ) -> TemperatureTemperatureDifference[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureTemperatureDifference[V, S]: ...
+    @override
+    def item(self) -> TemperatureTemperatureDifference[float, S]: ...
     @overload
     @override
     def __rtruediv__(

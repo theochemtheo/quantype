@@ -133,6 +133,37 @@ class MagnetizationPerTemperatureRate(
     ) -> TemperatureRate[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MagnetizationPerTemperatureRate[float, S], other: TemperatureRate[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MagnetizationPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationPerTemperatureRate[float, S], other: W, /
+    ) -> MagnetizationPerTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationPerTemperatureRate[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, TemperatureRateKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, TemperatureRateKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationPerTemperatureRate[V, S]: ...
     @overload
     def __rmul__(
@@ -148,6 +179,23 @@ class MagnetizationPerTemperatureRate(
     def __rmul__(
         self, other: _Numerical, /
     ) -> MagnetizationPerTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationPerTemperatureRate[float, S], other: W, /
+    ) -> MagnetizationPerTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> MagnetizationPerTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

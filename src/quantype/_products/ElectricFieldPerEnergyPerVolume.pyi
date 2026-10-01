@@ -133,6 +133,37 @@ class ElectricFieldPerEnergyPerVolume(
     ) -> EnergyPerVolume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricFieldPerEnergyPerVolume[float, S], other: EnergyPerVolume[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerVolume[V, S] | EnergyPerVolume[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricFieldPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricFieldPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricFieldPerEnergyPerVolume[float, S], other: W, /
+    ) -> ElectricFieldPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectricFieldPerEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricFieldPerEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricFieldPerEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -148,6 +179,23 @@ class ElectricFieldPerEnergyPerVolume(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ElectricFieldPerEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricFieldPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricFieldPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricFieldPerEnergyPerVolume[float, S], other: W, /
+    ) -> ElectricFieldPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectricFieldPerEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> ElectricFieldPerEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

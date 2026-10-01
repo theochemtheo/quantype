@@ -139,6 +139,39 @@ class TemperatureRatePerElectronDensity(
     ) -> ElectronDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureRatePerElectronDensity[float, S],
+        other: ElectronDensity[W, S],
+        /,
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronDensity[V, S] | ElectronDensity[float, S], /
+    ) -> TemperatureRate[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureRatePerElectronDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRatePerElectronDensity[float, S], other: W, /
+    ) -> TemperatureRatePerElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRatePerElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRatePerElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureRatePerElectronDensity[V, S]: ...
@@ -156,6 +189,23 @@ class TemperatureRatePerElectronDensity(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureRatePerElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRatePerElectronDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRatePerElectronDensity[float, S], other: W, /
+    ) -> TemperatureRatePerElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRatePerElectronDensity[V, S]: ...
+    @override
+    def item(self) -> TemperatureRatePerElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

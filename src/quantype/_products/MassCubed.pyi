@@ -74,6 +74,25 @@ class MassCubed(Quantity[Pow[MassKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[MassKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MassCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassCubed[float, S], other: W, /
+    ) -> MassCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MassKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MassKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class MassCubed(Quantity[Pow[MassKind, Literal[3]], V, S]):
     ) -> MassCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassCubed[float, S], other: W, /
+    ) -> MassCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassCubed[V, S]: ...
+    @override
+    def item(self) -> MassCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -92,6 +92,25 @@ class AreaAction(Quantity[Mul[AreaKind, ActionKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, ActionKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaAction[float, S], other: W, /
+    ) -> AreaAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaAction[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class AreaAction(Quantity[Mul[AreaKind, ActionKind], V, S]):
     ) -> AreaAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaAction[float, S], other: W, /
+    ) -> AreaAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaAction[V, S]: ...
+    @override
+    def item(self) -> AreaAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

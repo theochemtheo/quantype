@@ -125,6 +125,31 @@ class EntropyPerTime(Quantity[Div[EntropyKind, TimeKind], V, S]):
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerTime[float, S], other: Time[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerTime[float, S], other: W, /
+    ) -> EntropyPerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +161,19 @@ class EntropyPerTime(Quantity[Div[EntropyKind, TimeKind], V, S]):
     ) -> EntropyPerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerTime[float, S], other: W, /
+    ) -> EntropyPerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerTime[V, S]: ...
+    @override
+    def item(self) -> EntropyPerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -169,6 +169,49 @@ class TimeMass(Quantity[Mul[TimeKind, MassKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeMass[float, S], other: Frequency[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeMass[float, S], other: InverseTime[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeMass[float, S], other: Acceleration[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeMass[float, S], other: W, /
+    ) -> TimeMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeMass[V, S]: ...
     @overload
     def __rmul__(
@@ -180,6 +223,19 @@ class TimeMass(Quantity[Mul[TimeKind, MassKind], V, S]):
     ) -> TimeMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeMass[float, S], other: W, /
+    ) -> TimeMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeMass[V, S]: ...
+    @override
+    def item(self) -> TimeMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

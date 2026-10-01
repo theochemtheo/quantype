@@ -92,6 +92,25 @@ class EnergyEntropy(Quantity[Mul[EnergyKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[EnergyKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyEntropy[float, S], other: W, /
+    ) -> EnergyEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class EnergyEntropy(Quantity[Mul[EnergyKind, EntropyKind], V, S]):
     ) -> EnergyEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyEntropy[float, S], other: W, /
+    ) -> EnergyEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyEntropy[V, S]: ...
+    @override
+    def item(self) -> EnergyEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

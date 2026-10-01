@@ -171,6 +171,49 @@ class TimeAtomCount(Quantity[Mul[TimeKind, AtomCountKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> EnergyPerAtom[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeAtomCount[float, S], other: EnergyPerAtom[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeAtomCount[float, S], other: Frequency[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeAtomCount[float, S], other: InverseTime[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeAtomCount[float, S], other: W, /
+    ) -> TimeAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -182,6 +225,19 @@ class TimeAtomCount(Quantity[Mul[TimeKind, AtomCountKind], V, S]):
     ) -> TimeAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeAtomCount[float, S], other: W, /
+    ) -> TimeAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeAtomCount[V, S]: ...
+    @override
+    def item(self) -> TimeAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -102,6 +102,25 @@ class TemperatureDipoleMoment(Quantity[Mul[TemperatureKind, DipoleMomentKind], V
     ) -> Quantity[Div[Mul[TemperatureKind, DipoleMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDipoleMoment[float, S], other: W, /
+    ) -> TemperatureDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +132,19 @@ class TemperatureDipoleMoment(Quantity[Mul[TemperatureKind, DipoleMomentKind], V
     ) -> TemperatureDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDipoleMoment[float, S], other: W, /
+    ) -> TemperatureDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> TemperatureDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

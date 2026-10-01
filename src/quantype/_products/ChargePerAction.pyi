@@ -151,6 +151,39 @@ class ChargePerAction(Quantity[Div[ChargeKind, ActionKind], V, S]):
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerAction[float, S], other: ElectricPotential[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerAction[float, S], other: Action[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerAction[float, S], other: W, /
+    ) -> ChargePerAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerAction[V, S]: ...
     @overload
     def __rmul__(
@@ -162,6 +195,19 @@ class ChargePerAction(Quantity[Div[ChargeKind, ActionKind], V, S]):
     ) -> ChargePerAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerAction[float, S], other: W, /
+    ) -> ChargePerAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerAction[V, S]: ...
+    @override
+    def item(self) -> ChargePerAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

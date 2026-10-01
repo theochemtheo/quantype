@@ -132,6 +132,41 @@ class AnglePerInverseTime(Quantity[Div[AngleKind, InverseTimeKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerInverseTime[float, S], other: Frequency[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AnglePerInverseTime[float, S], other: InverseTime[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerInverseTime[float, S], other: W, /
+    ) -> AnglePerInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -143,6 +178,19 @@ class AnglePerInverseTime(Quantity[Div[AngleKind, InverseTimeKind], V, S]):
     ) -> AnglePerInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerInverseTime[float, S], other: W, /
+    ) -> AnglePerInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerInverseTime[V, S]: ...
+    @override
+    def item(self) -> AnglePerInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

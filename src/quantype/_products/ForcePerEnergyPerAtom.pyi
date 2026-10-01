@@ -125,6 +125,41 @@ class ForcePerEnergyPerAtom(Quantity[Div[ForceKind, EnergyPerAtomKind], V, S]):
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForcePerEnergyPerAtom[float, S], other: Length[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForcePerEnergyPerAtom[float, S], other: EnergyPerAtom[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForcePerEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForcePerEnergyPerAtom[float, S], other: W, /
+    ) -> ForcePerEnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForcePerEnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForcePerEnergyPerAtom[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceKind, EnergyPerAtomKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceKind, EnergyPerAtomKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForcePerEnergyPerAtom[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +171,19 @@ class ForcePerEnergyPerAtom(Quantity[Div[ForceKind, EnergyPerAtomKind], V, S]):
     ) -> ForcePerEnergyPerAtom[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForcePerEnergyPerAtom[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForcePerEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForcePerEnergyPerAtom[float, S], other: W, /
+    ) -> ForcePerEnergyPerAtom[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForcePerEnergyPerAtom[V, S]: ...
+    @override
+    def item(self) -> ForcePerEnergyPerAtom[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -124,6 +124,35 @@ class MomentumPerEnergyPerVolume(
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> EnergyPerVolume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MomentumPerEnergyPerVolume[float, S], other: EnergyPerVolume[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerVolume[V, S] | EnergyPerVolume[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MomentumPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MomentumPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumPerEnergyPerVolume[float, S], other: W, /
+    ) -> MomentumPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumPerEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumPerEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumPerEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -137,6 +166,21 @@ class MomentumPerEnergyPerVolume(
     ) -> MomentumPerEnergyPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumPerEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MomentumPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumPerEnergyPerVolume[float, S], other: W, /
+    ) -> MomentumPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumPerEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> MomentumPerEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

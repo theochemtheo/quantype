@@ -156,6 +156,43 @@ class ElectronCountPerFrequency(Quantity[Div[ElectronCountKind, FrequencyKind], 
     ) -> Frequency[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronCountPerFrequency[float, S], other: Frequency[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectronCountPerFrequency[float, S], other: InverseTime[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronCountPerFrequency[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronCountPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountPerFrequency[float, S], other: W, /
+    ) -> ElectronCountPerFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronCountPerFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountPerFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronCountPerFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -169,6 +206,21 @@ class ElectronCountPerFrequency(Quantity[Div[ElectronCountKind, FrequencyKind], 
     ) -> ElectronCountPerFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronCountPerFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountPerFrequency[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronCountPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountPerFrequency[float, S], other: W, /
+    ) -> ElectronCountPerFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronCountPerFrequency[V, S]: ...
+    @override
+    def item(self) -> ElectronCountPerFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

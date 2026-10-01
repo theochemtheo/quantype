@@ -134,6 +134,31 @@ class VelocitySquared(Quantity[Pow[VelocityKind, Literal[2]], V, S]):
     def _rtruediv_Energy(self, other: Energy[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocitySquared[float, S], other: Mass[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocitySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocitySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocitySquared[float, S], other: W, /
+    ) -> VelocitySquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocitySquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocitySquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[VelocityKind, Literal[2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[VelocityKind, Literal[2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocitySquared[V, S]: ...
     @overload
     def __rmul__(
@@ -145,6 +170,19 @@ class VelocitySquared(Quantity[Pow[VelocityKind, Literal[2]], V, S]):
     ) -> VelocitySquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocitySquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocitySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocitySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocitySquared[float, S], other: W, /
+    ) -> VelocitySquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocitySquared[V, S]: ...
+    @override
+    def item(self) -> VelocitySquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

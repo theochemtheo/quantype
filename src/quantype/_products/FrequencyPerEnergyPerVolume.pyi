@@ -140,6 +140,35 @@ class FrequencyPerEnergyPerVolume(
     ) -> EnergyPerVolume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerEnergyPerVolume[float, S], other: EnergyPerVolume[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerVolume[V, S] | EnergyPerVolume[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerEnergyPerVolume[float, S], other: W, /
+    ) -> FrequencyPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -153,6 +182,23 @@ class FrequencyPerEnergyPerVolume(
     ) -> FrequencyPerEnergyPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerEnergyPerVolume[float, S], other: W, /
+    ) -> FrequencyPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> FrequencyPerEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

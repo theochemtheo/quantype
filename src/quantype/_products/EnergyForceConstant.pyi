@@ -103,6 +103,25 @@ class EnergyForceConstant(Quantity[Mul[EnergyKind, ForceConstantKind], V, S]):
     ) -> Quantity[Div[Mul[EnergyKind, ForceConstantKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyForceConstant[float, S], other: W, /
+    ) -> EnergyForceConstant[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyForceConstant[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyForceConstant[V, S]: ...
     @overload
     def __rmul__(
@@ -114,6 +133,19 @@ class EnergyForceConstant(Quantity[Mul[EnergyKind, ForceConstantKind], V, S]):
     ) -> EnergyForceConstant[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyForceConstant[float, S], other: W, /
+    ) -> EnergyForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyForceConstant[V, S]: ...
+    @override
+    def item(self) -> EnergyForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

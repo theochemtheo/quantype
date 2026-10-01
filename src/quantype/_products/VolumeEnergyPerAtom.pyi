@@ -134,6 +134,33 @@ class VolumeEnergyPerAtom(Quantity[Mul[VolumeKind, EnergyPerAtomKind], V, S]):
     def _rtruediv_Energy(self, other: Energy[V, S], /) -> ParticleDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumeEnergyPerAtom[float, S], other: ParticleDensity[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumeEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeEnergyPerAtom[float, S], other: W, /
+    ) -> VolumeEnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeEnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeEnergyPerAtom[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, EnergyPerAtomKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, EnergyPerAtomKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeEnergyPerAtom[V, S]: ...
     @overload
     def __rmul__(
@@ -145,6 +172,19 @@ class VolumeEnergyPerAtom(Quantity[Mul[VolumeKind, EnergyPerAtomKind], V, S]):
     ) -> VolumeEnergyPerAtom[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeEnergyPerAtom[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeEnergyPerAtom[float, S], other: W, /
+    ) -> VolumeEnergyPerAtom[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeEnergyPerAtom[V, S]: ...
+    @override
+    def item(self) -> VolumeEnergyPerAtom[float, S]: ...
     @overload
     @override
     def __rtruediv__(

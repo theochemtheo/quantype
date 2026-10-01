@@ -117,6 +117,27 @@ class MagneticMomentElectricField(
     ) -> Quantity[Div[Mul[MagneticMomentKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MagneticMomentElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagneticMomentElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagneticMomentElectricField[float, S], other: W, /
+    ) -> MagneticMomentElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MagneticMomentElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagneticMomentElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagneticMomentElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -130,6 +151,23 @@ class MagneticMomentElectricField(
     ) -> MagneticMomentElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagneticMomentElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagneticMomentElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagneticMomentElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagneticMomentElectricField[float, S], other: W, /
+    ) -> MagneticMomentElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagneticMomentElectricField[V, S]: ...
+    @override
+    def item(self) -> MagneticMomentElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

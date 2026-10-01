@@ -104,6 +104,25 @@ class TemperatureElectricField(Quantity[Mul[TemperatureKind, ElectricFieldKind],
     ) -> Quantity[Div[Mul[TemperatureKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureElectricField[float, S], other: W, /
+    ) -> TemperatureElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +134,19 @@ class TemperatureElectricField(Quantity[Mul[TemperatureKind, ElectricFieldKind],
     ) -> TemperatureElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureElectricField[float, S], other: W, /
+    ) -> TemperatureElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureElectricField[V, S]: ...
+    @override
+    def item(self) -> TemperatureElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

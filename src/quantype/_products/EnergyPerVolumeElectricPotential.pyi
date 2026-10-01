@@ -127,6 +127,29 @@ class EnergyPerVolumeElectricPotential(
     ) -> Quantity[Div[Mul[EnergyPerVolumeKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyPerVolumeElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerVolumeElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerVolumeElectricPotential[float, S], other: W, /
+    ) -> EnergyPerVolumeElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> EnergyPerVolumeElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerVolumeElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerVolumeKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerVolumeKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerVolumeElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -142,6 +165,23 @@ class EnergyPerVolumeElectricPotential(
     def __rmul__(
         self, other: _Numerical, /
     ) -> EnergyPerVolumeElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerVolumeElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerVolumeElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerVolumeElectricPotential[float, S], other: W, /
+    ) -> EnergyPerVolumeElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> EnergyPerVolumeElectricPotential[V, S]: ...
+    @override
+    def item(self) -> EnergyPerVolumeElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -127,6 +127,35 @@ class MassDensityPerElectronCount(
     ) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerElectronCount[float, S], other: W, /
+    ) -> MassDensityPerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityPerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +169,23 @@ class MassDensityPerElectronCount(
     ) -> MassDensityPerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerElectronCount[float, S], other: W, /
+    ) -> MassDensityPerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MassDensityPerElectronCount[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

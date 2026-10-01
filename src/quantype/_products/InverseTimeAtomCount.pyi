@@ -125,6 +125,31 @@ class InverseTimeAtomCount(Quantity[Mul[InverseTimeKind, AtomCountKind], V, S]):
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimeAtomCount[float, S], other: Time[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimeAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimeAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimeAtomCount[float, S], other: W, /
+    ) -> InverseTimeAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimeAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimeAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[InverseTimeKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[InverseTimeKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimeAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +161,19 @@ class InverseTimeAtomCount(Quantity[Mul[InverseTimeKind, AtomCountKind], V, S]):
     ) -> InverseTimeAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimeAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimeAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimeAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimeAtomCount[float, S], other: W, /
+    ) -> InverseTimeAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> InverseTimeAtomCount[V, S]: ...
+    @override
+    def item(self) -> InverseTimeAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

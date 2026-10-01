@@ -102,6 +102,33 @@ class TimePerEnergyPerAtom(Quantity[Div[TimeKind, EnergyPerAtomKind], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> EnergyPerAtom[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerEnergyPerAtom[float, S], other: EnergyPerAtom[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerEnergyPerAtom[float, S], other: W, /
+    ) -> TimePerEnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerEnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerEnergyPerAtom[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, EnergyPerAtomKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, EnergyPerAtomKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerEnergyPerAtom[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class TimePerEnergyPerAtom(Quantity[Div[TimeKind, EnergyPerAtomKind], V, S]):
     ) -> TimePerEnergyPerAtom[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerEnergyPerAtom[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerEnergyPerAtom[float, S], other: W, /
+    ) -> TimePerEnergyPerAtom[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerEnergyPerAtom[V, S]: ...
+    @override
+    def item(self) -> TimePerEnergyPerAtom[float, S]: ...
     @overload
     @override
     def __rtruediv__(

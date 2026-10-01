@@ -133,6 +133,41 @@ class PerEntropy(Quantity[Pow[EntropyKind, Literal[-1]], V, S]):
     ) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerEntropy[float, S], other: Energy[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerEntropy[float, S], other: Entropy[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerEntropy[float, S], other: W, /
+    ) -> PerEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[EntropyKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[EntropyKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -144,6 +179,19 @@ class PerEntropy(Quantity[Pow[EntropyKind, Literal[-1]], V, S]):
     ) -> PerEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerEntropy[float, S], other: W, /
+    ) -> PerEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerEntropy[V, S]: ...
+    @override
+    def item(self) -> PerEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

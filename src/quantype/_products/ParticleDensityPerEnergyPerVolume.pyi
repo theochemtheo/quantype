@@ -139,6 +139,39 @@ class ParticleDensityPerEnergyPerVolume(
     ) -> EnergyPerVolume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ParticleDensityPerEnergyPerVolume[float, S],
+        other: EnergyPerVolume[W, S],
+        /,
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerVolume[V, S] | EnergyPerVolume[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ParticleDensityPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ParticleDensityPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityPerEnergyPerVolume[float, S], other: W, /
+    ) -> ParticleDensityPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ParticleDensityPerEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityPerEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> ParticleDensityPerEnergyPerVolume[V, S]: ...
@@ -156,6 +189,23 @@ class ParticleDensityPerEnergyPerVolume(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ParticleDensityPerEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ParticleDensityPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityPerEnergyPerVolume[float, S], other: W, /
+    ) -> ParticleDensityPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ParticleDensityPerEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityPerEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

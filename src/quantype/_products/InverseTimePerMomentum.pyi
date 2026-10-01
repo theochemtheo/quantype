@@ -166,6 +166,49 @@ class InverseTimePerMomentum(Quantity[Div[InverseTimeKind, MomentumKind], V, S])
     def _rtruediv_Acceleration(self, other: Acceleration[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimePerMomentum[float, S], other: Energy[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: InverseTimePerMomentum[float, S], other: Momentum[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: InverseTimePerMomentum[float, S], other: Action[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimePerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimePerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimePerMomentum[float, S], other: W, /
+    ) -> InverseTimePerMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimePerMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimePerMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimePerMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -177,6 +220,19 @@ class InverseTimePerMomentum(Quantity[Div[InverseTimeKind, MomentumKind], V, S])
     ) -> InverseTimePerMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimePerMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimePerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimePerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimePerMomentum[float, S], other: W, /
+    ) -> InverseTimePerMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> InverseTimePerMomentum[V, S]: ...
+    @override
+    def item(self) -> InverseTimePerMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

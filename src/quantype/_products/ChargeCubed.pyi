@@ -74,6 +74,25 @@ class ChargeCubed(Quantity[Pow[ChargeKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[ChargeKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ChargeCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargeCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargeCubed[float, S], other: W, /
+    ) -> ChargeCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargeCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargeCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ChargeKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ChargeKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargeCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class ChargeCubed(Quantity[Pow[ChargeKind, Literal[3]], V, S]):
     ) -> ChargeCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargeCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargeCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargeCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargeCubed[float, S], other: W, /
+    ) -> ChargeCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargeCubed[V, S]: ...
+    @override
+    def item(self) -> ChargeCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

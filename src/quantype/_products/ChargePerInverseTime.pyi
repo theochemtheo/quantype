@@ -233,6 +233,65 @@ class ChargePerInverseTime(Quantity[Div[ChargeKind, InverseTimeKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerInverseTime[float, S], other: Velocity[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerInverseTime[float, S], other: Frequency[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerInverseTime[float, S], other: InverseTime[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerInverseTime[float, S], other: ElectricPotential[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerInverseTime[float, S], other: ElectricField[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerInverseTime[float, S], other: W, /
+    ) -> ChargePerInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -244,6 +303,19 @@ class ChargePerInverseTime(Quantity[Div[ChargeKind, InverseTimeKind], V, S]):
     ) -> ChargePerInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerInverseTime[float, S], other: W, /
+    ) -> ChargePerInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerInverseTime[V, S]: ...
+    @override
+    def item(self) -> ChargePerInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

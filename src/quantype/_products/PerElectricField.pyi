@@ -187,6 +187,55 @@ class PerElectricField(Quantity[Pow[ElectricFieldKind, Literal[-1]], V, S]):
     def _rtruediv_DipoleMoment(self, other: DipoleMoment[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerElectricField[float, S], other: Energy[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerElectricField[float, S], other: Force[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerElectricField[float, S], other: ElectricPotential[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerElectricField[float, S], other: W, /
+    ) -> PerElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ElectricFieldKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ElectricFieldKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -198,6 +247,19 @@ class PerElectricField(Quantity[Pow[ElectricFieldKind, Literal[-1]], V, S]):
     ) -> PerElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerElectricField[float, S], other: W, /
+    ) -> PerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerElectricField[V, S]: ...
+    @override
+    def item(self) -> PerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

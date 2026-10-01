@@ -177,6 +177,35 @@ class FrequencyElectricPotential(
     ) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyElectricPotential[float, S], other: Time[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyElectricPotential[float, S], other: W, /
+    ) -> FrequencyElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -190,6 +219,21 @@ class FrequencyElectricPotential(
     ) -> FrequencyElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyElectricPotential[float, S], other: W, /
+    ) -> FrequencyElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyElectricPotential[V, S]: ...
+    @override
+    def item(self) -> FrequencyElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

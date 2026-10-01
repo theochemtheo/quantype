@@ -94,6 +94,25 @@ class AngleElectricField(Quantity[Mul[AngleKind, ElectricFieldKind], V, S]):
     ) -> Quantity[Div[Mul[AngleKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AngleElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AngleElectricField[float, S], other: W, /
+    ) -> AngleElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AngleElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AngleElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AngleElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class AngleElectricField(Quantity[Mul[AngleKind, ElectricFieldKind], V, S]):
     ) -> AngleElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AngleElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AngleElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AngleElectricField[float, S], other: W, /
+    ) -> AngleElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AngleElectricField[V, S]: ...
+    @override
+    def item(self) -> AngleElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

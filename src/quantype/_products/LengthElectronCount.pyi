@@ -94,6 +94,25 @@ class LengthElectronCount(Quantity[Mul[LengthKind, ElectronCountKind], V, S]):
     ) -> Quantity[Div[Mul[LengthKind, ElectronCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: LengthElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthElectronCount[float, S], other: W, /
+    ) -> LengthElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class LengthElectronCount(Quantity[Mul[LengthKind, ElectronCountKind], V, S]):
     ) -> LengthElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthElectronCount[float, S], other: W, /
+    ) -> LengthElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthElectronCount[V, S]: ...
+    @override
+    def item(self) -> LengthElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

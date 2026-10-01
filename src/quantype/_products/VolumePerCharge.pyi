@@ -134,6 +134,39 @@ class VolumePerCharge(Quantity[Div[VolumeKind, ChargeKind], V, S]):
     ) -> EnergyDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerCharge[float, S], other: Pressure[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumePerCharge[float, S], other: Charge[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(self, other: Charge[V, S] | Charge[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerCharge[float, S], other: W, /
+    ) -> VolumePerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -145,6 +178,19 @@ class VolumePerCharge(Quantity[Div[VolumeKind, ChargeKind], V, S]):
     ) -> VolumePerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerCharge[float, S], other: W, /
+    ) -> VolumePerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerCharge[V, S]: ...
+    @override
+    def item(self) -> VolumePerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

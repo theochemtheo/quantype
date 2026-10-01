@@ -141,6 +141,41 @@ class VelocityPerEntropy(Quantity[Div[VelocityKind, EntropyKind], V, S]):
     ) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityPerEntropy[float, S], other: Momentum[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerEntropy[float, S], other: Entropy[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityPerEntropy[float, S], other: W, /
+    ) -> VelocityPerEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityPerEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityPerEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityPerEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -152,6 +187,19 @@ class VelocityPerEntropy(Quantity[Div[VelocityKind, EntropyKind], V, S]):
     ) -> VelocityPerEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityPerEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityPerEntropy[float, S], other: W, /
+    ) -> VelocityPerEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityPerEntropy[V, S]: ...
+    @override
+    def item(self) -> VelocityPerEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

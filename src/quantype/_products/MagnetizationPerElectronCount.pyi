@@ -127,6 +127,37 @@ class MagnetizationPerElectronCount(
     ) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MagnetizationPerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MagnetizationPerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationPerElectronCount[float, S], other: W, /
+    ) -> MagnetizationPerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationPerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationPerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +171,23 @@ class MagnetizationPerElectronCount(
     ) -> MagnetizationPerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagnetizationPerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationPerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationPerElectronCount[float, S], other: W, /
+    ) -> MagnetizationPerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerElectronCount[V, S]: ...
+    @override
+    def item(self) -> MagnetizationPerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

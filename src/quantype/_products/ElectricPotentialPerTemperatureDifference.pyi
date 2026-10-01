@@ -188,6 +188,55 @@ class ElectricPotentialPerTemperatureDifference(
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Charge[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricPotentialPerTemperatureDifference[float, S],
+        other: TemperatureDifference[W, S],
+        /,
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricPotentialPerTemperatureDifference[float, S],
+        other: Charge[W, S],
+        /,
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricPotentialPerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricPotentialPerTemperatureDifference[float, S], other: W, /
+    ) -> ElectricPotentialPerTemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectricPotentialPerTemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricPotentialPerTemperatureDifference[float, S],
+        other: Quantity[K, W, S],
+        /,
+    ) -> Quantity[
+        Mul[Div[ElectricPotentialKind, TemperatureDifferenceKind], K], W, S
+    ]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[
+        Mul[Div[ElectricPotentialKind, TemperatureDifferenceKind], K], V, S
+    ]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> ElectricPotentialPerTemperatureDifference[V, S]: ...
@@ -205,6 +254,23 @@ class ElectricPotentialPerTemperatureDifference(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ElectricPotentialPerTemperatureDifference[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricPotentialPerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricPotentialPerTemperatureDifference[float, S], other: W, /
+    ) -> ElectricPotentialPerTemperatureDifference[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectricPotentialPerTemperatureDifference[V, S]: ...
+    @override
+    def item(self) -> ElectricPotentialPerTemperatureDifference[float, S]: ...
     @overload
     @override
     def __rtruediv__(

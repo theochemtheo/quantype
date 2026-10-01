@@ -98,6 +98,33 @@ class AnglePerMomentum(Quantity[Div[AngleKind, MomentumKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerMomentum[float, S], other: Momentum[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerMomentum[float, S], other: W, /
+    ) -> AnglePerMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +136,19 @@ class AnglePerMomentum(Quantity[Div[AngleKind, MomentumKind], V, S]):
     ) -> AnglePerMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerMomentum[float, S], other: W, /
+    ) -> AnglePerMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerMomentum[V, S]: ...
+    @override
+    def item(self) -> AnglePerMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

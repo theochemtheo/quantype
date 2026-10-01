@@ -250,6 +250,73 @@ class PerVolume(Quantity[Pow[VolumeKind, Literal[-1]], V, S]):
     def _rtruediv_MassDensity(self, other: MassDensity[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerVolume[float, S], other: Volume[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerVolume[float, S], other: Energy[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerVolume[float, S], other: MagneticMoment[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerVolume[float, S], other: AtomCount[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerVolume[float, S], other: ElectronCount[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerVolume[float, S], other: Mass[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Mass[V, S] | Mass[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerVolume[float, S], other: W, /
+    ) -> PerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[VolumeKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[VolumeKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -261,6 +328,19 @@ class PerVolume(Quantity[Pow[VolumeKind, Literal[-1]], V, S]):
     ) -> PerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerVolume[float, S], other: W, /
+    ) -> PerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerVolume[V, S]: ...
+    @override
+    def item(self) -> PerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

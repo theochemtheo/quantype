@@ -127,6 +127,37 @@ class MagnetizationPerDipoleMoment(
     ) -> DipoleMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MagnetizationPerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MagnetizationPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationPerDipoleMoment[float, S], other: W, /
+    ) -> MagnetizationPerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationPerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationPerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +171,23 @@ class MagnetizationPerDipoleMoment(
     ) -> MagnetizationPerDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagnetizationPerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationPerDipoleMoment[float, S], other: W, /
+    ) -> MagnetizationPerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> MagnetizationPerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

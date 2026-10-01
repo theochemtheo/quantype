@@ -117,6 +117,27 @@ class LengthTemperatureDifference(
     ) -> Quantity[Div[Mul[LengthKind, TemperatureDifferenceKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: LengthTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> LengthTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthTemperatureDifference[float, S], other: W, /
+    ) -> LengthTemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthTemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthTemperatureDifference[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, TemperatureDifferenceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, TemperatureDifferenceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthTemperatureDifference[V, S]: ...
     @overload
     def __rmul__(
@@ -130,6 +151,23 @@ class LengthTemperatureDifference(
     ) -> LengthTemperatureDifference[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthTemperatureDifference[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> LengthTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthTemperatureDifference[float, S], other: W, /
+    ) -> LengthTemperatureDifference[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> LengthTemperatureDifference[V, S]: ...
+    @override
+    def item(self) -> LengthTemperatureDifference[float, S]: ...
     @overload
     @override
     def __rtruediv__(

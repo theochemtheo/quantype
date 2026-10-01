@@ -147,6 +147,41 @@ class AtomCountPerAction(Quantity[Div[AtomCountKind, ActionKind], V, S]):
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AtomCountPerAction[float, S], other: EnergyPerAtom[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AtomCountPerAction[float, S], other: Action[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AtomCountPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountPerAction[float, S], other: W, /
+    ) -> AtomCountPerAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountPerAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountPerAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountPerAction[V, S]: ...
     @overload
     def __rmul__(
@@ -158,6 +193,19 @@ class AtomCountPerAction(Quantity[Div[AtomCountKind, ActionKind], V, S]):
     ) -> AtomCountPerAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountPerAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountPerAction[float, S], other: W, /
+    ) -> AtomCountPerAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountPerAction[V, S]: ...
+    @override
+    def item(self) -> AtomCountPerAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

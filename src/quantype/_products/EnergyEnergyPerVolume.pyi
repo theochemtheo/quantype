@@ -96,6 +96,25 @@ class EnergyEnergyPerVolume(Quantity[Mul[EnergyKind, EnergyPerVolumeKind], V, S]
     ) -> Quantity[Div[Mul[EnergyKind, EnergyPerVolumeKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyEnergyPerVolume[float, S], other: W, /
+    ) -> EnergyEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class EnergyEnergyPerVolume(Quantity[Mul[EnergyKind, EnergyPerVolumeKind], V, S]
     ) -> EnergyEnergyPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyEnergyPerVolume[float, S], other: W, /
+    ) -> EnergyEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> EnergyEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

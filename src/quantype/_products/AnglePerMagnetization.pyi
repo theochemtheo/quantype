@@ -102,6 +102,33 @@ class AnglePerMagnetization(Quantity[Div[AngleKind, MagnetizationKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Magnetization[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerMagnetization[float, S], other: Magnetization[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerMagnetization[float, S], other: W, /
+    ) -> AnglePerMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class AnglePerMagnetization(Quantity[Div[AngleKind, MagnetizationKind], V, S]):
     ) -> AnglePerMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerMagnetization[float, S], other: W, /
+    ) -> AnglePerMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerMagnetization[V, S]: ...
+    @override
+    def item(self) -> AnglePerMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

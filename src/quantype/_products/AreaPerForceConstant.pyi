@@ -140,6 +140,39 @@ class AreaPerForceConstant(Quantity[Div[AreaKind, ForceConstantKind], V, S]):
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerForceConstant[float, S], other: Force[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerForceConstant[float, S], other: ForceConstant[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerForceConstant[float, S], other: W, /
+    ) -> AreaPerForceConstant[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerForceConstant[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerForceConstant[V, S]: ...
     @overload
     def __rmul__(
@@ -151,6 +184,19 @@ class AreaPerForceConstant(Quantity[Div[AreaKind, ForceConstantKind], V, S]):
     ) -> AreaPerForceConstant[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerForceConstant[float, S], other: W, /
+    ) -> AreaPerForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerForceConstant[V, S]: ...
+    @override
+    def item(self) -> AreaPerForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

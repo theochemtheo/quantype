@@ -76,6 +76,25 @@ class PerElectronCountSquared(Quantity[Pow[ElectronCountKind, Literal[-2]], V, S
     ) -> Quantity[Div[Pow[ElectronCountKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerElectronCountSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerElectronCountSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerElectronCountSquared[float, S], other: W, /
+    ) -> PerElectronCountSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerElectronCountSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerElectronCountSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ElectronCountKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ElectronCountKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerElectronCountSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -87,6 +106,19 @@ class PerElectronCountSquared(Quantity[Pow[ElectronCountKind, Literal[-2]], V, S
     ) -> PerElectronCountSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerElectronCountSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerElectronCountSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerElectronCountSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerElectronCountSquared[float, S], other: W, /
+    ) -> PerElectronCountSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerElectronCountSquared[V, S]: ...
+    @override
+    def item(self) -> PerElectronCountSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

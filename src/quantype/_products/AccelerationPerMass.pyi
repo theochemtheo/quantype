@@ -100,6 +100,33 @@ class AccelerationPerMass(Quantity[Div[AccelerationKind, MassKind], V, S]):
     def _rtruediv_Acceleration(self, other: Acceleration[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AccelerationPerMass[float, S], other: Mass[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Mass[V, S] | Mass[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AccelerationPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AccelerationPerMass[float, S], other: W, /
+    ) -> AccelerationPerMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AccelerationPerMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AccelerationPerMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AccelerationPerMass[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class AccelerationPerMass(Quantity[Div[AccelerationKind, MassKind], V, S]):
     ) -> AccelerationPerMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AccelerationPerMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AccelerationPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AccelerationPerMass[float, S], other: W, /
+    ) -> AccelerationPerMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AccelerationPerMass[V, S]: ...
+    @override
+    def item(self) -> AccelerationPerMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

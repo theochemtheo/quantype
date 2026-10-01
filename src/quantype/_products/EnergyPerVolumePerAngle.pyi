@@ -104,6 +104,33 @@ class EnergyPerVolumePerAngle(Quantity[Div[EnergyPerVolumeKind, AngleKind], V, S
     ) -> Angle[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyPerVolumePerAngle[float, S], other: Angle[W, S], /
+    ) -> EnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Angle[V, S] | Angle[float, S], /
+    ) -> EnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyPerVolumePerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerVolumePerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerVolumePerAngle[float, S], other: W, /
+    ) -> EnergyPerVolumePerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerVolumePerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerVolumePerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyPerVolumeKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyPerVolumeKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerVolumePerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +142,19 @@ class EnergyPerVolumePerAngle(Quantity[Div[EnergyPerVolumeKind, AngleKind], V, S
     ) -> EnergyPerVolumePerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerVolumePerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerVolumePerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerVolumePerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerVolumePerAngle[float, S], other: W, /
+    ) -> EnergyPerVolumePerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerVolumePerAngle[V, S]: ...
+    @override
+    def item(self) -> EnergyPerVolumePerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

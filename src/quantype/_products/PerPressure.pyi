@@ -114,6 +114,39 @@ class PerPressure(Quantity[Pow[PressureKind, Literal[-1]], V, S]):
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerPressure[float, S], other: Energy[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(self, other: Energy[V, S] | Energy[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerPressure[float, S], other: Pressure[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerPressure[float, S], other: W, /
+    ) -> PerPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[PressureKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[PressureKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +158,19 @@ class PerPressure(Quantity[Pow[PressureKind, Literal[-1]], V, S]):
     ) -> PerPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerPressure[float, S], other: W, /
+    ) -> PerPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerPressure[V, S]: ...
+    @override
+    def item(self) -> PerPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

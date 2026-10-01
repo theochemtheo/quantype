@@ -116,6 +116,35 @@ class EntropyPerTemperatureRate(Quantity[Div[EntropyKind, TemperatureRateKind], 
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> TemperatureRate[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerTemperatureRate[float, S], other: TemperatureRate[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EntropyPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerTemperatureRate[float, S], other: W, /
+    ) -> EntropyPerTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerTemperatureRate[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, TemperatureRateKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, TemperatureRateKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerTemperatureRate[V, S]: ...
     @overload
     def __rmul__(
@@ -129,6 +158,21 @@ class EntropyPerTemperatureRate(Quantity[Div[EntropyKind, TemperatureRateKind], 
     ) -> EntropyPerTemperatureRate[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EntropyPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerTemperatureRate[float, S], other: W, /
+    ) -> EntropyPerTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> EntropyPerTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

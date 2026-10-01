@@ -94,6 +94,25 @@ class EnergyEnergyPerAtom(Quantity[Mul[EnergyKind, EnergyPerAtomKind], V, S]):
     ) -> Quantity[Div[Mul[EnergyKind, EnergyPerAtomKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyEnergyPerAtom[float, S], other: W, /
+    ) -> EnergyEnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyEnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyEnergyPerAtom[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, EnergyPerAtomKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, EnergyPerAtomKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyEnergyPerAtom[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class EnergyEnergyPerAtom(Quantity[Mul[EnergyKind, EnergyPerAtomKind], V, S]):
     ) -> EnergyEnergyPerAtom[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyEnergyPerAtom[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyEnergyPerAtom[float, S], other: W, /
+    ) -> EnergyEnergyPerAtom[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyEnergyPerAtom[V, S]: ...
+    @override
+    def item(self) -> EnergyEnergyPerAtom[float, S]: ...
     @overload
     @override
     def __rtruediv__(

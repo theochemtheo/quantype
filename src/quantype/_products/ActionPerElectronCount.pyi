@@ -102,6 +102,33 @@ class ActionPerElectronCount(Quantity[Div[ActionKind, ElectronCountKind], V, S])
     def _rtruediv_Action(self, other: Action[V, S], /) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ActionPerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ActionPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ActionPerElectronCount[float, S], other: W, /
+    ) -> ActionPerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ActionPerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ActionPerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ActionKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ActionKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ActionPerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class ActionPerElectronCount(Quantity[Div[ActionKind, ElectronCountKind], V, S])
     ) -> ActionPerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ActionPerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ActionPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ActionPerElectronCount[float, S], other: W, /
+    ) -> ActionPerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ActionPerElectronCount[V, S]: ...
+    @override
+    def item(self) -> ActionPerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

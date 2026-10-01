@@ -117,6 +117,27 @@ class ParticleDensityDipoleMoment(
     ) -> Quantity[Div[Mul[ParticleDensityKind, DipoleMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ParticleDensityDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ParticleDensityDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityDipoleMoment[float, S], other: W, /
+    ) -> ParticleDensityDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensityDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -130,6 +151,23 @@ class ParticleDensityDipoleMoment(
     ) -> ParticleDensityDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensityDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ParticleDensityDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityDipoleMoment[float, S], other: W, /
+    ) -> ParticleDensityDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ParticleDensityDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

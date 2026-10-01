@@ -98,6 +98,33 @@ class VolumePerPressure(Quantity[Div[VolumeKind, PressureKind], V, S]):
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerPressure[float, S], other: Pressure[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerPressure[float, S], other: W, /
+    ) -> VolumePerPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +136,19 @@ class VolumePerPressure(Quantity[Div[VolumeKind, PressureKind], V, S]):
     ) -> VolumePerPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerPressure[float, S], other: W, /
+    ) -> VolumePerPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerPressure[V, S]: ...
+    @override
+    def item(self) -> VolumePerPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

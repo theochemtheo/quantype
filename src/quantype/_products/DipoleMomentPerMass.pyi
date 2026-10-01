@@ -100,6 +100,33 @@ class DipoleMomentPerMass(Quantity[Div[DipoleMomentKind, MassKind], V, S]):
     def _rtruediv_DipoleMoment(self, other: DipoleMoment[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: DipoleMomentPerMass[float, S], other: Mass[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Mass[V, S] | Mass[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: DipoleMomentPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMomentPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: DipoleMomentPerMass[float, S], other: W, /
+    ) -> DipoleMomentPerMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> DipoleMomentPerMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: DipoleMomentPerMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> DipoleMomentPerMass[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class DipoleMomentPerMass(Quantity[Div[DipoleMomentKind, MassKind], V, S]):
     ) -> DipoleMomentPerMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> DipoleMomentPerMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: DipoleMomentPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMomentPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: DipoleMomentPerMass[float, S], other: W, /
+    ) -> DipoleMomentPerMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> DipoleMomentPerMass[V, S]: ...
+    @override
+    def item(self) -> DipoleMomentPerMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

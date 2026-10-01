@@ -137,6 +137,41 @@ class ChargePerPressure(Quantity[Div[ChargeKind, PressureKind], V, S]):
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerPressure[float, S], other: Pressure[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerPressure[float, S], other: ElectricPotential[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerPressure[float, S], other: W, /
+    ) -> ChargePerPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -148,6 +183,19 @@ class ChargePerPressure(Quantity[Div[ChargeKind, PressureKind], V, S]):
     ) -> ChargePerPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerPressure[float, S], other: W, /
+    ) -> ChargePerPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerPressure[V, S]: ...
+    @override
+    def item(self) -> ChargePerPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

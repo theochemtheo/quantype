@@ -112,6 +112,33 @@ class ActionPerTemperatureRate(Quantity[Div[ActionKind, TemperatureRateKind], V,
     def _rtruediv_Action(self, other: Action[V, S], /) -> TemperatureRate[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ActionPerTemperatureRate[float, S], other: TemperatureRate[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ActionPerTemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ActionPerTemperatureRate[float, S], other: W, /
+    ) -> ActionPerTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ActionPerTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ActionPerTemperatureRate[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ActionKind, TemperatureRateKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ActionKind, TemperatureRateKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ActionPerTemperatureRate[V, S]: ...
     @overload
     def __rmul__(
@@ -123,6 +150,19 @@ class ActionPerTemperatureRate(Quantity[Div[ActionKind, TemperatureRateKind], V,
     ) -> ActionPerTemperatureRate[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ActionPerTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ActionPerTemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ActionPerTemperatureRate[float, S], other: W, /
+    ) -> ActionPerTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ActionPerTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> ActionPerTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

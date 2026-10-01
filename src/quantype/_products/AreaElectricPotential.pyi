@@ -122,6 +122,25 @@ class AreaElectricPotential(Quantity[Mul[AreaKind, ElectricPotentialKind], V, S]
     ) -> Quantity[Div[Mul[AreaKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaElectricPotential[float, S], other: W, /
+    ) -> AreaElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -133,6 +152,19 @@ class AreaElectricPotential(Quantity[Mul[AreaKind, ElectricPotentialKind], V, S]
     ) -> AreaElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaElectricPotential[float, S], other: W, /
+    ) -> AreaElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaElectricPotential[V, S]: ...
+    @override
+    def item(self) -> AreaElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -127,6 +127,33 @@ class TemperatureFrequency(Quantity[Mul[TemperatureKind, FrequencyKind], V, S]):
     def _rtruediv_Temperature(self, other: Temperature[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureFrequency[float, S], other: Time[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureFrequency[float, S], other: W, /
+    ) -> TemperatureFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -138,6 +165,19 @@ class TemperatureFrequency(Quantity[Mul[TemperatureKind, FrequencyKind], V, S]):
     ) -> TemperatureFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureFrequency[float, S], other: W, /
+    ) -> TemperatureFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureFrequency[V, S]: ...
+    @override
+    def item(self) -> TemperatureFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -150,6 +150,45 @@ class AreaPerEnergy(Quantity[Div[AreaKind, EnergyKind], V, S]):
     def _rtruediv_Area(self, other: Area[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerEnergy[float, S], other: Energy[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Energy[V, S] | Energy[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerEnergy[float, S], other: Force[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerEnergy[float, S], other: ForceConstant[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerEnergy[float, S], other: W, /
+    ) -> AreaPerEnergy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerEnergy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerEnergy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, EnergyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, EnergyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerEnergy[V, S]: ...
     @overload
     def __rmul__(
@@ -161,6 +200,19 @@ class AreaPerEnergy(Quantity[Div[AreaKind, EnergyKind], V, S]):
     ) -> AreaPerEnergy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerEnergy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerEnergy[float, S], other: W, /
+    ) -> AreaPerEnergy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerEnergy[V, S]: ...
+    @override
+    def item(self) -> AreaPerEnergy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

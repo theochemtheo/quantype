@@ -147,6 +147,29 @@ class ForceConstantElectricPotential(
     ) -> Quantity[Div[Mul[ForceConstantKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceConstantElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantElectricPotential[float, S], other: W, /
+    ) -> ForceConstantElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ForceConstantElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -162,6 +185,23 @@ class ForceConstantElectricPotential(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ForceConstantElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantElectricPotential[float, S], other: W, /
+    ) -> ForceConstantElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ForceConstantElectricPotential[V, S]: ...
+    @override
+    def item(self) -> ForceConstantElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -233,6 +233,65 @@ class TimeCharge(Quantity[Mul[TimeKind, ChargeKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeCharge[float, S], other: Velocity[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeCharge[float, S], other: Frequency[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeCharge[float, S], other: InverseTime[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeCharge[float, S], other: ElectricPotential[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeCharge[float, S], other: ElectricField[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeCharge[float, S], other: W, /
+    ) -> TimeCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -244,6 +303,19 @@ class TimeCharge(Quantity[Mul[TimeKind, ChargeKind], V, S]):
     ) -> TimeCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeCharge[float, S], other: W, /
+    ) -> TimeCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeCharge[V, S]: ...
+    @override
+    def item(self) -> TimeCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

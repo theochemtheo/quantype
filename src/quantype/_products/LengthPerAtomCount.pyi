@@ -123,6 +123,41 @@ class LengthPerAtomCount(Quantity[Div[LengthKind, AtomCountKind], V, S]):
     def _rtruediv_EnergyPerAtom(self, other: EnergyPerAtom[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthPerAtomCount[float, S], other: Force[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Force[V, S] | Force[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerAtomCount[float, S], other: AtomCount[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthPerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthPerAtomCount[float, S], other: W, /
+    ) -> LengthPerAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthPerAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthPerAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[LengthKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[LengthKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthPerAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -134,6 +169,19 @@ class LengthPerAtomCount(Quantity[Div[LengthKind, AtomCountKind], V, S]):
     ) -> LengthPerAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthPerAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthPerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthPerAtomCount[float, S], other: W, /
+    ) -> LengthPerAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthPerAtomCount[V, S]: ...
+    @override
+    def item(self) -> LengthPerAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

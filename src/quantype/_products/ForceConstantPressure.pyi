@@ -94,6 +94,25 @@ class ForceConstantPressure(Quantity[Mul[ForceConstantKind, PressureKind], V, S]
     ) -> Quantity[Div[Mul[ForceConstantKind, PressureKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceConstantPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPressure[float, S], other: W, /
+    ) -> ForceConstantPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class ForceConstantPressure(Quantity[Mul[ForceConstantKind, PressureKind], V, S]
     ) -> ForceConstantPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPressure[float, S], other: W, /
+    ) -> ForceConstantPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantPressure[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

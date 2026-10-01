@@ -98,6 +98,33 @@ class AnglePerPressure(Quantity[Div[AngleKind, PressureKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerPressure[float, S], other: Pressure[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerPressure[float, S], other: W, /
+    ) -> AnglePerPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +136,19 @@ class AnglePerPressure(Quantity[Div[AngleKind, PressureKind], V, S]):
     ) -> AnglePerPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerPressure[float, S], other: W, /
+    ) -> AnglePerPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerPressure[V, S]: ...
+    @override
+    def item(self) -> AnglePerPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

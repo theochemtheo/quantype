@@ -92,6 +92,25 @@ class ChargeAction(Quantity[Mul[ChargeKind, ActionKind], V, S]):
     ) -> Quantity[Div[Mul[ChargeKind, ActionKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ChargeAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargeAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargeAction[float, S], other: W, /
+    ) -> ChargeAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargeAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargeAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ChargeKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ChargeKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargeAction[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class ChargeAction(Quantity[Mul[ChargeKind, ActionKind], V, S]):
     ) -> ChargeAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargeAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargeAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargeAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargeAction[float, S], other: W, /
+    ) -> ChargeAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargeAction[V, S]: ...
+    @override
+    def item(self) -> ChargeAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

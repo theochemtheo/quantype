@@ -106,6 +106,33 @@ class ForcePerElectronDensity(Quantity[Div[ForceKind, ElectronDensityKind], V, S
     def _rtruediv_Force(self, other: Force[V, S], /) -> ElectronDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForcePerElectronDensity[float, S], other: ElectronDensity[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronDensity[V, S] | ElectronDensity[float, S], /
+    ) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForcePerElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForcePerElectronDensity[float, S], other: W, /
+    ) -> ForcePerElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForcePerElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForcePerElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForcePerElectronDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class ForcePerElectronDensity(Quantity[Div[ForceKind, ElectronDensityKind], V, S
     ) -> ForcePerElectronDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForcePerElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForcePerElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForcePerElectronDensity[float, S], other: W, /
+    ) -> ForcePerElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForcePerElectronDensity[V, S]: ...
+    @override
+    def item(self) -> ForcePerElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -96,6 +96,25 @@ class AngleElectricPotential(Quantity[Mul[AngleKind, ElectricPotentialKind], V, 
     ) -> Quantity[Div[Mul[AngleKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AngleElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AngleElectricPotential[float, S], other: W, /
+    ) -> AngleElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AngleElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AngleElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AngleElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class AngleElectricPotential(Quantity[Mul[AngleKind, ElectricPotentialKind], V, 
     ) -> AngleElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AngleElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AngleElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AngleElectricPotential[float, S], other: W, /
+    ) -> AngleElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AngleElectricPotential[V, S]: ...
+    @override
+    def item(self) -> AngleElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

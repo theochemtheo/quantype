@@ -104,6 +104,25 @@ class MagneticMomentAtomCount(Quantity[Mul[MagneticMomentKind, AtomCountKind], V
     ) -> Quantity[Div[Mul[MagneticMomentKind, AtomCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MagneticMomentAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagneticMomentAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagneticMomentAtomCount[float, S], other: W, /
+    ) -> MagneticMomentAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MagneticMomentAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagneticMomentAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagneticMomentAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +134,19 @@ class MagneticMomentAtomCount(Quantity[Mul[MagneticMomentKind, AtomCountKind], V
     ) -> MagneticMomentAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagneticMomentAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagneticMomentAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagneticMomentAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagneticMomentAtomCount[float, S], other: W, /
+    ) -> MagneticMomentAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MagneticMomentAtomCount[V, S]: ...
+    @override
+    def item(self) -> MagneticMomentAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

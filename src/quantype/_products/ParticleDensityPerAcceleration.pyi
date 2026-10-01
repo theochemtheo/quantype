@@ -129,6 +129,37 @@ class ParticleDensityPerAcceleration(
     ) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ParticleDensityPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ParticleDensityPerAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ParticleDensityPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityPerAcceleration[float, S], other: W, /
+    ) -> ParticleDensityPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ParticleDensityPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -144,6 +175,23 @@ class ParticleDensityPerAcceleration(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ParticleDensityPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityPerAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ParticleDensityPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityPerAcceleration[float, S], other: W, /
+    ) -> ParticleDensityPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ParticleDensityPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

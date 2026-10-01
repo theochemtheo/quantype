@@ -136,6 +136,41 @@ class VolumePerElectricField(Quantity[Div[VolumeKind, ElectricFieldKind], V, S])
     ) -> EnergyDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerElectricField[float, S], other: Pressure[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumePerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerElectricField[float, S], other: W, /
+    ) -> VolumePerElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -147,6 +182,19 @@ class VolumePerElectricField(Quantity[Div[VolumeKind, ElectricFieldKind], V, S])
     ) -> VolumePerElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerElectricField[float, S], other: W, /
+    ) -> VolumePerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerElectricField[V, S]: ...
+    @override
+    def item(self) -> VolumePerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

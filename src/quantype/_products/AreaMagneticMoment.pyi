@@ -96,6 +96,25 @@ class AreaMagneticMoment(Quantity[Mul[AreaKind, MagneticMomentKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, MagneticMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaMagneticMoment[float, S], other: W, /
+    ) -> AreaMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class AreaMagneticMoment(Quantity[Mul[AreaKind, MagneticMomentKind], V, S]):
     ) -> AreaMagneticMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaMagneticMoment[float, S], other: W, /
+    ) -> AreaMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> AreaMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -83,6 +83,25 @@ class MassDensitySquared(Quantity[Pow[MassDensityKind, Literal[2]], V, S]):
     ) -> Quantity[Div[Pow[MassDensityKind, Literal[2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MassDensitySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensitySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensitySquared[float, S], other: W, /
+    ) -> MassDensitySquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensitySquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensitySquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MassDensityKind, Literal[2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MassDensityKind, Literal[2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensitySquared[V, S]: ...
     @overload
     def __rmul__(
@@ -94,6 +113,19 @@ class MassDensitySquared(Quantity[Pow[MassDensityKind, Literal[2]], V, S]):
     ) -> MassDensitySquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensitySquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensitySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensitySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensitySquared[float, S], other: W, /
+    ) -> MassDensitySquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensitySquared[V, S]: ...
+    @override
+    def item(self) -> MassDensitySquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

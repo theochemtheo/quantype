@@ -142,6 +142,31 @@ class AreaVelocity(Quantity[Mul[AreaKind, VelocityKind], V, S]):
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaVelocity[float, S], other: Time[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaVelocity[float, S], other: W, /
+    ) -> AreaVelocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaVelocity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaVelocity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, VelocityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, VelocityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaVelocity[V, S]: ...
     @overload
     def __rmul__(
@@ -153,6 +178,19 @@ class AreaVelocity(Quantity[Mul[AreaKind, VelocityKind], V, S]):
     ) -> AreaVelocity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaVelocity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaVelocity[float, S], other: W, /
+    ) -> AreaVelocity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaVelocity[V, S]: ...
+    @override
+    def item(self) -> AreaVelocity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

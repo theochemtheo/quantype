@@ -134,6 +134,31 @@ class LengthAcceleration(Quantity[Mul[LengthKind, AccelerationKind], V, S]):
     def _rtruediv_Energy(self, other: Energy[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthAcceleration[float, S], other: Mass[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthAcceleration[float, S], other: W, /
+    ) -> LengthAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -145,6 +170,19 @@ class LengthAcceleration(Quantity[Mul[LengthKind, AccelerationKind], V, S]):
     ) -> LengthAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthAcceleration[float, S], other: W, /
+    ) -> LengthAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthAcceleration[V, S]: ...
+    @override
+    def item(self) -> LengthAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -160,6 +160,49 @@ class EntropyPerCharge(Quantity[Div[EntropyKind, ChargeKind], V, S]):
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Charge[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerCharge[float, S], other: Temperature[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerCharge[float, S], other: TemperatureDifference[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerCharge[float, S], other: Charge[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerCharge[float, S], other: W, /
+    ) -> EntropyPerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -171,6 +214,19 @@ class EntropyPerCharge(Quantity[Div[EntropyKind, ChargeKind], V, S]):
     ) -> EntropyPerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerCharge[float, S], other: W, /
+    ) -> EntropyPerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerCharge[V, S]: ...
+    @override
+    def item(self) -> EntropyPerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

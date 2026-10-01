@@ -127,6 +127,37 @@ class ForceConstantPerElectronCount(
     ) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerElectronCount[float, S], other: W, /
+    ) -> ForceConstantPerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ForceConstantPerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +171,23 @@ class ForceConstantPerElectronCount(
     ) -> ForceConstantPerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantPerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerElectronCount[float, S], other: W, /
+    ) -> ForceConstantPerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ForceConstantPerElectronCount[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

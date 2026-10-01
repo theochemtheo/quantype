@@ -143,6 +143,43 @@ class ForceConstantPerAtomCount(Quantity[Div[ForceConstantKind, AtomCountKind], 
     ) -> AtomCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerAtomCount[float, S], other: Area[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerAtomCount[float, S], other: AtomCount[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerAtomCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerAtomCount[float, S], other: W, /
+    ) -> ForceConstantPerAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantPerAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPerAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -156,6 +193,21 @@ class ForceConstantPerAtomCount(Quantity[Div[ForceConstantKind, AtomCountKind], 
     ) -> ForceConstantPerAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantPerAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerAtomCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerAtomCount[float, S], other: W, /
+    ) -> ForceConstantPerAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantPerAtomCount[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

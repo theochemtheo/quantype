@@ -164,6 +164,47 @@ class AreaPerDipoleMoment(Quantity[Div[AreaKind, DipoleMomentKind], V, S]):
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerDipoleMoment[float, S], other: ForceConstant[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerDipoleMoment[float, S], other: Charge[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Charge[V, S] | Charge[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerDipoleMoment[float, S], other: W, /
+    ) -> AreaPerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -175,6 +216,19 @@ class AreaPerDipoleMoment(Quantity[Div[AreaKind, DipoleMomentKind], V, S]):
     ) -> AreaPerDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerDipoleMoment[float, S], other: W, /
+    ) -> AreaPerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> AreaPerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

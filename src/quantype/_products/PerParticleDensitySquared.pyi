@@ -82,6 +82,27 @@ class PerParticleDensitySquared(Quantity[Pow[ParticleDensityKind, Literal[-2]], 
     ) -> Quantity[Div[Pow[ParticleDensityKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerParticleDensitySquared[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> PerParticleDensitySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerParticleDensitySquared[float, S], other: W, /
+    ) -> PerParticleDensitySquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerParticleDensitySquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerParticleDensitySquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ParticleDensityKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ParticleDensityKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerParticleDensitySquared[V, S]: ...
     @overload
     def __rmul__(
@@ -95,6 +116,21 @@ class PerParticleDensitySquared(Quantity[Pow[ParticleDensityKind, Literal[-2]], 
     ) -> PerParticleDensitySquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerParticleDensitySquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerParticleDensitySquared[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> PerParticleDensitySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerParticleDensitySquared[float, S], other: W, /
+    ) -> PerParticleDensitySquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerParticleDensitySquared[V, S]: ...
+    @override
+    def item(self) -> PerParticleDensitySquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

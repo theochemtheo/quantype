@@ -74,6 +74,25 @@ class PerAtomCountSquared(Quantity[Pow[AtomCountKind, Literal[-2]], V, S]):
     ) -> Quantity[Div[Pow[AtomCountKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerAtomCountSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerAtomCountSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerAtomCountSquared[float, S], other: W, /
+    ) -> PerAtomCountSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerAtomCountSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerAtomCountSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[AtomCountKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[AtomCountKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerAtomCountSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerAtomCountSquared(Quantity[Pow[AtomCountKind, Literal[-2]], V, S]):
     ) -> PerAtomCountSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerAtomCountSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerAtomCountSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerAtomCountSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerAtomCountSquared[float, S], other: W, /
+    ) -> PerAtomCountSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerAtomCountSquared[V, S]: ...
+    @override
+    def item(self) -> PerAtomCountSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

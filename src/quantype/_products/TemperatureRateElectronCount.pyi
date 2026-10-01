@@ -117,6 +117,29 @@ class TemperatureRateElectronCount(
     ) -> Quantity[Div[Mul[TemperatureRateKind, ElectronCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureRateElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRateElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRateElectronCount[float, S], other: W, /
+    ) -> TemperatureRateElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRateElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRateElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureRateKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureRateKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureRateElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -130,6 +153,23 @@ class TemperatureRateElectronCount(
     ) -> TemperatureRateElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureRateElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRateElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRateElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRateElectronCount[float, S], other: W, /
+    ) -> TemperatureRateElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRateElectronCount[V, S]: ...
+    @override
+    def item(self) -> TemperatureRateElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

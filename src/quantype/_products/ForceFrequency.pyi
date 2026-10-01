@@ -153,6 +153,31 @@ class ForceFrequency(Quantity[Mul[ForceKind, FrequencyKind], V, S]):
     def _rtruediv_Force(self, other: Force[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceFrequency[float, S], other: Time[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceFrequency[float, S], other: W, /
+    ) -> ForceFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -164,6 +189,19 @@ class ForceFrequency(Quantity[Mul[ForceKind, FrequencyKind], V, S]):
     ) -> ForceFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceFrequency[float, S], other: W, /
+    ) -> ForceFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceFrequency[V, S]: ...
+    @override
+    def item(self) -> ForceFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

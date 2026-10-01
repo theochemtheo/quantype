@@ -98,6 +98,31 @@ class AnglePerMass(Quantity[Div[AngleKind, MassKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerMass[float, S], other: Mass[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerMass[float, S], other: W, /
+    ) -> AnglePerMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerMass[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +134,19 @@ class AnglePerMass(Quantity[Div[AngleKind, MassKind], V, S]):
     ) -> AnglePerMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerMass[float, S], other: W, /
+    ) -> AnglePerMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerMass[V, S]: ...
+    @override
+    def item(self) -> AnglePerMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

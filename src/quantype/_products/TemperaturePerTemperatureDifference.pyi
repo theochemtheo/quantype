@@ -191,6 +191,53 @@ class TemperaturePerTemperatureDifference(
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Entropy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperaturePerTemperatureDifference[float, S], other: Energy[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Energy[V, S] | Energy[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TemperaturePerTemperatureDifference[float, S],
+        other: TemperatureDifference[W, S],
+        /,
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TemperaturePerTemperatureDifference[float, S], other: Entropy[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperaturePerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperaturePerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperaturePerTemperatureDifference[float, S], other: W, /
+    ) -> TemperaturePerTemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperaturePerTemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperaturePerTemperatureDifference[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, TemperatureDifferenceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, TemperatureDifferenceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperaturePerTemperatureDifference[V, S]: ...
@@ -208,6 +255,23 @@ class TemperaturePerTemperatureDifference(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperaturePerTemperatureDifference[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperaturePerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperaturePerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperaturePerTemperatureDifference[float, S], other: W, /
+    ) -> TemperaturePerTemperatureDifference[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperaturePerTemperatureDifference[V, S]: ...
+    @override
+    def item(self) -> TemperaturePerTemperatureDifference[float, S]: ...
     @overload
     @override
     def __rtruediv__(

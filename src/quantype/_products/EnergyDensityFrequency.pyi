@@ -135,6 +135,33 @@ class EnergyDensityFrequency(Quantity[Mul[EnergyDensityKind, FrequencyKind], V, 
     def _rtruediv_EnergyDensity(self, other: EnergyDensity[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyDensityFrequency[float, S], other: Time[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyDensityFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityFrequency[float, S], other: W, /
+    ) -> EnergyDensityFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyDensityFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyDensityFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +173,19 @@ class EnergyDensityFrequency(Quantity[Mul[EnergyDensityKind, FrequencyKind], V, 
     ) -> EnergyDensityFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyDensityFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityFrequency[float, S], other: W, /
+    ) -> EnergyDensityFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyDensityFrequency[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

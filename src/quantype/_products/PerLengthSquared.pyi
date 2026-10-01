@@ -166,6 +166,53 @@ class PerLengthSquared(Quantity[Pow[LengthKind, Literal[-2]], V, S]):
     ) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerLengthSquared[float, S], other: Area[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerLengthSquared[float, S], other: Volume[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerLengthSquared[float, S], other: Energy[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerLengthSquared[float, S], other: Force[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerLengthSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerLengthSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerLengthSquared[float, S], other: W, /
+    ) -> PerLengthSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerLengthSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerLengthSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[LengthKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[LengthKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerLengthSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -177,6 +224,19 @@ class PerLengthSquared(Quantity[Pow[LengthKind, Literal[-2]], V, S]):
     ) -> PerLengthSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerLengthSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerLengthSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerLengthSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerLengthSquared[float, S], other: W, /
+    ) -> PerLengthSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerLengthSquared[V, S]: ...
+    @override
+    def item(self) -> PerLengthSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

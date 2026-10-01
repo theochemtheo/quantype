@@ -104,6 +104,25 @@ class ForceConstantTemperature(Quantity[Mul[ForceConstantKind, TemperatureKind],
     ) -> Quantity[Div[Mul[ForceConstantKind, TemperatureKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceConstantTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantTemperature[float, S], other: W, /
+    ) -> ForceConstantTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +134,19 @@ class ForceConstantTemperature(Quantity[Mul[ForceConstantKind, TemperatureKind],
     ) -> ForceConstantTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantTemperature[float, S], other: W, /
+    ) -> ForceConstantTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantTemperature[V, S]: ...
+    @override
+    def item(self) -> ForceConstantTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

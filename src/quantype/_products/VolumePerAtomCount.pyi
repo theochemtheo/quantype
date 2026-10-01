@@ -157,6 +157,49 @@ class VolumePerAtomCount(Quantity[Div[VolumeKind, AtomCountKind], V, S]):
     ) -> EnergyDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerAtomCount[float, S], other: Pressure[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumePerAtomCount[float, S], other: ParticleDensity[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumePerAtomCount[float, S], other: AtomCount[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerAtomCount[float, S], other: W, /
+    ) -> VolumePerAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -168,6 +211,19 @@ class VolumePerAtomCount(Quantity[Div[VolumeKind, AtomCountKind], V, S]):
     ) -> VolumePerAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerAtomCount[float, S], other: W, /
+    ) -> VolumePerAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerAtomCount[V, S]: ...
+    @override
+    def item(self) -> VolumePerAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

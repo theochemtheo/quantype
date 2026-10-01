@@ -117,6 +117,29 @@ class EnergyDensityEnergyPerVolume(
     ) -> Quantity[Div[Mul[EnergyDensityKind, EnergyPerVolumeKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyDensityEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyDensityEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityEnergyPerVolume[float, S], other: W, /
+    ) -> EnergyDensityEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> EnergyDensityEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyDensityEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -130,6 +153,23 @@ class EnergyDensityEnergyPerVolume(
     ) -> EnergyDensityEnergyPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyDensityEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyDensityEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityEnergyPerVolume[float, S], other: W, /
+    ) -> EnergyDensityEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> EnergyDensityEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

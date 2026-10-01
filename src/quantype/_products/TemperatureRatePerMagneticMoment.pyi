@@ -135,6 +135,37 @@ class TemperatureRatePerMagneticMoment(
     ) -> MagneticMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureRatePerMagneticMoment[float, S], other: MagneticMoment[W, S], /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> TemperatureRate[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureRatePerMagneticMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRatePerMagneticMoment[float, S], other: W, /
+    ) -> TemperatureRatePerMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRatePerMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRatePerMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureRatePerMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -150,6 +181,23 @@ class TemperatureRatePerMagneticMoment(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureRatePerMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRatePerMagneticMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRatePerMagneticMoment[float, S], other: W, /
+    ) -> TemperatureRatePerMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRatePerMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> TemperatureRatePerMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

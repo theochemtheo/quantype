@@ -139,6 +139,33 @@ class MagneticMomentPerTime(Quantity[Div[MagneticMomentKind, TimeKind], V, S]):
     ) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MagneticMomentPerTime[float, S], other: Time[W, S], /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> MagneticMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MagneticMomentPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagneticMomentPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagneticMomentPerTime[float, S], other: W, /
+    ) -> MagneticMomentPerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MagneticMomentPerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagneticMomentPerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MagneticMomentKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MagneticMomentKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagneticMomentPerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -150,6 +177,19 @@ class MagneticMomentPerTime(Quantity[Div[MagneticMomentKind, TimeKind], V, S]):
     ) -> MagneticMomentPerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagneticMomentPerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagneticMomentPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagneticMomentPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagneticMomentPerTime[float, S], other: W, /
+    ) -> MagneticMomentPerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MagneticMomentPerTime[V, S]: ...
+    @override
+    def item(self) -> MagneticMomentPerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

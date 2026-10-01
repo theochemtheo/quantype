@@ -91,6 +91,33 @@ class PerAngle(Quantity[Pow[AngleKind, Literal[-1]], V, S]):
     ) -> Quantity[Div[Pow[AngleKind, Literal[-1]], K], V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerAngle[float, S], other: Angle[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Angle[V, S] | Angle[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerAngle[float, S], other: W, /
+    ) -> PerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[AngleKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[AngleKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -102,6 +129,19 @@ class PerAngle(Quantity[Pow[AngleKind, Literal[-1]], V, S]):
     ) -> PerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerAngle[float, S], other: W, /
+    ) -> PerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerAngle[V, S]: ...
+    @override
+    def item(self) -> PerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

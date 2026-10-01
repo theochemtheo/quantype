@@ -214,10 +214,16 @@ def dimensionless_stubs(name: str) -> str:
     return text
 
 
+# `a @ b` multiplies kinds as `a * b` does, so it shares the product protocols.
+MATMUL = ("mul", "__matmul__", "Mul", "_RMul", "_rmul_")
+
+
 def multiplicative_stubs(name: str, catalogue: Catalogue, table: Table) -> str:
     text = ""
-    for _, method, expression, protocol, _ in PROTOCOLS:
+    for _, method, expression, protocol, _ in (*PROTOCOLS, MATMUL):
         signatures = scaling(method, name, lambda storage: f"{name}[{storage}, S]")
+        if method == "__matmul__":
+            signatures = signatures[1:]  # Scalars have no matrix product.
         signatures += [
             f"def {method}[R](self: {name}[float, S], other: {protocol}{name}F[S, R], /) -> R: ...",
             f"def {method}[R](self, other: {protocol}{name}[{name}[V, S], R], /) -> R: ...",
@@ -264,6 +270,8 @@ def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
     # A spread of absolute temperatures is a temperature difference.
     spread = "TemperatureDifference" if name == "Temperature" else name
     text += f"    @override\n    def std(self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False) -> {spread}[V, S]: ...\n"
+    text += f"    @override\n    def var(self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False) -> {power_type(spread, 2, catalogue, table)}: ...\n"
+    text += f"    @override\n    def item(self) -> {name}[float, S]: ...\n"
     # Absolute temperatures scale and multiply, but a sum of them is meaningless.
     if name != "Temperature":
         text += f"    @override\n    def sum(self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False) -> {name}[V, S]: ...\n"
@@ -272,6 +280,10 @@ def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
         text += dimensionless_stubs(name)
     text += overloads(
         scaling("__rmul__", name, lambda storage: f"{name}[{storage}, S]"),
+        overrides=True,
+    )
+    text += overloads(
+        scaling("__rmatmul__", name, lambda storage: f"{name}[{storage}, S]")[1:],
         overrides=True,
     )
     inverse = product_type("div", "Dimensionless", name, catalogue, table)
@@ -387,8 +399,18 @@ def structural_quantity_stub() -> str:
             overrides=True,
         )
     text += overloads(
-        structural_scaling("__rmul__", "Quantity[K, {}, S]"), overrides=True
+        [
+            *structural_scaling("__matmul__", "Quantity[K, {}, S]")[1:],
+            "def __matmul__[A, B, L, W](self: _StructuralQuantity[A, B, float, S], other: Quantity[L, W, S], /) -> Quantity[Mul[K, L], W, S]: ...",
+            "def __matmul__[A, B, L](self: _StructuralQuantity[A, B, V, S], other: Quantity[L, V, S] | Quantity[L, float, S], /) -> Quantity[Mul[K, L], V, S]: ...",
+        ],
+        overrides=True,
     )
+    for method in ("__rmul__", "__rmatmul__"):
+        scaled = structural_scaling(method, "Quantity[K, {}, S]")
+        text += overloads(
+            scaled[1:] if method == "__rmatmul__" else scaled, overrides=True
+        )
     # The shared base necessarily uses the builtin marker. This refinement is
     # nominal, not a widening; each catalogue has its own structural base.
     text += overloads(
@@ -408,6 +430,14 @@ def structural_quantity_stub() -> str:
         ],
         overrides=True,
     )
+    text += overloads(
+        [
+            "def var[A, B](self: _StructuralQuantity[A, B, V, S], axis: int | None = None, *, ddof: int = 0, keepdims: bool = False) -> Quantity[Pow[K, Literal[2]], V, S]: ...",
+            "def var(self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False) -> Quantity[Any, V, S]: ...",
+        ],
+        overrides=True,
+    )
+    text += "    @override\n    def item(self) -> Quantity[K, float, S]: ...\n"
     return text
 
 
@@ -756,12 +786,15 @@ def adapter_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
 
 
 NUMPY_FUNCTIONS = (
-    "abs", "absolute", "allclose", "arccos", "arcsin", "arctan", "arctan2", "clip",
-    "concatenate", "cos", "cosh", "cross", "cumsum", "diff", "dot", "exp",
-    "expand_dims", "expm1", "isclose", "isfinite", "isinf", "isnan", "linalg", "log",
-    "log1p", "log2", "log10", "max", "maximum", "mean", "min", "minimum", "reshape",
-    "sin", "sinh", "sqrt", "squeeze", "stack", "std", "sum", "tan", "tanh",
-    "transpose", "where", "zeros_like",
+    "abs", "absolute", "allclose", "arccos", "arcsin", "arctan", "arctan2",
+    "argmax", "argmin", "argsort", "clip", "concatenate", "cos", "cosh", "cross",
+    "cumsum", "diff", "dot", "exp", "expand_dims", "expm1", "fabs", "hypot",
+    "isclose", "isfinite", "isinf", "isnan", "linalg", "linspace", "log", "log10",
+    "log1p", "log2", "matmul", "max", "maximum", "mean", "median", "min", "minimum",
+    "nanmax", "nanmean", "nanmedian", "nanmin", "nanstd", "nansum", "nanvar",
+    "outer", "percentile", "quantile", "reshape", "sign", "sin", "sinh", "sort",
+    "sqrt", "square", "squeeze", "stack", "std", "sum", "tan", "tanh", "transpose",
+    "trapezoid", "var", "where", "zeros_like",
 )  # fmt: skip
 # Unary functions with unit rules: names, argument kind, result kind.
 NUMPY_UNARY = (
@@ -790,6 +823,28 @@ RAW_UNARY = (
 )
 
 
+STRUCTURES = ("Mul", "Div", "Pow")
+
+
+def unnamed_products(
+    function: str, first: str, second: str, extra: str = ""
+) -> list[str]:
+    """A product with an unnamed operand, which no protocol member names.
+
+    Named operands are left to the protocol overloads: an overlapping fallback
+    makes Pyright infer Any when array storage has Any in its shape.
+    """
+    left = [
+        f"def {function}[A, B, L, V, S: UnitSystem]({first}: _BaseQuantity[{e}[A, B], V, S], {second}: _BaseQuantity[L, V, S]{extra}) -> Quantity[Mul[{e}[A, B], L], V, S]: ..."
+        for e in STRUCTURES
+    ]
+    right = [
+        f"def {function}[K, A, B, V, S: UnitSystem]({first}: _BaseQuantity[K, V, S], {second}: _BaseQuantity[{e}[A, B], V, S]{extra}) -> Quantity[Mul[K, {e}[A, B]], V, S]: ..."
+        for e in STRUCTURES
+    ]
+    return left + right
+
+
 def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     """``qnp``: NumPy's names with unit rules, typed with the catalogue's classes."""
     text = (
@@ -799,7 +854,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         + "# pyright: reportPrivateUsage=false\n"
     )
     text += "from collections.abc import Sequence\nfrom typing import Any, Literal, overload\n"
-    text += "import numpy as np\nfrom quantype.core import Quantity as _BaseQuantity, _Numerical\n"
+    text += "import numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Quantity as _BaseQuantity, _Numerical\n"
     text += "from quantype.systems import UnitSystem\n"
     text += (
         f"from {package}._generated import (" + ", ".join(catalogue.quantities) + ")\n"
@@ -809,7 +864,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         if package != "quantype"
         else "from quantype.core import Quantity\n"
     )
-    text += f"from {package}.kinds import Mul\n"
+    text += f"from {package}.kinds import Div, Mul, Pow\n"
     squares = sorted(
         (name, pair.left)
         for name, pair in table.pairs.items()
@@ -849,7 +904,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         "def sqrt[V, S: UnitSystem](x: Dimensionless[V, S], /) -> Dimensionless[V, S]: ..."
     )
     text += overloads([*roots, *(raw.format("sqrt") for raw in RAW_UNARY)], indent="")
-    for name in ("absolute", "abs"):
+    for name in ("absolute", "abs", "fabs"):
         text += overloads(
             [
                 f"def {name}[Q: {quantity}](x: Q, /) -> Q: ...",
@@ -865,7 +920,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         ],
         indent="",
     )
-    for name in ("maximum", "minimum"):
+    for name in ("maximum", "minimum", "hypot"):
         text += overloads(
             [
                 f"def {name}[Q: {quantity}](a: Q, b: Q, /) -> Q: ...",
@@ -897,23 +952,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
             ],
             indent="",
         )
-    # As for `*`: the second operand's protocol member names the result.
-    products = [
-        signature
-        for name in catalogue.quantities
-        for signature in (
-            f"def dot[S: UnitSystem, R](a: {name}[float, S], b: _RMul{name}F[S, R], /) -> R: ...",
-            f"def dot[V, S: UnitSystem, R](a: {name}[V, S], b: _RMul{name}[{name}[V, S], R], /) -> R: ...",
-        )
-    ]
-    text += overloads(
-        [
-            *products,
-            "def dot[K, L, V, S: UnitSystem](a: _BaseQuantity[K, V, S], b: _BaseQuantity[L, V, S], /) -> Quantity[Mul[K, L], V, S]: ...",
-            "def dot[A: _Numerical](a: A, b: A, /) -> Any: ...",
-        ],
-        indent="",
-    )
+    text += numpy_products(catalogue, quantity)
     text += overloads(
         [
             "def cross[K, L, V, S: UnitSystem](a: _BaseQuantity[K, V, S], b: _BaseQuantity[L, V, S], /, axis: int = ...) -> Quantity[Mul[K, L], V, S]: ...",
@@ -935,6 +974,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         ("squeeze", "axis: int | None = ..."),
         ("expand_dims", "axis: int"),
         ("cumsum", "axis: int | None = ..."),
+        ("sort", "axis: int = ..."),
     ):
         text += overloads(
             [
@@ -950,7 +990,10 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         ],
         indent="",
     )
-    for name in ("sum", "mean", "max", "min"):
+    for name in (
+        "sum", "mean", "max", "min", "median",
+        "nansum", "nanmean", "nanmax", "nanmin", "nanmedian",
+    ):  # fmt: skip
         text += overloads(
             [
                 f"def {name}[Q: {quantity}](x: Q, axis: int | None = ..., *, keepdims: bool = ...) -> Q: ...",
@@ -958,15 +1001,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
             ],
             indent="",
         )
-    # A spread or difference of absolute temperatures is a temperature difference.
-    text += overloads(
-        [
-            "def std[V, S: UnitSystem](x: Temperature[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...) -> TemperatureDifference[V, S]: ...",
-            f"def std[Q: {quantity}](x: Q, axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...) -> Q: ...",
-            "def std(x: _Numerical, axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...) -> Any: ...",
-        ],
-        indent="",
-    )
+    text += numpy_statistics(catalogue, table, quantity)
     text += overloads(
         [
             "def diff[V, S: UnitSystem](x: Temperature[V, S], n: int = ..., axis: int = ...) -> TemperatureDifference[V, S]: ...",
@@ -981,6 +1016,141 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     text += "    @overload\n    @staticmethod\n"
     text += "    def norm[A: _Numerical](x: A, axis: int | None = ..., *, keepdims: bool = ...) -> A: ...\n"
     text += "\nlinalg: _Linalg\n"
+    return text
+
+
+def numpy_products(catalogue: Catalogue, quantity: str) -> str:
+    """``dot``, ``matmul``, ``outer`` and ``trapezoid``: kinds multiply as for ``*``."""
+    text = ""
+    # As for `*`: the second operand's protocol member names the result.
+    products = [
+        signature
+        for name in catalogue.quantities
+        for signature in (
+            f"def dot[S: UnitSystem, R](a: {name}[float, S], b: _RMul{name}F[S, R], /) -> R: ...",
+            f"def dot[V, S: UnitSystem, R](a: {name}[V, S], b: _RMul{name}[{name}[V, S], R], /) -> R: ...",
+        )
+    ]
+    text += overloads(
+        [
+            *products,
+            *unnamed_products("dot", "a", "b", ", /"),
+            "def dot[A: _Numerical](a: A, b: A, /) -> Any: ...",
+        ],
+        indent="",
+    )
+    # A plain array multiplies a quantity, keeping its kind.
+    for name in ("matmul", "outer"):
+        text += overloads(
+            [
+                *(
+                    signature.replace("def dot", f"def {name}")
+                    for signature in products
+                ),
+                f"def {name}[Q: {quantity}](a: Q, b: _Numerical, /) -> Q: ...",
+                f"def {name}[Q: {quantity}](a: _Numerical, b: Q, /) -> Q: ...",
+                *unnamed_products(name, "a", "b", ", /"),
+                f"def {name}[A: _Numerical](a: A, b: A, /) -> A: ...",
+            ],
+            indent="",
+        )
+    # The integral of y over x is y times x; over a plain spacing, y's kind.
+    trapezoid = [
+        signature
+        for name in catalogue.quantities
+        for signature in (
+            f"def trapezoid[S: UnitSystem, R](y: {name}[float, S], x: _RMul{name}F[S, R], dx: float = ..., axis: int = ...) -> R: ...",
+            f"def trapezoid[V, S: UnitSystem, R](y: {name}[V, S], x: _RMul{name}[{name}[V, S], R], dx: float = ..., axis: int = ...) -> R: ...",
+        )
+    ]
+    text += overloads(
+        [
+            *trapezoid,
+            *unnamed_products(
+                "trapezoid", "y", "x", ", dx: float = ..., axis: int = ..."
+            ),
+            f"def trapezoid[Q: {quantity}](y: Q, x: _Numerical | None = ..., dx: float = ..., axis: int = ...) -> Q: ...",
+            "def trapezoid(y: _Numerical, x: _Numerical | None = ..., dx: float = ..., axis: int = ...) -> Any: ...",
+        ],
+        indent="",
+    )
+    return text
+
+
+def numpy_statistics(catalogue: Catalogue, table: Table, quantity: str) -> str:
+    """Quantiles, spreads, variances, squares, indices and ranges."""
+    text = ""
+    for name in ("percentile", "quantile"):
+        text += overloads(
+            [
+                f"def {name}[Q: {quantity}](x: Q, q: Any, axis: int | None = ..., *, keepdims: bool = ...) -> Q: ...",
+                f"def {name}(x: _Numerical, q: Any, axis: int | None = ..., *, keepdims: bool = ...) -> Any: ...",
+            ],
+            indent="",
+        )
+    # A spread or difference of absolute temperatures is a temperature difference.
+    spread = "axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ..."
+    for name in ("std", "nanstd"):
+        text += overloads(
+            [
+                f"def {name}[V, S: UnitSystem](x: Temperature[V, S], {spread}) -> TemperatureDifference[V, S]: ...",
+                f"def {name}[Q: {quantity}](x: Q, {spread}) -> Q: ...",
+                f"def {name}(x: _Numerical, {spread}) -> Any: ...",
+            ],
+            indent="",
+        )
+    # Variances and squares are named as `x ** 2` is.
+    for name, parameters, raw in (
+        ("var", f", {spread}", [f"def var(x: _Numerical, {spread}) -> Any: ..."]),
+        ("nanvar", f", {spread}", [f"def nanvar(x: _Numerical, {spread}) -> Any: ..."]),
+        ("square", ", /", [signature.format("square") for signature in RAW_UNARY]),
+    ):
+        squared = [
+            f"def {name}[V, S: UnitSystem](x: {kind}[V, S]{parameters}) -> {power_type(base, 2, catalogue, table)}: ..."
+            for kind in catalogue.quantities
+            for base in (
+                "TemperatureDifference"
+                if kind == "Temperature" and name != "square"
+                else kind,
+            )
+        ]
+        text += overloads(
+            [
+                *squared,
+                *(
+                    f"def {name}[A, B, V, S: UnitSystem](x: _BaseQuantity[{e}[A, B], V, S]{parameters}) -> Quantity[Pow[{e}[A, B], Literal[2]], V, S]: ..."
+                    for e in STRUCTURES
+                ),
+                *raw,
+            ],
+            indent="",
+        )
+    # Indices and signs carry no unit.
+    text += "def argsort(x: Any, axis: int = ...) -> Any: ...\n"
+    for name in ("argmin", "argmax"):
+        text += f"def {name}(x: Any, axis: int | None = ...) -> Any: ...\n"
+    text += overloads(
+        [
+            "def sign[V](x: _BaseQuantity[Any, V, Any], /) -> V: ...",
+            *(raw.format("sign") for raw in RAW_UNARY),
+        ],
+        indent="",
+    )
+    # Float endpoints give an array of the same kind; array endpoints stack.
+    endpoints = "num: int = ..., *, endpoint: bool = ..."
+    text += overloads(
+        [
+            *(
+                f"def linspace[S: UnitSystem](start: {kind}[float, S], stop: {kind}[float, S], {endpoints}) -> {kind}[npt.NDArray[np.float64], S]: ..."
+                for kind in catalogue.quantities
+            ),
+            f"def linspace[K, S: UnitSystem](start: _BaseQuantity[K, float, S], stop: _BaseQuantity[K, float, S], {endpoints}) -> Quantity[K, npt.NDArray[np.float64], S]: ...",
+            f"def linspace[Q: {quantity}](start: Q, stop: Q, {endpoints}) -> Q: ...",
+            f"def linspace(start: float, stop: float, {endpoints}) -> npt.NDArray[np.float64]: ...",
+            f"def linspace[A: _Numerical](start: A, stop: A, {endpoints}) -> A: ...",
+        ],
+        indent="",
+    )
     return text
 
 

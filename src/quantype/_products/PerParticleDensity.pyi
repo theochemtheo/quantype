@@ -122,6 +122,41 @@ class PerParticleDensity(Quantity[Pow[ParticleDensityKind, Literal[-1]], V, S]):
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> AtomCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerParticleDensity[float, S], other: ParticleDensity[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerParticleDensity[float, S], other: AtomCount[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerParticleDensity[float, S], other: W, /
+    ) -> PerParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerParticleDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ParticleDensityKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ParticleDensityKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerParticleDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -133,6 +168,19 @@ class PerParticleDensity(Quantity[Pow[ParticleDensityKind, Literal[-1]], V, S]):
     ) -> PerParticleDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerParticleDensity[float, S], other: W, /
+    ) -> PerParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerParticleDensity[V, S]: ...
+    @override
+    def item(self) -> PerParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -131,6 +131,37 @@ class DipoleMomentPerEnergyPerVolume(
     ) -> EnergyPerVolume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: DipoleMomentPerEnergyPerVolume[float, S], other: EnergyPerVolume[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerVolume[V, S] | EnergyPerVolume[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: DipoleMomentPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: DipoleMomentPerEnergyPerVolume[float, S], other: W, /
+    ) -> DipoleMomentPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: DipoleMomentPerEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> DipoleMomentPerEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +177,23 @@ class DipoleMomentPerEnergyPerVolume(
     def __rmul__(
         self, other: _Numerical, /
     ) -> DipoleMomentPerEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: DipoleMomentPerEnergyPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: DipoleMomentPerEnergyPerVolume[float, S], other: W, /
+    ) -> DipoleMomentPerEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> DipoleMomentPerEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

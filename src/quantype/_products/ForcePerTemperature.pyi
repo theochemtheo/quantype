@@ -121,6 +121,41 @@ class ForcePerTemperature(Quantity[Div[ForceKind, TemperatureKind], V, S]):
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForcePerTemperature[float, S], other: Length[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForcePerTemperature[float, S], other: Temperature[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForcePerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForcePerTemperature[float, S], other: W, /
+    ) -> ForcePerTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForcePerTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForcePerTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForcePerTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -132,6 +167,19 @@ class ForcePerTemperature(Quantity[Div[ForceKind, TemperatureKind], V, S]):
     ) -> ForcePerTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForcePerTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForcePerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForcePerTemperature[float, S], other: W, /
+    ) -> ForcePerTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForcePerTemperature[V, S]: ...
+    @override
+    def item(self) -> ForcePerTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -153,6 +153,43 @@ class FrequencyPerEnergyPerAtom(Quantity[Div[FrequencyKind, EnergyPerAtomKind], 
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerEnergyPerAtom[float, S], other: EnergyPerAtom[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerEnergyPerAtom[float, S], other: Action[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerEnergyPerAtom[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerEnergyPerAtom[float, S], other: W, /
+    ) -> FrequencyPerEnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerEnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerEnergyPerAtom[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, EnergyPerAtomKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, EnergyPerAtomKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerEnergyPerAtom[V, S]: ...
     @overload
     def __rmul__(
@@ -166,6 +203,21 @@ class FrequencyPerEnergyPerAtom(Quantity[Div[FrequencyKind, EnergyPerAtomKind], 
     ) -> FrequencyPerEnergyPerAtom[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerEnergyPerAtom[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerEnergyPerAtom[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerEnergyPerAtom[float, S], other: W, /
+    ) -> FrequencyPerEnergyPerAtom[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerEnergyPerAtom[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerEnergyPerAtom[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -122,6 +122,25 @@ class AreaElectricField(Quantity[Mul[AreaKind, ElectricFieldKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaElectricField[float, S], other: W, /
+    ) -> AreaElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -133,6 +152,19 @@ class AreaElectricField(Quantity[Mul[AreaKind, ElectricFieldKind], V, S]):
     ) -> AreaElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaElectricField[float, S], other: W, /
+    ) -> AreaElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaElectricField[V, S]: ...
+    @override
+    def item(self) -> AreaElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -92,6 +92,25 @@ class VolumeMass(Quantity[Mul[VolumeKind, MassKind], V, S]):
     ) -> Quantity[Div[Mul[VolumeKind, MassKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VolumeMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeMass[float, S], other: W, /
+    ) -> VolumeMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeMass[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class VolumeMass(Quantity[Mul[VolumeKind, MassKind], V, S]):
     ) -> VolumeMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeMass[float, S], other: W, /
+    ) -> VolumeMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeMass[V, S]: ...
+    @override
+    def item(self) -> VolumeMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -122,6 +122,35 @@ class MassDensityPerDipoleMoment(
     ) -> DipoleMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerDipoleMoment[float, S], other: W, /
+    ) -> MassDensityPerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityPerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -135,6 +164,21 @@ class MassDensityPerDipoleMoment(
     ) -> MassDensityPerDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerDipoleMoment[float, S], other: W, /
+    ) -> MassDensityPerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityPerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

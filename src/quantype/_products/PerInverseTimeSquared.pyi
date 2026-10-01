@@ -157,6 +157,49 @@ class PerInverseTimeSquared(Quantity[Pow[InverseTimeKind, Literal[-2]], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerInverseTimeSquared[float, S], other: Frequency[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerInverseTimeSquared[float, S], other: InverseTime[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerInverseTimeSquared[float, S], other: Acceleration[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerInverseTimeSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerInverseTimeSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerInverseTimeSquared[float, S], other: W, /
+    ) -> PerInverseTimeSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerInverseTimeSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerInverseTimeSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[InverseTimeKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[InverseTimeKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerInverseTimeSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -168,6 +211,19 @@ class PerInverseTimeSquared(Quantity[Pow[InverseTimeKind, Literal[-2]], V, S]):
     ) -> PerInverseTimeSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerInverseTimeSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerInverseTimeSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerInverseTimeSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerInverseTimeSquared[float, S], other: W, /
+    ) -> PerInverseTimeSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerInverseTimeSquared[V, S]: ...
+    @override
+    def item(self) -> PerInverseTimeSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

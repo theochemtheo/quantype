@@ -107,6 +107,31 @@ class AreaPerMass(Quantity[Div[AreaKind, MassKind], V, S]):
     ) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerMass[float, S], other: Mass[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerMass[float, S], other: W, /
+    ) -> AreaPerMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerMass[V, S]: ...
     @overload
     def __rmul__(
@@ -118,6 +143,19 @@ class AreaPerMass(Quantity[Div[AreaKind, MassKind], V, S]):
     ) -> AreaPerMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerMass[float, S], other: W, /
+    ) -> AreaPerMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerMass[V, S]: ...
+    @override
+    def item(self) -> AreaPerMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

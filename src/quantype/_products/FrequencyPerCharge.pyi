@@ -201,6 +201,57 @@ class FrequencyPerCharge(Quantity[Div[FrequencyKind, ChargeKind], V, S]):
     ) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerCharge[float, S], other: Momentum[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerCharge[float, S], other: Charge[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerCharge[float, S], other: DipoleMoment[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerCharge[float, S], other: Action[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerCharge[float, S], other: W, /
+    ) -> FrequencyPerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -212,6 +263,19 @@ class FrequencyPerCharge(Quantity[Div[FrequencyKind, ChargeKind], V, S]):
     ) -> FrequencyPerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerCharge[float, S], other: W, /
+    ) -> FrequencyPerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerCharge[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

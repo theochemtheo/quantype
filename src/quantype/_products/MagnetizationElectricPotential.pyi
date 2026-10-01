@@ -121,6 +121,29 @@ class MagnetizationElectricPotential(
     ) -> Quantity[Div[Mul[MagnetizationKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MagnetizationElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationElectricPotential[float, S], other: W, /
+    ) -> MagnetizationElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +159,23 @@ class MagnetizationElectricPotential(
     def __rmul__(
         self, other: _Numerical, /
     ) -> MagnetizationElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationElectricPotential[float, S], other: W, /
+    ) -> MagnetizationElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationElectricPotential[V, S]: ...
+    @override
+    def item(self) -> MagnetizationElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

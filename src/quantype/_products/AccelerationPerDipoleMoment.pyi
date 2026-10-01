@@ -127,6 +127,35 @@ class AccelerationPerDipoleMoment(
     ) -> DipoleMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AccelerationPerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AccelerationPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> AccelerationPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AccelerationPerDipoleMoment[float, S], other: W, /
+    ) -> AccelerationPerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AccelerationPerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AccelerationPerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AccelerationPerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +169,23 @@ class AccelerationPerDipoleMoment(
     ) -> AccelerationPerDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AccelerationPerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AccelerationPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> AccelerationPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AccelerationPerDipoleMoment[float, S], other: W, /
+    ) -> AccelerationPerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> AccelerationPerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> AccelerationPerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

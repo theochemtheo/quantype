@@ -74,6 +74,25 @@ class PerActionSquared(Quantity[Pow[ActionKind, Literal[-2]], V, S]):
     ) -> Quantity[Div[Pow[ActionKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerActionSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerActionSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerActionSquared[float, S], other: W, /
+    ) -> PerActionSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerActionSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerActionSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ActionKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ActionKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerActionSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerActionSquared(Quantity[Pow[ActionKind, Literal[-2]], V, S]):
     ) -> PerActionSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerActionSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerActionSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerActionSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerActionSquared[float, S], other: W, /
+    ) -> PerActionSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerActionSquared[V, S]: ...
+    @override
+    def item(self) -> PerActionSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

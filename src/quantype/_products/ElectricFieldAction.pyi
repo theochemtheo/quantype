@@ -94,6 +94,25 @@ class ElectricFieldAction(Quantity[Mul[ElectricFieldKind, ActionKind], V, S]):
     ) -> Quantity[Div[Mul[ElectricFieldKind, ActionKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectricFieldAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricFieldAction[float, S], other: W, /
+    ) -> ElectricFieldAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricFieldAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricFieldAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ElectricFieldKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ElectricFieldKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricFieldAction[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class ElectricFieldAction(Quantity[Mul[ElectricFieldKind, ActionKind], V, S]):
     ) -> ElectricFieldAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricFieldAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricFieldAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricFieldAction[float, S], other: W, /
+    ) -> ElectricFieldAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricFieldAction[V, S]: ...
+    @override
+    def item(self) -> ElectricFieldAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

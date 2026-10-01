@@ -158,6 +158,43 @@ class PressurePerElectricPotential(
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressurePerElectricPotential[float, S], other: Volume[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PressurePerElectricPotential[float, S], other: ElectricPotential[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressurePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> PressurePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressurePerElectricPotential[float, S], other: W, /
+    ) -> PressurePerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> PressurePerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressurePerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[PressureKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[PressureKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressurePerElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -171,6 +208,23 @@ class PressurePerElectricPotential(
     ) -> PressurePerElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressurePerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressurePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> PressurePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressurePerElectricPotential[float, S], other: W, /
+    ) -> PressurePerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> PressurePerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> PressurePerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

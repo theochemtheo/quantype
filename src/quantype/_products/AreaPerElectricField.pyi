@@ -185,6 +185,49 @@ class AreaPerElectricField(Quantity[Div[AreaKind, ElectricFieldKind], V, S]):
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerElectricField[float, S], other: ForceConstant[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerElectricField[float, S], other: ElectricPotential[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerElectricField[float, S], other: W, /
+    ) -> AreaPerElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -196,6 +239,19 @@ class AreaPerElectricField(Quantity[Div[AreaKind, ElectricFieldKind], V, S]):
     ) -> AreaPerElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerElectricField[float, S], other: W, /
+    ) -> AreaPerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerElectricField[V, S]: ...
+    @override
+    def item(self) -> AreaPerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

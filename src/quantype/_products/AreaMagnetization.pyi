@@ -128,6 +128,33 @@ class AreaMagnetization(Quantity[Mul[AreaKind, MagnetizationKind], V, S]):
     ) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaMagnetization[float, S], other: Length[W, S], /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> MagneticMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaMagnetization[float, S], other: W, /
+    ) -> AreaMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -139,6 +166,19 @@ class AreaMagnetization(Quantity[Mul[AreaKind, MagnetizationKind], V, S]):
     ) -> AreaMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaMagnetization[float, S], other: W, /
+    ) -> AreaMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaMagnetization[V, S]: ...
+    @override
+    def item(self) -> AreaMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

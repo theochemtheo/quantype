@@ -174,6 +174,42 @@ numbers must be in particular units.
 function from `Length[Array, S]` to `Energy[Array, S]` differentiates to
 `Force[Array, S]`. See [autodiff](autodiff.md).
 
+### Generic over the kind
+
+A function can take two quantities of whatever kind with one type variable for
+the whole quantity, bounded by `Quantity`:
+
+```python
+from typing import Any
+
+from quantype import Quantity, u
+
+
+def larger[Q: Quantity[Any, Any, Any]](a: Q, b: Q) -> Q:
+    return a if a > b else b
+
+
+assert larger(2 * u.nm, 3 * u.nm) == 3 * u.nm
+product = larger((2 * u.nm) * (3 * u.fs), (3 * u.fs) * (2 * u.nm))
+assert product == (6 * u.nm) * (1 * u.fs)
+```
+
+A kind parameter shared by both arguments works for named kinds and for
+variables:
+
+```python notest
+def larger[K, S: UnitSystem](
+    a: Quantity[K, Any, S], b: Quantity[K, Any, S]
+) -> Quantity[K, Any, S]: ...
+```
+
+mypy and Pyright reject a product expression written directly in its call, such
+as `larger(nm * fs, fs * nm)`, because they infer `K` from the expression's left
+factor. Pyrefly and ty accept it. The bound type variable accepts product
+expressions in every checker, but leaves the kinds unchecked statically, so the
+first `larger` checks them at runtime through `>`.
+`quantype.testing.assert_allclose` takes its arguments the same way.
+
 ## Supported checkers
 
 The unit-system parameter has a default (PEP 696). The stubs declare it with

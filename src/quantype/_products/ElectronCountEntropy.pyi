@@ -94,6 +94,25 @@ class ElectronCountEntropy(Quantity[Mul[ElectronCountKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[ElectronCountKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectronCountEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountEntropy[float, S], other: W, /
+    ) -> ElectronCountEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronCountEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ElectronCountKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ElectronCountKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronCountEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class ElectronCountEntropy(Quantity[Mul[ElectronCountKind, EntropyKind], V, S]):
     ) -> ElectronCountEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronCountEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountEntropy[float, S], other: W, /
+    ) -> ElectronCountEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronCountEntropy[V, S]: ...
+    @override
+    def item(self) -> ElectronCountEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

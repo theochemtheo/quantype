@@ -111,6 +111,25 @@ class VolumeEnergyDensity(Quantity[Mul[VolumeKind, EnergyDensityKind], V, S]):
     def _rtruediv_Energy(self, other: Energy[V, S], /) -> Dimensionless[V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VolumeEnergyDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeEnergyDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeEnergyDensity[float, S], other: W, /
+    ) -> VolumeEnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeEnergyDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeEnergyDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, EnergyDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, EnergyDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeEnergyDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -122,6 +141,19 @@ class VolumeEnergyDensity(Quantity[Mul[VolumeKind, EnergyDensityKind], V, S]):
     ) -> VolumeEnergyDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeEnergyDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeEnergyDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeEnergyDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeEnergyDensity[float, S], other: W, /
+    ) -> VolumeEnergyDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeEnergyDensity[V, S]: ...
+    @override
+    def item(self) -> VolumeEnergyDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

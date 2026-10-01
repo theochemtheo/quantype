@@ -172,6 +172,47 @@ class TemperatureDifferencePerForceConstant(
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureDifferencePerForceConstant[float, S],
+        other: ForceConstant[W, S],
+        /,
+    ) -> TemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> TemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TemperatureDifferencePerForceConstant[float, S], other: Entropy[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Entropy[V, S] | Entropy[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureDifferencePerForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferencePerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferencePerForceConstant[float, S], other: W, /
+    ) -> TemperatureDifferencePerForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferencePerForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferencePerForceConstant[float, S],
+        other: Quantity[K, W, S],
+        /,
+    ) -> Quantity[Mul[Div[TemperatureDifferenceKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureDifferenceKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureDifferencePerForceConstant[V, S]: ...
@@ -189,6 +230,23 @@ class TemperatureDifferencePerForceConstant(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureDifferencePerForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferencePerForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferencePerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferencePerForceConstant[float, S], other: W, /
+    ) -> TemperatureDifferencePerForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferencePerForceConstant[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferencePerForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

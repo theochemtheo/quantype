@@ -92,6 +92,25 @@ class VelocityAngle(Quantity[Mul[VelocityKind, AngleKind], V, S]):
     ) -> Quantity[Div[Mul[VelocityKind, AngleKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VelocityAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityAngle[float, S], other: W, /
+    ) -> VelocityAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class VelocityAngle(Quantity[Mul[VelocityKind, AngleKind], V, S]):
     ) -> VelocityAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityAngle[float, S], other: W, /
+    ) -> VelocityAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityAngle[V, S]: ...
+    @override
+    def item(self) -> VelocityAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

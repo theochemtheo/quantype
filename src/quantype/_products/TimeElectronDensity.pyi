@@ -152,6 +152,41 @@ class TimeElectronDensity(Quantity[Mul[TimeKind, ElectronDensityKind], V, S]):
     ) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeElectronDensity[float, S], other: Frequency[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeElectronDensity[float, S], other: InverseTime[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeElectronDensity[float, S], other: W, /
+    ) -> TimeElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeElectronDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -163,6 +198,19 @@ class TimeElectronDensity(Quantity[Mul[TimeKind, ElectronDensityKind], V, S]):
     ) -> TimeElectronDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeElectronDensity[float, S], other: W, /
+    ) -> TimeElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeElectronDensity[V, S]: ...
+    @override
+    def item(self) -> TimeElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

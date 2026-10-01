@@ -112,6 +112,33 @@ class VolumePerElectronDensity(Quantity[Div[VolumeKind, ElectronDensityKind], V,
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> ElectronDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerElectronDensity[float, S], other: ElectronDensity[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronDensity[V, S] | ElectronDensity[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerElectronDensity[float, S], other: W, /
+    ) -> VolumePerElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerElectronDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -123,6 +150,19 @@ class VolumePerElectronDensity(Quantity[Div[VolumeKind, ElectronDensityKind], V,
     ) -> VolumePerElectronDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerElectronDensity[float, S], other: W, /
+    ) -> VolumePerElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerElectronDensity[V, S]: ...
+    @override
+    def item(self) -> VolumePerElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

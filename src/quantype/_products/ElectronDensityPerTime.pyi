@@ -139,6 +139,33 @@ class ElectronDensityPerTime(Quantity[Div[ElectronDensityKind, TimeKind], V, S])
     ) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronDensityPerTime[float, S], other: Time[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronDensityPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityPerTime[float, S], other: W, /
+    ) -> ElectronDensityPerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronDensityPerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityPerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityPerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -150,6 +177,19 @@ class ElectronDensityPerTime(Quantity[Div[ElectronDensityKind, TimeKind], V, S])
     ) -> ElectronDensityPerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronDensityPerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityPerTime[float, S], other: W, /
+    ) -> ElectronDensityPerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronDensityPerTime[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityPerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

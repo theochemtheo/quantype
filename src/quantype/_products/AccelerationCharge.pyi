@@ -94,6 +94,25 @@ class AccelerationCharge(Quantity[Mul[AccelerationKind, ChargeKind], V, S]):
     ) -> Quantity[Div[Mul[AccelerationKind, ChargeKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AccelerationCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AccelerationCharge[float, S], other: W, /
+    ) -> AccelerationCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AccelerationCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AccelerationCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AccelerationKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AccelerationKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AccelerationCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class AccelerationCharge(Quantity[Mul[AccelerationKind, ChargeKind], V, S]):
     ) -> AccelerationCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AccelerationCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AccelerationCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AccelerationCharge[float, S], other: W, /
+    ) -> AccelerationCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AccelerationCharge[V, S]: ...
+    @override
+    def item(self) -> AccelerationCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

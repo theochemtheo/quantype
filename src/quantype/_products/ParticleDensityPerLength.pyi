@@ -106,6 +106,33 @@ class ParticleDensityPerLength(Quantity[Div[ParticleDensityKind, LengthKind], V,
     ) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ParticleDensityPerLength[float, S], other: Length[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ParticleDensityPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityPerLength[float, S], other: W, /
+    ) -> ParticleDensityPerLength[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensityPerLength[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityPerLength[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, LengthKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, LengthKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityPerLength[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class ParticleDensityPerLength(Quantity[Div[ParticleDensityKind, LengthKind], V,
     ) -> ParticleDensityPerLength[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensityPerLength[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityPerLength[float, S], other: W, /
+    ) -> ParticleDensityPerLength[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ParticleDensityPerLength[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityPerLength[float, S]: ...
     @overload
     @override
     def __rtruediv__(

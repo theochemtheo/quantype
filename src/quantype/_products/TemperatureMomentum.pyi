@@ -92,6 +92,25 @@ class TemperatureMomentum(Quantity[Mul[TemperatureKind, MomentumKind], V, S]):
     ) -> Quantity[Div[Mul[TemperatureKind, MomentumKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureMomentum[float, S], other: W, /
+    ) -> TemperatureMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class TemperatureMomentum(Quantity[Mul[TemperatureKind, MomentumKind], V, S]):
     ) -> TemperatureMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureMomentum[float, S], other: W, /
+    ) -> TemperatureMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureMomentum[V, S]: ...
+    @override
+    def item(self) -> TemperatureMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

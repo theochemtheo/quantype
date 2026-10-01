@@ -106,6 +106,33 @@ class AnglePerParticleDensity(Quantity[Div[AngleKind, ParticleDensityKind], V, S
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> ParticleDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerParticleDensity[float, S], other: ParticleDensity[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerParticleDensity[float, S], other: W, /
+    ) -> AnglePerParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerParticleDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, ParticleDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, ParticleDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerParticleDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class AnglePerParticleDensity(Quantity[Div[AngleKind, ParticleDensityKind], V, S
     ) -> AnglePerParticleDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerParticleDensity[float, S], other: W, /
+    ) -> AnglePerParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerParticleDensity[V, S]: ...
+    @override
+    def item(self) -> AnglePerParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -164,6 +164,49 @@ class VolumeTime(Quantity[Mul[VolumeKind, TimeKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> EnergyDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumeTime[float, S], other: Pressure[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumeTime[float, S], other: Frequency[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumeTime[float, S], other: InverseTime[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumeTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeTime[float, S], other: W, /
+    ) -> VolumeTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeTime[V, S]: ...
     @overload
     def __rmul__(
@@ -175,6 +218,19 @@ class VolumeTime(Quantity[Mul[VolumeKind, TimeKind], V, S]):
     ) -> VolumeTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeTime[float, S], other: W, /
+    ) -> VolumeTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeTime[V, S]: ...
+    @override
+    def item(self) -> VolumeTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

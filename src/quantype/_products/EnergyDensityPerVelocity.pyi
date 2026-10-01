@@ -106,6 +106,33 @@ class EnergyDensityPerVelocity(Quantity[Div[EnergyDensityKind, VelocityKind], V,
     ) -> Velocity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyDensityPerVelocity[float, S], other: Velocity[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyDensityPerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityPerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityPerVelocity[float, S], other: W, /
+    ) -> EnergyDensityPerVelocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyDensityPerVelocity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityPerVelocity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, VelocityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, VelocityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyDensityPerVelocity[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class EnergyDensityPerVelocity(Quantity[Div[EnergyDensityKind, VelocityKind], V,
     ) -> EnergyDensityPerVelocity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyDensityPerVelocity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityPerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityPerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityPerVelocity[float, S], other: W, /
+    ) -> EnergyDensityPerVelocity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyDensityPerVelocity[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityPerVelocity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

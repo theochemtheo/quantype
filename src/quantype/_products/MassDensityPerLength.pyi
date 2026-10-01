@@ -100,6 +100,33 @@ class MassDensityPerLength(Quantity[Div[MassDensityKind, LengthKind], V, S]):
     def _rtruediv_MassDensity(self, other: MassDensity[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerLength[float, S], other: Length[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerLength[float, S], other: W, /
+    ) -> MassDensityPerLength[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityPerLength[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerLength[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, LengthKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, LengthKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerLength[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class MassDensityPerLength(Quantity[Div[MassDensityKind, LengthKind], V, S]):
     ) -> MassDensityPerLength[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerLength[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerLength[float, S], other: W, /
+    ) -> MassDensityPerLength[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityPerLength[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerLength[float, S]: ...
     @overload
     @override
     def __rtruediv__(

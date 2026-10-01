@@ -132,6 +132,31 @@ class AreaPressure(Quantity[Mul[AreaKind, PressureKind], V, S]):
     def _rtruediv_Force(self, other: Force[V, S], /) -> Dimensionless[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPressure[float, S], other: Length[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Length[V, S] | Length[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPressure[float, S], other: W, /
+    ) -> AreaPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -143,6 +168,19 @@ class AreaPressure(Quantity[Mul[AreaKind, PressureKind], V, S]):
     ) -> AreaPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPressure[float, S], other: W, /
+    ) -> AreaPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPressure[V, S]: ...
+    @override
+    def item(self) -> AreaPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

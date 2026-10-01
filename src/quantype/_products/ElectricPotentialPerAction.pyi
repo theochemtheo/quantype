@@ -157,6 +157,43 @@ class ElectricPotentialPerAction(
     ) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricPotentialPerAction[float, S], other: Charge[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricPotentialPerAction[float, S], other: Action[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricPotentialPerAction[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricPotentialPerAction[float, S], other: W, /
+    ) -> ElectricPotentialPerAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricPotentialPerAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricPotentialPerAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricPotentialPerAction[V, S]: ...
     @overload
     def __rmul__(
@@ -170,6 +207,21 @@ class ElectricPotentialPerAction(
     ) -> ElectricPotentialPerAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricPotentialPerAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricPotentialPerAction[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricPotentialPerAction[float, S], other: W, /
+    ) -> ElectricPotentialPerAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricPotentialPerAction[V, S]: ...
+    @override
+    def item(self) -> ElectricPotentialPerAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

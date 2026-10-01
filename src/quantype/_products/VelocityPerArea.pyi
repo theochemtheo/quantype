@@ -150,6 +150,39 @@ class VelocityPerArea(Quantity[Div[VelocityKind, AreaKind], V, S]):
     def _rtruediv_InverseTime(self, other: InverseTime[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityPerArea[float, S], other: Area[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerArea[float, S], other: Momentum[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityPerArea[float, S], other: W, /
+    ) -> VelocityPerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityPerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityPerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityPerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -161,6 +194,19 @@ class VelocityPerArea(Quantity[Div[VelocityKind, AreaKind], V, S]):
     ) -> VelocityPerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityPerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityPerArea[float, S], other: W, /
+    ) -> VelocityPerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityPerArea[V, S]: ...
+    @override
+    def item(self) -> VelocityPerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -112,6 +112,27 @@ class ForceConstantEnergyDensity(
     ) -> Quantity[Div[Mul[ForceConstantKind, EnergyDensityKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceConstantEnergyDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantEnergyDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantEnergyDensity[float, S], other: W, /
+    ) -> ForceConstantEnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantEnergyDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantEnergyDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, EnergyDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, EnergyDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantEnergyDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +146,21 @@ class ForceConstantEnergyDensity(
     ) -> ForceConstantEnergyDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantEnergyDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantEnergyDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantEnergyDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantEnergyDensity[float, S], other: W, /
+    ) -> ForceConstantEnergyDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantEnergyDensity[V, S]: ...
+    @override
+    def item(self) -> ForceConstantEnergyDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

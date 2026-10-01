@@ -112,6 +112,27 @@ class TemperatureElectronDensity(
     ) -> Quantity[Div[Mul[TemperatureKind, ElectronDensityKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureElectronDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureElectronDensity[float, S], other: W, /
+    ) -> TemperatureElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureElectronDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +146,21 @@ class TemperatureElectronDensity(
     ) -> TemperatureElectronDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureElectronDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureElectronDensity[float, S], other: W, /
+    ) -> TemperatureElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureElectronDensity[V, S]: ...
+    @override
+    def item(self) -> TemperatureElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

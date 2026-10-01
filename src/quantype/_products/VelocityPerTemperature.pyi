@@ -125,6 +125,41 @@ class VelocityPerTemperature(Quantity[Div[VelocityKind, TemperatureKind], V, S])
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityPerTemperature[float, S], other: Temperature[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerTemperature[float, S], other: Momentum[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityPerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityPerTemperature[float, S], other: W, /
+    ) -> VelocityPerTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityPerTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityPerTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityPerTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +171,19 @@ class VelocityPerTemperature(Quantity[Div[VelocityKind, TemperatureKind], V, S])
     ) -> VelocityPerTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityPerTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityPerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityPerTemperature[float, S], other: W, /
+    ) -> VelocityPerTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityPerTemperature[V, S]: ...
+    @override
+    def item(self) -> VelocityPerTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

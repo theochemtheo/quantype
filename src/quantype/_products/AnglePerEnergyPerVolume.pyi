@@ -106,6 +106,33 @@ class AnglePerEnergyPerVolume(Quantity[Div[AngleKind, EnergyPerVolumeKind], V, S
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> EnergyPerVolume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerEnergyPerVolume[float, S], other: EnergyPerVolume[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerVolume[V, S] | EnergyPerVolume[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerEnergyPerVolume[float, S], other: W, /
+    ) -> AnglePerEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class AnglePerEnergyPerVolume(Quantity[Div[AngleKind, EnergyPerVolumeKind], V, S
     ) -> AnglePerEnergyPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerEnergyPerVolume[float, S], other: W, /
+    ) -> AnglePerEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> AnglePerEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -138,6 +138,25 @@ class AreaForce(Quantity[Mul[AreaKind, ForceKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, ForceKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaForce[float, S], other: W, /
+    ) -> AreaForce[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaForce[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaForce[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ForceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ForceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaForce[V, S]: ...
     @overload
     def __rmul__(
@@ -149,6 +168,19 @@ class AreaForce(Quantity[Mul[AreaKind, ForceKind], V, S]):
     ) -> AreaForce[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaForce[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaForce[float, S], other: W, /
+    ) -> AreaForce[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaForce[V, S]: ...
+    @override
+    def item(self) -> AreaForce[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -96,6 +96,25 @@ class ElectronDensityAction(Quantity[Mul[ElectronDensityKind, ActionKind], V, S]
     ) -> Quantity[Div[Mul[ElectronDensityKind, ActionKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectronDensityAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityAction[float, S], other: W, /
+    ) -> ElectronDensityAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronDensityAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ElectronDensityKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ElectronDensityKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityAction[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class ElectronDensityAction(Quantity[Mul[ElectronDensityKind, ActionKind], V, S]
     ) -> ElectronDensityAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronDensityAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityAction[float, S], other: W, /
+    ) -> ElectronDensityAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronDensityAction[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

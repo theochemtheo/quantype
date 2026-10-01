@@ -127,6 +127,37 @@ class ElectronCountPerElectricField(
     ) -> ElectricField[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronCountPerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronCountPerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronCountPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountPerElectricField[float, S], other: W, /
+    ) -> ElectronCountPerElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectronCountPerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountPerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronCountPerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +171,23 @@ class ElectronCountPerElectricField(
     ) -> ElectronCountPerElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronCountPerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountPerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronCountPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountPerElectricField[float, S], other: W, /
+    ) -> ElectronCountPerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectronCountPerElectricField[V, S]: ...
+    @override
+    def item(self) -> ElectronCountPerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

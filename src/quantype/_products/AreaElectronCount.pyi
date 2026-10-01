@@ -94,6 +94,25 @@ class AreaElectronCount(Quantity[Mul[AreaKind, ElectronCountKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, ElectronCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaElectronCount[float, S], other: W, /
+    ) -> AreaElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class AreaElectronCount(Quantity[Mul[AreaKind, ElectronCountKind], V, S]):
     ) -> AreaElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaElectronCount[float, S], other: W, /
+    ) -> AreaElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaElectronCount[V, S]: ...
+    @override
+    def item(self) -> AreaElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

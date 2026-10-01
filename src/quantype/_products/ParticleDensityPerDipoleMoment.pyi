@@ -129,6 +129,37 @@ class ParticleDensityPerDipoleMoment(
     ) -> DipoleMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ParticleDensityPerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ParticleDensityPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ParticleDensityPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityPerDipoleMoment[float, S], other: W, /
+    ) -> ParticleDensityPerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ParticleDensityPerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityPerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityPerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -144,6 +175,23 @@ class ParticleDensityPerDipoleMoment(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ParticleDensityPerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ParticleDensityPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityPerDipoleMoment[float, S], other: W, /
+    ) -> ParticleDensityPerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ParticleDensityPerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityPerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

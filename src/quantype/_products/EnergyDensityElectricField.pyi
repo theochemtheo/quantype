@@ -112,6 +112,27 @@ class EnergyDensityElectricField(
     ) -> Quantity[Div[Mul[EnergyDensityKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyDensityElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyDensityElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityElectricField[float, S], other: W, /
+    ) -> EnergyDensityElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyDensityElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyDensityElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +146,21 @@ class EnergyDensityElectricField(
     ) -> EnergyDensityElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyDensityElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyDensityElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityElectricField[float, S], other: W, /
+    ) -> EnergyDensityElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyDensityElectricField[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -78,6 +78,25 @@ class PerMagneticMomentSquared(Quantity[Pow[MagneticMomentKind, Literal[-2]], V,
     ) -> Quantity[Div[Pow[MagneticMomentKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerMagneticMomentSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMagneticMomentSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerMagneticMomentSquared[float, S], other: W, /
+    ) -> PerMagneticMomentSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerMagneticMomentSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerMagneticMomentSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MagneticMomentKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MagneticMomentKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerMagneticMomentSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -89,6 +108,19 @@ class PerMagneticMomentSquared(Quantity[Pow[MagneticMomentKind, Literal[-2]], V,
     ) -> PerMagneticMomentSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerMagneticMomentSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerMagneticMomentSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMagneticMomentSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerMagneticMomentSquared[float, S], other: W, /
+    ) -> PerMagneticMomentSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerMagneticMomentSquared[V, S]: ...
+    @override
+    def item(self) -> PerMagneticMomentSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

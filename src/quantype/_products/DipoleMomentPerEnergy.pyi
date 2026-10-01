@@ -187,6 +187,55 @@ class DipoleMomentPerEnergy(Quantity[Div[DipoleMomentKind, EnergyKind], V, S]):
     def _rtruediv_DipoleMoment(self, other: DipoleMoment[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: DipoleMomentPerEnergy[float, S], other: Energy[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: DipoleMomentPerEnergy[float, S], other: Force[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: DipoleMomentPerEnergy[float, S], other: ElectricPotential[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: DipoleMomentPerEnergy[float, S], other: ElectricField[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: DipoleMomentPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMomentPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: DipoleMomentPerEnergy[float, S], other: W, /
+    ) -> DipoleMomentPerEnergy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> DipoleMomentPerEnergy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: DipoleMomentPerEnergy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, EnergyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, EnergyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> DipoleMomentPerEnergy[V, S]: ...
     @overload
     def __rmul__(
@@ -198,6 +247,19 @@ class DipoleMomentPerEnergy(Quantity[Div[DipoleMomentKind, EnergyKind], V, S]):
     ) -> DipoleMomentPerEnergy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> DipoleMomentPerEnergy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: DipoleMomentPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMomentPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: DipoleMomentPerEnergy[float, S], other: W, /
+    ) -> DipoleMomentPerEnergy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> DipoleMomentPerEnergy[V, S]: ...
+    @override
+    def item(self) -> DipoleMomentPerEnergy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

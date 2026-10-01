@@ -127,6 +127,33 @@ class InverseTimeMassDensity(Quantity[Mul[InverseTimeKind, MassDensityKind], V, 
     def _rtruediv_MassDensity(self, other: MassDensity[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimeMassDensity[float, S], other: Time[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimeMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimeMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimeMassDensity[float, S], other: W, /
+    ) -> InverseTimeMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimeMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimeMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[InverseTimeKind, MassDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[InverseTimeKind, MassDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimeMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -138,6 +165,19 @@ class InverseTimeMassDensity(Quantity[Mul[InverseTimeKind, MassDensityKind], V, 
     ) -> InverseTimeMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimeMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimeMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimeMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimeMassDensity[float, S], other: W, /
+    ) -> InverseTimeMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> InverseTimeMassDensity[V, S]: ...
+    @override
+    def item(self) -> InverseTimeMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

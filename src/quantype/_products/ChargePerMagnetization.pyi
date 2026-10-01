@@ -102,6 +102,33 @@ class ChargePerMagnetization(Quantity[Div[ChargeKind, MagnetizationKind], V, S])
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Magnetization[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerMagnetization[float, S], other: Magnetization[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerMagnetization[float, S], other: W, /
+    ) -> ChargePerMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class ChargePerMagnetization(Quantity[Div[ChargeKind, MagnetizationKind], V, S])
     ) -> ChargePerMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerMagnetization[float, S], other: W, /
+    ) -> ChargePerMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerMagnetization[V, S]: ...
+    @override
+    def item(self) -> ChargePerMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

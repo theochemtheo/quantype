@@ -112,6 +112,27 @@ class AtomCountElectricPotential(
     ) -> Quantity[Div[Mul[AtomCountKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AtomCountElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> AtomCountElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountElectricPotential[float, S], other: W, /
+    ) -> AtomCountElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +146,21 @@ class AtomCountElectricPotential(
     ) -> AtomCountElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> AtomCountElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountElectricPotential[float, S], other: W, /
+    ) -> AtomCountElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountElectricPotential[V, S]: ...
+    @override
+    def item(self) -> AtomCountElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

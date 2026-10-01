@@ -94,6 +94,25 @@ class DipoleMomentAction(Quantity[Mul[DipoleMomentKind, ActionKind], V, S]):
     ) -> Quantity[Div[Mul[DipoleMomentKind, ActionKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: DipoleMomentAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMomentAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: DipoleMomentAction[float, S], other: W, /
+    ) -> DipoleMomentAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> DipoleMomentAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: DipoleMomentAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[DipoleMomentKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[DipoleMomentKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> DipoleMomentAction[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class DipoleMomentAction(Quantity[Mul[DipoleMomentKind, ActionKind], V, S]):
     ) -> DipoleMomentAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> DipoleMomentAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: DipoleMomentAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> DipoleMomentAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: DipoleMomentAction[float, S], other: W, /
+    ) -> DipoleMomentAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> DipoleMomentAction[V, S]: ...
+    @override
+    def item(self) -> DipoleMomentAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

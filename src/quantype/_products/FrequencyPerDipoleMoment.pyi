@@ -153,6 +153,41 @@ class FrequencyPerDipoleMoment(Quantity[Div[FrequencyKind, DipoleMomentKind], V,
     ) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerDipoleMoment[float, S], other: Action[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerDipoleMoment[float, S], other: W, /
+    ) -> FrequencyPerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -164,6 +199,19 @@ class FrequencyPerDipoleMoment(Quantity[Div[FrequencyKind, DipoleMomentKind], V,
     ) -> FrequencyPerDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerDipoleMoment[float, S], other: W, /
+    ) -> FrequencyPerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

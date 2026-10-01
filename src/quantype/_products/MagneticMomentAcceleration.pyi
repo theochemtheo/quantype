@@ -114,6 +114,27 @@ class MagneticMomentAcceleration(
     ) -> Quantity[Div[Mul[MagneticMomentKind, AccelerationKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MagneticMomentAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagneticMomentAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagneticMomentAcceleration[float, S], other: W, /
+    ) -> MagneticMomentAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MagneticMomentAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagneticMomentAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagneticMomentAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -127,6 +148,21 @@ class MagneticMomentAcceleration(
     ) -> MagneticMomentAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagneticMomentAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagneticMomentAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagneticMomentAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagneticMomentAcceleration[float, S], other: W, /
+    ) -> MagneticMomentAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MagneticMomentAcceleration[V, S]: ...
+    @override
+    def item(self) -> MagneticMomentAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

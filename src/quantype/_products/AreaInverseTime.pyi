@@ -151,6 +151,31 @@ class AreaInverseTime(Quantity[Mul[AreaKind, InverseTimeKind], V, S]):
     def _rtruediv_Area(self, other: Area[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaInverseTime[float, S], other: Time[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaInverseTime[float, S], other: W, /
+    ) -> AreaInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -162,6 +187,19 @@ class AreaInverseTime(Quantity[Mul[AreaKind, InverseTimeKind], V, S]):
     ) -> AreaInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaInverseTime[float, S], other: W, /
+    ) -> AreaInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaInverseTime[V, S]: ...
+    @override
+    def item(self) -> AreaInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

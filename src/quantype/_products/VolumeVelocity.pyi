@@ -120,6 +120,33 @@ class VolumeVelocity(Quantity[Mul[VolumeKind, VelocityKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> MassDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumeVelocity[float, S], other: MassDensity[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MassDensity[V, S] | MassDensity[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumeVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeVelocity[float, S], other: W, /
+    ) -> VolumeVelocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeVelocity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeVelocity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, VelocityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, VelocityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeVelocity[V, S]: ...
     @overload
     def __rmul__(
@@ -131,6 +158,19 @@ class VolumeVelocity(Quantity[Mul[VolumeKind, VelocityKind], V, S]):
     ) -> VolumeVelocity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeVelocity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeVelocity[float, S], other: W, /
+    ) -> VolumeVelocity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeVelocity[V, S]: ...
+    @override
+    def item(self) -> VolumeVelocity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -94,6 +94,25 @@ class MagnetizationAngle(Quantity[Mul[MagnetizationKind, AngleKind], V, S]):
     ) -> Quantity[Div[Mul[MagnetizationKind, AngleKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MagnetizationAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagnetizationAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationAngle[float, S], other: W, /
+    ) -> MagnetizationAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MagnetizationAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class MagnetizationAngle(Quantity[Mul[MagnetizationKind, AngleKind], V, S]):
     ) -> MagnetizationAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagnetizationAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagnetizationAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationAngle[float, S], other: W, /
+    ) -> MagnetizationAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MagnetizationAngle[V, S]: ...
+    @override
+    def item(self) -> MagnetizationAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

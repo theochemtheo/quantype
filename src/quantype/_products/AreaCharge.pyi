@@ -112,6 +112,25 @@ class AreaCharge(Quantity[Mul[AreaKind, ChargeKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, ChargeKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaCharge[float, S], other: W, /
+    ) -> AreaCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -123,6 +142,19 @@ class AreaCharge(Quantity[Mul[AreaKind, ChargeKind], V, S]):
     ) -> AreaCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaCharge[float, S], other: W, /
+    ) -> AreaCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaCharge[V, S]: ...
+    @override
+    def item(self) -> AreaCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

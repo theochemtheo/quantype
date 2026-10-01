@@ -141,6 +141,39 @@ class TemperatureRatePerElectricPotential(
     ) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureRatePerElectricPotential[float, S],
+        other: ElectricPotential[W, S],
+        /,
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> TemperatureRate[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureRatePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRatePerElectricPotential[float, S], other: W, /
+    ) -> TemperatureRatePerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRatePerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRatePerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureRatePerElectricPotential[V, S]: ...
@@ -158,6 +191,23 @@ class TemperatureRatePerElectricPotential(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureRatePerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRatePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRatePerElectricPotential[float, S], other: W, /
+    ) -> TemperatureRatePerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRatePerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> TemperatureRatePerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

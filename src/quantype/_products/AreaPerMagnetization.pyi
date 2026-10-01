@@ -102,6 +102,33 @@ class AreaPerMagnetization(Quantity[Div[AreaKind, MagnetizationKind], V, S]):
     def _rtruediv_Area(self, other: Area[V, S], /) -> Magnetization[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerMagnetization[float, S], other: Magnetization[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerMagnetization[float, S], other: W, /
+    ) -> AreaPerMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class AreaPerMagnetization(Quantity[Div[AreaKind, MagnetizationKind], V, S]):
     ) -> AreaPerMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerMagnetization[float, S], other: W, /
+    ) -> AreaPerMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerMagnetization[V, S]: ...
+    @override
+    def item(self) -> AreaPerMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

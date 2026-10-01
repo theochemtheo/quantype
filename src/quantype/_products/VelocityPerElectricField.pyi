@@ -141,6 +141,41 @@ class VelocityPerElectricField(Quantity[Div[VelocityKind, ElectricFieldKind], V,
     ) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityPerElectricField[float, S], other: Momentum[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityPerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityPerElectricField[float, S], other: W, /
+    ) -> VelocityPerElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityPerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityPerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityPerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -152,6 +187,19 @@ class VelocityPerElectricField(Quantity[Div[VelocityKind, ElectricFieldKind], V,
     ) -> VelocityPerElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityPerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityPerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityPerElectricField[float, S], other: W, /
+    ) -> VelocityPerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityPerElectricField[V, S]: ...
+    @override
+    def item(self) -> VelocityPerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

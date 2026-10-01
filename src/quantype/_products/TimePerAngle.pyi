@@ -98,6 +98,31 @@ class TimePerAngle(Quantity[Div[TimeKind, AngleKind], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> Angle[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerAngle[float, S], other: Angle[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Angle[V, S] | Angle[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerAngle[float, S], other: W, /
+    ) -> TimePerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +134,19 @@ class TimePerAngle(Quantity[Div[TimeKind, AngleKind], V, S]):
     ) -> TimePerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerAngle[float, S], other: W, /
+    ) -> TimePerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerAngle[V, S]: ...
+    @override
+    def item(self) -> TimePerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

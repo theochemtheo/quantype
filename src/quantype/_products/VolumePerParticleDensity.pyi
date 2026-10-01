@@ -112,6 +112,33 @@ class VolumePerParticleDensity(Quantity[Div[VolumeKind, ParticleDensityKind], V,
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> ParticleDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerParticleDensity[float, S], other: ParticleDensity[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerParticleDensity[float, S], other: W, /
+    ) -> VolumePerParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerParticleDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ParticleDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ParticleDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerParticleDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -123,6 +150,19 @@ class VolumePerParticleDensity(Quantity[Div[VolumeKind, ParticleDensityKind], V,
     ) -> VolumePerParticleDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerParticleDensity[float, S], other: W, /
+    ) -> VolumePerParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerParticleDensity[V, S]: ...
+    @override
+    def item(self) -> VolumePerParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -100,6 +100,33 @@ class MassPerAcceleration(Quantity[Div[MassKind, AccelerationKind], V, S]):
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassPerAcceleration[float, S], other: W, /
+    ) -> MassPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class MassPerAcceleration(Quantity[Div[MassKind, AccelerationKind], V, S]):
     ) -> MassPerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassPerAcceleration[float, S], other: W, /
+    ) -> MassPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> MassPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

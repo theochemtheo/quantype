@@ -83,6 +83,25 @@ class EntropySquared(Quantity[Pow[EntropyKind, Literal[2]], V, S]):
     ) -> Quantity[Div[Pow[EntropyKind, Literal[2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EntropySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropySquared[float, S], other: W, /
+    ) -> EntropySquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropySquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropySquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[EntropyKind, Literal[2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[EntropyKind, Literal[2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropySquared[V, S]: ...
     @overload
     def __rmul__(
@@ -94,6 +113,19 @@ class EntropySquared(Quantity[Pow[EntropyKind, Literal[2]], V, S]):
     ) -> EntropySquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropySquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropySquared[float, S], other: W, /
+    ) -> EntropySquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropySquared[V, S]: ...
+    @override
+    def item(self) -> EntropySquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

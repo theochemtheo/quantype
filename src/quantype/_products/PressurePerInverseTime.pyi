@@ -167,6 +167,47 @@ class PressurePerInverseTime(Quantity[Div[PressureKind, InverseTimeKind], V, S])
     def _rtruediv_Action(self, other: Action[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressurePerInverseTime[float, S], other: Volume[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PressurePerInverseTime[float, S], other: Frequency[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PressurePerInverseTime[float, S], other: InverseTime[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressurePerInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressurePerInverseTime[float, S], other: W, /
+    ) -> PressurePerInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressurePerInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressurePerInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[PressureKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[PressureKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressurePerInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -178,6 +219,19 @@ class PressurePerInverseTime(Quantity[Div[PressureKind, InverseTimeKind], V, S])
     ) -> PressurePerInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressurePerInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressurePerInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressurePerInverseTime[float, S], other: W, /
+    ) -> PressurePerInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressurePerInverseTime[V, S]: ...
+    @override
+    def item(self) -> PressurePerInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

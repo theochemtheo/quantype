@@ -153,6 +153,31 @@ class ForceInverseTime(Quantity[Mul[ForceKind, InverseTimeKind], V, S]):
     def _rtruediv_Force(self, other: Force[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceInverseTime[float, S], other: Time[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceInverseTime[float, S], other: W, /
+    ) -> ForceInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -164,6 +189,19 @@ class ForceInverseTime(Quantity[Mul[ForceKind, InverseTimeKind], V, S]):
     ) -> ForceInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceInverseTime[float, S], other: W, /
+    ) -> ForceInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceInverseTime[V, S]: ...
+    @override
+    def item(self) -> ForceInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

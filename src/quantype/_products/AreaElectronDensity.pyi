@@ -130,6 +130,33 @@ class AreaElectronDensity(Quantity[Mul[AreaKind, ElectronDensityKind], V, S]):
     ) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaElectronDensity[float, S], other: Length[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaElectronDensity[float, S], other: W, /
+    ) -> AreaElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaElectronDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -141,6 +168,19 @@ class AreaElectronDensity(Quantity[Mul[AreaKind, ElectronDensityKind], V, S]):
     ) -> AreaElectronDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaElectronDensity[float, S], other: W, /
+    ) -> AreaElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaElectronDensity[V, S]: ...
+    @override
+    def item(self) -> AreaElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

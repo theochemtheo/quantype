@@ -149,6 +149,33 @@ class ParticleDensityFrequency(Quantity[Mul[ParticleDensityKind, FrequencyKind],
     ) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ParticleDensityFrequency[float, S], other: Time[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ParticleDensityFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityFrequency[float, S], other: W, /
+    ) -> ParticleDensityFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensityFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -160,6 +187,19 @@ class ParticleDensityFrequency(Quantity[Mul[ParticleDensityKind, FrequencyKind],
     ) -> ParticleDensityFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensityFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityFrequency[float, S], other: W, /
+    ) -> ParticleDensityFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ParticleDensityFrequency[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

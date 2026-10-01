@@ -74,6 +74,25 @@ class AngleCubed(Quantity[Pow[AngleKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[AngleKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AngleCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AngleCubed[float, S], other: W, /
+    ) -> AngleCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AngleCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AngleCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[AngleKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[AngleKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AngleCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class AngleCubed(Quantity[Pow[AngleKind, Literal[3]], V, S]):
     ) -> AngleCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AngleCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AngleCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AngleCubed[float, S], other: W, /
+    ) -> AngleCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AngleCubed[V, S]: ...
+    @override
+    def item(self) -> AngleCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

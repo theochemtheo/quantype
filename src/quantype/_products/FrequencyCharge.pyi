@@ -125,6 +125,31 @@ class FrequencyCharge(Quantity[Mul[FrequencyKind, ChargeKind], V, S]):
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyCharge[float, S], other: Time[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyCharge[float, S], other: W, /
+    ) -> FrequencyCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +161,19 @@ class FrequencyCharge(Quantity[Mul[FrequencyKind, ChargeKind], V, S]):
     ) -> FrequencyCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyCharge[float, S], other: W, /
+    ) -> FrequencyCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyCharge[V, S]: ...
+    @override
+    def item(self) -> FrequencyCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

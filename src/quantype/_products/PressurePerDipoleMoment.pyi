@@ -139,6 +139,41 @@ class PressurePerDipoleMoment(Quantity[Div[PressureKind, DipoleMomentKind], V, S
     ) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressurePerDipoleMoment[float, S], other: Volume[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PressurePerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressurePerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressurePerDipoleMoment[float, S], other: W, /
+    ) -> PressurePerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressurePerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressurePerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[PressureKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[PressureKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressurePerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -150,6 +185,19 @@ class PressurePerDipoleMoment(Quantity[Div[PressureKind, DipoleMomentKind], V, S
     ) -> PressurePerDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressurePerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressurePerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressurePerDipoleMoment[float, S], other: W, /
+    ) -> PressurePerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressurePerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> PressurePerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

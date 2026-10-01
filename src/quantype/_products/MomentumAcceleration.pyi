@@ -164,6 +164,31 @@ class MomentumAcceleration(Quantity[Mul[MomentumKind, AccelerationKind], V, S]):
     def _rtruediv_Energy(self, other: Energy[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MomentumAcceleration[float, S], other: Time[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MomentumAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumAcceleration[float, S], other: W, /
+    ) -> MomentumAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MomentumKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MomentumKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -175,6 +200,19 @@ class MomentumAcceleration(Quantity[Mul[MomentumKind, AccelerationKind], V, S]):
     ) -> MomentumAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumAcceleration[float, S], other: W, /
+    ) -> MomentumAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumAcceleration[V, S]: ...
+    @override
+    def item(self) -> MomentumAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

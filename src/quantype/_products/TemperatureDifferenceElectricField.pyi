@@ -127,6 +127,29 @@ class TemperatureDifferenceElectricField(
     ) -> Quantity[Div[Mul[TemperatureDifferenceKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureDifferenceElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferenceElectricField[float, S], other: W, /
+    ) -> TemperatureDifferenceElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferenceElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureDifferenceElectricField[V, S]: ...
@@ -144,6 +167,23 @@ class TemperatureDifferenceElectricField(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureDifferenceElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferenceElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferenceElectricField[float, S], other: W, /
+    ) -> TemperatureDifferenceElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceElectricField[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferenceElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

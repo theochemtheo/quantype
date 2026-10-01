@@ -112,6 +112,27 @@ class EnergyPerAtomForceConstant(
     ) -> Quantity[Div[Mul[EnergyPerAtomKind, ForceConstantKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyPerAtomForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerAtomForceConstant[float, S], other: W, /
+    ) -> EnergyPerAtomForceConstant[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerAtomForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerAtomForceConstant[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerAtomKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerAtomKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerAtomForceConstant[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +146,21 @@ class EnergyPerAtomForceConstant(
     ) -> EnergyPerAtomForceConstant[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerAtomForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerAtomForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerAtomForceConstant[float, S], other: W, /
+    ) -> EnergyPerAtomForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerAtomForceConstant[V, S]: ...
+    @override
+    def item(self) -> EnergyPerAtomForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

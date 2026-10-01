@@ -166,6 +166,45 @@ class ForceConstantPerElectricPotential(
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerElectricPotential[float, S], other: Area[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerElectricPotential[float, S],
+        other: ElectricPotential[W, S],
+        /,
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerElectricPotential[float, S], other: W, /
+    ) -> ForceConstantPerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ForceConstantPerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> ForceConstantPerElectricPotential[V, S]: ...
@@ -183,6 +222,23 @@ class ForceConstantPerElectricPotential(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ForceConstantPerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerElectricPotential[float, S], other: W, /
+    ) -> ForceConstantPerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ForceConstantPerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

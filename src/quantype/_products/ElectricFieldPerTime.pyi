@@ -135,6 +135,33 @@ class ElectricFieldPerTime(Quantity[Div[ElectricFieldKind, TimeKind], V, S]):
     def _rtruediv_ElectricField(self, other: ElectricField[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricFieldPerTime[float, S], other: Time[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricFieldPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricFieldPerTime[float, S], other: W, /
+    ) -> ElectricFieldPerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricFieldPerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricFieldPerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricFieldPerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +173,19 @@ class ElectricFieldPerTime(Quantity[Div[ElectricFieldKind, TimeKind], V, S]):
     ) -> ElectricFieldPerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricFieldPerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricFieldPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricFieldPerTime[float, S], other: W, /
+    ) -> ElectricFieldPerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricFieldPerTime[V, S]: ...
+    @override
+    def item(self) -> ElectricFieldPerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

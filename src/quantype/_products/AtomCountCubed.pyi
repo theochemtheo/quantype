@@ -74,6 +74,25 @@ class AtomCountCubed(Quantity[Pow[AtomCountKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[AtomCountKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AtomCountCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountCubed[float, S], other: W, /
+    ) -> AtomCountCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[AtomCountKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[AtomCountKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class AtomCountCubed(Quantity[Pow[AtomCountKind, Literal[3]], V, S]):
     ) -> AtomCountCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountCubed[float, S], other: W, /
+    ) -> AtomCountCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountCubed[V, S]: ...
+    @override
+    def item(self) -> AtomCountCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

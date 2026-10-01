@@ -92,6 +92,25 @@ class PressureAngle(Quantity[Mul[PressureKind, AngleKind], V, S]):
     ) -> Quantity[Div[Mul[PressureKind, AngleKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PressureAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressureAngle[float, S], other: W, /
+    ) -> PressureAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressureAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressureAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressureAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class PressureAngle(Quantity[Mul[PressureKind, AngleKind], V, S]):
     ) -> PressureAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressureAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressureAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressureAngle[float, S], other: W, /
+    ) -> PressureAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressureAngle[V, S]: ...
+    @override
+    def item(self) -> PressureAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

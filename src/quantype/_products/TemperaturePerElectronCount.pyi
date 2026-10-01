@@ -127,6 +127,35 @@ class TemperaturePerElectronCount(
     ) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperaturePerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperaturePerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperaturePerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperaturePerElectronCount[float, S], other: W, /
+    ) -> TemperaturePerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperaturePerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperaturePerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperaturePerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +169,23 @@ class TemperaturePerElectronCount(
     ) -> TemperaturePerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperaturePerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperaturePerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperaturePerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperaturePerElectronCount[float, S], other: W, /
+    ) -> TemperaturePerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperaturePerElectronCount[V, S]: ...
+    @override
+    def item(self) -> TemperaturePerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

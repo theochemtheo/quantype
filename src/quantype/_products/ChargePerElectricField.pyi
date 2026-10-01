@@ -143,6 +143,41 @@ class ChargePerElectricField(Quantity[Div[ChargeKind, ElectricFieldKind], V, S])
     ) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerElectricField[float, S], other: ElectricPotential[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerElectricField[float, S], other: W, /
+    ) -> ChargePerElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -154,6 +189,19 @@ class ChargePerElectricField(Quantity[Div[ChargeKind, ElectricFieldKind], V, S])
     ) -> ChargePerElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerElectricField[float, S], other: W, /
+    ) -> ChargePerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerElectricField[V, S]: ...
+    @override
+    def item(self) -> ChargePerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

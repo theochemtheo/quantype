@@ -195,6 +195,37 @@ class TemperatureDifferenceInverseTime(
     ) -> Dimensionless[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureDifferenceInverseTime[float, S], other: Time[W, S], /
+    ) -> TemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> TemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureDifferenceInverseTime[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferenceInverseTime[float, S], other: W, /
+    ) -> TemperatureDifferenceInverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferenceInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureDifferenceInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -210,6 +241,23 @@ class TemperatureDifferenceInverseTime(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureDifferenceInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferenceInverseTime[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferenceInverseTime[float, S], other: W, /
+    ) -> TemperatureDifferenceInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceInverseTime[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferenceInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

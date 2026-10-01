@@ -141,6 +141,39 @@ class ElectricPotentialPerParticleDensity(
     ) -> ParticleDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricPotentialPerParticleDensity[float, S],
+        other: ParticleDensity[W, S],
+        /,
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricPotentialPerParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricPotentialPerParticleDensity[float, S], other: W, /
+    ) -> ElectricPotentialPerParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectricPotentialPerParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricPotentialPerParticleDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, ParticleDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, ParticleDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> ElectricPotentialPerParticleDensity[V, S]: ...
@@ -158,6 +191,23 @@ class ElectricPotentialPerParticleDensity(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ElectricPotentialPerParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricPotentialPerParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricPotentialPerParticleDensity[float, S], other: W, /
+    ) -> ElectricPotentialPerParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectricPotentialPerParticleDensity[V, S]: ...
+    @override
+    def item(self) -> ElectricPotentialPerParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

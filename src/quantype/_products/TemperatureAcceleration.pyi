@@ -102,6 +102,25 @@ class TemperatureAcceleration(Quantity[Mul[TemperatureKind, AccelerationKind], V
     ) -> Quantity[Div[Mul[TemperatureKind, AccelerationKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureAcceleration[float, S], other: W, /
+    ) -> TemperatureAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +132,19 @@ class TemperatureAcceleration(Quantity[Mul[TemperatureKind, AccelerationKind], V
     ) -> TemperatureAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureAcceleration[float, S], other: W, /
+    ) -> TemperatureAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureAcceleration[V, S]: ...
+    @override
+    def item(self) -> TemperatureAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

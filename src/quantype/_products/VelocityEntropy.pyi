@@ -92,6 +92,25 @@ class VelocityEntropy(Quantity[Mul[VelocityKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[VelocityKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VelocityEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityEntropy[float, S], other: W, /
+    ) -> VelocityEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class VelocityEntropy(Quantity[Mul[VelocityKind, EntropyKind], V, S]):
     ) -> VelocityEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityEntropy[float, S], other: W, /
+    ) -> VelocityEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityEntropy[V, S]: ...
+    @override
+    def item(self) -> VelocityEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

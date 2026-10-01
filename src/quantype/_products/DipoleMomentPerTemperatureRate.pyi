@@ -131,6 +131,37 @@ class DipoleMomentPerTemperatureRate(
     ) -> TemperatureRate[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: DipoleMomentPerTemperatureRate[float, S], other: TemperatureRate[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: DipoleMomentPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: DipoleMomentPerTemperatureRate[float, S], other: W, /
+    ) -> DipoleMomentPerTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: DipoleMomentPerTemperatureRate[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, TemperatureRateKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, TemperatureRateKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> DipoleMomentPerTemperatureRate[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +177,23 @@ class DipoleMomentPerTemperatureRate(
     def __rmul__(
         self, other: _Numerical, /
     ) -> DipoleMomentPerTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: DipoleMomentPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: DipoleMomentPerTemperatureRate[float, S], other: W, /
+    ) -> DipoleMomentPerTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> DipoleMomentPerTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

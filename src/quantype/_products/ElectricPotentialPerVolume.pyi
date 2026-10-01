@@ -175,6 +175,51 @@ class ElectricPotentialPerVolume(
     def _rtruediv_ElectricField(self, other: ElectricField[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricPotentialPerVolume[float, S], other: Area[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricPotentialPerVolume[float, S], other: Volume[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricPotentialPerVolume[float, S], other: Charge[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricPotentialPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricPotentialPerVolume[float, S], other: W, /
+    ) -> ElectricPotentialPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricPotentialPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricPotentialPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, VolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, VolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricPotentialPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -188,6 +233,21 @@ class ElectricPotentialPerVolume(
     ) -> ElectricPotentialPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricPotentialPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricPotentialPerVolume[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricPotentialPerVolume[float, S], other: W, /
+    ) -> ElectricPotentialPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricPotentialPerVolume[V, S]: ...
+    @override
+    def item(self) -> ElectricPotentialPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

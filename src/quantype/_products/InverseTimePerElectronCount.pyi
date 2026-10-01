@@ -136,6 +136,35 @@ class InverseTimePerElectronCount(
     ) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimePerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimePerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> InverseTimePerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimePerElectronCount[float, S], other: W, /
+    ) -> InverseTimePerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimePerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimePerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimePerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -149,6 +178,23 @@ class InverseTimePerElectronCount(
     ) -> InverseTimePerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimePerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimePerElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> InverseTimePerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimePerElectronCount[float, S], other: W, /
+    ) -> InverseTimePerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> InverseTimePerElectronCount[V, S]: ...
+    @override
+    def item(self) -> InverseTimePerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

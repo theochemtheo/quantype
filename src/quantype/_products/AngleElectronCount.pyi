@@ -94,6 +94,25 @@ class AngleElectronCount(Quantity[Mul[AngleKind, ElectronCountKind], V, S]):
     ) -> Quantity[Div[Mul[AngleKind, ElectronCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AngleElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AngleElectronCount[float, S], other: W, /
+    ) -> AngleElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AngleElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AngleElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AngleElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class AngleElectronCount(Quantity[Mul[AngleKind, ElectronCountKind], V, S]):
     ) -> AngleElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AngleElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AngleElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AngleElectronCount[float, S], other: W, /
+    ) -> AngleElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AngleElectronCount[V, S]: ...
+    @override
+    def item(self) -> AngleElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

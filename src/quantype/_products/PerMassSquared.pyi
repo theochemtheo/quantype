@@ -74,6 +74,25 @@ class PerMassSquared(Quantity[Pow[MassKind, Literal[-2]], V, S]):
     ) -> Quantity[Div[Pow[MassKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerMassSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMassSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerMassSquared[float, S], other: W, /
+    ) -> PerMassSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerMassSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerMassSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MassKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MassKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerMassSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerMassSquared(Quantity[Pow[MassKind, Literal[-2]], V, S]):
     ) -> PerMassSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerMassSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerMassSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMassSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerMassSquared[float, S], other: W, /
+    ) -> PerMassSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerMassSquared[V, S]: ...
+    @override
+    def item(self) -> PerMassSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -157,6 +157,49 @@ class TimePerFrequency(Quantity[Div[TimeKind, FrequencyKind], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> Frequency[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerFrequency[float, S], other: Frequency[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimePerFrequency[float, S], other: InverseTime[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimePerFrequency[float, S], other: Acceleration[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerFrequency[float, S], other: W, /
+    ) -> TimePerFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -168,6 +211,19 @@ class TimePerFrequency(Quantity[Div[TimeKind, FrequencyKind], V, S]):
     ) -> TimePerFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerFrequency[float, S], other: W, /
+    ) -> TimePerFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerFrequency[V, S]: ...
+    @override
+    def item(self) -> TimePerFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

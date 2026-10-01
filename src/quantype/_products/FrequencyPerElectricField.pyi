@@ -217,6 +217,59 @@ class FrequencyPerElectricField(Quantity[Div[FrequencyKind, ElectricFieldKind], 
     def _rtruediv_DipoleMoment(self, other: DipoleMoment[V, S], /) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerElectricField[float, S], other: Momentum[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerElectricField[float, S], other: ElectricPotential[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerElectricField[float, S], other: Action[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerElectricField[float, S], other: W, /
+    ) -> FrequencyPerElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -230,6 +283,21 @@ class FrequencyPerElectricField(Quantity[Div[FrequencyKind, ElectricFieldKind], 
     ) -> FrequencyPerElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerElectricField[float, S], other: W, /
+    ) -> FrequencyPerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerElectricField[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

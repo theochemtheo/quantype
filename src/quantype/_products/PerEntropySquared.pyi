@@ -74,6 +74,25 @@ class PerEntropySquared(Quantity[Pow[EntropyKind, Literal[-2]], V, S]):
     ) -> Quantity[Div[Pow[EntropyKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerEntropySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerEntropySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerEntropySquared[float, S], other: W, /
+    ) -> PerEntropySquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerEntropySquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerEntropySquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[EntropyKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[EntropyKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerEntropySquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerEntropySquared(Quantity[Pow[EntropyKind, Literal[-2]], V, S]):
     ) -> PerEntropySquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerEntropySquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerEntropySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerEntropySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerEntropySquared[float, S], other: W, /
+    ) -> PerEntropySquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerEntropySquared[V, S]: ...
+    @override
+    def item(self) -> PerEntropySquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

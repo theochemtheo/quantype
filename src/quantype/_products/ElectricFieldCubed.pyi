@@ -74,6 +74,25 @@ class ElectricFieldCubed(Quantity[Pow[ElectricFieldKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[ElectricFieldKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectricFieldCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricFieldCubed[float, S], other: W, /
+    ) -> ElectricFieldCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricFieldCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricFieldCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ElectricFieldKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ElectricFieldKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricFieldCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class ElectricFieldCubed(Quantity[Pow[ElectricFieldKind, Literal[3]], V, S]):
     ) -> ElectricFieldCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricFieldCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricFieldCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricFieldCubed[float, S], other: W, /
+    ) -> ElectricFieldCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricFieldCubed[V, S]: ...
+    @override
+    def item(self) -> ElectricFieldCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

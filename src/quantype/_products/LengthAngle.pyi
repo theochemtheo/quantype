@@ -92,6 +92,25 @@ class LengthAngle(Quantity[Mul[LengthKind, AngleKind], V, S]):
     ) -> Quantity[Div[Mul[LengthKind, AngleKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: LengthAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthAngle[float, S], other: W, /
+    ) -> LengthAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class LengthAngle(Quantity[Mul[LengthKind, AngleKind], V, S]):
     ) -> LengthAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthAngle[float, S], other: W, /
+    ) -> LengthAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthAngle[V, S]: ...
+    @override
+    def item(self) -> LengthAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

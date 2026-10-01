@@ -112,6 +112,33 @@ class ActionPerElectronDensity(Quantity[Div[ActionKind, ElectronDensityKind], V,
     def _rtruediv_Action(self, other: Action[V, S], /) -> ElectronDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ActionPerElectronDensity[float, S], other: ElectronDensity[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronDensity[V, S] | ElectronDensity[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ActionPerElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ActionPerElectronDensity[float, S], other: W, /
+    ) -> ActionPerElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ActionPerElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ActionPerElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ActionKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ActionKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ActionPerElectronDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -123,6 +150,19 @@ class ActionPerElectronDensity(Quantity[Div[ActionKind, ElectronDensityKind], V,
     ) -> ActionPerElectronDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ActionPerElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ActionPerElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ActionPerElectronDensity[float, S], other: W, /
+    ) -> ActionPerElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ActionPerElectronDensity[V, S]: ...
+    @override
+    def item(self) -> ActionPerElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

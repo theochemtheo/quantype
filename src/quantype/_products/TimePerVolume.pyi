@@ -98,6 +98,31 @@ class TimePerVolume(Quantity[Div[TimeKind, VolumeKind], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerVolume[float, S], other: Volume[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerVolume[float, S], other: W, /
+    ) -> TimePerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, VolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, VolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +134,19 @@ class TimePerVolume(Quantity[Div[TimeKind, VolumeKind], V, S]):
     ) -> TimePerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerVolume[float, S], other: W, /
+    ) -> TimePerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerVolume[V, S]: ...
+    @override
+    def item(self) -> TimePerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

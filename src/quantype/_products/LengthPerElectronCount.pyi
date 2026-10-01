@@ -102,6 +102,33 @@ class LengthPerElectronCount(Quantity[Div[LengthKind, ElectronCountKind], V, S])
     def _rtruediv_Length(self, other: Length[V, S], /) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthPerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthPerElectronCount[float, S], other: W, /
+    ) -> LengthPerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthPerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthPerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[LengthKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[LengthKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthPerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class LengthPerElectronCount(Quantity[Div[LengthKind, ElectronCountKind], V, S])
     ) -> LengthPerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthPerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthPerElectronCount[float, S], other: W, /
+    ) -> LengthPerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthPerElectronCount[V, S]: ...
+    @override
+    def item(self) -> LengthPerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

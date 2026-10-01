@@ -138,6 +138,27 @@ class MagneticMomentMassDensity(
     ) -> Quantity[Div[Mul[MagneticMomentKind, MassDensityKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MagneticMomentMassDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagneticMomentMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagneticMomentMassDensity[float, S], other: W, /
+    ) -> MagneticMomentMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MagneticMomentMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagneticMomentMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, MassDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, MassDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagneticMomentMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -151,6 +172,21 @@ class MagneticMomentMassDensity(
     ) -> MagneticMomentMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagneticMomentMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagneticMomentMassDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagneticMomentMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagneticMomentMassDensity[float, S], other: W, /
+    ) -> MagneticMomentMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MagneticMomentMassDensity[V, S]: ...
+    @override
+    def item(self) -> MagneticMomentMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

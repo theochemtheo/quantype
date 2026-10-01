@@ -74,6 +74,25 @@ class PerDipoleMomentSquared(Quantity[Pow[DipoleMomentKind, Literal[-2]], V, S])
     ) -> Quantity[Div[Pow[DipoleMomentKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerDipoleMomentSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerDipoleMomentSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerDipoleMomentSquared[float, S], other: W, /
+    ) -> PerDipoleMomentSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerDipoleMomentSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerDipoleMomentSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[DipoleMomentKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[DipoleMomentKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerDipoleMomentSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerDipoleMomentSquared(Quantity[Pow[DipoleMomentKind, Literal[-2]], V, S])
     ) -> PerDipoleMomentSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerDipoleMomentSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerDipoleMomentSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerDipoleMomentSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerDipoleMomentSquared[float, S], other: W, /
+    ) -> PerDipoleMomentSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerDipoleMomentSquared[V, S]: ...
+    @override
+    def item(self) -> PerDipoleMomentSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

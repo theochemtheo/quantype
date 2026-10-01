@@ -123,6 +123,35 @@ class EnergyDensityPerTemperature(
     ) -> Temperature[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyDensityPerTemperature[float, S], other: Temperature[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyDensityPerTemperature[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyDensityPerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityPerTemperature[float, S], other: W, /
+    ) -> EnergyDensityPerTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyDensityPerTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityPerTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyDensityPerTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +165,23 @@ class EnergyDensityPerTemperature(
     ) -> EnergyDensityPerTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyDensityPerTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityPerTemperature[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyDensityPerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityPerTemperature[float, S], other: W, /
+    ) -> EnergyDensityPerTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> EnergyDensityPerTemperature[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityPerTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

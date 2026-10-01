@@ -179,6 +179,57 @@ class PerCharge(Quantity[Pow[ChargeKind, Literal[-1]], V, S]):
     def _rtruediv_ElectricField(self, other: ElectricField[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerCharge[float, S], other: Energy[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerCharge[float, S], other: Force[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Force[V, S] | Force[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerCharge[float, S], other: Charge[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerCharge[float, S], other: DipoleMoment[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerCharge[float, S], other: W, /
+    ) -> PerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ChargeKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ChargeKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -190,6 +241,19 @@ class PerCharge(Quantity[Pow[ChargeKind, Literal[-1]], V, S]):
     ) -> PerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerCharge[float, S], other: W, /
+    ) -> PerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerCharge[V, S]: ...
+    @override
+    def item(self) -> PerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

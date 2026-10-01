@@ -74,6 +74,25 @@ class InverseTimeCubed(Quantity[Pow[InverseTimeKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[InverseTimeKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: InverseTimeCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimeCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimeCubed[float, S], other: W, /
+    ) -> InverseTimeCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimeCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimeCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[InverseTimeKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[InverseTimeKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimeCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class InverseTimeCubed(Quantity[Pow[InverseTimeKind, Literal[3]], V, S]):
     ) -> InverseTimeCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimeCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimeCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimeCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimeCubed[float, S], other: W, /
+    ) -> InverseTimeCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> InverseTimeCubed[V, S]: ...
+    @override
+    def item(self) -> InverseTimeCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

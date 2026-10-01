@@ -142,6 +142,39 @@ class VolumePerAction(Quantity[Div[VolumeKind, ActionKind], V, S]):
     ) -> EnergyDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerAction[float, S], other: Pressure[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumePerAction[float, S], other: Action[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerAction[float, S], other: W, /
+    ) -> VolumePerAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerAction[V, S]: ...
     @overload
     def __rmul__(
@@ -153,6 +186,19 @@ class VolumePerAction(Quantity[Div[VolumeKind, ActionKind], V, S]):
     ) -> VolumePerAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumePerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerAction[float, S], other: W, /
+    ) -> VolumePerAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerAction[V, S]: ...
+    @override
+    def item(self) -> VolumePerAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

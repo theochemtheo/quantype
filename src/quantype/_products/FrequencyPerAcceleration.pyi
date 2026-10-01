@@ -215,6 +215,63 @@ class FrequencyPerAcceleration(Quantity[Div[FrequencyKind, AccelerationKind], V,
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerAcceleration[float, S], other: Length[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Length[V, S] | Length[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerAcceleration[float, S], other: Velocity[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerAcceleration[float, S], other: Energy[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerAcceleration[float, S], other: Momentum[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerAcceleration[float, S], other: W, /
+    ) -> FrequencyPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -226,6 +283,19 @@ class FrequencyPerAcceleration(Quantity[Div[FrequencyKind, AccelerationKind], V,
     ) -> FrequencyPerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerAcceleration[float, S], other: W, /
+    ) -> FrequencyPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

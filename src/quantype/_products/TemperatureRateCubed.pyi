@@ -74,6 +74,25 @@ class TemperatureRateCubed(Quantity[Pow[TemperatureRateKind, Literal[3]], V, S])
     ) -> Quantity[Div[Pow[TemperatureRateKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureRateCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureRateCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRateCubed[float, S], other: W, /
+    ) -> TemperatureRateCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureRateCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRateCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[TemperatureRateKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[TemperatureRateKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureRateCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class TemperatureRateCubed(Quantity[Pow[TemperatureRateKind, Literal[3]], V, S])
     ) -> TemperatureRateCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureRateCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRateCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureRateCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRateCubed[float, S], other: W, /
+    ) -> TemperatureRateCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureRateCubed[V, S]: ...
+    @override
+    def item(self) -> TemperatureRateCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

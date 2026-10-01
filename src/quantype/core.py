@@ -527,6 +527,16 @@ class Quantity[K, V, S: UnitSystem]:
         quotient = keep_storage(raw, operand / raw)
         return _wrap(kind, _rescaled(quotient, scale), self._system)
 
+    def __matmul__(self, other: Any) -> Quantity[Any, Any, Any]:
+        from quantype._internal._numpy import matmul
+
+        return cast("Quantity[Any, Any, Any]", matmul(self, other))
+
+    def __rmatmul__(self, other: Any) -> Quantity[Any, Any, Any]:
+        from quantype._internal._numpy import matmul
+
+        return cast("Quantity[Any, Any, Any]", matmul(other, self))
+
     def _operand(self, value: object) -> Any:
         operand = real_operand(value)
         if operand is None:
@@ -714,6 +724,64 @@ class Quantity[K, V, S: UnitSystem]:
 
     def min(self, axis: int | None = None, *, keepdims: bool = False) -> Self:
         return self._reduce("min", axis, keepdims=keepdims)
+
+    def var(
+        self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Quantity[Any, V, S]:
+        """Variance: the square of the kind, as ``quantype.numpy.var`` gives."""
+        from quantype._internal._numpy import var
+
+        return cast(
+            "Quantity[Any, V, S]", var(self, axis, ddof=ddof, keepdims=keepdims)
+        )
+
+    def copy(self) -> Self:
+        """A copy whose numbers are independent of this quantity's."""
+        raw: Any = self._value
+        if type(raw).__module__.startswith("torch"):
+            return self._with(raw.clone())
+        copied = getattr(raw, "copy", None)
+        return self._with(copied() if callable(copied) else raw)
+
+    @property
+    def size(self) -> int:
+        """The number of elements: 1 for a scalar."""
+        raw: Any = self._value
+        if type(raw).__module__.startswith("torch"):
+            return int(raw.numel())
+        return int(getattr(raw, "size", 1))
+
+    def ravel(self) -> Self:
+        """The numbers as one dimension, keeping the kind."""
+        return self.reshape(-1)
+
+    def flatten(self) -> Self:
+        """The numbers as one dimension, keeping the kind."""
+        return self.reshape(-1)
+
+    def item(self) -> Quantity[K, float, S]:
+        """A one-element quantity as one with Python float storage."""
+        raw: Any = self._value
+        number = float(raw.item() if hasattr(raw, "item") else raw)
+        return cast("Quantity[K, float, S]", self._with(number))
+
+    def argmin(self, axis: int | None = None) -> Any:
+        """The index of the smallest value, as a plain integer or array."""
+        from quantype._internal._numpy import argmin
+
+        return argmin(self, axis=axis)
+
+    def argmax(self, axis: int | None = None) -> Any:
+        """The index of the largest value, as a plain integer or array."""
+        from quantype._internal._numpy import argmax
+
+        return argmax(self, axis=axis)
+
+    def argsort(self, axis: int = -1) -> Any:
+        """The indices that sort the values, as a plain array."""
+        from quantype._internal._numpy import argsort
+
+        return argsort(self, axis=axis)
 
     def __array__(self, dtype: object = None, copy: object = None) -> Any:
         raise TypeError(

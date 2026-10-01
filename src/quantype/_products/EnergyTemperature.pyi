@@ -110,6 +110,25 @@ class EnergyTemperature(Quantity[Mul[EnergyKind, TemperatureKind], V, S]):
     ) -> Quantity[Div[Mul[EnergyKind, TemperatureKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyTemperature[float, S], other: W, /
+    ) -> EnergyTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -121,6 +140,19 @@ class EnergyTemperature(Quantity[Mul[EnergyKind, TemperatureKind], V, S]):
     ) -> EnergyTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyTemperature[float, S], other: W, /
+    ) -> EnergyTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyTemperature[V, S]: ...
+    @override
+    def item(self) -> EnergyTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

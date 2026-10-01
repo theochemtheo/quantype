@@ -87,6 +87,25 @@ class ParticleDensitySquared(Quantity[Pow[ParticleDensityKind, Literal[2]], V, S
     ) -> Quantity[Div[Pow[ParticleDensityKind, Literal[2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ParticleDensitySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensitySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensitySquared[float, S], other: W, /
+    ) -> ParticleDensitySquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensitySquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensitySquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ParticleDensityKind, Literal[2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ParticleDensityKind, Literal[2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensitySquared[V, S]: ...
     @overload
     def __rmul__(
@@ -98,6 +117,19 @@ class ParticleDensitySquared(Quantity[Pow[ParticleDensityKind, Literal[2]], V, S
     ) -> ParticleDensitySquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensitySquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensitySquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensitySquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensitySquared[float, S], other: W, /
+    ) -> ParticleDensitySquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ParticleDensitySquared[V, S]: ...
+    @override
+    def item(self) -> ParticleDensitySquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

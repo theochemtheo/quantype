@@ -233,6 +233,65 @@ class TimeElectricField(Quantity[Mul[TimeKind, ElectricFieldKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> DipoleMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeElectricField[float, S], other: Velocity[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeElectricField[float, S], other: Frequency[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeElectricField[float, S], other: InverseTime[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeElectricField[float, S], other: Charge[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeElectricField[float, S], other: DipoleMoment[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeElectricField[float, S], other: W, /
+    ) -> TimeElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -244,6 +303,19 @@ class TimeElectricField(Quantity[Mul[TimeKind, ElectricFieldKind], V, S]):
     ) -> TimeElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeElectricField[float, S], other: W, /
+    ) -> TimeElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeElectricField[V, S]: ...
+    @override
+    def item(self) -> TimeElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -166,6 +166,45 @@ class ElectricPotentialPerDipoleMoment(
     ) -> Charge[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricPotentialPerDipoleMoment[float, S], other: Charge[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricPotentialPerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricPotentialPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricPotentialPerDipoleMoment[float, S], other: W, /
+    ) -> ElectricPotentialPerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectricPotentialPerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricPotentialPerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricPotentialPerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -181,6 +220,23 @@ class ElectricPotentialPerDipoleMoment(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ElectricPotentialPerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricPotentialPerDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialPerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricPotentialPerDipoleMoment[float, S], other: W, /
+    ) -> ElectricPotentialPerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectricPotentialPerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> ElectricPotentialPerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -127,6 +127,37 @@ class MagnetizationPerEnergyPerAtom(
     ) -> EnergyPerAtom[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MagnetizationPerEnergyPerAtom[float, S], other: EnergyPerAtom[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MagnetizationPerEnergyPerAtom[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationPerEnergyPerAtom[float, S], other: W, /
+    ) -> MagnetizationPerEnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerEnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationPerEnergyPerAtom[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, EnergyPerAtomKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, EnergyPerAtomKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationPerEnergyPerAtom[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +171,23 @@ class MagnetizationPerEnergyPerAtom(
     ) -> MagnetizationPerEnergyPerAtom[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagnetizationPerEnergyPerAtom[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationPerEnergyPerAtom[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationPerEnergyPerAtom[float, S], other: W, /
+    ) -> MagnetizationPerEnergyPerAtom[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerEnergyPerAtom[V, S]: ...
+    @override
+    def item(self) -> MagnetizationPerEnergyPerAtom[float, S]: ...
     @overload
     @override
     def __rtruediv__(

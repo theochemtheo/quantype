@@ -167,6 +167,47 @@ class TimePressure(Quantity[Mul[TimeKind, PressureKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePressure[float, S], other: Volume[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimePressure[float, S], other: Frequency[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimePressure[float, S], other: InverseTime[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePressure[float, S], other: W, /
+    ) -> TimePressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePressure[V, S]: ...
     @overload
     def __rmul__(
@@ -178,6 +219,19 @@ class TimePressure(Quantity[Mul[TimeKind, PressureKind], V, S]):
     ) -> TimePressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePressure[float, S], other: W, /
+    ) -> TimePressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePressure[V, S]: ...
+    @override
+    def item(self) -> TimePressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

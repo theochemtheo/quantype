@@ -116,6 +116,31 @@ class LengthMassDensity(Quantity[Mul[LengthKind, MassDensityKind], V, S]):
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthMassDensity[float, S], other: Area[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthMassDensity[float, S], other: W, /
+    ) -> LengthMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, MassDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, MassDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -127,6 +152,19 @@ class LengthMassDensity(Quantity[Mul[LengthKind, MassDensityKind], V, S]):
     ) -> LengthMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthMassDensity[float, S], other: W, /
+    ) -> LengthMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthMassDensity[V, S]: ...
+    @override
+    def item(self) -> LengthMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

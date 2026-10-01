@@ -106,6 +106,33 @@ class TemperatureRatePerCharge(Quantity[Div[TemperatureRateKind, ChargeKind], V,
     ) -> Charge[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureRatePerCharge[float, S], other: Charge[W, S], /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> TemperatureRate[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureRatePerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureRatePerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRatePerCharge[float, S], other: W, /
+    ) -> TemperatureRatePerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureRatePerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRatePerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureRatePerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class TemperatureRatePerCharge(Quantity[Div[TemperatureRateKind, ChargeKind], V,
     ) -> TemperatureRatePerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureRatePerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRatePerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureRatePerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRatePerCharge[float, S], other: W, /
+    ) -> TemperatureRatePerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureRatePerCharge[V, S]: ...
+    @override
+    def item(self) -> TemperatureRatePerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

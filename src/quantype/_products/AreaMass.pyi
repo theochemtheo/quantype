@@ -92,6 +92,25 @@ class AreaMass(Quantity[Mul[AreaKind, MassKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, MassKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaMass[float, S], other: W, /
+    ) -> AreaMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaMass[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class AreaMass(Quantity[Mul[AreaKind, MassKind], V, S]):
     ) -> AreaMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaMass[float, S], other: W, /
+    ) -> AreaMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaMass[V, S]: ...
+    @override
+    def item(self) -> AreaMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

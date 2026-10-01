@@ -94,6 +94,25 @@ class ForceElectronCount(Quantity[Mul[ForceKind, ElectronCountKind], V, S]):
     ) -> Quantity[Div[Mul[ForceKind, ElectronCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceElectronCount[float, S], other: W, /
+    ) -> ForceElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class ForceElectronCount(Quantity[Mul[ForceKind, ElectronCountKind], V, S]):
     ) -> ForceElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceElectronCount[float, S], other: W, /
+    ) -> ForceElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceElectronCount[V, S]: ...
+    @override
+    def item(self) -> ForceElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

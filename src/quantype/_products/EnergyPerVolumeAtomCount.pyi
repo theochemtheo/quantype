@@ -106,6 +106,25 @@ class EnergyPerVolumeAtomCount(Quantity[Mul[EnergyPerVolumeKind, AtomCountKind],
     ) -> Quantity[Div[Mul[EnergyPerVolumeKind, AtomCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyPerVolumeAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerVolumeAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerVolumeAtomCount[float, S], other: W, /
+    ) -> EnergyPerVolumeAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerVolumeAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerVolumeAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerVolumeKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerVolumeKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerVolumeAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +136,19 @@ class EnergyPerVolumeAtomCount(Quantity[Mul[EnergyPerVolumeKind, AtomCountKind],
     ) -> EnergyPerVolumeAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerVolumeAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerVolumeAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerVolumeAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerVolumeAtomCount[float, S], other: W, /
+    ) -> EnergyPerVolumeAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerVolumeAtomCount[V, S]: ...
+    @override
+    def item(self) -> EnergyPerVolumeAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

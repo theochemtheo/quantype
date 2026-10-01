@@ -135,6 +135,33 @@ class ForceConstantPerTime(Quantity[Div[ForceConstantKind, TimeKind], V, S]):
     def _rtruediv_ForceConstant(self, other: ForceConstant[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerTime[float, S], other: Time[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerTime[float, S], other: W, /
+    ) -> ForceConstantPerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantPerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +173,19 @@ class ForceConstantPerTime(Quantity[Div[ForceConstantKind, TimeKind], V, S]):
     ) -> ForceConstantPerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantPerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerTime[float, S], other: W, /
+    ) -> ForceConstantPerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantPerTime[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

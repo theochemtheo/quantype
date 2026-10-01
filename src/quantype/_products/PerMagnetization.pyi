@@ -128,6 +128,41 @@ class PerMagnetization(Quantity[Pow[MagnetizationKind, Literal[-1]], V, S]):
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> MagneticMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerMagnetization[float, S], other: MagneticMoment[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerMagnetization[float, S], other: Magnetization[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerMagnetization[float, S], other: W, /
+    ) -> PerMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MagnetizationKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MagnetizationKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -139,6 +174,19 @@ class PerMagnetization(Quantity[Pow[MagnetizationKind, Literal[-1]], V, S]):
     ) -> PerMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerMagnetization[float, S], other: W, /
+    ) -> PerMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerMagnetization[V, S]: ...
+    @override
+    def item(self) -> PerMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

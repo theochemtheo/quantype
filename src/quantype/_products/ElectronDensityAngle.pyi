@@ -96,6 +96,25 @@ class ElectronDensityAngle(Quantity[Mul[ElectronDensityKind, AngleKind], V, S]):
     ) -> Quantity[Div[Mul[ElectronDensityKind, AngleKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectronDensityAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityAngle[float, S], other: W, /
+    ) -> ElectronDensityAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronDensityAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ElectronDensityKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ElectronDensityKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class ElectronDensityAngle(Quantity[Mul[ElectronDensityKind, AngleKind], V, S]):
     ) -> ElectronDensityAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronDensityAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityAngle[float, S], other: W, /
+    ) -> ElectronDensityAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronDensityAngle[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

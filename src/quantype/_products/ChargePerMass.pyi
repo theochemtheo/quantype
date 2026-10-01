@@ -131,6 +131,39 @@ class ChargePerMass(Quantity[Div[ChargeKind, MassKind], V, S]):
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerMass[float, S], other: Mass[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerMass[float, S], other: ElectricField[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerMass[float, S], other: W, /
+    ) -> ChargePerMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerMass[V, S]: ...
     @overload
     def __rmul__(
@@ -142,6 +175,19 @@ class ChargePerMass(Quantity[Div[ChargeKind, MassKind], V, S]):
     ) -> ChargePerMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerMass[float, S], other: W, /
+    ) -> ChargePerMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerMass[V, S]: ...
+    @override
+    def item(self) -> ChargePerMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

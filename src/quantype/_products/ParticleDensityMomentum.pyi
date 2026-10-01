@@ -104,6 +104,25 @@ class ParticleDensityMomentum(Quantity[Mul[ParticleDensityKind, MomentumKind], V
     ) -> Quantity[Div[Mul[ParticleDensityKind, MomentumKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ParticleDensityMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityMomentum[float, S], other: W, /
+    ) -> ParticleDensityMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensityMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +134,19 @@ class ParticleDensityMomentum(Quantity[Mul[ParticleDensityKind, MomentumKind], V
     ) -> ParticleDensityMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensityMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityMomentum[float, S], other: W, /
+    ) -> ParticleDensityMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ParticleDensityMomentum[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

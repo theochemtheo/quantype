@@ -131,6 +131,39 @@ class MassPerTemperatureDifference(
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> TemperatureDifference[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassPerTemperatureDifference[float, S],
+        other: TemperatureDifference[W, S],
+        /,
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassPerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassPerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassPerTemperatureDifference[float, S], other: W, /
+    ) -> MassPerTemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MassPerTemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassPerTemperatureDifference[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassKind, TemperatureDifferenceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassKind, TemperatureDifferenceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassPerTemperatureDifference[V, S]: ...
     @overload
     def __rmul__(
@@ -144,6 +177,23 @@ class MassPerTemperatureDifference(
     ) -> MassPerTemperatureDifference[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassPerTemperatureDifference[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassPerTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassPerTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassPerTemperatureDifference[float, S], other: W, /
+    ) -> MassPerTemperatureDifference[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MassPerTemperatureDifference[V, S]: ...
+    @override
+    def item(self) -> MassPerTemperatureDifference[float, S]: ...
     @overload
     @override
     def __rtruediv__(

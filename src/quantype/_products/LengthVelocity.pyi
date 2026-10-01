@@ -142,6 +142,31 @@ class LengthVelocity(Quantity[Mul[LengthKind, VelocityKind], V, S]):
     def _rtruediv_Area(self, other: Area[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthVelocity[float, S], other: Time[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthVelocity[float, S], other: W, /
+    ) -> LengthVelocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthVelocity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthVelocity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, VelocityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, VelocityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthVelocity[V, S]: ...
     @overload
     def __rmul__(
@@ -153,6 +178,19 @@ class LengthVelocity(Quantity[Mul[LengthKind, VelocityKind], V, S]):
     ) -> LengthVelocity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthVelocity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthVelocity[float, S], other: W, /
+    ) -> LengthVelocity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthVelocity[V, S]: ...
+    @override
+    def item(self) -> LengthVelocity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

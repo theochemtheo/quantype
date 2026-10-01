@@ -145,6 +145,41 @@ class PressurePerMagnetization(Quantity[Div[PressureKind, MagnetizationKind], V,
     def _rtruediv_Pressure(self, other: Pressure[V, S], /) -> Magnetization[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressurePerMagnetization[float, S], other: MagneticMoment[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> Energy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PressurePerMagnetization[float, S], other: Magnetization[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressurePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressurePerMagnetization[float, S], other: W, /
+    ) -> PressurePerMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressurePerMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressurePerMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[PressureKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[PressureKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressurePerMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -156,6 +191,19 @@ class PressurePerMagnetization(Quantity[Div[PressureKind, MagnetizationKind], V,
     ) -> PressurePerMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressurePerMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressurePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressurePerMagnetization[float, S], other: W, /
+    ) -> PressurePerMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressurePerMagnetization[V, S]: ...
+    @override
+    def item(self) -> PressurePerMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

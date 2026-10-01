@@ -116,6 +116,39 @@ class PerMassDensity(Quantity[Pow[MassDensityKind, Literal[-1]], V, S]):
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> Mass[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerMassDensity[float, S], other: Mass[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerMassDensity[float, S], other: MassDensity[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MassDensity[V, S] | MassDensity[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerMassDensity[float, S], other: W, /
+    ) -> PerMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[MassDensityKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[MassDensityKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -127,6 +160,19 @@ class PerMassDensity(Quantity[Pow[MassDensityKind, Literal[-1]], V, S]):
     ) -> PerMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerMassDensity[float, S], other: W, /
+    ) -> PerMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerMassDensity[V, S]: ...
+    @override
+    def item(self) -> PerMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

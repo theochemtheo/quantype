@@ -74,6 +74,25 @@ class ForceCubed(Quantity[Pow[ForceKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[ForceKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceCubed[float, S], other: W, /
+    ) -> ForceCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ForceKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ForceKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class ForceCubed(Quantity[Pow[ForceKind, Literal[3]], V, S]):
     ) -> ForceCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceCubed[float, S], other: W, /
+    ) -> ForceCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceCubed[V, S]: ...
+    @override
+    def item(self) -> ForceCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -100,6 +100,33 @@ class EnergyDensityPerArea(Quantity[Div[EnergyDensityKind, AreaKind], V, S]):
     def _rtruediv_EnergyDensity(self, other: EnergyDensity[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyDensityPerArea[float, S], other: Area[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyDensityPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityPerArea[float, S], other: W, /
+    ) -> EnergyDensityPerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyDensityPerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityPerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyDensityPerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class EnergyDensityPerArea(Quantity[Div[EnergyDensityKind, AreaKind], V, S]):
     ) -> EnergyDensityPerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyDensityPerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityPerArea[float, S], other: W, /
+    ) -> EnergyDensityPerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyDensityPerArea[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityPerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

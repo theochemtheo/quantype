@@ -94,6 +94,25 @@ class AtomCountElectronCount(Quantity[Mul[AtomCountKind, ElectronCountKind], V, 
     ) -> Quantity[Div[Mul[AtomCountKind, ElectronCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AtomCountElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountElectronCount[float, S], other: W, /
+    ) -> AtomCountElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class AtomCountElectronCount(Quantity[Mul[AtomCountKind, ElectronCountKind], V, 
     ) -> AtomCountElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountElectronCount[float, S], other: W, /
+    ) -> AtomCountElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountElectronCount[V, S]: ...
+    @override
+    def item(self) -> AtomCountElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

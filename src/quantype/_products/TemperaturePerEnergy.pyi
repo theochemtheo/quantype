@@ -133,6 +133,41 @@ class TemperaturePerEnergy(Quantity[Div[TemperatureKind, EnergyKind], V, S]):
     ) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperaturePerEnergy[float, S], other: Energy[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TemperaturePerEnergy[float, S], other: Entropy[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperaturePerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperaturePerEnergy[float, S], other: W, /
+    ) -> TemperaturePerEnergy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperaturePerEnergy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperaturePerEnergy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, EnergyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, EnergyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperaturePerEnergy[V, S]: ...
     @overload
     def __rmul__(
@@ -144,6 +179,19 @@ class TemperaturePerEnergy(Quantity[Div[TemperatureKind, EnergyKind], V, S]):
     ) -> TemperaturePerEnergy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperaturePerEnergy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperaturePerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperaturePerEnergy[float, S], other: W, /
+    ) -> TemperaturePerEnergy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperaturePerEnergy[V, S]: ...
+    @override
+    def item(self) -> TemperaturePerEnergy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

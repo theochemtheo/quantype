@@ -104,6 +104,33 @@ class ElectronDensityPerAngle(Quantity[Div[ElectronDensityKind, AngleKind], V, S
     ) -> Angle[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronDensityPerAngle[float, S], other: Angle[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Angle[V, S] | Angle[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronDensityPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityPerAngle[float, S], other: W, /
+    ) -> ElectronDensityPerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronDensityPerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityPerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityPerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +142,19 @@ class ElectronDensityPerAngle(Quantity[Div[ElectronDensityKind, AngleKind], V, S
     ) -> ElectronDensityPerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronDensityPerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityPerAngle[float, S], other: W, /
+    ) -> ElectronDensityPerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronDensityPerAngle[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityPerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

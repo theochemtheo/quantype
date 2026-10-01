@@ -98,6 +98,33 @@ class AtomCountPerAngle(Quantity[Div[AtomCountKind, AngleKind], V, S]):
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Angle[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AtomCountPerAngle[float, S], other: Angle[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Angle[V, S] | Angle[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AtomCountPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountPerAngle[float, S], other: W, /
+    ) -> AtomCountPerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountPerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountPerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountPerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +136,19 @@ class AtomCountPerAngle(Quantity[Div[AtomCountKind, AngleKind], V, S]):
     ) -> AtomCountPerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountPerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountPerAngle[float, S], other: W, /
+    ) -> AtomCountPerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountPerAngle[V, S]: ...
+    @override
+    def item(self) -> AtomCountPerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -131,6 +131,37 @@ class ElectricFieldPerMagneticMoment(
     ) -> MagneticMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricFieldPerMagneticMoment[float, S], other: MagneticMoment[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricFieldPerMagneticMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricFieldPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricFieldPerMagneticMoment[float, S], other: W, /
+    ) -> ElectricFieldPerMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectricFieldPerMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricFieldPerMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricFieldPerMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +177,23 @@ class ElectricFieldPerMagneticMoment(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ElectricFieldPerMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricFieldPerMagneticMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricFieldPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricFieldPerMagneticMoment[float, S], other: W, /
+    ) -> ElectricFieldPerMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectricFieldPerMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> ElectricFieldPerMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

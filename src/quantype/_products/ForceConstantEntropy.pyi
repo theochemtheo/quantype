@@ -94,6 +94,25 @@ class ForceConstantEntropy(Quantity[Mul[ForceConstantKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[ForceConstantKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceConstantEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantEntropy[float, S], other: W, /
+    ) -> ForceConstantEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class ForceConstantEntropy(Quantity[Mul[ForceConstantKind, EntropyKind], V, S]):
     ) -> ForceConstantEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantEntropy[float, S], other: W, /
+    ) -> ForceConstantEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantEntropy[V, S]: ...
+    @override
+    def item(self) -> ForceConstantEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

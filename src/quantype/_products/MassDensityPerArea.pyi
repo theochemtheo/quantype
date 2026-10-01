@@ -100,6 +100,33 @@ class MassDensityPerArea(Quantity[Div[MassDensityKind, AreaKind], V, S]):
     def _rtruediv_MassDensity(self, other: MassDensity[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerArea[float, S], other: Area[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerArea[float, S], other: W, /
+    ) -> MassDensityPerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityPerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class MassDensityPerArea(Quantity[Div[MassDensityKind, AreaKind], V, S]):
     ) -> MassDensityPerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerArea[float, S], other: W, /
+    ) -> MassDensityPerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityPerArea[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

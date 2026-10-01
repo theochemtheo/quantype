@@ -137,6 +137,47 @@ class PerForce(Quantity[Pow[ForceKind, Literal[-1]], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerForce[float, S], other: Energy[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Energy[V, S] | Energy[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerForce[float, S], other: Force[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Force[V, S] | Force[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerForce[float, S], other: Momentum[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerForce[float, S], other: W, /
+    ) -> PerForce[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerForce[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerForce[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ForceKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ForceKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerForce[V, S]: ...
     @overload
     def __rmul__(
@@ -148,6 +189,19 @@ class PerForce(Quantity[Pow[ForceKind, Literal[-1]], V, S]):
     ) -> PerForce[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerForce[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerForce[float, S], other: W, /
+    ) -> PerForce[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerForce[V, S]: ...
+    @override
+    def item(self) -> PerForce[float, S]: ...
     @overload
     @override
     def __rtruediv__(

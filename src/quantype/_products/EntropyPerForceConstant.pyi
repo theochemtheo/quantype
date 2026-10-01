@@ -160,6 +160,49 @@ class EntropyPerForceConstant(Quantity[Div[EntropyKind, ForceConstantKind], V, S
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerForceConstant[float, S], other: ForceConstant[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerForceConstant[float, S], other: Temperature[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerForceConstant[float, S], other: TemperatureDifference[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerForceConstant[float, S], other: W, /
+    ) -> EntropyPerForceConstant[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerForceConstant[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerForceConstant[V, S]: ...
     @overload
     def __rmul__(
@@ -171,6 +214,19 @@ class EntropyPerForceConstant(Quantity[Div[EntropyKind, ForceConstantKind], V, S
     ) -> EntropyPerForceConstant[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerForceConstant[float, S], other: W, /
+    ) -> EntropyPerForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerForceConstant[V, S]: ...
+    @override
+    def item(self) -> EntropyPerForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -98,6 +98,31 @@ class AnglePerCharge(Quantity[Div[AngleKind, ChargeKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Charge[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerCharge[float, S], other: Charge[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(self, other: Charge[V, S] | Charge[float, S], /) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerCharge[float, S], other: W, /
+    ) -> AnglePerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +134,19 @@ class AnglePerCharge(Quantity[Div[AngleKind, ChargeKind], V, S]):
     ) -> AnglePerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerCharge[float, S], other: W, /
+    ) -> AnglePerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerCharge[V, S]: ...
+    @override
+    def item(self) -> AnglePerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

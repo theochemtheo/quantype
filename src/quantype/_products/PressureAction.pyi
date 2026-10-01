@@ -92,6 +92,25 @@ class PressureAction(Quantity[Mul[PressureKind, ActionKind], V, S]):
     ) -> Quantity[Div[Mul[PressureKind, ActionKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PressureAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressureAction[float, S], other: W, /
+    ) -> PressureAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressureAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressureAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressureAction[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class PressureAction(Quantity[Mul[PressureKind, ActionKind], V, S]):
     ) -> PressureAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressureAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressureAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressureAction[float, S], other: W, /
+    ) -> PressureAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressureAction[V, S]: ...
+    @override
+    def item(self) -> PressureAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -127,6 +127,41 @@ class TemperaturePerArea(Quantity[Div[TemperatureKind, AreaKind], V, S]):
     def _rtruediv_Temperature(self, other: Temperature[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperaturePerArea[float, S], other: Area[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TemperaturePerArea[float, S], other: Entropy[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperaturePerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperaturePerArea[float, S], other: W, /
+    ) -> TemperaturePerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperaturePerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperaturePerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperaturePerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -138,6 +173,19 @@ class TemperaturePerArea(Quantity[Div[TemperatureKind, AreaKind], V, S]):
     ) -> TemperaturePerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperaturePerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperaturePerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperaturePerArea[float, S], other: W, /
+    ) -> TemperaturePerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperaturePerArea[V, S]: ...
+    @override
+    def item(self) -> TemperaturePerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

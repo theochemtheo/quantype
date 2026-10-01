@@ -92,6 +92,25 @@ class AtomCountMomentum(Quantity[Mul[AtomCountKind, MomentumKind], V, S]):
     ) -> Quantity[Div[Mul[AtomCountKind, MomentumKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AtomCountMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountMomentum[float, S], other: W, /
+    ) -> AtomCountMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class AtomCountMomentum(Quantity[Mul[AtomCountKind, MomentumKind], V, S]):
     ) -> AtomCountMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountMomentum[float, S], other: W, /
+    ) -> AtomCountMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountMomentum[V, S]: ...
+    @override
+    def item(self) -> AtomCountMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

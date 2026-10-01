@@ -191,6 +191,55 @@ class MomentumPerEnergy(Quantity[Div[MomentumKind, EnergyKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MomentumPerEnergy[float, S], other: Length[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Length[V, S] | Length[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MomentumPerEnergy[float, S], other: Velocity[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MomentumPerEnergy[float, S], other: Energy[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MomentumPerEnergy[float, S], other: Momentum[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MomentumPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumPerEnergy[float, S], other: W, /
+    ) -> MomentumPerEnergy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumPerEnergy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumPerEnergy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, EnergyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, EnergyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumPerEnergy[V, S]: ...
     @overload
     def __rmul__(
@@ -202,6 +251,19 @@ class MomentumPerEnergy(Quantity[Div[MomentumKind, EnergyKind], V, S]):
     ) -> MomentumPerEnergy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumPerEnergy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumPerEnergy[float, S], other: W, /
+    ) -> MomentumPerEnergy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumPerEnergy[V, S]: ...
+    @override
+    def item(self) -> MomentumPerEnergy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

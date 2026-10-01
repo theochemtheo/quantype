@@ -162,6 +162,45 @@ class MassDensityPerElectronDensity(
     ) -> ElectronDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerElectronDensity[float, S], other: ElectronDensity[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronDensity[V, S] | ElectronDensity[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MassDensityPerElectronDensity[float, S], other: ElectronCount[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerElectronDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerElectronDensity[float, S], other: W, /
+    ) -> MassDensityPerElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MassDensityPerElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerElectronDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -175,6 +214,23 @@ class MassDensityPerElectronDensity(
     ) -> MassDensityPerElectronDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerElectronDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MassDensityPerElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerElectronDensity[float, S], other: W, /
+    ) -> MassDensityPerElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MassDensityPerElectronDensity[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -127,6 +127,33 @@ class AccelerationPerMomentum(Quantity[Div[AccelerationKind, MomentumKind], V, S
     ) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AccelerationPerMomentum[float, S], other: Momentum[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AccelerationPerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationPerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AccelerationPerMomentum[float, S], other: W, /
+    ) -> AccelerationPerMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AccelerationPerMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AccelerationPerMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AccelerationPerMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -138,6 +165,19 @@ class AccelerationPerMomentum(Quantity[Div[AccelerationKind, MomentumKind], V, S
     ) -> AccelerationPerMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AccelerationPerMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AccelerationPerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationPerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AccelerationPerMomentum[float, S], other: W, /
+    ) -> AccelerationPerMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AccelerationPerMomentum[V, S]: ...
+    @override
+    def item(self) -> AccelerationPerMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

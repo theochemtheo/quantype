@@ -125,6 +125,31 @@ class PressureInverseTime(Quantity[Mul[PressureKind, InverseTimeKind], V, S]):
     def _rtruediv_Pressure(self, other: Pressure[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressureInverseTime[float, S], other: Time[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressureInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressureInverseTime[float, S], other: W, /
+    ) -> PressureInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressureInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressureInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressureInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +161,19 @@ class PressureInverseTime(Quantity[Mul[PressureKind, InverseTimeKind], V, S]):
     ) -> PressureInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressureInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressureInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressureInverseTime[float, S], other: W, /
+    ) -> PressureInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressureInverseTime[V, S]: ...
+    @override
+    def item(self) -> PressureInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

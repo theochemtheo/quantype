@@ -132,6 +132,41 @@ class TimeAngle(Quantity[Mul[TimeKind, AngleKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeAngle[float, S], other: Frequency[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeAngle[float, S], other: InverseTime[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeAngle[float, S], other: W, /
+    ) -> TimeAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -143,6 +178,19 @@ class TimeAngle(Quantity[Mul[TimeKind, AngleKind], V, S]):
     ) -> TimeAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeAngle[float, S], other: W, /
+    ) -> TimeAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeAngle[V, S]: ...
+    @override
+    def item(self) -> TimeAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

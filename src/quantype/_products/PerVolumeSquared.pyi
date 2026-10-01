@@ -74,6 +74,25 @@ class PerVolumeSquared(Quantity[Pow[VolumeKind, Literal[-2]], V, S]):
     ) -> Quantity[Div[Pow[VolumeKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerVolumeSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerVolumeSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerVolumeSquared[float, S], other: W, /
+    ) -> PerVolumeSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerVolumeSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerVolumeSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[VolumeKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[VolumeKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerVolumeSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerVolumeSquared(Quantity[Pow[VolumeKind, Literal[-2]], V, S]):
     ) -> PerVolumeSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerVolumeSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerVolumeSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerVolumeSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerVolumeSquared[float, S], other: W, /
+    ) -> PerVolumeSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerVolumeSquared[V, S]: ...
+    @override
+    def item(self) -> PerVolumeSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

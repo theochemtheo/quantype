@@ -94,6 +94,25 @@ class AtomCountElectricField(Quantity[Mul[AtomCountKind, ElectricFieldKind], V, 
     ) -> Quantity[Div[Mul[AtomCountKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AtomCountElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountElectricField[float, S], other: W, /
+    ) -> AtomCountElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class AtomCountElectricField(Quantity[Mul[AtomCountKind, ElectricFieldKind], V, 
     ) -> AtomCountElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountElectricField[float, S], other: W, /
+    ) -> AtomCountElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountElectricField[V, S]: ...
+    @override
+    def item(self) -> AtomCountElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

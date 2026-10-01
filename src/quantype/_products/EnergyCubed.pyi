@@ -74,6 +74,25 @@ class EnergyCubed(Quantity[Pow[EnergyKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[EnergyKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyCubed[float, S], other: W, /
+    ) -> EnergyCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[EnergyKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[EnergyKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class EnergyCubed(Quantity[Pow[EnergyKind, Literal[3]], V, S]):
     ) -> EnergyCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyCubed[float, S], other: W, /
+    ) -> EnergyCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyCubed[V, S]: ...
+    @override
+    def item(self) -> EnergyCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

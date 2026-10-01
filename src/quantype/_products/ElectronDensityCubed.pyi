@@ -74,6 +74,25 @@ class ElectronDensityCubed(Quantity[Pow[ElectronDensityKind, Literal[3]], V, S])
     ) -> Quantity[Div[Pow[ElectronDensityKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectronDensityCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityCubed[float, S], other: W, /
+    ) -> ElectronDensityCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronDensityCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ElectronDensityKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ElectronDensityKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class ElectronDensityCubed(Quantity[Pow[ElectronDensityKind, Literal[3]], V, S])
     ) -> ElectronDensityCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronDensityCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityCubed[float, S], other: W, /
+    ) -> ElectronDensityCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronDensityCubed[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

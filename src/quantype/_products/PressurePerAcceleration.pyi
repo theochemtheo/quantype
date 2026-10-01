@@ -106,6 +106,33 @@ class PressurePerAcceleration(Quantity[Div[PressureKind, AccelerationKind], V, S
     def _rtruediv_Pressure(self, other: Pressure[V, S], /) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressurePerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressurePerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressurePerAcceleration[float, S], other: W, /
+    ) -> PressurePerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressurePerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressurePerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[PressureKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[PressureKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressurePerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class PressurePerAcceleration(Quantity[Div[PressureKind, AccelerationKind], V, S
     ) -> PressurePerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressurePerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressurePerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressurePerAcceleration[float, S], other: W, /
+    ) -> PressurePerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressurePerAcceleration[V, S]: ...
+    @override
+    def item(self) -> PressurePerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

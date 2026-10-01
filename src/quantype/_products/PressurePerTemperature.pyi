@@ -125,6 +125,41 @@ class PressurePerTemperature(Quantity[Div[PressureKind, TemperatureKind], V, S])
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressurePerTemperature[float, S], other: Volume[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PressurePerTemperature[float, S], other: Temperature[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressurePerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressurePerTemperature[float, S], other: W, /
+    ) -> PressurePerTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressurePerTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressurePerTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[PressureKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[PressureKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressurePerTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +171,19 @@ class PressurePerTemperature(Quantity[Div[PressureKind, TemperatureKind], V, S])
     ) -> PressurePerTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressurePerTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressurePerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressurePerTemperature[float, S], other: W, /
+    ) -> PressurePerTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressurePerTemperature[V, S]: ...
+    @override
+    def item(self) -> PressurePerTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

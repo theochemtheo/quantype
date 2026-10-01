@@ -106,6 +106,33 @@ class TemperatureRatePerVolume(Quantity[Div[TemperatureRateKind, VolumeKind], V,
     ) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureRatePerVolume[float, S], other: Volume[W, S], /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> TemperatureRate[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureRatePerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureRatePerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRatePerVolume[float, S], other: W, /
+    ) -> TemperatureRatePerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureRatePerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRatePerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, VolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, VolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureRatePerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class TemperatureRatePerVolume(Quantity[Div[TemperatureRateKind, VolumeKind], V,
     ) -> TemperatureRatePerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureRatePerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRatePerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureRatePerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRatePerVolume[float, S], other: W, /
+    ) -> TemperatureRatePerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureRatePerVolume[V, S]: ...
+    @override
+    def item(self) -> TemperatureRatePerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

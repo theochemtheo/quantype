@@ -92,6 +92,25 @@ class AngleEntropy(Quantity[Mul[AngleKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[AngleKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AngleEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AngleEntropy[float, S], other: W, /
+    ) -> AngleEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AngleEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AngleEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AngleEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class AngleEntropy(Quantity[Mul[AngleKind, EntropyKind], V, S]):
     ) -> AngleEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AngleEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AngleEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AngleEntropy[float, S], other: W, /
+    ) -> AngleEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AngleEntropy[V, S]: ...
+    @override
+    def item(self) -> AngleEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

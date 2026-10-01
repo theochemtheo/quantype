@@ -92,6 +92,25 @@ class VolumeMomentum(Quantity[Mul[VolumeKind, MomentumKind], V, S]):
     ) -> Quantity[Div[Mul[VolumeKind, MomentumKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VolumeMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeMomentum[float, S], other: W, /
+    ) -> VolumeMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class VolumeMomentum(Quantity[Mul[VolumeKind, MomentumKind], V, S]):
     ) -> VolumeMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeMomentum[float, S], other: W, /
+    ) -> VolumeMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeMomentum[V, S]: ...
+    @override
+    def item(self) -> VolumeMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

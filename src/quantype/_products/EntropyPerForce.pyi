@@ -152,6 +152,47 @@ class EntropyPerForce(Quantity[Div[EntropyKind, ForceKind], V, S]):
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerForce[float, S], other: Force[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerForce[float, S], other: Temperature[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerForce[float, S], other: TemperatureDifference[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerForce[float, S], other: W, /
+    ) -> EntropyPerForce[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerForce[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerForce[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ForceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, ForceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerForce[V, S]: ...
     @overload
     def __rmul__(
@@ -163,6 +204,19 @@ class EntropyPerForce(Quantity[Div[EntropyKind, ForceKind], V, S]):
     ) -> EntropyPerForce[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerForce[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerForce[float, S], other: W, /
+    ) -> EntropyPerForce[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerForce[V, S]: ...
+    @override
+    def item(self) -> EntropyPerForce[float, S]: ...
     @overload
     @override
     def __rtruediv__(

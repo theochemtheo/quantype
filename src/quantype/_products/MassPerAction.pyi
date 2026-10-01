@@ -98,6 +98,31 @@ class MassPerAction(Quantity[Div[MassKind, ActionKind], V, S]):
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassPerAction[float, S], other: Action[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassPerAction[float, S], other: W, /
+    ) -> MassPerAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassPerAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassPerAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassPerAction[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +134,19 @@ class MassPerAction(Quantity[Div[MassKind, ActionKind], V, S]):
     ) -> MassPerAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassPerAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassPerAction[float, S], other: W, /
+    ) -> MassPerAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassPerAction[V, S]: ...
+    @override
+    def item(self) -> MassPerAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

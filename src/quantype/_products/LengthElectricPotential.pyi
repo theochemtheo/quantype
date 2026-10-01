@@ -130,6 +130,25 @@ class LengthElectricPotential(Quantity[Mul[LengthKind, ElectricPotentialKind], V
     ) -> Quantity[Div[Mul[LengthKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: LengthElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthElectricPotential[float, S], other: W, /
+    ) -> LengthElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -141,6 +160,19 @@ class LengthElectricPotential(Quantity[Mul[LengthKind, ElectricPotentialKind], V
     ) -> LengthElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthElectricPotential[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthElectricPotential[float, S], other: W, /
+    ) -> LengthElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthElectricPotential[V, S]: ...
+    @override
+    def item(self) -> LengthElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

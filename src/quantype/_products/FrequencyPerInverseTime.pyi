@@ -1082,6 +1082,269 @@ class FrequencyPerInverseTime(Quantity[Div[FrequencyKind, InverseTimeKind], V, S
     def _rtruediv_Action(self, other: Action[V, S], /) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Length[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Length[V, S] | Length[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Area[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Volume[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Time[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Velocity[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Energy[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Energy[V, S] | Energy[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: EnergyPerAtom[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Force[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: ForceConstant[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Pressure[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: EnergyDensity[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyDensity[V, S] | EnergyDensity[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: EnergyPerVolume[W, S], /
+    ) -> EnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerVolume[V, S] | EnergyPerVolume[float, S], /
+    ) -> EnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Temperature[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: TemperatureDifference[W, S], /
+    ) -> TemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> TemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: TemperatureRate[W, S], /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> TemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: MagneticMoment[W, S], /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> MagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Magnetization[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: ParticleDensity[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: ElectronDensity[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronDensity[V, S] | ElectronDensity[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Angle[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(self, other: Angle[V, S] | Angle[float, S], /) -> Angle[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: InverseTime[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: AtomCount[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: ElectronCount[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Mass[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: MassDensity[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MassDensity[V, S] | MassDensity[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Momentum[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Acceleration[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Charge[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Charge[V, S] | Charge[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: ElectricPotential[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: ElectricField[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: DipoleMoment[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Entropy[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerInverseTime[float, S], other: Action[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerInverseTime[float, S], other: W, /
+    ) -> FrequencyPerInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -1093,6 +1356,19 @@ class FrequencyPerInverseTime(Quantity[Div[FrequencyKind, InverseTimeKind], V, S
     ) -> FrequencyPerInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerInverseTime[float, S], other: W, /
+    ) -> FrequencyPerInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerInverseTime[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

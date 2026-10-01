@@ -124,6 +124,41 @@ class ElectricFieldPerEnergy(Quantity[Div[ElectricFieldKind, EnergyKind], V, S])
     ) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricFieldPerEnergy[float, S], other: Energy[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricFieldPerEnergy[float, S], other: DipoleMoment[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricFieldPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricFieldPerEnergy[float, S], other: W, /
+    ) -> ElectricFieldPerEnergy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricFieldPerEnergy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricFieldPerEnergy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, EnergyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, EnergyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricFieldPerEnergy[V, S]: ...
     @overload
     def __rmul__(
@@ -135,6 +170,19 @@ class ElectricFieldPerEnergy(Quantity[Div[ElectricFieldKind, EnergyKind], V, S])
     ) -> ElectricFieldPerEnergy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricFieldPerEnergy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricFieldPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricFieldPerEnergy[float, S], other: W, /
+    ) -> ElectricFieldPerEnergy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricFieldPerEnergy[V, S]: ...
+    @override
+    def item(self) -> ElectricFieldPerEnergy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

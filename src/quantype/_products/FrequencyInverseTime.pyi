@@ -141,6 +141,33 @@ class FrequencyInverseTime(Quantity[Mul[FrequencyKind, InverseTimeKind], V, S]):
     def _rtruediv_Acceleration(self, other: Acceleration[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyInverseTime[float, S], other: Length[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyInverseTime[float, S], other: W, /
+    ) -> FrequencyInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -152,6 +179,19 @@ class FrequencyInverseTime(Quantity[Mul[FrequencyKind, InverseTimeKind], V, S]):
     ) -> FrequencyInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyInverseTime[float, S], other: W, /
+    ) -> FrequencyInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyInverseTime[V, S]: ...
+    @override
+    def item(self) -> FrequencyInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

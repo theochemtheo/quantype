@@ -106,6 +106,33 @@ class ElectronCountPerPressure(Quantity[Div[ElectronCountKind, PressureKind], V,
     ) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronCountPerPressure[float, S], other: Pressure[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronCountPerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountPerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountPerPressure[float, S], other: W, /
+    ) -> ElectronCountPerPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronCountPerPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountPerPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronCountPerPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class ElectronCountPerPressure(Quantity[Div[ElectronCountKind, PressureKind], V,
     ) -> ElectronCountPerPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronCountPerPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountPerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountPerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountPerPressure[float, S], other: W, /
+    ) -> ElectronCountPerPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronCountPerPressure[V, S]: ...
+    @override
+    def item(self) -> ElectronCountPerPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

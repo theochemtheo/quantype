@@ -131,6 +131,37 @@ class ElectronDensityPerElectricField(
     ) -> ElectricField[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronDensityPerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronDensityPerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronDensityPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityPerElectricField[float, S], other: W, /
+    ) -> ElectronDensityPerElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectronDensityPerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityPerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityPerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +177,23 @@ class ElectronDensityPerElectricField(
     def __rmul__(
         self, other: _Numerical, /
     ) -> ElectronDensityPerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityPerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronDensityPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityPerElectricField[float, S], other: W, /
+    ) -> ElectronDensityPerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectronDensityPerElectricField[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityPerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

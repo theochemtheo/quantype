@@ -104,6 +104,25 @@ class PressureTemperatureRate(Quantity[Mul[PressureKind, TemperatureRateKind], V
     ) -> Quantity[Div[Mul[PressureKind, TemperatureRateKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PressureTemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressureTemperatureRate[float, S], other: W, /
+    ) -> PressureTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressureTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressureTemperatureRate[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, TemperatureRateKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, TemperatureRateKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressureTemperatureRate[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +134,19 @@ class PressureTemperatureRate(Quantity[Mul[PressureKind, TemperatureRateKind], V
     ) -> PressureTemperatureRate[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressureTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressureTemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressureTemperatureRate[float, S], other: W, /
+    ) -> PressureTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressureTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> PressureTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

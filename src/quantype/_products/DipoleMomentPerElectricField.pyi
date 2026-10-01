@@ -127,6 +127,37 @@ class DipoleMomentPerElectricField(
     ) -> ElectricField[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: DipoleMomentPerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: DipoleMomentPerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: DipoleMomentPerElectricField[float, S], other: W, /
+    ) -> DipoleMomentPerElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: DipoleMomentPerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> DipoleMomentPerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +171,23 @@ class DipoleMomentPerElectricField(
     ) -> DipoleMomentPerElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> DipoleMomentPerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: DipoleMomentPerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> DipoleMomentPerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: DipoleMomentPerElectricField[float, S], other: W, /
+    ) -> DipoleMomentPerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> DipoleMomentPerElectricField[V, S]: ...
+    @override
+    def item(self) -> DipoleMomentPerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

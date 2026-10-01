@@ -94,6 +94,25 @@ class MomentumElectricField(Quantity[Mul[MomentumKind, ElectricFieldKind], V, S]
     ) -> Quantity[Div[Mul[MomentumKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MomentumElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumElectricField[float, S], other: W, /
+    ) -> MomentumElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MomentumKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MomentumKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class MomentumElectricField(Quantity[Mul[MomentumKind, ElectricFieldKind], V, S]
     ) -> MomentumElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumElectricField[float, S], other: W, /
+    ) -> MomentumElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumElectricField[V, S]: ...
+    @override
+    def item(self) -> MomentumElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

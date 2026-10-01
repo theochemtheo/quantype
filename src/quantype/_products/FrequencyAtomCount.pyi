@@ -125,6 +125,31 @@ class FrequencyAtomCount(Quantity[Mul[FrequencyKind, AtomCountKind], V, S]):
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyAtomCount[float, S], other: Time[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyAtomCount[float, S], other: W, /
+    ) -> FrequencyAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +161,19 @@ class FrequencyAtomCount(Quantity[Mul[FrequencyKind, AtomCountKind], V, S]):
     ) -> FrequencyAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyAtomCount[float, S], other: W, /
+    ) -> FrequencyAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyAtomCount[V, S]: ...
+    @override
+    def item(self) -> FrequencyAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

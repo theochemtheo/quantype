@@ -126,6 +126,31 @@ class MassDensityAcceleration(Quantity[Mul[MassDensityKind, AccelerationKind], V
     def _rtruediv_Force(self, other: Force[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityAcceleration[float, S], other: Volume[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityAcceleration[float, S], other: W, /
+    ) -> MassDensityAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MassDensityKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MassDensityKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -137,6 +162,19 @@ class MassDensityAcceleration(Quantity[Mul[MassDensityKind, AccelerationKind], V
     ) -> MassDensityAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityAcceleration[float, S], other: W, /
+    ) -> MassDensityAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityAcceleration[V, S]: ...
+    @override
+    def item(self) -> MassDensityAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

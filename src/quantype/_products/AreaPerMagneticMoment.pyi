@@ -104,6 +104,33 @@ class AreaPerMagneticMoment(Quantity[Div[AreaKind, MagneticMomentKind], V, S]):
     def _rtruediv_Area(self, other: Area[V, S], /) -> MagneticMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerMagneticMoment[float, S], other: MagneticMoment[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerMagneticMoment[float, S], other: W, /
+    ) -> AreaPerMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +142,19 @@ class AreaPerMagneticMoment(Quantity[Div[AreaKind, MagneticMomentKind], V, S]):
     ) -> AreaPerMagneticMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerMagneticMoment[float, S], other: W, /
+    ) -> AreaPerMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> AreaPerMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

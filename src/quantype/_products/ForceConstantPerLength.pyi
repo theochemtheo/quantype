@@ -156,6 +156,45 @@ class ForceConstantPerLength(Quantity[Div[ForceConstantKind, LengthKind], V, S])
     ) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerLength[float, S], other: Length[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerLength[float, S], other: Area[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerLength[float, S], other: Volume[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerLength[float, S], other: W, /
+    ) -> ForceConstantPerLength[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantPerLength[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerLength[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, LengthKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, LengthKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPerLength[V, S]: ...
     @overload
     def __rmul__(
@@ -167,6 +206,19 @@ class ForceConstantPerLength(Quantity[Div[ForceConstantKind, LengthKind], V, S])
     ) -> ForceConstantPerLength[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantPerLength[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerLength[float, S], other: W, /
+    ) -> ForceConstantPerLength[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantPerLength[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerLength[float, S]: ...
     @overload
     @override
     def __rtruediv__(

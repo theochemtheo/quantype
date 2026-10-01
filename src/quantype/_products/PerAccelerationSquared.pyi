@@ -74,6 +74,25 @@ class PerAccelerationSquared(Quantity[Pow[AccelerationKind, Literal[-2]], V, S])
     ) -> Quantity[Div[Pow[AccelerationKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerAccelerationSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerAccelerationSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerAccelerationSquared[float, S], other: W, /
+    ) -> PerAccelerationSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerAccelerationSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerAccelerationSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[AccelerationKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[AccelerationKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerAccelerationSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerAccelerationSquared(Quantity[Pow[AccelerationKind, Literal[-2]], V, S])
     ) -> PerAccelerationSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerAccelerationSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerAccelerationSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerAccelerationSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerAccelerationSquared[float, S], other: W, /
+    ) -> PerAccelerationSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerAccelerationSquared[V, S]: ...
+    @override
+    def item(self) -> PerAccelerationSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

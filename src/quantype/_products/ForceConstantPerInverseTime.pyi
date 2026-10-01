@@ -242,6 +242,65 @@ class ForceConstantPerInverseTime(
     def _rtruediv_Action(self, other: Action[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerInverseTime[float, S], other: Length[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerInverseTime[float, S], other: Area[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerInverseTime[float, S], other: Velocity[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Force[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerInverseTime[float, S], other: Frequency[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerInverseTime[float, S], other: InverseTime[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerInverseTime[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerInverseTime[float, S], other: W, /
+    ) -> ForceConstantPerInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantPerInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPerInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -255,6 +314,23 @@ class ForceConstantPerInverseTime(
     ) -> ForceConstantPerInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantPerInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerInverseTime[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantPerInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerInverseTime[float, S], other: W, /
+    ) -> ForceConstantPerInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ForceConstantPerInverseTime[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -195,6 +195,57 @@ class ChargePerForceConstant(Quantity[Div[ChargeKind, ForceConstantKind], V, S])
     def _rtruediv_DipoleMoment(self, other: DipoleMoment[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerForceConstant[float, S], other: Force[W, S], /
+    ) -> DipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Force[V, S] | Force[float, S], /
+    ) -> DipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerForceConstant[float, S], other: ForceConstant[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerForceConstant[float, S], other: ElectricPotential[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerForceConstant[float, S], other: ElectricField[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerForceConstant[float, S], other: W, /
+    ) -> ChargePerForceConstant[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerForceConstant[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerForceConstant[V, S]: ...
     @overload
     def __rmul__(
@@ -206,6 +257,19 @@ class ChargePerForceConstant(Quantity[Div[ChargeKind, ForceConstantKind], V, S])
     ) -> ChargePerForceConstant[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerForceConstant[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerForceConstant[float, S], other: W, /
+    ) -> ChargePerForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerForceConstant[V, S]: ...
+    @override
+    def item(self) -> ChargePerForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

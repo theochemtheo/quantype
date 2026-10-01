@@ -179,6 +179,47 @@ class MassPerTime(Quantity[Div[MassKind, TimeKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassPerTime[float, S], other: Length[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MassPerTime[float, S], other: Time[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MassPerTime[float, S], other: Velocity[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassPerTime[float, S], other: W, /
+    ) -> MassPerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassPerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassPerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassPerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -190,6 +231,19 @@ class MassPerTime(Quantity[Div[MassKind, TimeKind], V, S]):
     ) -> MassPerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassPerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassPerTime[float, S], other: W, /
+    ) -> MassPerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassPerTime[V, S]: ...
+    @override
+    def item(self) -> MassPerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -102,6 +102,33 @@ class MassPerEnergyPerAtom(Quantity[Div[MassKind, EnergyPerAtomKind], V, S]):
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> EnergyPerAtom[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassPerEnergyPerAtom[float, S], other: EnergyPerAtom[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassPerEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassPerEnergyPerAtom[float, S], other: W, /
+    ) -> MassPerEnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassPerEnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassPerEnergyPerAtom[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassKind, EnergyPerAtomKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassKind, EnergyPerAtomKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassPerEnergyPerAtom[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class MassPerEnergyPerAtom(Quantity[Div[MassKind, EnergyPerAtomKind], V, S]):
     ) -> MassPerEnergyPerAtom[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassPerEnergyPerAtom[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassPerEnergyPerAtom[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerEnergyPerAtom[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassPerEnergyPerAtom[float, S], other: W, /
+    ) -> MassPerEnergyPerAtom[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassPerEnergyPerAtom[V, S]: ...
+    @override
+    def item(self) -> MassPerEnergyPerAtom[float, S]: ...
     @overload
     @override
     def __rtruediv__(

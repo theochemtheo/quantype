@@ -98,6 +98,31 @@ class AnglePerArea(Quantity[Div[AngleKind, AreaKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerArea[float, S], other: Area[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerArea[float, S], other: W, /
+    ) -> AnglePerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +134,19 @@ class AnglePerArea(Quantity[Div[AngleKind, AreaKind], V, S]):
     ) -> AnglePerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerArea[float, S], other: W, /
+    ) -> AnglePerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerArea[V, S]: ...
+    @override
+    def item(self) -> AnglePerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

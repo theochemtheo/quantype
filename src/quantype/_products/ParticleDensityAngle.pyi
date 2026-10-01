@@ -96,6 +96,25 @@ class ParticleDensityAngle(Quantity[Mul[ParticleDensityKind, AngleKind], V, S]):
     ) -> Quantity[Div[Mul[ParticleDensityKind, AngleKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ParticleDensityAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityAngle[float, S], other: W, /
+    ) -> ParticleDensityAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensityAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class ParticleDensityAngle(Quantity[Mul[ParticleDensityKind, AngleKind], V, S]):
     ) -> ParticleDensityAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensityAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityAngle[float, S], other: W, /
+    ) -> ParticleDensityAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ParticleDensityAngle[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

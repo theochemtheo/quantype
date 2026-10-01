@@ -104,6 +104,25 @@ class TemperatureMagnetization(Quantity[Mul[TemperatureKind, MagnetizationKind],
     ) -> Quantity[Div[Mul[TemperatureKind, MagnetizationKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureMagnetization[float, S], other: W, /
+    ) -> TemperatureMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +134,19 @@ class TemperatureMagnetization(Quantity[Mul[TemperatureKind, MagnetizationKind],
     ) -> TemperatureMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperatureMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureMagnetization[float, S], other: W, /
+    ) -> TemperatureMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureMagnetization[V, S]: ...
+    @override
+    def item(self) -> TemperatureMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

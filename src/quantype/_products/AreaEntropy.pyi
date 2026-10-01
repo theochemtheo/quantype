@@ -92,6 +92,25 @@ class AreaEntropy(Quantity[Mul[AreaKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaEntropy[float, S], other: W, /
+    ) -> AreaEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class AreaEntropy(Quantity[Mul[AreaKind, EntropyKind], V, S]):
     ) -> AreaEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaEntropy[float, S], other: W, /
+    ) -> AreaEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaEntropy[V, S]: ...
+    @override
+    def item(self) -> AreaEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

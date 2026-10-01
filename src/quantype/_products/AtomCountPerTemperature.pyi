@@ -139,6 +139,41 @@ class AtomCountPerTemperature(Quantity[Div[AtomCountKind, TemperatureKind], V, S
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> EnergyPerAtom[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AtomCountPerTemperature[float, S], other: EnergyPerAtom[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AtomCountPerTemperature[float, S], other: Temperature[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AtomCountPerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountPerTemperature[float, S], other: W, /
+    ) -> AtomCountPerTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountPerTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountPerTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountPerTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -150,6 +185,19 @@ class AtomCountPerTemperature(Quantity[Div[AtomCountKind, TemperatureKind], V, S
     ) -> AtomCountPerTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountPerTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountPerTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountPerTemperature[float, S], other: W, /
+    ) -> AtomCountPerTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountPerTemperature[V, S]: ...
+    @override
+    def item(self) -> AtomCountPerTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

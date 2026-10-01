@@ -132,6 +132,41 @@ class AnglePerFrequency(Quantity[Div[AngleKind, FrequencyKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Frequency[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerFrequency[float, S], other: Frequency[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AnglePerFrequency[float, S], other: InverseTime[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerFrequency[float, S], other: W, /
+    ) -> AnglePerFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -143,6 +178,19 @@ class AnglePerFrequency(Quantity[Div[AngleKind, FrequencyKind], V, S]):
     ) -> AnglePerFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerFrequency[float, S], other: W, /
+    ) -> AnglePerFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerFrequency[V, S]: ...
+    @override
+    def item(self) -> AnglePerFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

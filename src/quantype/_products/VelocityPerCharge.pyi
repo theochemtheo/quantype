@@ -133,6 +133,41 @@ class VelocityPerCharge(Quantity[Div[VelocityKind, ChargeKind], V, S]):
     ) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityPerCharge[float, S], other: Momentum[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerCharge[float, S], other: Charge[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityPerCharge[float, S], other: W, /
+    ) -> VelocityPerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityPerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityPerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityPerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -144,6 +179,19 @@ class VelocityPerCharge(Quantity[Div[VelocityKind, ChargeKind], V, S]):
     ) -> VelocityPerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityPerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityPerCharge[float, S], other: W, /
+    ) -> VelocityPerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityPerCharge[V, S]: ...
+    @override
+    def item(self) -> VelocityPerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

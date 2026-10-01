@@ -92,6 +92,25 @@ class EnergyAtomCount(Quantity[Mul[EnergyKind, AtomCountKind], V, S]):
     ) -> Quantity[Div[Mul[EnergyKind, AtomCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyAtomCount[float, S], other: W, /
+    ) -> EnergyAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class EnergyAtomCount(Quantity[Mul[EnergyKind, AtomCountKind], V, S]):
     ) -> EnergyAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyAtomCount[float, S], other: W, /
+    ) -> EnergyAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyAtomCount[V, S]: ...
+    @override
+    def item(self) -> EnergyAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

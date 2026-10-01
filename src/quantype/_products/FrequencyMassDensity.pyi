@@ -127,6 +127,33 @@ class FrequencyMassDensity(Quantity[Mul[FrequencyKind, MassDensityKind], V, S]):
     def _rtruediv_MassDensity(self, other: MassDensity[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyMassDensity[float, S], other: Time[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyMassDensity[float, S], other: W, /
+    ) -> FrequencyMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, MassDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, MassDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -138,6 +165,19 @@ class FrequencyMassDensity(Quantity[Mul[FrequencyKind, MassDensityKind], V, S]):
     ) -> FrequencyMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyMassDensity[float, S], other: W, /
+    ) -> FrequencyMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyMassDensity[V, S]: ...
+    @override
+    def item(self) -> FrequencyMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

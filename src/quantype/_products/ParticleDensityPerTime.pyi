@@ -139,6 +139,33 @@ class ParticleDensityPerTime(Quantity[Div[ParticleDensityKind, TimeKind], V, S])
     ) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ParticleDensityPerTime[float, S], other: Time[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ParticleDensityPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityPerTime[float, S], other: W, /
+    ) -> ParticleDensityPerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensityPerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityPerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityPerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -150,6 +177,19 @@ class ParticleDensityPerTime(Quantity[Div[ParticleDensityKind, TimeKind], V, S])
     ) -> ParticleDensityPerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensityPerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityPerTime[float, S], other: W, /
+    ) -> ParticleDensityPerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ParticleDensityPerTime[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityPerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

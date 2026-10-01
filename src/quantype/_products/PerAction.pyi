@@ -123,6 +123,41 @@ class PerAction(Quantity[Pow[ActionKind, Literal[-1]], V, S]):
     def _rtruediv_InverseTime(self, other: InverseTime[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerAction[float, S], other: Energy[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerAction[float, S], other: Action[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerAction[float, S], other: W, /
+    ) -> PerAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ActionKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ActionKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerAction[V, S]: ...
     @overload
     def __rmul__(
@@ -134,6 +169,19 @@ class PerAction(Quantity[Pow[ActionKind, Literal[-1]], V, S]):
     ) -> PerAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerAction[float, S], other: W, /
+    ) -> PerAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerAction[V, S]: ...
+    @override
+    def item(self) -> PerAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

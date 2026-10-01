@@ -83,6 +83,25 @@ class AreaCubed(Quantity[Pow[AreaKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[AreaKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaCubed[float, S], other: W, /
+    ) -> AreaCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[AreaKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[AreaKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -94,6 +113,19 @@ class AreaCubed(Quantity[Pow[AreaKind, Literal[3]], V, S]):
     ) -> AreaCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaCubed[float, S], other: W, /
+    ) -> AreaCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaCubed[V, S]: ...
+    @override
+    def item(self) -> AreaCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

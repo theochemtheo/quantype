@@ -168,6 +168,45 @@ class MagnetizationPerParticleDensity(
     ) -> ParticleDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MagnetizationPerParticleDensity[float, S], other: ParticleDensity[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MagnetizationPerParticleDensity[float, S], other: AtomCount[W, S], /
+    ) -> MagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> MagneticMoment[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MagnetizationPerParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationPerParticleDensity[float, S], other: W, /
+    ) -> MagnetizationPerParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationPerParticleDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, ParticleDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, ParticleDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationPerParticleDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -183,6 +222,23 @@ class MagnetizationPerParticleDensity(
     def __rmul__(
         self, other: _Numerical, /
     ) -> MagnetizationPerParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationPerParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationPerParticleDensity[float, S], other: W, /
+    ) -> MagnetizationPerParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerParticleDensity[V, S]: ...
+    @override
+    def item(self) -> MagnetizationPerParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

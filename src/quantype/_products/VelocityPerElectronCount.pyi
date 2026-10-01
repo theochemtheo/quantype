@@ -108,6 +108,33 @@ class VelocityPerElectronCount(Quantity[Div[VelocityKind, ElectronCountKind], V,
     def _rtruediv_Velocity(self, other: Velocity[V, S], /) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityPerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityPerElectronCount[float, S], other: W, /
+    ) -> VelocityPerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityPerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityPerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityPerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -119,6 +146,19 @@ class VelocityPerElectronCount(Quantity[Div[VelocityKind, ElectronCountKind], V,
     ) -> VelocityPerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityPerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityPerElectronCount[float, S], other: W, /
+    ) -> VelocityPerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityPerElectronCount[V, S]: ...
+    @override
+    def item(self) -> VelocityPerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

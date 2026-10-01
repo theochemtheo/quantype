@@ -92,6 +92,25 @@ class LengthEntropy(Quantity[Mul[LengthKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[LengthKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: LengthEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthEntropy[float, S], other: W, /
+    ) -> LengthEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class LengthEntropy(Quantity[Mul[LengthKind, EntropyKind], V, S]):
     ) -> LengthEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthEntropy[float, S], other: W, /
+    ) -> LengthEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthEntropy[V, S]: ...
+    @override
+    def item(self) -> LengthEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -112,6 +112,27 @@ class TemperatureRateMassDensity(
     ) -> Quantity[Div[Mul[TemperatureRateKind, MassDensityKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureRateMassDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRateMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRateMassDensity[float, S], other: W, /
+    ) -> TemperatureRateMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureRateMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRateMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureRateKind, MassDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureRateKind, MassDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureRateMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +146,21 @@ class TemperatureRateMassDensity(
     ) -> TemperatureRateMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureRateMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRateMassDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRateMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRateMassDensity[float, S], other: W, /
+    ) -> TemperatureRateMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureRateMassDensity[V, S]: ...
+    @override
+    def item(self) -> TemperatureRateMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

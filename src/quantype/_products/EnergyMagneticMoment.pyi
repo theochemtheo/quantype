@@ -96,6 +96,25 @@ class EnergyMagneticMoment(Quantity[Mul[EnergyKind, MagneticMomentKind], V, S]):
     ) -> Quantity[Div[Mul[EnergyKind, MagneticMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyMagneticMoment[float, S], other: W, /
+    ) -> EnergyMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class EnergyMagneticMoment(Quantity[Mul[EnergyKind, MagneticMomentKind], V, S]):
     ) -> EnergyMagneticMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyMagneticMoment[float, S], other: W, /
+    ) -> EnergyMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> EnergyMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

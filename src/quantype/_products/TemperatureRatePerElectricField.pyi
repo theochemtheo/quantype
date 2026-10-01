@@ -131,6 +131,37 @@ class TemperatureRatePerElectricField(
     ) -> ElectricField[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperatureRatePerElectricField[float, S], other: ElectricField[W, S], /
+    ) -> TemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> TemperatureRate[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperatureRatePerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureRatePerElectricField[float, S], other: W, /
+    ) -> TemperatureRatePerElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRatePerElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureRatePerElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureRateKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureRatePerElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +177,23 @@ class TemperatureRatePerElectricField(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureRatePerElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureRatePerElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureRatePerElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureRatePerElectricField[float, S], other: W, /
+    ) -> TemperatureRatePerElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureRatePerElectricField[V, S]: ...
+    @override
+    def item(self) -> TemperatureRatePerElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

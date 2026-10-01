@@ -104,6 +104,33 @@ class AreaPerTemperatureRate(Quantity[Div[AreaKind, TemperatureRateKind], V, S])
     def _rtruediv_Area(self, other: Area[V, S], /) -> TemperatureRate[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerTemperatureRate[float, S], other: TemperatureRate[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerTemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerTemperatureRate[float, S], other: W, /
+    ) -> AreaPerTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerTemperatureRate[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, TemperatureRateKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, TemperatureRateKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerTemperatureRate[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +142,19 @@ class AreaPerTemperatureRate(Quantity[Div[AreaKind, TemperatureRateKind], V, S])
     ) -> AreaPerTemperatureRate[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerTemperatureRate[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerTemperatureRate[float, S], other: W, /
+    ) -> AreaPerTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> AreaPerTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

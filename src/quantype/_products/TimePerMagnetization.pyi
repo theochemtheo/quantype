@@ -102,6 +102,33 @@ class TimePerMagnetization(Quantity[Div[TimeKind, MagnetizationKind], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> Magnetization[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerMagnetization[float, S], other: Magnetization[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Magnetization[V, S] | Magnetization[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerMagnetization[float, S], other: W, /
+    ) -> TimePerMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class TimePerMagnetization(Quantity[Div[TimeKind, MagnetizationKind], V, S]):
     ) -> TimePerMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerMagnetization[float, S], other: W, /
+    ) -> TimePerMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerMagnetization[V, S]: ...
+    @override
+    def item(self) -> TimePerMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

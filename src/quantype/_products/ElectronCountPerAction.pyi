@@ -102,6 +102,33 @@ class ElectronCountPerAction(Quantity[Div[ElectronCountKind, ActionKind], V, S])
     ) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronCountPerAction[float, S], other: Action[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronCountPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountPerAction[float, S], other: W, /
+    ) -> ElectronCountPerAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronCountPerAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountPerAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronCountPerAction[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class ElectronCountPerAction(Quantity[Div[ElectronCountKind, ActionKind], V, S])
     ) -> ElectronCountPerAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronCountPerAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountPerAction[float, S], other: W, /
+    ) -> ElectronCountPerAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronCountPerAction[V, S]: ...
+    @override
+    def item(self) -> ElectronCountPerAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

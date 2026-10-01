@@ -102,6 +102,33 @@ class TimePerElectronCount(Quantity[Div[TimeKind, ElectronCountKind], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerElectronCount[float, S], other: W, /
+    ) -> TimePerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class TimePerElectronCount(Quantity[Div[TimeKind, ElectronCountKind], V, S]):
     ) -> TimePerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerElectronCount[float, S], other: W, /
+    ) -> TimePerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerElectronCount[V, S]: ...
+    @override
+    def item(self) -> TimePerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

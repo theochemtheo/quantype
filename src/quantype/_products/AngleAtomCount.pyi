@@ -92,6 +92,25 @@ class AngleAtomCount(Quantity[Mul[AngleKind, AtomCountKind], V, S]):
     ) -> Quantity[Div[Mul[AngleKind, AtomCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AngleAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AngleAtomCount[float, S], other: W, /
+    ) -> AngleAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AngleAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AngleAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AngleAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class AngleAtomCount(Quantity[Mul[AngleKind, AtomCountKind], V, S]):
     ) -> AngleAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AngleAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AngleAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AngleAtomCount[float, S], other: W, /
+    ) -> AngleAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AngleAtomCount[V, S]: ...
+    @override
+    def item(self) -> AngleAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

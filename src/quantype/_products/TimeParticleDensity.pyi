@@ -152,6 +152,41 @@ class TimeParticleDensity(Quantity[Mul[TimeKind, ParticleDensityKind], V, S]):
     ) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeParticleDensity[float, S], other: Frequency[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeParticleDensity[float, S], other: InverseTime[W, S], /
+    ) -> ParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> ParticleDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeParticleDensity[float, S], other: W, /
+    ) -> TimeParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeParticleDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ParticleDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ParticleDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeParticleDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -163,6 +198,19 @@ class TimeParticleDensity(Quantity[Mul[TimeKind, ParticleDensityKind], V, S]):
     ) -> TimeParticleDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeParticleDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeParticleDensity[float, S], other: W, /
+    ) -> TimeParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeParticleDensity[V, S]: ...
+    @override
+    def item(self) -> TimeParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

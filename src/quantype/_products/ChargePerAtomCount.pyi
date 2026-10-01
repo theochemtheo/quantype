@@ -139,6 +139,41 @@ class ChargePerAtomCount(Quantity[Div[ChargeKind, AtomCountKind], V, S]):
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> AtomCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerAtomCount[float, S], other: AtomCount[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerAtomCount[float, S], other: ElectricPotential[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerAtomCount[float, S], other: W, /
+    ) -> ChargePerAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -150,6 +185,19 @@ class ChargePerAtomCount(Quantity[Div[ChargeKind, AtomCountKind], V, S]):
     ) -> ChargePerAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerAtomCount[float, S], other: W, /
+    ) -> ChargePerAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerAtomCount[V, S]: ...
+    @override
+    def item(self) -> ChargePerAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

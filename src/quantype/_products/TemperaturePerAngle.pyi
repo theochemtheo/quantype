@@ -100,6 +100,33 @@ class TemperaturePerAngle(Quantity[Div[TemperatureKind, AngleKind], V, S]):
     def _rtruediv_Temperature(self, other: Temperature[V, S], /) -> Angle[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperaturePerAngle[float, S], other: Angle[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Angle[V, S] | Angle[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperaturePerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperaturePerAngle[float, S], other: W, /
+    ) -> TemperaturePerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperaturePerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperaturePerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperaturePerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class TemperaturePerAngle(Quantity[Div[TemperatureKind, AngleKind], V, S]):
     ) -> TemperaturePerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperaturePerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperaturePerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperaturePerAngle[float, S], other: W, /
+    ) -> TemperaturePerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperaturePerAngle[V, S]: ...
+    @override
+    def item(self) -> TemperaturePerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

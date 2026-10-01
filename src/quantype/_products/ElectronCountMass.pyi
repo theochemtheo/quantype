@@ -94,6 +94,25 @@ class ElectronCountMass(Quantity[Mul[ElectronCountKind, MassKind], V, S]):
     ) -> Quantity[Div[Mul[ElectronCountKind, MassKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectronCountMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountMass[float, S], other: W, /
+    ) -> ElectronCountMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronCountMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ElectronCountKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ElectronCountKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronCountMass[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class ElectronCountMass(Quantity[Mul[ElectronCountKind, MassKind], V, S]):
     ) -> ElectronCountMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronCountMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountMass[float, S], other: W, /
+    ) -> ElectronCountMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronCountMass[V, S]: ...
+    @override
+    def item(self) -> ElectronCountMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

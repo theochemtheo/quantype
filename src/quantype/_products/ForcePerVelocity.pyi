@@ -226,6 +226,63 @@ class ForcePerVelocity(Quantity[Div[ForceKind, VelocityKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForcePerVelocity[float, S], other: Length[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForcePerVelocity[float, S], other: Time[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForcePerVelocity[float, S], other: Velocity[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Force[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForcePerVelocity[float, S], other: Frequency[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForcePerVelocity[float, S], other: InverseTime[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForcePerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForcePerVelocity[float, S], other: W, /
+    ) -> ForcePerVelocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForcePerVelocity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForcePerVelocity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceKind, VelocityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceKind, VelocityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForcePerVelocity[V, S]: ...
     @overload
     def __rmul__(
@@ -237,6 +294,19 @@ class ForcePerVelocity(Quantity[Div[ForceKind, VelocityKind], V, S]):
     ) -> ForcePerVelocity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForcePerVelocity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForcePerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForcePerVelocity[float, S], other: W, /
+    ) -> ForcePerVelocity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForcePerVelocity[V, S]: ...
+    @override
+    def item(self) -> ForcePerVelocity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -96,6 +96,25 @@ class LengthMagneticMoment(Quantity[Mul[LengthKind, MagneticMomentKind], V, S]):
     ) -> Quantity[Div[Mul[LengthKind, MagneticMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: LengthMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthMagneticMoment[float, S], other: W, /
+    ) -> LengthMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class LengthMagneticMoment(Quantity[Mul[LengthKind, MagneticMomentKind], V, S]):
     ) -> LengthMagneticMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthMagneticMoment[float, S], other: W, /
+    ) -> LengthMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> LengthMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

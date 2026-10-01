@@ -191,6 +191,55 @@ class TimePerLength(Quantity[Div[TimeKind, LengthKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerLength[float, S], other: Length[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Length[V, S] | Length[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimePerLength[float, S], other: Velocity[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimePerLength[float, S], other: Energy[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimePerLength[float, S], other: Momentum[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerLength[float, S], other: W, /
+    ) -> TimePerLength[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerLength[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerLength[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, LengthKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, LengthKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerLength[V, S]: ...
     @overload
     def __rmul__(
@@ -202,6 +251,19 @@ class TimePerLength(Quantity[Div[TimeKind, LengthKind], V, S]):
     ) -> TimePerLength[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerLength[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerLength[float, S], other: W, /
+    ) -> TimePerLength[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerLength[V, S]: ...
+    @override
+    def item(self) -> TimePerLength[float, S]: ...
     @overload
     @override
     def __rtruediv__(

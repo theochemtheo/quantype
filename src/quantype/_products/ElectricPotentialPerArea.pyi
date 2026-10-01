@@ -168,6 +168,49 @@ class ElectricPotentialPerArea(Quantity[Div[ElectricPotentialKind, AreaKind], V,
     ) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricPotentialPerArea[float, S], other: Length[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricPotentialPerArea[float, S], other: Area[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricPotentialPerArea[float, S], other: Charge[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricPotentialPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricPotentialPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricPotentialPerArea[float, S], other: W, /
+    ) -> ElectricPotentialPerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricPotentialPerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricPotentialPerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricPotentialPerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -179,6 +222,19 @@ class ElectricPotentialPerArea(Quantity[Div[ElectricPotentialKind, AreaKind], V,
     ) -> ElectricPotentialPerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricPotentialPerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricPotentialPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricPotentialPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricPotentialPerArea[float, S], other: W, /
+    ) -> ElectricPotentialPerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricPotentialPerArea[V, S]: ...
+    @override
+    def item(self) -> ElectricPotentialPerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

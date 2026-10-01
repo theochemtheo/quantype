@@ -92,6 +92,25 @@ class LengthTemperature(Quantity[Mul[LengthKind, TemperatureKind], V, S]):
     ) -> Quantity[Div[Mul[LengthKind, TemperatureKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: LengthTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthTemperature[float, S], other: W, /
+    ) -> LengthTemperature[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthTemperature[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthTemperature[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, TemperatureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, TemperatureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthTemperature[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class LengthTemperature(Quantity[Mul[LengthKind, TemperatureKind], V, S]):
     ) -> LengthTemperature[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthTemperature[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthTemperature[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthTemperature[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthTemperature[float, S], other: W, /
+    ) -> LengthTemperature[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthTemperature[V, S]: ...
+    @override
+    def item(self) -> LengthTemperature[float, S]: ...
     @overload
     @override
     def __rtruediv__(

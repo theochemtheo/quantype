@@ -112,6 +112,27 @@ class ElectronCountDipoleMoment(
     ) -> Quantity[Div[Mul[ElectronCountKind, DipoleMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectronCountDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronCountDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountDipoleMoment[float, S], other: W, /
+    ) -> ElectronCountDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronCountDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ElectronCountKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ElectronCountKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronCountDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +146,21 @@ class ElectronCountDipoleMoment(
     ) -> ElectronCountDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronCountDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectronCountDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountDipoleMoment[float, S], other: W, /
+    ) -> ElectronCountDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronCountDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> ElectronCountDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

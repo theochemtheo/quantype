@@ -120,6 +120,25 @@ class ParticleDensityMass(Quantity[Mul[ParticleDensityKind, MassKind], V, S]):
     ) -> Quantity[Div[Mul[ParticleDensityKind, MassKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ParticleDensityMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ParticleDensityMass[float, S], other: W, /
+    ) -> ParticleDensityMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ParticleDensityMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ParticleDensityMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ParticleDensityMass[V, S]: ...
     @overload
     def __rmul__(
@@ -131,6 +150,19 @@ class ParticleDensityMass(Quantity[Mul[ParticleDensityKind, MassKind], V, S]):
     ) -> ParticleDensityMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ParticleDensityMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ParticleDensityMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ParticleDensityMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ParticleDensityMass[float, S], other: W, /
+    ) -> ParticleDensityMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ParticleDensityMass[V, S]: ...
+    @override
+    def item(self) -> ParticleDensityMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

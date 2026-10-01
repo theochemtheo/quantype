@@ -125,6 +125,31 @@ class InverseTimeEntropy(Quantity[Mul[InverseTimeKind, EntropyKind], V, S]):
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimeEntropy[float, S], other: Time[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimeEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimeEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimeEntropy[float, S], other: W, /
+    ) -> InverseTimeEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimeEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimeEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[InverseTimeKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[InverseTimeKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimeEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +161,19 @@ class InverseTimeEntropy(Quantity[Mul[InverseTimeKind, EntropyKind], V, S]):
     ) -> InverseTimeEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimeEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimeEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> InverseTimeEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimeEntropy[float, S], other: W, /
+    ) -> InverseTimeEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> InverseTimeEntropy[V, S]: ...
+    @override
+    def item(self) -> InverseTimeEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

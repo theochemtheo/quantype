@@ -96,6 +96,25 @@ class AreaEnergyPerVolume(Quantity[Mul[AreaKind, EnergyPerVolumeKind], V, S]):
     ) -> Quantity[Div[Mul[AreaKind, EnergyPerVolumeKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AreaEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaEnergyPerVolume[float, S], other: W, /
+    ) -> AreaEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +126,19 @@ class AreaEnergyPerVolume(Quantity[Mul[AreaKind, EnergyPerVolumeKind], V, S]):
     ) -> AreaEnergyPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaEnergyPerVolume[float, S], other: W, /
+    ) -> AreaEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> AreaEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

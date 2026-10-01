@@ -150,6 +150,43 @@ class AccelerationPerForceConstant(
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AccelerationPerForceConstant[float, S], other: ForceConstant[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AccelerationPerForceConstant[float, S], other: Mass[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AccelerationPerForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> AccelerationPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AccelerationPerForceConstant[float, S], other: W, /
+    ) -> AccelerationPerForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> AccelerationPerForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AccelerationPerForceConstant[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AccelerationPerForceConstant[V, S]: ...
     @overload
     def __rmul__(
@@ -163,6 +200,23 @@ class AccelerationPerForceConstant(
     ) -> AccelerationPerForceConstant[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AccelerationPerForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AccelerationPerForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> AccelerationPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AccelerationPerForceConstant[float, S], other: W, /
+    ) -> AccelerationPerForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> AccelerationPerForceConstant[V, S]: ...
+    @override
+    def item(self) -> AccelerationPerForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -8,6 +8,7 @@ from collections.abc import Sequence
 from typing import Any, Literal, overload
 
 import numpy as np
+import numpy.typing as npt
 
 from quantype._generated import (
     Acceleration,
@@ -118,7 +119,7 @@ from quantype._generated import (
 )
 from quantype.core import Quantity, _Numerical
 from quantype.core import Quantity as _BaseQuantity
-from quantype.kinds import Mul
+from quantype.kinds import Div, Mul, Pow
 from quantype.products import (
     AccelerationSquared,
     ActionSquared,
@@ -164,6 +165,9 @@ __all__ = [
     "arcsin",
     "arctan",
     "arctan2",
+    "argmax",
+    "argmin",
+    "argsort",
     "clip",
     "concatenate",
     "cos",
@@ -175,24 +179,42 @@ __all__ = [
     "exp",
     "expand_dims",
     "expm1",
+    "fabs",
+    "hypot",
     "isclose",
     "isfinite",
     "isinf",
     "isnan",
     "linalg",
+    "linspace",
     "log",
     "log1p",
     "log2",
     "log10",
+    "matmul",
     "max",
     "maximum",
     "mean",
+    "median",
     "min",
     "minimum",
+    "nanmax",
+    "nanmean",
+    "nanmedian",
+    "nanmin",
+    "nanstd",
+    "nansum",
+    "nanvar",
+    "outer",
+    "percentile",
+    "quantile",
     "reshape",
+    "sign",
     "sin",
     "sinh",
+    "sort",
     "sqrt",
+    "square",
     "squeeze",
     "stack",
     "std",
@@ -200,6 +222,8 @@ __all__ = [
     "tan",
     "tanh",
     "transpose",
+    "trapezoid",
+    "var",
     "where",
     "zeros_like",
 ]
@@ -431,6 +455,14 @@ def abs[F: np.floating[Any]](x: F, /) -> F: ...
 @overload
 def abs[A: _Numerical](x: A, /) -> A: ...
 @overload
+def fabs[Q: _BaseQuantity[Any, Any, Any]](x: Q, /) -> Q: ...
+@overload
+def fabs(x: float, /) -> float: ...
+@overload
+def fabs[F: np.floating[Any]](x: F, /) -> F: ...
+@overload
+def fabs[A: _Numerical](x: A, /) -> A: ...
+@overload
 def arctan2[K, V, S: UnitSystem](
     y: _BaseQuantity[K, V, S], x: _BaseQuantity[K, V, S], /
 ) -> Angle[V, S]: ...
@@ -446,6 +478,10 @@ def maximum[A: _Numerical](a: A, b: A, /) -> A: ...
 def minimum[Q: _BaseQuantity[Any, Any, Any]](a: Q, b: Q, /) -> Q: ...
 @overload
 def minimum[A: _Numerical](a: A, b: A, /) -> A: ...
+@overload
+def hypot[Q: _BaseQuantity[Any, Any, Any]](a: Q, b: Q, /) -> Q: ...
+@overload
+def hypot[A: _Numerical](a: A, b: A, /) -> A: ...
 @overload
 def clip[Q: _BaseQuantity[Any, Any, Any]](
     x: Q, a_min: Q | None, a_max: Q | None, /
@@ -716,11 +752,1055 @@ def dot[V, S: UnitSystem, R](
     a: Action[V, S], b: _RMulAction[Action[V, S], R], /
 ) -> R: ...
 @overload
-def dot[K, L, V, S: UnitSystem](
-    a: _BaseQuantity[K, V, S], b: _BaseQuantity[L, V, S], /
-) -> Quantity[Mul[K, L], V, S]: ...
+def dot[A, B, L, V, S: UnitSystem](
+    a: _BaseQuantity[Mul[A, B], V, S], b: _BaseQuantity[L, V, S], /
+) -> Quantity[Mul[Mul[A, B], L], V, S]: ...
+@overload
+def dot[A, B, L, V, S: UnitSystem](
+    a: _BaseQuantity[Div[A, B], V, S], b: _BaseQuantity[L, V, S], /
+) -> Quantity[Mul[Div[A, B], L], V, S]: ...
+@overload
+def dot[A, B, L, V, S: UnitSystem](
+    a: _BaseQuantity[Pow[A, B], V, S], b: _BaseQuantity[L, V, S], /
+) -> Quantity[Mul[Pow[A, B], L], V, S]: ...
+@overload
+def dot[K, A, B, V, S: UnitSystem](
+    a: _BaseQuantity[K, V, S], b: _BaseQuantity[Mul[A, B], V, S], /
+) -> Quantity[Mul[K, Mul[A, B]], V, S]: ...
+@overload
+def dot[K, A, B, V, S: UnitSystem](
+    a: _BaseQuantity[K, V, S], b: _BaseQuantity[Div[A, B], V, S], /
+) -> Quantity[Mul[K, Div[A, B]], V, S]: ...
+@overload
+def dot[K, A, B, V, S: UnitSystem](
+    a: _BaseQuantity[K, V, S], b: _BaseQuantity[Pow[A, B], V, S], /
+) -> Quantity[Mul[K, Pow[A, B]], V, S]: ...
 @overload
 def dot[A: _Numerical](a: A, b: A, /) -> Any: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: Dimensionless[float, S], b: _RMulDimensionlessF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Dimensionless[V, S], b: _RMulDimensionless[Dimensionless[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Length[float, S], b: _RMulLengthF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Length[V, S], b: _RMulLength[Length[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Area[float, S], b: _RMulAreaF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](a: Area[V, S], b: _RMulArea[Area[V, S], R], /) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Volume[float, S], b: _RMulVolumeF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Volume[V, S], b: _RMulVolume[Volume[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Time[float, S], b: _RMulTimeF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](a: Time[V, S], b: _RMulTime[Time[V, S], R], /) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: Velocity[float, S], b: _RMulVelocityF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Velocity[V, S], b: _RMulVelocity[Velocity[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Energy[float, S], b: _RMulEnergyF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Energy[V, S], b: _RMulEnergy[Energy[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: EnergyPerAtom[float, S], b: _RMulEnergyPerAtomF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: EnergyPerAtom[V, S], b: _RMulEnergyPerAtom[EnergyPerAtom[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Force[float, S], b: _RMulForceF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Force[V, S], b: _RMulForce[Force[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: ForceConstant[float, S], b: _RMulForceConstantF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: ForceConstant[V, S], b: _RMulForceConstant[ForceConstant[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: Pressure[float, S], b: _RMulPressureF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Pressure[V, S], b: _RMulPressure[Pressure[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: EnergyDensity[float, S], b: _RMulEnergyDensityF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: EnergyDensity[V, S], b: _RMulEnergyDensity[EnergyDensity[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: EnergyPerVolume[float, S], b: _RMulEnergyPerVolumeF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: EnergyPerVolume[V, S], b: _RMulEnergyPerVolume[EnergyPerVolume[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: Temperature[float, S], b: _RMulTemperatureF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Temperature[V, S], b: _RMulTemperature[Temperature[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: TemperatureDifference[float, S], b: _RMulTemperatureDifferenceF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: TemperatureDifference[V, S],
+    b: _RMulTemperatureDifference[TemperatureDifference[V, S], R],
+    /,
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: TemperatureRate[float, S], b: _RMulTemperatureRateF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: TemperatureRate[V, S], b: _RMulTemperatureRate[TemperatureRate[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: MagneticMoment[float, S], b: _RMulMagneticMomentF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: MagneticMoment[V, S], b: _RMulMagneticMoment[MagneticMoment[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: Magnetization[float, S], b: _RMulMagnetizationF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Magnetization[V, S], b: _RMulMagnetization[Magnetization[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: ParticleDensity[float, S], b: _RMulParticleDensityF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: ParticleDensity[V, S], b: _RMulParticleDensity[ParticleDensity[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: ElectronDensity[float, S], b: _RMulElectronDensityF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: ElectronDensity[V, S], b: _RMulElectronDensity[ElectronDensity[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Angle[float, S], b: _RMulAngleF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Angle[V, S], b: _RMulAngle[Angle[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: Frequency[float, S], b: _RMulFrequencyF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Frequency[V, S], b: _RMulFrequency[Frequency[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: InverseTime[float, S], b: _RMulInverseTimeF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: InverseTime[V, S], b: _RMulInverseTime[InverseTime[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: AtomCount[float, S], b: _RMulAtomCountF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: AtomCount[V, S], b: _RMulAtomCount[AtomCount[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: ElectronCount[float, S], b: _RMulElectronCountF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: ElectronCount[V, S], b: _RMulElectronCount[ElectronCount[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Mass[float, S], b: _RMulMassF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](a: Mass[V, S], b: _RMulMass[Mass[V, S], R], /) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: MassDensity[float, S], b: _RMulMassDensityF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: MassDensity[V, S], b: _RMulMassDensity[MassDensity[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: Momentum[float, S], b: _RMulMomentumF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Momentum[V, S], b: _RMulMomentum[Momentum[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: Acceleration[float, S], b: _RMulAccelerationF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Acceleration[V, S], b: _RMulAcceleration[Acceleration[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Charge[float, S], b: _RMulChargeF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Charge[V, S], b: _RMulCharge[Charge[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: ElectricPotential[float, S], b: _RMulElectricPotentialF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: ElectricPotential[V, S], b: _RMulElectricPotential[ElectricPotential[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: ElectricField[float, S], b: _RMulElectricFieldF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: ElectricField[V, S], b: _RMulElectricField[ElectricField[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](
+    a: DipoleMoment[float, S], b: _RMulDipoleMomentF[S, R], /
+) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: DipoleMoment[V, S], b: _RMulDipoleMoment[DipoleMoment[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Entropy[float, S], b: _RMulEntropyF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Entropy[V, S], b: _RMulEntropy[Entropy[V, S], R], /
+) -> R: ...
+@overload
+def matmul[S: UnitSystem, R](a: Action[float, S], b: _RMulActionF[S, R], /) -> R: ...
+@overload
+def matmul[V, S: UnitSystem, R](
+    a: Action[V, S], b: _RMulAction[Action[V, S], R], /
+) -> R: ...
+@overload
+def matmul[Q: _BaseQuantity[Any, Any, Any]](a: Q, b: _Numerical, /) -> Q: ...
+@overload
+def matmul[Q: _BaseQuantity[Any, Any, Any]](a: _Numerical, b: Q, /) -> Q: ...
+@overload
+def matmul[A, B, L, V, S: UnitSystem](
+    a: _BaseQuantity[Mul[A, B], V, S], b: _BaseQuantity[L, V, S], /
+) -> Quantity[Mul[Mul[A, B], L], V, S]: ...
+@overload
+def matmul[A, B, L, V, S: UnitSystem](
+    a: _BaseQuantity[Div[A, B], V, S], b: _BaseQuantity[L, V, S], /
+) -> Quantity[Mul[Div[A, B], L], V, S]: ...
+@overload
+def matmul[A, B, L, V, S: UnitSystem](
+    a: _BaseQuantity[Pow[A, B], V, S], b: _BaseQuantity[L, V, S], /
+) -> Quantity[Mul[Pow[A, B], L], V, S]: ...
+@overload
+def matmul[K, A, B, V, S: UnitSystem](
+    a: _BaseQuantity[K, V, S], b: _BaseQuantity[Mul[A, B], V, S], /
+) -> Quantity[Mul[K, Mul[A, B]], V, S]: ...
+@overload
+def matmul[K, A, B, V, S: UnitSystem](
+    a: _BaseQuantity[K, V, S], b: _BaseQuantity[Div[A, B], V, S], /
+) -> Quantity[Mul[K, Div[A, B]], V, S]: ...
+@overload
+def matmul[K, A, B, V, S: UnitSystem](
+    a: _BaseQuantity[K, V, S], b: _BaseQuantity[Pow[A, B], V, S], /
+) -> Quantity[Mul[K, Pow[A, B]], V, S]: ...
+@overload
+def matmul[A: _Numerical](a: A, b: A, /) -> A: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: Dimensionless[float, S], b: _RMulDimensionlessF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Dimensionless[V, S], b: _RMulDimensionless[Dimensionless[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Length[float, S], b: _RMulLengthF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Length[V, S], b: _RMulLength[Length[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Area[float, S], b: _RMulAreaF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](a: Area[V, S], b: _RMulArea[Area[V, S], R], /) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Volume[float, S], b: _RMulVolumeF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Volume[V, S], b: _RMulVolume[Volume[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Time[float, S], b: _RMulTimeF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](a: Time[V, S], b: _RMulTime[Time[V, S], R], /) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Velocity[float, S], b: _RMulVelocityF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Velocity[V, S], b: _RMulVelocity[Velocity[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Energy[float, S], b: _RMulEnergyF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Energy[V, S], b: _RMulEnergy[Energy[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: EnergyPerAtom[float, S], b: _RMulEnergyPerAtomF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: EnergyPerAtom[V, S], b: _RMulEnergyPerAtom[EnergyPerAtom[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Force[float, S], b: _RMulForceF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Force[V, S], b: _RMulForce[Force[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: ForceConstant[float, S], b: _RMulForceConstantF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: ForceConstant[V, S], b: _RMulForceConstant[ForceConstant[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Pressure[float, S], b: _RMulPressureF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Pressure[V, S], b: _RMulPressure[Pressure[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: EnergyDensity[float, S], b: _RMulEnergyDensityF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: EnergyDensity[V, S], b: _RMulEnergyDensity[EnergyDensity[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: EnergyPerVolume[float, S], b: _RMulEnergyPerVolumeF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: EnergyPerVolume[V, S], b: _RMulEnergyPerVolume[EnergyPerVolume[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: Temperature[float, S], b: _RMulTemperatureF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Temperature[V, S], b: _RMulTemperature[Temperature[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: TemperatureDifference[float, S], b: _RMulTemperatureDifferenceF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: TemperatureDifference[V, S],
+    b: _RMulTemperatureDifference[TemperatureDifference[V, S], R],
+    /,
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: TemperatureRate[float, S], b: _RMulTemperatureRateF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: TemperatureRate[V, S], b: _RMulTemperatureRate[TemperatureRate[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: MagneticMoment[float, S], b: _RMulMagneticMomentF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: MagneticMoment[V, S], b: _RMulMagneticMoment[MagneticMoment[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: Magnetization[float, S], b: _RMulMagnetizationF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Magnetization[V, S], b: _RMulMagnetization[Magnetization[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: ParticleDensity[float, S], b: _RMulParticleDensityF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: ParticleDensity[V, S], b: _RMulParticleDensity[ParticleDensity[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: ElectronDensity[float, S], b: _RMulElectronDensityF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: ElectronDensity[V, S], b: _RMulElectronDensity[ElectronDensity[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Angle[float, S], b: _RMulAngleF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Angle[V, S], b: _RMulAngle[Angle[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: Frequency[float, S], b: _RMulFrequencyF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Frequency[V, S], b: _RMulFrequency[Frequency[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: InverseTime[float, S], b: _RMulInverseTimeF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: InverseTime[V, S], b: _RMulInverseTime[InverseTime[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: AtomCount[float, S], b: _RMulAtomCountF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: AtomCount[V, S], b: _RMulAtomCount[AtomCount[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: ElectronCount[float, S], b: _RMulElectronCountF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: ElectronCount[V, S], b: _RMulElectronCount[ElectronCount[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Mass[float, S], b: _RMulMassF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](a: Mass[V, S], b: _RMulMass[Mass[V, S], R], /) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: MassDensity[float, S], b: _RMulMassDensityF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: MassDensity[V, S], b: _RMulMassDensity[MassDensity[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Momentum[float, S], b: _RMulMomentumF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Momentum[V, S], b: _RMulMomentum[Momentum[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: Acceleration[float, S], b: _RMulAccelerationF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Acceleration[V, S], b: _RMulAcceleration[Acceleration[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Charge[float, S], b: _RMulChargeF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Charge[V, S], b: _RMulCharge[Charge[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: ElectricPotential[float, S], b: _RMulElectricPotentialF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: ElectricPotential[V, S], b: _RMulElectricPotential[ElectricPotential[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: ElectricField[float, S], b: _RMulElectricFieldF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: ElectricField[V, S], b: _RMulElectricField[ElectricField[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](
+    a: DipoleMoment[float, S], b: _RMulDipoleMomentF[S, R], /
+) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: DipoleMoment[V, S], b: _RMulDipoleMoment[DipoleMoment[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Entropy[float, S], b: _RMulEntropyF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Entropy[V, S], b: _RMulEntropy[Entropy[V, S], R], /
+) -> R: ...
+@overload
+def outer[S: UnitSystem, R](a: Action[float, S], b: _RMulActionF[S, R], /) -> R: ...
+@overload
+def outer[V, S: UnitSystem, R](
+    a: Action[V, S], b: _RMulAction[Action[V, S], R], /
+) -> R: ...
+@overload
+def outer[Q: _BaseQuantity[Any, Any, Any]](a: Q, b: _Numerical, /) -> Q: ...
+@overload
+def outer[Q: _BaseQuantity[Any, Any, Any]](a: _Numerical, b: Q, /) -> Q: ...
+@overload
+def outer[A, B, L, V, S: UnitSystem](
+    a: _BaseQuantity[Mul[A, B], V, S], b: _BaseQuantity[L, V, S], /
+) -> Quantity[Mul[Mul[A, B], L], V, S]: ...
+@overload
+def outer[A, B, L, V, S: UnitSystem](
+    a: _BaseQuantity[Div[A, B], V, S], b: _BaseQuantity[L, V, S], /
+) -> Quantity[Mul[Div[A, B], L], V, S]: ...
+@overload
+def outer[A, B, L, V, S: UnitSystem](
+    a: _BaseQuantity[Pow[A, B], V, S], b: _BaseQuantity[L, V, S], /
+) -> Quantity[Mul[Pow[A, B], L], V, S]: ...
+@overload
+def outer[K, A, B, V, S: UnitSystem](
+    a: _BaseQuantity[K, V, S], b: _BaseQuantity[Mul[A, B], V, S], /
+) -> Quantity[Mul[K, Mul[A, B]], V, S]: ...
+@overload
+def outer[K, A, B, V, S: UnitSystem](
+    a: _BaseQuantity[K, V, S], b: _BaseQuantity[Div[A, B], V, S], /
+) -> Quantity[Mul[K, Div[A, B]], V, S]: ...
+@overload
+def outer[K, A, B, V, S: UnitSystem](
+    a: _BaseQuantity[K, V, S], b: _BaseQuantity[Pow[A, B], V, S], /
+) -> Quantity[Mul[K, Pow[A, B]], V, S]: ...
+@overload
+def outer[A: _Numerical](a: A, b: A, /) -> A: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Dimensionless[float, S],
+    x: _RMulDimensionlessF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Dimensionless[V, S],
+    x: _RMulDimensionless[Dimensionless[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Length[float, S], x: _RMulLengthF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Length[V, S], x: _RMulLength[Length[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Area[float, S], x: _RMulAreaF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Area[V, S], x: _RMulArea[Area[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Volume[float, S], x: _RMulVolumeF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Volume[V, S], x: _RMulVolume[Volume[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Time[float, S], x: _RMulTimeF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Time[V, S], x: _RMulTime[Time[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Velocity[float, S], x: _RMulVelocityF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Velocity[V, S],
+    x: _RMulVelocity[Velocity[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Energy[float, S], x: _RMulEnergyF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Energy[V, S], x: _RMulEnergy[Energy[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: EnergyPerAtom[float, S],
+    x: _RMulEnergyPerAtomF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: EnergyPerAtom[V, S],
+    x: _RMulEnergyPerAtom[EnergyPerAtom[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Force[float, S], x: _RMulForceF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Force[V, S], x: _RMulForce[Force[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: ForceConstant[float, S],
+    x: _RMulForceConstantF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: ForceConstant[V, S],
+    x: _RMulForceConstant[ForceConstant[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Pressure[float, S], x: _RMulPressureF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Pressure[V, S],
+    x: _RMulPressure[Pressure[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: EnergyDensity[float, S],
+    x: _RMulEnergyDensityF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: EnergyDensity[V, S],
+    x: _RMulEnergyDensity[EnergyDensity[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: EnergyPerVolume[float, S],
+    x: _RMulEnergyPerVolumeF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: EnergyPerVolume[V, S],
+    x: _RMulEnergyPerVolume[EnergyPerVolume[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Temperature[float, S],
+    x: _RMulTemperatureF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Temperature[V, S],
+    x: _RMulTemperature[Temperature[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: TemperatureDifference[float, S],
+    x: _RMulTemperatureDifferenceF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: TemperatureDifference[V, S],
+    x: _RMulTemperatureDifference[TemperatureDifference[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: TemperatureRate[float, S],
+    x: _RMulTemperatureRateF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: TemperatureRate[V, S],
+    x: _RMulTemperatureRate[TemperatureRate[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: MagneticMoment[float, S],
+    x: _RMulMagneticMomentF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: MagneticMoment[V, S],
+    x: _RMulMagneticMoment[MagneticMoment[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Magnetization[float, S],
+    x: _RMulMagnetizationF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Magnetization[V, S],
+    x: _RMulMagnetization[Magnetization[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: ParticleDensity[float, S],
+    x: _RMulParticleDensityF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: ParticleDensity[V, S],
+    x: _RMulParticleDensity[ParticleDensity[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: ElectronDensity[float, S],
+    x: _RMulElectronDensityF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: ElectronDensity[V, S],
+    x: _RMulElectronDensity[ElectronDensity[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Angle[float, S], x: _RMulAngleF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Angle[V, S], x: _RMulAngle[Angle[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Frequency[float, S], x: _RMulFrequencyF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Frequency[V, S],
+    x: _RMulFrequency[Frequency[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: InverseTime[float, S],
+    x: _RMulInverseTimeF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: InverseTime[V, S],
+    x: _RMulInverseTime[InverseTime[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: AtomCount[float, S], x: _RMulAtomCountF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: AtomCount[V, S],
+    x: _RMulAtomCount[AtomCount[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: ElectronCount[float, S],
+    x: _RMulElectronCountF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: ElectronCount[V, S],
+    x: _RMulElectronCount[ElectronCount[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Mass[float, S], x: _RMulMassF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Mass[V, S], x: _RMulMass[Mass[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: MassDensity[float, S],
+    x: _RMulMassDensityF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: MassDensity[V, S],
+    x: _RMulMassDensity[MassDensity[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Momentum[float, S], x: _RMulMomentumF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Momentum[V, S],
+    x: _RMulMomentum[Momentum[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Acceleration[float, S],
+    x: _RMulAccelerationF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Acceleration[V, S],
+    x: _RMulAcceleration[Acceleration[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Charge[float, S], x: _RMulChargeF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Charge[V, S], x: _RMulCharge[Charge[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: ElectricPotential[float, S],
+    x: _RMulElectricPotentialF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: ElectricPotential[V, S],
+    x: _RMulElectricPotential[ElectricPotential[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: ElectricField[float, S],
+    x: _RMulElectricFieldF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: ElectricField[V, S],
+    x: _RMulElectricField[ElectricField[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: DipoleMoment[float, S],
+    x: _RMulDipoleMomentF[S, R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: DipoleMoment[V, S],
+    x: _RMulDipoleMoment[DipoleMoment[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Entropy[float, S], x: _RMulEntropyF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Entropy[V, S],
+    x: _RMulEntropy[Entropy[V, S], R],
+    dx: float = ...,
+    axis: int = ...,
+) -> R: ...
+@overload
+def trapezoid[S: UnitSystem, R](
+    y: Action[float, S], x: _RMulActionF[S, R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[V, S: UnitSystem, R](
+    y: Action[V, S], x: _RMulAction[Action[V, S], R], dx: float = ..., axis: int = ...
+) -> R: ...
+@overload
+def trapezoid[A, B, L, V, S: UnitSystem](
+    y: _BaseQuantity[Mul[A, B], V, S],
+    x: _BaseQuantity[L, V, S],
+    dx: float = ...,
+    axis: int = ...,
+) -> Quantity[Mul[Mul[A, B], L], V, S]: ...
+@overload
+def trapezoid[A, B, L, V, S: UnitSystem](
+    y: _BaseQuantity[Div[A, B], V, S],
+    x: _BaseQuantity[L, V, S],
+    dx: float = ...,
+    axis: int = ...,
+) -> Quantity[Mul[Div[A, B], L], V, S]: ...
+@overload
+def trapezoid[A, B, L, V, S: UnitSystem](
+    y: _BaseQuantity[Pow[A, B], V, S],
+    x: _BaseQuantity[L, V, S],
+    dx: float = ...,
+    axis: int = ...,
+) -> Quantity[Mul[Pow[A, B], L], V, S]: ...
+@overload
+def trapezoid[K, A, B, V, S: UnitSystem](
+    y: _BaseQuantity[K, V, S],
+    x: _BaseQuantity[Mul[A, B], V, S],
+    dx: float = ...,
+    axis: int = ...,
+) -> Quantity[Mul[K, Mul[A, B]], V, S]: ...
+@overload
+def trapezoid[K, A, B, V, S: UnitSystem](
+    y: _BaseQuantity[K, V, S],
+    x: _BaseQuantity[Div[A, B], V, S],
+    dx: float = ...,
+    axis: int = ...,
+) -> Quantity[Mul[K, Div[A, B]], V, S]: ...
+@overload
+def trapezoid[K, A, B, V, S: UnitSystem](
+    y: _BaseQuantity[K, V, S],
+    x: _BaseQuantity[Pow[A, B], V, S],
+    dx: float = ...,
+    axis: int = ...,
+) -> Quantity[Mul[K, Pow[A, B]], V, S]: ...
+@overload
+def trapezoid[Q: _BaseQuantity[Any, Any, Any]](
+    y: Q, x: _Numerical | None = ..., dx: float = ..., axis: int = ...
+) -> Q: ...
+@overload
+def trapezoid(
+    y: _Numerical, x: _Numerical | None = ..., dx: float = ..., axis: int = ...
+) -> Any: ...
 @overload
 def cross[K, L, V, S: UnitSystem](
     a: _BaseQuantity[K, V, S], b: _BaseQuantity[L, V, S], /, axis: int = ...
@@ -764,6 +1844,10 @@ def cumsum[Q: _BaseQuantity[Any, Any, Any]](x: Q, axis: int | None = ...) -> Q: 
 @overload
 def cumsum[A: _Numerical](x: A, axis: int | None = ...) -> A: ...
 @overload
+def sort[Q: _BaseQuantity[Any, Any, Any]](x: Q, axis: int = ...) -> Q: ...
+@overload
+def sort[A: _Numerical](x: A, axis: int = ...) -> A: ...
+@overload
 def zeros_like[Q: _BaseQuantity[Any, Any, Any]](x: Q) -> Q: ...
 @overload
 def zeros_like[A: _Numerical](x: A) -> A: ...
@@ -792,6 +1876,60 @@ def min[Q: _BaseQuantity[Any, Any, Any]](
 @overload
 def min(x: _Numerical, axis: int | None = ..., *, keepdims: bool = ...) -> Any: ...
 @overload
+def median[Q: _BaseQuantity[Any, Any, Any]](
+    x: Q, axis: int | None = ..., *, keepdims: bool = ...
+) -> Q: ...
+@overload
+def median(x: _Numerical, axis: int | None = ..., *, keepdims: bool = ...) -> Any: ...
+@overload
+def nansum[Q: _BaseQuantity[Any, Any, Any]](
+    x: Q, axis: int | None = ..., *, keepdims: bool = ...
+) -> Q: ...
+@overload
+def nansum(x: _Numerical, axis: int | None = ..., *, keepdims: bool = ...) -> Any: ...
+@overload
+def nanmean[Q: _BaseQuantity[Any, Any, Any]](
+    x: Q, axis: int | None = ..., *, keepdims: bool = ...
+) -> Q: ...
+@overload
+def nanmean(x: _Numerical, axis: int | None = ..., *, keepdims: bool = ...) -> Any: ...
+@overload
+def nanmax[Q: _BaseQuantity[Any, Any, Any]](
+    x: Q, axis: int | None = ..., *, keepdims: bool = ...
+) -> Q: ...
+@overload
+def nanmax(x: _Numerical, axis: int | None = ..., *, keepdims: bool = ...) -> Any: ...
+@overload
+def nanmin[Q: _BaseQuantity[Any, Any, Any]](
+    x: Q, axis: int | None = ..., *, keepdims: bool = ...
+) -> Q: ...
+@overload
+def nanmin(x: _Numerical, axis: int | None = ..., *, keepdims: bool = ...) -> Any: ...
+@overload
+def nanmedian[Q: _BaseQuantity[Any, Any, Any]](
+    x: Q, axis: int | None = ..., *, keepdims: bool = ...
+) -> Q: ...
+@overload
+def nanmedian(
+    x: _Numerical, axis: int | None = ..., *, keepdims: bool = ...
+) -> Any: ...
+@overload
+def percentile[Q: _BaseQuantity[Any, Any, Any]](
+    x: Q, q: Any, axis: int | None = ..., *, keepdims: bool = ...
+) -> Q: ...
+@overload
+def percentile(
+    x: _Numerical, q: Any, axis: int | None = ..., *, keepdims: bool = ...
+) -> Any: ...
+@overload
+def quantile[Q: _BaseQuantity[Any, Any, Any]](
+    x: Q, q: Any, axis: int | None = ..., *, keepdims: bool = ...
+) -> Q: ...
+@overload
+def quantile(
+    x: _Numerical, q: Any, axis: int | None = ..., *, keepdims: bool = ...
+) -> Any: ...
+@overload
 def std[V, S: UnitSystem](
     x: Temperature[V, S],
     axis: int | None = ...,
@@ -807,6 +1945,923 @@ def std[Q: _BaseQuantity[Any, Any, Any]](
 def std(
     x: _Numerical, axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
 ) -> Any: ...
+@overload
+def nanstd[V, S: UnitSystem](
+    x: Temperature[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> TemperatureDifference[V, S]: ...
+@overload
+def nanstd[Q: _BaseQuantity[Any, Any, Any]](
+    x: Q, axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> Q: ...
+@overload
+def nanstd(
+    x: _Numerical, axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> Any: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Dimensionless[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> Dimensionless[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Length[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> Area[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Area[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> AreaSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Volume[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> VolumeSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Time[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> TimeSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Velocity[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> VelocitySquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Energy[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> EnergySquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: EnergyPerAtom[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> EnergyPerAtomSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Force[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> ForceSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: ForceConstant[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ForceConstantSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Pressure[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> PressureSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: EnergyDensity[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> EnergyDensitySquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: EnergyPerVolume[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> EnergyPerVolumeSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Temperature[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> TemperatureDifferenceSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: TemperatureDifference[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> TemperatureDifferenceSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: TemperatureRate[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> TemperatureRateSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: MagneticMoment[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> MagneticMomentSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Magnetization[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> MagnetizationSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: ParticleDensity[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ParticleDensitySquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: ElectronDensity[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ElectronDensitySquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Angle[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> AngleSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Frequency[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> FrequencySquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: InverseTime[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> InverseTimeSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: AtomCount[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> AtomCountSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: ElectronCount[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ElectronCountSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Mass[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> MassSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: MassDensity[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> MassDensitySquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Momentum[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> MomentumSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Acceleration[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> AccelerationSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Charge[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> ChargeSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: ElectricPotential[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ElectricPotentialSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: ElectricField[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ElectricFieldSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: DipoleMoment[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> DipoleMomentSquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Entropy[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> EntropySquared[V, S]: ...
+@overload
+def var[V, S: UnitSystem](
+    x: Action[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> ActionSquared[V, S]: ...
+@overload
+def var[A, B, V, S: UnitSystem](
+    x: _BaseQuantity[Mul[A, B], V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> Quantity[Pow[Mul[A, B], Literal[2]], V, S]: ...
+@overload
+def var[A, B, V, S: UnitSystem](
+    x: _BaseQuantity[Div[A, B], V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> Quantity[Pow[Div[A, B], Literal[2]], V, S]: ...
+@overload
+def var[A, B, V, S: UnitSystem](
+    x: _BaseQuantity[Pow[A, B], V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> Quantity[Pow[Pow[A, B], Literal[2]], V, S]: ...
+@overload
+def var(
+    x: _Numerical, axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> Any: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Dimensionless[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> Dimensionless[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Length[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> Area[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Area[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> AreaSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Volume[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> VolumeSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Time[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> TimeSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Velocity[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> VelocitySquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Energy[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> EnergySquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: EnergyPerAtom[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> EnergyPerAtomSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Force[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> ForceSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: ForceConstant[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ForceConstantSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Pressure[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> PressureSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: EnergyDensity[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> EnergyDensitySquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: EnergyPerVolume[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> EnergyPerVolumeSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Temperature[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> TemperatureDifferenceSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: TemperatureDifference[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> TemperatureDifferenceSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: TemperatureRate[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> TemperatureRateSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: MagneticMoment[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> MagneticMomentSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Magnetization[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> MagnetizationSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: ParticleDensity[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ParticleDensitySquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: ElectronDensity[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ElectronDensitySquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Angle[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> AngleSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Frequency[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> FrequencySquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: InverseTime[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> InverseTimeSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: AtomCount[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> AtomCountSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: ElectronCount[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ElectronCountSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Mass[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> MassSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: MassDensity[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> MassDensitySquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Momentum[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> MomentumSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Acceleration[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> AccelerationSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Charge[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> ChargeSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: ElectricPotential[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ElectricPotentialSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: ElectricField[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> ElectricFieldSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: DipoleMoment[V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> DipoleMomentSquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Entropy[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> EntropySquared[V, S]: ...
+@overload
+def nanvar[V, S: UnitSystem](
+    x: Action[V, S], axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> ActionSquared[V, S]: ...
+@overload
+def nanvar[A, B, V, S: UnitSystem](
+    x: _BaseQuantity[Mul[A, B], V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> Quantity[Pow[Mul[A, B], Literal[2]], V, S]: ...
+@overload
+def nanvar[A, B, V, S: UnitSystem](
+    x: _BaseQuantity[Div[A, B], V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> Quantity[Pow[Div[A, B], Literal[2]], V, S]: ...
+@overload
+def nanvar[A, B, V, S: UnitSystem](
+    x: _BaseQuantity[Pow[A, B], V, S],
+    axis: int | None = ...,
+    *,
+    ddof: int = ...,
+    keepdims: bool = ...,
+) -> Quantity[Pow[Pow[A, B], Literal[2]], V, S]: ...
+@overload
+def nanvar(
+    x: _Numerical, axis: int | None = ..., *, ddof: int = ..., keepdims: bool = ...
+) -> Any: ...
+@overload
+def square[V, S: UnitSystem](x: Dimensionless[V, S], /) -> Dimensionless[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Length[V, S], /) -> Area[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Area[V, S], /) -> AreaSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Volume[V, S], /) -> VolumeSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Time[V, S], /) -> TimeSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Velocity[V, S], /) -> VelocitySquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Energy[V, S], /) -> EnergySquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: EnergyPerAtom[V, S], /
+) -> EnergyPerAtomSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Force[V, S], /) -> ForceSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: ForceConstant[V, S], /
+) -> ForceConstantSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Pressure[V, S], /) -> PressureSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: EnergyDensity[V, S], /
+) -> EnergyDensitySquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: EnergyPerVolume[V, S], /
+) -> EnergyPerVolumeSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Temperature[V, S], /) -> TemperatureSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: TemperatureDifference[V, S], /
+) -> TemperatureDifferenceSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: TemperatureRate[V, S], /
+) -> TemperatureRateSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: MagneticMoment[V, S], /
+) -> MagneticMomentSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: Magnetization[V, S], /
+) -> MagnetizationSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: ParticleDensity[V, S], /
+) -> ParticleDensitySquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: ElectronDensity[V, S], /
+) -> ElectronDensitySquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Angle[V, S], /) -> AngleSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Frequency[V, S], /) -> FrequencySquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: InverseTime[V, S], /) -> InverseTimeSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: AtomCount[V, S], /) -> AtomCountSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: ElectronCount[V, S], /
+) -> ElectronCountSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Mass[V, S], /) -> MassSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: MassDensity[V, S], /) -> MassDensitySquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Momentum[V, S], /) -> MomentumSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Acceleration[V, S], /) -> AccelerationSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Charge[V, S], /) -> ChargeSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: ElectricPotential[V, S], /
+) -> ElectricPotentialSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](
+    x: ElectricField[V, S], /
+) -> ElectricFieldSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: DipoleMoment[V, S], /) -> DipoleMomentSquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Entropy[V, S], /) -> EntropySquared[V, S]: ...
+@overload
+def square[V, S: UnitSystem](x: Action[V, S], /) -> ActionSquared[V, S]: ...
+@overload
+def square[A, B, V, S: UnitSystem](
+    x: _BaseQuantity[Mul[A, B], V, S], /
+) -> Quantity[Pow[Mul[A, B], Literal[2]], V, S]: ...
+@overload
+def square[A, B, V, S: UnitSystem](
+    x: _BaseQuantity[Div[A, B], V, S], /
+) -> Quantity[Pow[Div[A, B], Literal[2]], V, S]: ...
+@overload
+def square[A, B, V, S: UnitSystem](
+    x: _BaseQuantity[Pow[A, B], V, S], /
+) -> Quantity[Pow[Pow[A, B], Literal[2]], V, S]: ...
+@overload
+def square(x: float, /) -> float: ...
+@overload
+def square[F: np.floating[Any]](x: F, /) -> F: ...
+@overload
+def square[A: _Numerical](x: A, /) -> A: ...
+def argsort(x: Any, axis: int = ...) -> Any: ...
+def argmin(x: Any, axis: int | None = ...) -> Any: ...
+def argmax(x: Any, axis: int | None = ...) -> Any: ...
+@overload
+def sign[V](x: _BaseQuantity[Any, V, Any], /) -> V: ...
+@overload
+def sign(x: float, /) -> float: ...
+@overload
+def sign[F: np.floating[Any]](x: F, /) -> F: ...
+@overload
+def sign[A: _Numerical](x: A, /) -> A: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Dimensionless[float, S],
+    stop: Dimensionless[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Dimensionless[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Length[float, S],
+    stop: Length[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Length[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Area[float, S], stop: Area[float, S], num: int = ..., *, endpoint: bool = ...
+) -> Area[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Volume[float, S],
+    stop: Volume[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Volume[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Time[float, S], stop: Time[float, S], num: int = ..., *, endpoint: bool = ...
+) -> Time[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Velocity[float, S],
+    stop: Velocity[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Velocity[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Energy[float, S],
+    stop: Energy[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Energy[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: EnergyPerAtom[float, S],
+    stop: EnergyPerAtom[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> EnergyPerAtom[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Force[float, S],
+    stop: Force[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Force[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: ForceConstant[float, S],
+    stop: ForceConstant[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ForceConstant[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Pressure[float, S],
+    stop: Pressure[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Pressure[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: EnergyDensity[float, S],
+    stop: EnergyDensity[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> EnergyDensity[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: EnergyPerVolume[float, S],
+    stop: EnergyPerVolume[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> EnergyPerVolume[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Temperature[float, S],
+    stop: Temperature[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Temperature[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: TemperatureDifference[float, S],
+    stop: TemperatureDifference[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> TemperatureDifference[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: TemperatureRate[float, S],
+    stop: TemperatureRate[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> TemperatureRate[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: MagneticMoment[float, S],
+    stop: MagneticMoment[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> MagneticMoment[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Magnetization[float, S],
+    stop: Magnetization[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Magnetization[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: ParticleDensity[float, S],
+    stop: ParticleDensity[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ParticleDensity[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: ElectronDensity[float, S],
+    stop: ElectronDensity[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ElectronDensity[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Angle[float, S],
+    stop: Angle[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Angle[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Frequency[float, S],
+    stop: Frequency[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Frequency[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: InverseTime[float, S],
+    stop: InverseTime[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> InverseTime[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: AtomCount[float, S],
+    stop: AtomCount[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> AtomCount[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: ElectronCount[float, S],
+    stop: ElectronCount[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ElectronCount[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Mass[float, S], stop: Mass[float, S], num: int = ..., *, endpoint: bool = ...
+) -> Mass[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: MassDensity[float, S],
+    stop: MassDensity[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> MassDensity[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Momentum[float, S],
+    stop: Momentum[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Momentum[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Acceleration[float, S],
+    stop: Acceleration[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Acceleration[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Charge[float, S],
+    stop: Charge[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Charge[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: ElectricPotential[float, S],
+    stop: ElectricPotential[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ElectricPotential[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: ElectricField[float, S],
+    stop: ElectricField[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ElectricField[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: DipoleMoment[float, S],
+    stop: DipoleMoment[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> DipoleMoment[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Entropy[float, S],
+    stop: Entropy[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Entropy[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[S: UnitSystem](
+    start: Action[float, S],
+    stop: Action[float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Action[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[K, S: UnitSystem](
+    start: _BaseQuantity[K, float, S],
+    stop: _BaseQuantity[K, float, S],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Quantity[K, npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[Q: _BaseQuantity[Any, Any, Any]](
+    start: Q, stop: Q, num: int = ..., *, endpoint: bool = ...
+) -> Q: ...
+@overload
+def linspace(
+    start: float, stop: float, num: int = ..., *, endpoint: bool = ...
+) -> npt.NDArray[np.float64]: ...
+@overload
+def linspace[A: _Numerical](
+    start: A, stop: A, num: int = ..., *, endpoint: bool = ...
+) -> A: ...
 @overload
 def diff[V, S: UnitSystem](
     x: Temperature[V, S], n: int = ..., axis: int = ...

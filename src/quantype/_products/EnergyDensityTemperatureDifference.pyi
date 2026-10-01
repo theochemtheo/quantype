@@ -127,6 +127,29 @@ class EnergyDensityTemperatureDifference(
     ) -> Quantity[Div[Mul[EnergyDensityKind, TemperatureDifferenceKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyDensityTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyDensityTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityTemperatureDifference[float, S], other: W, /
+    ) -> EnergyDensityTemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> EnergyDensityTemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityTemperatureDifference[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, TemperatureDifferenceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, TemperatureDifferenceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> EnergyDensityTemperatureDifference[V, S]: ...
@@ -144,6 +167,23 @@ class EnergyDensityTemperatureDifference(
     def __rmul__(
         self, other: _Numerical, /
     ) -> EnergyDensityTemperatureDifference[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyDensityTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityTemperatureDifference[float, S], other: W, /
+    ) -> EnergyDensityTemperatureDifference[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> EnergyDensityTemperatureDifference[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityTemperatureDifference[float, S]: ...
     @overload
     @override
     def __rtruediv__(

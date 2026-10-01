@@ -148,6 +148,41 @@ class TimeElectronCount(Quantity[Mul[TimeKind, ElectronCountKind], V, S]):
     ) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeElectronCount[float, S], other: Frequency[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeElectronCount[float, S], other: InverseTime[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeElectronCount[float, S], other: W, /
+    ) -> TimeElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -159,6 +194,19 @@ class TimeElectronCount(Quantity[Mul[TimeKind, ElectronCountKind], V, S]):
     ) -> TimeElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeElectronCount[float, S], other: W, /
+    ) -> TimeElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeElectronCount[V, S]: ...
+    @override
+    def item(self) -> TimeElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

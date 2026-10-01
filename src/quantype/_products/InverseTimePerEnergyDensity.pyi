@@ -136,6 +136,35 @@ class InverseTimePerEnergyDensity(
     ) -> EnergyDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimePerEnergyDensity[float, S], other: EnergyDensity[W, S], /
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyDensity[V, S] | EnergyDensity[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimePerEnergyDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> InverseTimePerEnergyDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimePerEnergyDensity[float, S], other: W, /
+    ) -> InverseTimePerEnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> InverseTimePerEnergyDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimePerEnergyDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, EnergyDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, EnergyDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimePerEnergyDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -149,6 +178,23 @@ class InverseTimePerEnergyDensity(
     ) -> InverseTimePerEnergyDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> InverseTimePerEnergyDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimePerEnergyDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> InverseTimePerEnergyDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimePerEnergyDensity[float, S], other: W, /
+    ) -> InverseTimePerEnergyDensity[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> InverseTimePerEnergyDensity[V, S]: ...
+    @override
+    def item(self) -> InverseTimePerEnergyDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

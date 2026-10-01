@@ -94,6 +94,25 @@ class VelocityMagnetization(Quantity[Mul[VelocityKind, MagnetizationKind], V, S]
     ) -> Quantity[Div[Mul[VelocityKind, MagnetizationKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VelocityMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityMagnetization[float, S], other: W, /
+    ) -> VelocityMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class VelocityMagnetization(Quantity[Mul[VelocityKind, MagnetizationKind], V, S]
     ) -> VelocityMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityMagnetization[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityMagnetization[float, S], other: W, /
+    ) -> VelocityMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityMagnetization[V, S]: ...
+    @override
+    def item(self) -> VelocityMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

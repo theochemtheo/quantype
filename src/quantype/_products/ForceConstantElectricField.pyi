@@ -112,6 +112,27 @@ class ForceConstantElectricField(
     ) -> Quantity[Div[Mul[ForceConstantKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceConstantElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantElectricField[float, S], other: W, /
+    ) -> ForceConstantElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +146,21 @@ class ForceConstantElectricField(
     ) -> ForceConstantElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantElectricField[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantElectricField[float, S], other: W, /
+    ) -> ForceConstantElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantElectricField[V, S]: ...
+    @override
+    def item(self) -> ForceConstantElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

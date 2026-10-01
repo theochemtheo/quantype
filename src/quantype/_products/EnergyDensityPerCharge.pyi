@@ -102,6 +102,33 @@ class EnergyDensityPerCharge(Quantity[Div[EnergyDensityKind, ChargeKind], V, S])
     ) -> Charge[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyDensityPerCharge[float, S], other: Charge[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyDensityPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityPerCharge[float, S], other: W, /
+    ) -> EnergyDensityPerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyDensityPerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityPerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyDensityPerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class EnergyDensityPerCharge(Quantity[Div[EnergyDensityKind, ChargeKind], V, S])
     ) -> EnergyDensityPerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyDensityPerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityPerCharge[float, S], other: W, /
+    ) -> EnergyDensityPerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyDensityPerCharge[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityPerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

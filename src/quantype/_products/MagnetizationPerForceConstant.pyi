@@ -127,6 +127,37 @@ class MagnetizationPerForceConstant(
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MagnetizationPerForceConstant[float, S], other: ForceConstant[W, S], /
+    ) -> Magnetization[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> Magnetization[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MagnetizationPerForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationPerForceConstant[float, S], other: W, /
+    ) -> MagnetizationPerForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerForceConstant[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationPerForceConstant[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, ForceConstantKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, ForceConstantKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationPerForceConstant[V, S]: ...
     @overload
     def __rmul__(
@@ -140,6 +171,23 @@ class MagnetizationPerForceConstant(
     ) -> MagnetizationPerForceConstant[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagnetizationPerForceConstant[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationPerForceConstant[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MagnetizationPerForceConstant[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationPerForceConstant[float, S], other: W, /
+    ) -> MagnetizationPerForceConstant[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> MagnetizationPerForceConstant[V, S]: ...
+    @override
+    def item(self) -> MagnetizationPerForceConstant[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -170,6 +170,43 @@ class FrequencyPerElectricPotential(
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerElectricPotential[float, S], other: ElectricPotential[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerElectricPotential[float, S], other: Action[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerElectricPotential[float, S], other: W, /
+    ) -> FrequencyPerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> FrequencyPerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -183,6 +220,23 @@ class FrequencyPerElectricPotential(
     ) -> FrequencyPerElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> FrequencyPerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerElectricPotential[float, S], other: W, /
+    ) -> FrequencyPerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> FrequencyPerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

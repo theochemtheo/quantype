@@ -85,6 +85,25 @@ class ElectronCountSquared(Quantity[Pow[ElectronCountKind, Literal[2]], V, S]):
     ) -> Quantity[Div[Pow[ElectronCountKind, Literal[2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectronCountSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountSquared[float, S], other: W, /
+    ) -> ElectronCountSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronCountSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[ElectronCountKind, Literal[2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[ElectronCountKind, Literal[2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronCountSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -96,6 +115,19 @@ class ElectronCountSquared(Quantity[Pow[ElectronCountKind, Literal[2]], V, S]):
     ) -> ElectronCountSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronCountSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountSquared[float, S], other: W, /
+    ) -> ElectronCountSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronCountSquared[V, S]: ...
+    @override
+    def item(self) -> ElectronCountSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -139,6 +139,41 @@ class ChargePerVelocity(Quantity[Div[ChargeKind, VelocityKind], V, S]):
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Velocity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerVelocity[float, S], other: Velocity[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ChargePerVelocity[float, S], other: ElectricPotential[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerVelocity[float, S], other: W, /
+    ) -> ChargePerVelocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerVelocity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerVelocity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, VelocityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, VelocityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerVelocity[V, S]: ...
     @overload
     def __rmul__(
@@ -150,6 +185,19 @@ class ChargePerVelocity(Quantity[Div[ChargeKind, VelocityKind], V, S]):
     ) -> ChargePerVelocity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerVelocity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerVelocity[float, S], other: W, /
+    ) -> ChargePerVelocity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerVelocity[V, S]: ...
+    @override
+    def item(self) -> ChargePerVelocity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

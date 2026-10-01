@@ -125,6 +125,31 @@ class PressureFrequency(Quantity[Mul[PressureKind, FrequencyKind], V, S]):
     def _rtruediv_Pressure(self, other: Pressure[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressureFrequency[float, S], other: Time[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressureFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressureFrequency[float, S], other: W, /
+    ) -> PressureFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressureFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressureFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressureFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +161,19 @@ class PressureFrequency(Quantity[Mul[PressureKind, FrequencyKind], V, S]):
     ) -> PressureFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressureFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressureFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressureFrequency[float, S], other: W, /
+    ) -> PressureFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressureFrequency[V, S]: ...
+    @override
+    def item(self) -> PressureFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

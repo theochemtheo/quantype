@@ -108,6 +108,33 @@ class MomentumPerElectronCount(Quantity[Div[MomentumKind, ElectronCountKind], V,
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MomentumPerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MomentumPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumPerElectronCount[float, S], other: W, /
+    ) -> MomentumPerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumPerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumPerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumPerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -119,6 +146,19 @@ class MomentumPerElectronCount(Quantity[Div[MomentumKind, ElectronCountKind], V,
     ) -> MomentumPerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumPerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumPerElectronCount[float, S], other: W, /
+    ) -> MomentumPerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumPerElectronCount[V, S]: ...
+    @override
+    def item(self) -> MomentumPerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

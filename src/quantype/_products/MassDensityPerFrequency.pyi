@@ -138,6 +138,41 @@ class MassDensityPerFrequency(Quantity[Div[MassDensityKind, FrequencyKind], V, S
     def _rtruediv_MassDensity(self, other: MassDensity[V, S], /) -> Frequency[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerFrequency[float, S], other: Frequency[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MassDensityPerFrequency[float, S], other: InverseTime[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerFrequency[float, S], other: W, /
+    ) -> MassDensityPerFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityPerFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -149,6 +184,19 @@ class MassDensityPerFrequency(Quantity[Div[MassDensityKind, FrequencyKind], V, S
     ) -> MassDensityPerFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerFrequency[float, S], other: W, /
+    ) -> MassDensityPerFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityPerFrequency[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

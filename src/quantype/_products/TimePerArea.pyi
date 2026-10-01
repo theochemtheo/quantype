@@ -96,6 +96,31 @@ class TimePerArea(Quantity[Div[TimeKind, AreaKind], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerArea[float, S], other: Area[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerArea[float, S], other: W, /
+    ) -> TimePerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -107,6 +132,19 @@ class TimePerArea(Quantity[Div[TimeKind, AreaKind], V, S]):
     ) -> TimePerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerArea[float, S], other: W, /
+    ) -> TimePerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerArea[V, S]: ...
+    @override
+    def item(self) -> TimePerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

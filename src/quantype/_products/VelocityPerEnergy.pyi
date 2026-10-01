@@ -163,6 +163,47 @@ class VelocityPerEnergy(Quantity[Div[VelocityKind, EnergyKind], V, S]):
     def _rtruediv_InverseTime(self, other: InverseTime[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityPerEnergy[float, S], other: Energy[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerEnergy[float, S], other: Momentum[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityPerEnergy[float, S], other: Action[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityPerEnergy[float, S], other: W, /
+    ) -> VelocityPerEnergy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityPerEnergy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityPerEnergy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, EnergyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VelocityKind, EnergyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityPerEnergy[V, S]: ...
     @overload
     def __rmul__(
@@ -174,6 +215,19 @@ class VelocityPerEnergy(Quantity[Div[VelocityKind, EnergyKind], V, S]):
     ) -> VelocityPerEnergy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityPerEnergy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityPerEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityPerEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityPerEnergy[float, S], other: W, /
+    ) -> VelocityPerEnergy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityPerEnergy[V, S]: ...
+    @override
+    def item(self) -> VelocityPerEnergy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

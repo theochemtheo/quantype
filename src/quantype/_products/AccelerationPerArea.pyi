@@ -116,6 +116,39 @@ class AccelerationPerArea(Quantity[Div[AccelerationKind, AreaKind], V, S]):
     def _rtruediv_Acceleration(self, other: Acceleration[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AccelerationPerArea[float, S], other: Area[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AccelerationPerArea[float, S], other: Mass[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AccelerationPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AccelerationPerArea[float, S], other: W, /
+    ) -> AccelerationPerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AccelerationPerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AccelerationPerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AccelerationKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AccelerationPerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -127,6 +160,19 @@ class AccelerationPerArea(Quantity[Div[AccelerationKind, AreaKind], V, S]):
     ) -> AccelerationPerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AccelerationPerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AccelerationPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AccelerationPerArea[float, S], other: W, /
+    ) -> AccelerationPerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AccelerationPerArea[V, S]: ...
+    @override
+    def item(self) -> AccelerationPerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

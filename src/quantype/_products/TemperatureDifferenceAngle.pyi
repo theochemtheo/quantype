@@ -114,6 +114,27 @@ class TemperatureDifferenceAngle(
     ) -> Quantity[Div[Mul[TemperatureDifferenceKind, AngleKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureDifferenceAngle[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferenceAngle[float, S], other: W, /
+    ) -> TemperatureDifferenceAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperatureDifferenceAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferenceAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperatureDifferenceAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -127,6 +148,21 @@ class TemperatureDifferenceAngle(
     ) -> TemperatureDifferenceAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperatureDifferenceAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferenceAngle[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferenceAngle[float, S], other: W, /
+    ) -> TemperatureDifferenceAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperatureDifferenceAngle[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferenceAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

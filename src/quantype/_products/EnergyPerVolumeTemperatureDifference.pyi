@@ -141,6 +141,35 @@ class EnergyPerVolumeTemperatureDifference(
     ]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyPerVolumeTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerVolumeTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerVolumeTemperatureDifference[float, S], other: W, /
+    ) -> EnergyPerVolumeTemperatureDifference[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> EnergyPerVolumeTemperatureDifference[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerVolumeTemperatureDifference[float, S],
+        other: Quantity[K, W, S],
+        /,
+    ) -> Quantity[
+        Mul[Mul[EnergyPerVolumeKind, TemperatureDifferenceKind], K], W, S
+    ]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[
+        Mul[Mul[EnergyPerVolumeKind, TemperatureDifferenceKind], K], V, S
+    ]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> EnergyPerVolumeTemperatureDifference[V, S]: ...
@@ -158,6 +187,23 @@ class EnergyPerVolumeTemperatureDifference(
     def __rmul__(
         self, other: _Numerical, /
     ) -> EnergyPerVolumeTemperatureDifference[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerVolumeTemperatureDifference[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerVolumeTemperatureDifference[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerVolumeTemperatureDifference[float, S], other: W, /
+    ) -> EnergyPerVolumeTemperatureDifference[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> EnergyPerVolumeTemperatureDifference[V, S]: ...
+    @override
+    def item(self) -> EnergyPerVolumeTemperatureDifference[float, S]: ...
     @overload
     @override
     def __rtruediv__(

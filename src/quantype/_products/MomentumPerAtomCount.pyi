@@ -131,6 +131,41 @@ class MomentumPerAtomCount(Quantity[Div[MomentumKind, AtomCountKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> AtomCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MomentumPerAtomCount[float, S], other: Velocity[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: MomentumPerAtomCount[float, S], other: AtomCount[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MomentumPerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumPerAtomCount[float, S], other: W, /
+    ) -> MomentumPerAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumPerAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumPerAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumPerAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -142,6 +177,19 @@ class MomentumPerAtomCount(Quantity[Div[MomentumKind, AtomCountKind], V, S]):
     ) -> MomentumPerAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumPerAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumPerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MomentumPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumPerAtomCount[float, S], other: W, /
+    ) -> MomentumPerAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumPerAtomCount[V, S]: ...
+    @override
+    def item(self) -> MomentumPerAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

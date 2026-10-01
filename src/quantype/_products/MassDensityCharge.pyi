@@ -92,6 +92,25 @@ class MassDensityCharge(Quantity[Mul[MassDensityKind, ChargeKind], V, S]):
     ) -> Quantity[Div[Mul[MassDensityKind, ChargeKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MassDensityCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityCharge[float, S], other: W, /
+    ) -> MassDensityCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MassDensityKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MassDensityKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class MassDensityCharge(Quantity[Mul[MassDensityKind, ChargeKind], V, S]):
     ) -> MassDensityCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityCharge[float, S], other: W, /
+    ) -> MassDensityCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityCharge[V, S]: ...
+    @override
+    def item(self) -> MassDensityCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

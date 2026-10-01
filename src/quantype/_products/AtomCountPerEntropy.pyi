@@ -149,6 +149,41 @@ class AtomCountPerEntropy(Quantity[Div[AtomCountKind, EntropyKind], V, S]):
     def _rtruediv_AtomCount(self, other: AtomCount[V, S], /) -> Entropy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AtomCountPerEntropy[float, S], other: EnergyPerAtom[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: EnergyPerAtom[V, S] | EnergyPerAtom[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AtomCountPerEntropy[float, S], other: Entropy[W, S], /
+    ) -> AtomCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> AtomCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AtomCountPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AtomCountPerEntropy[float, S], other: W, /
+    ) -> AtomCountPerEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AtomCountPerEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AtomCountPerEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AtomCountKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AtomCountPerEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -160,6 +195,19 @@ class AtomCountPerEntropy(Quantity[Div[AtomCountKind, EntropyKind], V, S]):
     ) -> AtomCountPerEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AtomCountPerEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AtomCountPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AtomCountPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AtomCountPerEntropy[float, S], other: W, /
+    ) -> AtomCountPerEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AtomCountPerEntropy[V, S]: ...
+    @override
+    def item(self) -> AtomCountPerEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

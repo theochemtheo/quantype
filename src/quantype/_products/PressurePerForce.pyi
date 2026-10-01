@@ -137,6 +137,45 @@ class PressurePerForce(Quantity[Div[PressureKind, ForceKind], V, S]):
     def _rtruediv_Pressure(self, other: Pressure[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PressurePerForce[float, S], other: Area[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PressurePerForce[float, S], other: Volume[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PressurePerForce[float, S], other: Force[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PressurePerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressurePerForce[float, S], other: W, /
+    ) -> PressurePerForce[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressurePerForce[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressurePerForce[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[PressureKind, ForceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[PressureKind, ForceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressurePerForce[V, S]: ...
     @overload
     def __rmul__(
@@ -148,6 +187,19 @@ class PressurePerForce(Quantity[Div[PressureKind, ForceKind], V, S]):
     ) -> PressurePerForce[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressurePerForce[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressurePerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressurePerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressurePerForce[float, S], other: W, /
+    ) -> PressurePerForce[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressurePerForce[V, S]: ...
+    @override
+    def item(self) -> PressurePerForce[float, S]: ...
     @overload
     @override
     def __rtruediv__(

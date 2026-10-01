@@ -74,6 +74,25 @@ class PerTemperatureSquared(Quantity[Pow[TemperatureKind, Literal[-2]], V, S]):
     ) -> Quantity[Div[Pow[TemperatureKind, Literal[-2]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PerTemperatureSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerTemperatureSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerTemperatureSquared[float, S], other: W, /
+    ) -> PerTemperatureSquared[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerTemperatureSquared[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerTemperatureSquared[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[TemperatureKind, Literal[-2]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[TemperatureKind, Literal[-2]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerTemperatureSquared[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class PerTemperatureSquared(Quantity[Pow[TemperatureKind, Literal[-2]], V, S]):
     ) -> PerTemperatureSquared[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerTemperatureSquared[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerTemperatureSquared[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerTemperatureSquared[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerTemperatureSquared[float, S], other: W, /
+    ) -> PerTemperatureSquared[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerTemperatureSquared[V, S]: ...
+    @override
+    def item(self) -> PerTemperatureSquared[float, S]: ...
     @overload
     @override
     def __rtruediv__(

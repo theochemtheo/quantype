@@ -179,6 +179,57 @@ class ElectricFieldPerForce(Quantity[Div[ElectricFieldKind, ForceKind], V, S]):
     def _rtruediv_ElectricField(self, other: ElectricField[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricFieldPerForce[float, S], other: Energy[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricFieldPerForce[float, S], other: Force[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Force[V, S] | Force[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricFieldPerForce[float, S], other: Charge[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Charge[V, S] | Charge[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ElectricFieldPerForce[float, S], other: DipoleMoment[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Length[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricFieldPerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldPerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricFieldPerForce[float, S], other: W, /
+    ) -> ElectricFieldPerForce[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricFieldPerForce[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricFieldPerForce[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, ForceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, ForceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricFieldPerForce[V, S]: ...
     @overload
     def __rmul__(
@@ -190,6 +241,19 @@ class ElectricFieldPerForce(Quantity[Div[ElectricFieldKind, ForceKind], V, S]):
     ) -> ElectricFieldPerForce[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricFieldPerForce[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricFieldPerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricFieldPerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricFieldPerForce[float, S], other: W, /
+    ) -> ElectricFieldPerForce[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricFieldPerForce[V, S]: ...
+    @override
+    def item(self) -> ElectricFieldPerForce[float, S]: ...
     @overload
     @override
     def __rtruediv__(

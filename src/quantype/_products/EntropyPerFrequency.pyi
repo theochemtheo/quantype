@@ -214,6 +214,65 @@ class EntropyPerFrequency(Quantity[Div[EntropyKind, FrequencyKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> Temperature[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerFrequency[float, S], other: Temperature[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerFrequency[float, S], other: TemperatureDifference[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerFrequency[float, S], other: TemperatureRate[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> Energy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerFrequency[float, S], other: Frequency[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerFrequency[float, S], other: InverseTime[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerFrequency[float, S], other: W, /
+    ) -> EntropyPerFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -225,6 +284,19 @@ class EntropyPerFrequency(Quantity[Div[EntropyKind, FrequencyKind], V, S]):
     ) -> EntropyPerFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerFrequency[float, S], other: W, /
+    ) -> EntropyPerFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerFrequency[V, S]: ...
+    @override
+    def item(self) -> EntropyPerFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

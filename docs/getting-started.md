@@ -51,9 +51,11 @@ assert restored == length
 `2 * u.nm` is a shorter way to write `Length[float](2, u.nm)`. The type argument
 chooses the storage and converts the input into it: `Length[np.float64]` gives a
 NumPy scalar, and `Length[npt.NDArray[np.float64]]` a NumPy array. Bare
-`Length(...)` works at runtime, but strict type checkers can't tell what its
-storage is. Unit-first construction takes arrays but not lists; for a list, use
-a typed constructor or `u.nm(np.asarray(values))`.
+`Length(2.0, u.nm)` takes its storage from the value, as `u.nm(2.0)` does, so
+type checkers see a `Length[float]`. For an integer such as `Length(2, u.nm)`,
+they leave the storage open; write `Length[float](2, u.nm)`. Unit-first
+construction takes arrays but not lists; for a list, use a typed constructor or
+`u.nm(np.asarray(values))`.
 
 Pass `.magnitude(unit)` to a library that expects a particular unit, and
 `.value` to one that expects the unit system's raw numbers: ångströms, eV, and
@@ -111,7 +113,11 @@ assert distances.max() == 5 * u.nm
 `quantype.numpy`, imported as `qnp`, has NumPy's function names with unit rules,
 and works on NumPy, JAX, and Torch arrays. `qnp.cos(angle)` is `Dimensionless`,
 `qnp.arccos(ratio)` is an `Angle`, and `qnp.linalg.norm(positions, axis=-1)` is
-a `Length`.
+a `Length`. Sorting, medians, percentiles, and the `nan` reductions keep the
+kind. Variances and squares are named as `x ** 2` is, so `qnp.var(lengths)` is
+an `Area`. `qnp.matmul`, `@`, `qnp.outer`, and `qnp.trapezoid(velocities, times)`
+multiply kinds as `*` does. Indices and signs, from `qnp.argmin`, `qnp.argsort`,
+and `qnp.sign`, are plain arrays.
 
 NumPy's and Torch's own functions, such as `np.cos(q)` and `np.sum(q)`, apply the
 same rules at runtime. NumPy's type stubs reject quantities, so use `qnp` in
@@ -120,7 +126,9 @@ type-checked code. JAX's `jnp` functions can't see quantities at all, so use
 does `np.asarray(q)`. Pass `q.value` or `q.magnitude(unit)` instead.
 
 Indexing, iteration, `len()`, `.shape`, `.max()`, `.min()`, `.reshape(...)`,
-`.T`, `.squeeze()`, `.cumsum()`, and `.std()` all keep the kind. `<` and `>` need
+`.ravel()`, `.copy()`, `.T`, `.squeeze()`, `.cumsum()`, and `.std()` all keep the
+kind. `.var()` gives the squared kind, and `.item()` gives a quantity with float
+storage. `<` and `>` need
 the same kind and unit system, and return backend booleans. `==` compares
 values, element-wise for arrays, and quantities of different kinds or systems
 compare unequal. A plain number needs a unit to compare with a quantity:
@@ -135,8 +143,8 @@ import numpy as np
 from quantype import u
 
 positions = u.nm(np.array([3.0, 1.0, 2.0]))
-ordered = positions.with_value(np.sort(positions.value))
-assert ordered.unit is u.nm
+shifted = positions.with_value(np.roll(positions.value, 1))
+assert shifted.unit is u.nm
 ```
 
 `with_value` trusts its input, as `from_value` does: the numbers must already be

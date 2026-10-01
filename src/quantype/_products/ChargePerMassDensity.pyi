@@ -98,6 +98,33 @@ class ChargePerMassDensity(Quantity[Div[ChargeKind, MassDensityKind], V, S]):
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> MassDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ChargePerMassDensity[float, S], other: MassDensity[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MassDensity[V, S] | MassDensity[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ChargePerMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargePerMassDensity[float, S], other: W, /
+    ) -> ChargePerMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargePerMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargePerMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, MassDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ChargeKind, MassDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargePerMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +136,19 @@ class ChargePerMassDensity(Quantity[Div[ChargeKind, MassDensityKind], V, S]):
     ) -> ChargePerMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargePerMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargePerMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargePerMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargePerMassDensity[float, S], other: W, /
+    ) -> ChargePerMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargePerMassDensity[V, S]: ...
+    @override
+    def item(self) -> ChargePerMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

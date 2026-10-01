@@ -175,6 +175,41 @@ class EnergyPerFrequency(Quantity[Div[EnergyKind, FrequencyKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> Dimensionless[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyPerFrequency[float, S], other: Frequency[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Energy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EnergyPerFrequency[float, S], other: InverseTime[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyPerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerFrequency[float, S], other: W, /
+    ) -> EnergyPerFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -186,6 +221,19 @@ class EnergyPerFrequency(Quantity[Div[EnergyKind, FrequencyKind], V, S]):
     ) -> EnergyPerFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerFrequency[float, S], other: W, /
+    ) -> EnergyPerFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerFrequency[V, S]: ...
+    @override
+    def item(self) -> EnergyPerFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

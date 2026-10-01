@@ -106,6 +106,25 @@ class AccelerationDipoleMoment(Quantity[Mul[AccelerationKind, DipoleMomentKind],
     ) -> Quantity[Div[Mul[AccelerationKind, DipoleMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AccelerationDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AccelerationDipoleMoment[float, S], other: W, /
+    ) -> AccelerationDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AccelerationDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AccelerationDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AccelerationKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AccelerationKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AccelerationDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +136,19 @@ class AccelerationDipoleMoment(Quantity[Mul[AccelerationKind, DipoleMomentKind],
     ) -> AccelerationDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AccelerationDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AccelerationDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AccelerationDipoleMoment[float, S], other: W, /
+    ) -> AccelerationDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AccelerationDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> AccelerationDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

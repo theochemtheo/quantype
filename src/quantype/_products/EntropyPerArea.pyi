@@ -158,6 +158,47 @@ class EntropyPerArea(Quantity[Div[EntropyKind, AreaKind], V, S]):
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> Area[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerArea[float, S], other: Area[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerArea[float, S], other: Temperature[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Temperature[V, S] | Temperature[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EntropyPerArea[float, S], other: TemperatureDifference[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerArea[float, S], other: W, /
+    ) -> EntropyPerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, AreaKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, AreaKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -169,6 +210,19 @@ class EntropyPerArea(Quantity[Div[EntropyKind, AreaKind], V, S]):
     ) -> EntropyPerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerArea[float, S], other: W, /
+    ) -> EntropyPerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerArea[V, S]: ...
+    @override
+    def item(self) -> EntropyPerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

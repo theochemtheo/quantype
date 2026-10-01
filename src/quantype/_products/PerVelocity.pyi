@@ -191,6 +191,55 @@ class PerVelocity(Quantity[Pow[VelocityKind, Literal[-1]], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerVelocity[float, S], other: Length[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(self, other: Length[V, S] | Length[float, S], /) -> Time[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerVelocity[float, S], other: Velocity[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerVelocity[float, S], other: Energy[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerVelocity[float, S], other: Momentum[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerVelocity[float, S], other: W, /
+    ) -> PerVelocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerVelocity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerVelocity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[VelocityKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[VelocityKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerVelocity[V, S]: ...
     @overload
     def __rmul__(
@@ -202,6 +251,19 @@ class PerVelocity(Quantity[Pow[VelocityKind, Literal[-1]], V, S]):
     ) -> PerVelocity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerVelocity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerVelocity[float, S], other: W, /
+    ) -> PerVelocity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerVelocity[V, S]: ...
+    @override
+    def item(self) -> PerVelocity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

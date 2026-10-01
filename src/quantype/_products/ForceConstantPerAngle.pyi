@@ -100,6 +100,33 @@ class ForceConstantPerAngle(Quantity[Div[ForceConstantKind, AngleKind], V, S]):
     def _rtruediv_ForceConstant(self, other: ForceConstant[V, S], /) -> Angle[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerAngle[float, S], other: Angle[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Angle[V, S] | Angle[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerAngle[float, S], other: W, /
+    ) -> ForceConstantPerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantPerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class ForceConstantPerAngle(Quantity[Div[ForceConstantKind, AngleKind], V, S]):
     ) -> ForceConstantPerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantPerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerAngle[float, S], other: W, /
+    ) -> ForceConstantPerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantPerAngle[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

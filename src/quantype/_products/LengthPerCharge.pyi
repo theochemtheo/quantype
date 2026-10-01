@@ -193,6 +193,55 @@ class LengthPerCharge(Quantity[Div[LengthKind, ChargeKind], V, S]):
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthPerCharge[float, S], other: Force[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Force[V, S] | Force[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerCharge[float, S], other: ForceConstant[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerCharge[float, S], other: Charge[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Charge[V, S] | Charge[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthPerCharge[float, S], other: DipoleMoment[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthPerCharge[float, S], other: W, /
+    ) -> LengthPerCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthPerCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthPerCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[LengthKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[LengthKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthPerCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -204,6 +253,19 @@ class LengthPerCharge(Quantity[Div[LengthKind, ChargeKind], V, S]):
     ) -> LengthPerCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthPerCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthPerCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthPerCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthPerCharge[float, S], other: W, /
+    ) -> LengthPerCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthPerCharge[V, S]: ...
+    @override
+    def item(self) -> LengthPerCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

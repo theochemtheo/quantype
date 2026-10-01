@@ -132,6 +132,41 @@ class TimeAction(Quantity[Mul[TimeKind, ActionKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeAction[float, S], other: Frequency[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeAction[float, S], other: InverseTime[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeAction[float, S], other: W, /
+    ) -> TimeAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeAction[V, S]: ...
     @overload
     def __rmul__(
@@ -143,6 +178,19 @@ class TimeAction(Quantity[Mul[TimeKind, ActionKind], V, S]):
     ) -> TimeAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeAction[float, S], other: W, /
+    ) -> TimeAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeAction[V, S]: ...
+    @override
+    def item(self) -> TimeAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

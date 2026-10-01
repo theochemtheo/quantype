@@ -107,6 +107,33 @@ class AreaPerAcceleration(Quantity[Div[AreaKind, AccelerationKind], V, S]):
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerAcceleration[float, S], other: W, /
+    ) -> AreaPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -118,6 +145,19 @@ class AreaPerAcceleration(Quantity[Div[AreaKind, AccelerationKind], V, S]):
     ) -> AreaPerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerAcceleration[float, S], other: W, /
+    ) -> AreaPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> AreaPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

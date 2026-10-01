@@ -102,6 +102,33 @@ class ActionPerAcceleration(Quantity[Div[ActionKind, AccelerationKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ActionPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ActionPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ActionPerAcceleration[float, S], other: W, /
+    ) -> ActionPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ActionPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ActionPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ActionKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ActionKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ActionPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class ActionPerAcceleration(Quantity[Div[ActionKind, AccelerationKind], V, S]):
     ) -> ActionPerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ActionPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ActionPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ActionPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ActionPerAcceleration[float, S], other: W, /
+    ) -> ActionPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ActionPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> ActionPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

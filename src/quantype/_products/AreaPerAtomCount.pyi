@@ -137,6 +137,41 @@ class AreaPerAtomCount(Quantity[Div[AreaKind, AtomCountKind], V, S]):
     ) -> ForceConstant[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerAtomCount[float, S], other: ForceConstant[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerAtomCount[float, S], other: AtomCount[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerAtomCount[float, S], other: W, /
+    ) -> AreaPerAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -148,6 +183,19 @@ class AreaPerAtomCount(Quantity[Div[AreaKind, AtomCountKind], V, S]):
     ) -> AreaPerAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerAtomCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerAtomCount[float, S], other: W, /
+    ) -> AreaPerAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerAtomCount[V, S]: ...
+    @override
+    def item(self) -> AreaPerAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -165,6 +165,33 @@ class ElectricPotentialPerTime(Quantity[Div[ElectricPotentialKind, TimeKind], V,
     ) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectricPotentialPerTime[float, S], other: Time[W, S], /
+    ) -> ElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ElectricPotential[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectricPotentialPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricPotentialPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricPotentialPerTime[float, S], other: W, /
+    ) -> ElectricPotentialPerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectricPotentialPerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricPotentialPerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricPotentialPerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -176,6 +203,19 @@ class ElectricPotentialPerTime(Quantity[Div[ElectricPotentialKind, TimeKind], V,
     ) -> ElectricPotentialPerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricPotentialPerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricPotentialPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectricPotentialPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricPotentialPerTime[float, S], other: W, /
+    ) -> ElectricPotentialPerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectricPotentialPerTime[V, S]: ...
+    @override
+    def item(self) -> ElectricPotentialPerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -21,8 +21,11 @@ from quantype import (
     Quantity,
     Temperature,
     TemperatureDifference,
+    Time,
+    Velocity,
     u,
 )
+from quantype.products import TemperatureDifferenceSquared
 from quantype.systems import SI, Metal
 
 if TYPE_CHECKING:
@@ -232,3 +235,109 @@ def test_absolute_values_of_quantities_keep_kind_and_display() -> None:
     assert qnp.abs(-3 * u.eV) == 3 * u.eV
     energy: Any = np.absolute(cast("Any", -3 * u.eV))
     assert energy == 3 * u.eV
+
+
+@pytest.mark.parametrize("namespace", [qnp, numpy], ids=["qnp", "np"])
+def test_statistics_keep_the_kind(namespace: ModuleType) -> None:
+    values = _lengths([3.0, float("nan"), 1.0, 2.0], u.nm)
+    finite = _lengths([3.0, 1.0, 2.0], u.nm)
+    for result, expected in (
+        (namespace.sort(finite), [1, 2, 3]),
+        (namespace.median(finite), 2),
+        (namespace.percentile(finite, 50), 2),
+        (namespace.quantile(finite, 0.5), 2),
+        (namespace.nanmean(values), 2),
+        (namespace.nanmedian(values), 2),
+        (namespace.nanmax(values), 3),
+        (namespace.nanmin(values), 1),
+        (namespace.nansum(values), 6),
+        (namespace.hypot(finite, finite), np.sqrt(2) * np.array([3, 1, 2])),
+        (namespace.fabs(-finite), [3, 1, 2]),
+    ):
+        found = cast("Length[Array]", result)
+        assert isinstance(found, Length)
+        assert found.unit is u.nm
+        np.testing.assert_allclose(found.magnitude(), expected)
+    np.testing.assert_array_equal(namespace.argsort(finite), [1, 2, 0])
+    assert namespace.argmin(finite) == 1
+    assert namespace.argmax(finite) == 0
+    np.testing.assert_array_equal(namespace.sign(-finite), [-1, -1, -1])
+    assert isinstance(namespace.nanstd(values), Length)
+    with pytest.raises(TypeError, match="nansum is meaningless"):
+        namespace.nansum(Temperature[Array]([300.0], u.K))
+
+
+@pytest.mark.parametrize("namespace", [qnp, numpy], ids=["qnp", "np"])
+def test_variances_and_squares_are_squared_kinds(namespace: ModuleType) -> None:
+    lengths = _lengths([1.0, 3.0])
+    variance = cast("Area[Array]", namespace.var(lengths))
+    assert isinstance(variance, Area)
+    assert variance.value == pytest.approx(1)
+    assert isinstance(variance.value, np.ndarray)
+    assert isinstance(namespace.nanvar(lengths), Area)
+    assert isinstance(namespace.square(lengths), Area)
+    np.testing.assert_allclose(namespace.square(lengths).value, [1, 9])
+    spread = cast(
+        "TemperatureDifferenceSquared[Array]",
+        namespace.var(Temperature[Array]([300.0, 310.0], u.K)),
+    )
+    assert type(spread) is TemperatureDifferenceSquared
+    assert spread.value == pytest.approx(25)
+
+
+@pytest.mark.parametrize("namespace", [qnp, numpy], ids=["qnp", "np"])
+def test_matrix_products_and_integrals_follow_the_algebra(
+    namespace: ModuleType,
+) -> None:
+    forces = Force[Array]([[1.0, 0.0], [0.0, 2.0]], u.eV_per_angstrom)
+    displacement = _lengths([3.0, 4.0])
+    work = cast("Energy[Array]", namespace.matmul(forces, displacement))
+    assert isinstance(work, Energy)
+    np.testing.assert_allclose(work.magnitude(u.eV), [3, 8])
+    swap = np.array([[0.0, 1.0], [1.0, 0.0]])
+    rotated = cast("Length[Array]", namespace.matmul(swap, displacement))
+    assert isinstance(rotated, Length)
+    np.testing.assert_allclose(rotated.value, [4, 3])
+    assert isinstance(namespace.outer(displacement, displacement), Area)
+    total = namespace.dot(displacement, displacement)
+    assert isinstance(total.value, np.ndarray)  # array storage stays an array
+    times = Time[Array]([0.0, 1.0, 2.0], u.fs)
+    speeds = Velocity[Array]([1.0, 1.0, 1.0], u.angstrom_per_fs)
+    distance = cast("Length[Array]", namespace.trapezoid(speeds, times))
+    assert isinstance(distance, Length)
+    assert distance.magnitude(u.angstrom) == pytest.approx(2)
+    assert isinstance(distance.value, np.ndarray)
+    stepped = qnp.trapezoid(_lengths([1.0, 1.0, 1.0], u.nm), dx=0.5)
+    assert stepped.unit is u.nm
+    assert stepped.magnitude() == pytest.approx(1)
+
+
+def test_matmul_operator_and_ranges() -> None:
+    forces = Force[Array]([[1.0, 0.0], [0.0, 2.0]], u.eV_per_angstrom)
+    displacement = _lengths([3.0, 4.0])
+    assert isinstance(forces @ displacement, Energy)
+    assert isinstance(numpy.eye(2) @ displacement, Length)
+    assert isinstance(displacement @ numpy.eye(2), Length)
+    grid = qnp.linspace(0 * u.nm, 1 * u.nm, 5)
+    assert isinstance(grid, Length)
+    np.testing.assert_allclose(grid.magnitude(u.nm), [0, 0.25, 0.5, 0.75, 1])
+    with pytest.raises(TypeError, match="quantities of one kind"):
+        qnp.linspace(cast("Any", 0 * u.nm), 1 * u.eV)
+
+
+def test_array_conveniences() -> None:
+    positions = _lengths([[1.0, 2.0], [3.0, 4.0]], u.nm)
+    assert positions.size == 4
+    assert (1 * u.nm).size == 1
+    assert positions.ravel().shape == positions.flatten().shape == (4,)
+    assert positions.ravel().unit is u.nm
+    first = positions[0, 0].item()
+    assert type(first.value) is float
+    assert first == 1 * u.nm
+    copied = positions.copy()
+    copied.value[0, 0] = 0.0
+    assert positions.value[0, 0] == 10
+    assert positions.argmin() == 0
+    assert positions.argmax() == 3
+    np.testing.assert_array_equal(positions[0].argsort(), [0, 1])
+    assert isinstance(positions.var(), Area)

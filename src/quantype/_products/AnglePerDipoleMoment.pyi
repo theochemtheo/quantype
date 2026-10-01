@@ -100,6 +100,33 @@ class AnglePerDipoleMoment(Quantity[Div[AngleKind, DipoleMomentKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> DipoleMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerDipoleMoment[float, S], other: DipoleMoment[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerDipoleMoment[float, S], other: W, /
+    ) -> AnglePerDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class AnglePerDipoleMoment(Quantity[Div[AngleKind, DipoleMomentKind], V, S]):
     ) -> AnglePerDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerDipoleMoment[float, S], other: W, /
+    ) -> AnglePerDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> AnglePerDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

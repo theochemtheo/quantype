@@ -102,6 +102,33 @@ class AreaPerElectronCount(Quantity[Div[AreaKind, ElectronCountKind], V, S]):
     def _rtruediv_Area(self, other: Area[V, S], /) -> ElectronCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerElectronCount[float, S], other: ElectronCount[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectronCount[V, S] | ElectronCount[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerElectronCount[float, S], other: W, /
+    ) -> AreaPerElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class AreaPerElectronCount(Quantity[Div[AreaKind, ElectronCountKind], V, S]):
     ) -> AreaPerElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerElectronCount[float, S], other: W, /
+    ) -> AreaPerElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerElectronCount[V, S]: ...
+    @override
+    def item(self) -> AreaPerElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -276,6 +276,75 @@ class PerLength(Quantity[Pow[LengthKind, Literal[-1]], V, S]):
     ) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerLength[float, S], other: Length[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerLength[float, S], other: Area[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerLength[float, S], other: Volume[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerLength[float, S], other: Energy[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Energy[V, S] | Energy[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerLength[float, S], other: Force[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Force[V, S] | Force[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerLength[float, S], other: ElectricPotential[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerLength[float, S], other: DipoleMoment[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerLength[float, S], other: W, /
+    ) -> PerLength[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerLength[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerLength[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[LengthKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[LengthKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerLength[V, S]: ...
     @overload
     def __rmul__(
@@ -287,6 +356,19 @@ class PerLength(Quantity[Pow[LengthKind, Literal[-1]], V, S]):
     ) -> PerLength[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerLength[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerLength[float, S], other: W, /
+    ) -> PerLength[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerLength[V, S]: ...
+    @override
+    def item(self) -> PerLength[float, S]: ...
     @overload
     @override
     def __rtruediv__(

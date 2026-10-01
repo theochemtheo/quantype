@@ -92,6 +92,25 @@ class ForceMass(Quantity[Mul[ForceKind, MassKind], V, S]):
     ) -> Quantity[Div[Mul[ForceKind, MassKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceMass[float, S], other: W, /
+    ) -> ForceMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceMass[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class ForceMass(Quantity[Mul[ForceKind, MassKind], V, S]):
     ) -> ForceMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceMass[float, S], other: W, /
+    ) -> ForceMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceMass[V, S]: ...
+    @override
+    def item(self) -> ForceMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

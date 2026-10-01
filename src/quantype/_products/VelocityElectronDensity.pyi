@@ -104,6 +104,25 @@ class VelocityElectronDensity(Quantity[Mul[VelocityKind, ElectronDensityKind], V
     ) -> Quantity[Div[Mul[VelocityKind, ElectronDensityKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VelocityElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityElectronDensity[float, S], other: W, /
+    ) -> VelocityElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityElectronDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityElectronDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, ElectronDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, ElectronDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityElectronDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -115,6 +134,19 @@ class VelocityElectronDensity(Quantity[Mul[VelocityKind, ElectronDensityKind], V
     ) -> VelocityElectronDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityElectronDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityElectronDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityElectronDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityElectronDensity[float, S], other: W, /
+    ) -> VelocityElectronDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityElectronDensity[V, S]: ...
+    @override
+    def item(self) -> VelocityElectronDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

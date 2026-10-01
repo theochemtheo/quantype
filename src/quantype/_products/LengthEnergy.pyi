@@ -184,6 +184,25 @@ class LengthEnergy(Quantity[Mul[LengthKind, EnergyKind], V, S]):
     ) -> Quantity[Div[Mul[LengthKind, EnergyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: LengthEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthEnergy[float, S], other: W, /
+    ) -> LengthEnergy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthEnergy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthEnergy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, EnergyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, EnergyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthEnergy[V, S]: ...
     @overload
     def __rmul__(
@@ -195,6 +214,19 @@ class LengthEnergy(Quantity[Mul[LengthKind, EnergyKind], V, S]):
     ) -> LengthEnergy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthEnergy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthEnergy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthEnergy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthEnergy[float, S], other: W, /
+    ) -> LengthEnergy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthEnergy[V, S]: ...
+    @override
+    def item(self) -> LengthEnergy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

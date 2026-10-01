@@ -124,6 +124,35 @@ class MomentumPerParticleDensity(
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> ParticleDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MomentumPerParticleDensity[float, S], other: ParticleDensity[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ParticleDensity[V, S] | ParticleDensity[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MomentumPerParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MomentumPerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumPerParticleDensity[float, S], other: W, /
+    ) -> MomentumPerParticleDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumPerParticleDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumPerParticleDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, ParticleDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, ParticleDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumPerParticleDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -137,6 +166,21 @@ class MomentumPerParticleDensity(
     ) -> MomentumPerParticleDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumPerParticleDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumPerParticleDensity[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MomentumPerParticleDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumPerParticleDensity[float, S], other: W, /
+    ) -> MomentumPerParticleDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumPerParticleDensity[V, S]: ...
+    @override
+    def item(self) -> MomentumPerParticleDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

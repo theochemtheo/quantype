@@ -100,6 +100,33 @@ class MassDensityPerAngle(Quantity[Div[MassDensityKind, AngleKind], V, S]):
     def _rtruediv_MassDensity(self, other: MassDensity[V, S], /) -> Angle[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassDensityPerAngle[float, S], other: Angle[W, S], /
+    ) -> MassDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Angle[V, S] | Angle[float, S], /
+    ) -> MassDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassDensityPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityPerAngle[float, S], other: W, /
+    ) -> MassDensityPerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityPerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityPerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassDensityKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityPerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class MassDensityPerAngle(Quantity[Div[MassDensityKind, AngleKind], V, S]):
     ) -> MassDensityPerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityPerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityPerAngle[float, S], other: W, /
+    ) -> MassDensityPerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityPerAngle[V, S]: ...
+    @override
+    def item(self) -> MassDensityPerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

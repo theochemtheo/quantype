@@ -122,6 +122,25 @@ class PressureElectronCount(Quantity[Mul[PressureKind, ElectronCountKind], V, S]
     ) -> Quantity[Div[Mul[PressureKind, ElectronCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PressureElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressureElectronCount[float, S], other: W, /
+    ) -> PressureElectronCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressureElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressureElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressureElectronCount[V, S]: ...
     @overload
     def __rmul__(
@@ -133,6 +152,19 @@ class PressureElectronCount(Quantity[Mul[PressureKind, ElectronCountKind], V, S]
     ) -> PressureElectronCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressureElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressureElectronCount[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressureElectronCount[float, S], other: W, /
+    ) -> PressureElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressureElectronCount[V, S]: ...
+    @override
+    def item(self) -> PressureElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

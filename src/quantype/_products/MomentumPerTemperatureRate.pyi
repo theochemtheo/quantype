@@ -124,6 +124,35 @@ class MomentumPerTemperatureRate(
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> TemperatureRate[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MomentumPerTemperatureRate[float, S], other: TemperatureRate[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: TemperatureRate[V, S] | TemperatureRate[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MomentumPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MomentumPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MomentumPerTemperatureRate[float, S], other: W, /
+    ) -> MomentumPerTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MomentumPerTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MomentumPerTemperatureRate[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, TemperatureRateKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MomentumKind, TemperatureRateKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MomentumPerTemperatureRate[V, S]: ...
     @overload
     def __rmul__(
@@ -137,6 +166,21 @@ class MomentumPerTemperatureRate(
     ) -> MomentumPerTemperatureRate[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MomentumPerTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MomentumPerTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> MomentumPerTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MomentumPerTemperatureRate[float, S], other: W, /
+    ) -> MomentumPerTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MomentumPerTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> MomentumPerTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

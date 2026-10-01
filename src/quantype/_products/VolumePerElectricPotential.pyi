@@ -183,6 +183,51 @@ class VolumePerElectricPotential(
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> EnergyDensity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumePerElectricPotential[float, S], other: Pressure[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumePerElectricPotential[float, S], other: ElectricPotential[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VolumePerElectricPotential[float, S], other: ElectricField[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricField[V, S] | ElectricField[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> VolumePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumePerElectricPotential[float, S], other: W, /
+    ) -> VolumePerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumePerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumePerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[VolumeKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumePerElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -196,6 +241,21 @@ class VolumePerElectricPotential(
     ) -> VolumePerElectricPotential[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumePerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> VolumePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumePerElectricPotential[float, S], other: W, /
+    ) -> VolumePerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumePerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> VolumePerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

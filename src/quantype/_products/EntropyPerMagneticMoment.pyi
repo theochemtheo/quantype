@@ -110,6 +110,33 @@ class EntropyPerMagneticMoment(Quantity[Div[EntropyKind, MagneticMomentKind], V,
     def _rtruediv_Entropy(self, other: Entropy[V, S], /) -> MagneticMoment[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EntropyPerMagneticMoment[float, S], other: MagneticMoment[W, S], /
+    ) -> Entropy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: MagneticMoment[V, S] | MagneticMoment[float, S], /
+    ) -> Entropy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EntropyPerMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EntropyPerMagneticMoment[float, S], other: W, /
+    ) -> EntropyPerMagneticMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EntropyPerMagneticMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EntropyPerMagneticMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, MagneticMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EntropyKind, MagneticMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EntropyPerMagneticMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -121,6 +148,19 @@ class EntropyPerMagneticMoment(Quantity[Div[EntropyKind, MagneticMomentKind], V,
     ) -> EntropyPerMagneticMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EntropyPerMagneticMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EntropyPerMagneticMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EntropyPerMagneticMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EntropyPerMagneticMoment[float, S], other: W, /
+    ) -> EntropyPerMagneticMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EntropyPerMagneticMoment[V, S]: ...
+    @override
+    def item(self) -> EntropyPerMagneticMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

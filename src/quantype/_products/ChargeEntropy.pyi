@@ -92,6 +92,25 @@ class ChargeEntropy(Quantity[Mul[ChargeKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[ChargeKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ChargeEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargeEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ChargeEntropy[float, S], other: W, /
+    ) -> ChargeEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ChargeEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ChargeEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ChargeKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ChargeKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ChargeEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class ChargeEntropy(Quantity[Mul[ChargeKind, EntropyKind], V, S]):
     ) -> ChargeEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ChargeEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ChargeEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ChargeEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ChargeEntropy[float, S], other: W, /
+    ) -> ChargeEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ChargeEntropy[V, S]: ...
+    @override
+    def item(self) -> ChargeEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

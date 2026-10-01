@@ -102,6 +102,33 @@ class EnergyDensityPerAction(Quantity[Div[EnergyDensityKind, ActionKind], V, S])
     ) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyDensityPerAction[float, S], other: Action[W, S], /
+    ) -> EnergyDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> EnergyDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyDensityPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyDensityPerAction[float, S], other: W, /
+    ) -> EnergyDensityPerAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyDensityPerAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyDensityPerAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyDensityKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyDensityPerAction[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +140,19 @@ class EnergyDensityPerAction(Quantity[Div[EnergyDensityKind, ActionKind], V, S])
     ) -> EnergyDensityPerAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyDensityPerAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyDensityPerAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyDensityPerAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyDensityPerAction[float, S], other: W, /
+    ) -> EnergyDensityPerAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyDensityPerAction[V, S]: ...
+    @override
+    def item(self) -> EnergyDensityPerAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

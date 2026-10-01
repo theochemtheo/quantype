@@ -127,6 +127,29 @@ class TemperatureDifferenceElectronCount(
     ) -> Quantity[Div[Mul[TemperatureDifferenceKind, ElectronCountKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureDifferenceElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferenceElectronCount[float, S], other: W, /
+    ) -> TemperatureDifferenceElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceElectronCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferenceElectronCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, ElectronCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, ElectronCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureDifferenceElectronCount[V, S]: ...
@@ -144,6 +167,23 @@ class TemperatureDifferenceElectronCount(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureDifferenceElectronCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferenceElectronCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceElectronCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferenceElectronCount[float, S], other: W, /
+    ) -> TemperatureDifferenceElectronCount[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceElectronCount[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferenceElectronCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

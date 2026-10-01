@@ -98,6 +98,31 @@ class AnglePerForce(Quantity[Div[AngleKind, ForceKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Force[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AnglePerForce[float, S], other: Force[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AnglePerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AnglePerForce[float, S], other: W, /
+    ) -> AnglePerForce[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AnglePerForce[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AnglePerForce[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AngleKind, ForceKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AngleKind, ForceKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AnglePerForce[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +134,19 @@ class AnglePerForce(Quantity[Div[AngleKind, ForceKind], V, S]):
     ) -> AnglePerForce[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AnglePerForce[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AnglePerForce[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AnglePerForce[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AnglePerForce[float, S], other: W, /
+    ) -> AnglePerForce[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AnglePerForce[V, S]: ...
+    @override
+    def item(self) -> AnglePerForce[float, S]: ...
     @overload
     @override
     def __rtruediv__(

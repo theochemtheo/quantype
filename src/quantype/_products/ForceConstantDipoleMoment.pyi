@@ -136,6 +136,27 @@ class ForceConstantDipoleMoment(
     ) -> Quantity[Div[Mul[ForceConstantKind, DipoleMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ForceConstantDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantDipoleMoment[float, S], other: W, /
+    ) -> ForceConstantDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -149,6 +170,21 @@ class ForceConstantDipoleMoment(
     ) -> ForceConstantDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ForceConstantDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantDipoleMoment[float, S], other: W, /
+    ) -> ForceConstantDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> ForceConstantDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

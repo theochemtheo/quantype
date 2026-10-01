@@ -100,6 +100,33 @@ class ElectronCountPerAngle(Quantity[Div[ElectronCountKind, AngleKind], V, S]):
     def _rtruediv_ElectronCount(self, other: ElectronCount[V, S], /) -> Angle[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronCountPerAngle[float, S], other: Angle[W, S], /
+    ) -> ElectronCount[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Angle[V, S] | Angle[float, S], /
+    ) -> ElectronCount[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronCountPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronCountPerAngle[float, S], other: W, /
+    ) -> ElectronCountPerAngle[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronCountPerAngle[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronCountPerAngle[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, AngleKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, AngleKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronCountPerAngle[V, S]: ...
     @overload
     def __rmul__(
@@ -111,6 +138,19 @@ class ElectronCountPerAngle(Quantity[Div[ElectronCountKind, AngleKind], V, S]):
     ) -> ElectronCountPerAngle[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronCountPerAngle[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronCountPerAngle[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronCountPerAngle[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronCountPerAngle[float, S], other: W, /
+    ) -> ElectronCountPerAngle[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronCountPerAngle[V, S]: ...
+    @override
+    def item(self) -> ElectronCountPerAngle[float, S]: ...
     @overload
     @override
     def __rtruediv__(

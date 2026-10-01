@@ -112,6 +112,27 @@ class EnergyPerAtomMagnetization(
     ) -> Quantity[Div[Mul[EnergyPerAtomKind, MagnetizationKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyPerAtomMagnetization[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerAtomMagnetization[float, S], other: W, /
+    ) -> EnergyPerAtomMagnetization[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerAtomMagnetization[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerAtomMagnetization[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerAtomKind, MagnetizationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyPerAtomKind, MagnetizationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerAtomMagnetization[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +146,21 @@ class EnergyPerAtomMagnetization(
     ) -> EnergyPerAtomMagnetization[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerAtomMagnetization[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerAtomMagnetization[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomMagnetization[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerAtomMagnetization[float, S], other: W, /
+    ) -> EnergyPerAtomMagnetization[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerAtomMagnetization[V, S]: ...
+    @override
+    def item(self) -> EnergyPerAtomMagnetization[float, S]: ...
     @overload
     @override
     def __rtruediv__(

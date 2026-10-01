@@ -102,6 +102,25 @@ class MassDensityDipoleMoment(Quantity[Mul[MassDensityKind, DipoleMomentKind], V
     ) -> Quantity[Div[Mul[MassDensityKind, DipoleMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MassDensityDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassDensityDipoleMoment[float, S], other: W, /
+    ) -> MassDensityDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassDensityDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassDensityDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MassDensityKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MassDensityKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassDensityDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -113,6 +132,19 @@ class MassDensityDipoleMoment(Quantity[Mul[MassDensityKind, DipoleMomentKind], V
     ) -> MassDensityDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassDensityDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassDensityDipoleMoment[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassDensityDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassDensityDipoleMoment[float, S], other: W, /
+    ) -> MassDensityDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassDensityDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> MassDensityDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

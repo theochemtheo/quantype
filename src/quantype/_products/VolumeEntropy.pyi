@@ -92,6 +92,25 @@ class VolumeEntropy(Quantity[Mul[VolumeKind, EntropyKind], V, S]):
     ) -> Quantity[Div[Mul[VolumeKind, EntropyKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VolumeEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeEntropy[float, S], other: W, /
+    ) -> VolumeEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class VolumeEntropy(Quantity[Mul[VolumeKind, EntropyKind], V, S]):
     ) -> VolumeEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeEntropy[float, S], other: W, /
+    ) -> VolumeEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeEntropy[V, S]: ...
+    @override
+    def item(self) -> VolumeEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

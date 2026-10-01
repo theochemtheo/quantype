@@ -125,6 +125,41 @@ class ForceConstantPerMass(Quantity[Div[ForceConstantKind, MassKind], V, S]):
     def _rtruediv_Acceleration(self, other: Acceleration[V, S], /) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantPerMass[float, S], other: Length[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: ForceConstantPerMass[float, S], other: Mass[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Mass[V, S] | Mass[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantPerMass[float, S], other: W, /
+    ) -> ForceConstantPerMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantPerMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantPerMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantPerMass[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +171,19 @@ class ForceConstantPerMass(Quantity[Div[ForceConstantKind, MassKind], V, S]):
     ) -> ForceConstantPerMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantPerMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantPerMass[float, S], other: W, /
+    ) -> ForceConstantPerMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantPerMass[V, S]: ...
+    @override
+    def item(self) -> ForceConstantPerMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

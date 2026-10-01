@@ -151,6 +151,31 @@ class AreaFrequency(Quantity[Mul[AreaKind, FrequencyKind], V, S]):
     def _rtruediv_Area(self, other: Area[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaFrequency[float, S], other: Time[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaFrequency[float, S], other: W, /
+    ) -> AreaFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AreaKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -162,6 +187,19 @@ class AreaFrequency(Quantity[Mul[AreaKind, FrequencyKind], V, S]):
     ) -> AreaFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaFrequency[float, S], other: W, /
+    ) -> AreaFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaFrequency[V, S]: ...
+    @override
+    def item(self) -> AreaFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

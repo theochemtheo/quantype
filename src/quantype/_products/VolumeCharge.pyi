@@ -112,6 +112,25 @@ class VolumeCharge(Quantity[Mul[VolumeKind, ChargeKind], V, S]):
     ) -> Quantity[Div[Mul[VolumeKind, ChargeKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VolumeCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeCharge[float, S], other: W, /
+    ) -> VolumeCharge[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeCharge[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeCharge[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, ChargeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, ChargeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeCharge[V, S]: ...
     @overload
     def __rmul__(
@@ -123,6 +142,19 @@ class VolumeCharge(Quantity[Mul[VolumeKind, ChargeKind], V, S]):
     ) -> VolumeCharge[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeCharge[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeCharge[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeCharge[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeCharge[float, S], other: W, /
+    ) -> VolumeCharge[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeCharge[V, S]: ...
+    @override
+    def item(self) -> VolumeCharge[float, S]: ...
     @overload
     @override
     def __rtruediv__(

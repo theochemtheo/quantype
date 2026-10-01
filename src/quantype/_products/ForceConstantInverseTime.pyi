@@ -145,6 +145,33 @@ class ForceConstantInverseTime(Quantity[Mul[ForceConstantKind, InverseTimeKind],
     def _rtruediv_ForceConstant(self, other: ForceConstant[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForceConstantInverseTime[float, S], other: Time[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForceConstantInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForceConstantInverseTime[float, S], other: W, /
+    ) -> ForceConstantInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForceConstantInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForceConstantInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForceConstantInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -156,6 +183,19 @@ class ForceConstantInverseTime(Quantity[Mul[ForceConstantKind, InverseTimeKind],
     ) -> ForceConstantInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForceConstantInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForceConstantInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForceConstantInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForceConstantInverseTime[float, S], other: W, /
+    ) -> ForceConstantInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForceConstantInverseTime[V, S]: ...
+    @override
+    def item(self) -> ForceConstantInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

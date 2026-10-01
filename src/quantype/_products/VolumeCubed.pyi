@@ -74,6 +74,25 @@ class VolumeCubed(Quantity[Pow[VolumeKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[VolumeKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: VolumeCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeCubed[float, S], other: W, /
+    ) -> VolumeCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[VolumeKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[VolumeKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class VolumeCubed(Quantity[Pow[VolumeKind, Literal[3]], V, S]):
     ) -> VolumeCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeCubed[float, S], other: W, /
+    ) -> VolumeCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeCubed[V, S]: ...
+    @override
+    def item(self) -> VolumeCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

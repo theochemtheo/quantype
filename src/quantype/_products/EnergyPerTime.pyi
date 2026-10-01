@@ -188,6 +188,31 @@ class EnergyPerTime(Quantity[Div[EnergyKind, TimeKind], V, S]):
     def _rtruediv_Energy(self, other: Energy[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyPerTime[float, S], other: Time[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerTime[float, S], other: W, /
+    ) -> EnergyPerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -199,6 +224,19 @@ class EnergyPerTime(Quantity[Div[EnergyKind, TimeKind], V, S]):
     ) -> EnergyPerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerTime[float, S], other: W, /
+    ) -> EnergyPerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerTime[V, S]: ...
+    @override
+    def item(self) -> EnergyPerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

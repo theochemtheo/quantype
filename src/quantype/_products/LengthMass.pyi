@@ -182,6 +182,49 @@ class LengthMass(Quantity[Mul[LengthKind, MassKind], V, S]):
     def _rtruediv_Energy(self, other: Energy[V, S], /) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: LengthMass[float, S], other: Frequency[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthMass[float, S], other: InverseTime[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: LengthMass[float, S], other: Acceleration[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: LengthMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: LengthMass[float, S], other: W, /
+    ) -> LengthMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> LengthMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: LengthMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[LengthKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> LengthMass[V, S]: ...
     @overload
     def __rmul__(
@@ -193,6 +236,19 @@ class LengthMass(Quantity[Mul[LengthKind, MassKind], V, S]):
     ) -> LengthMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> LengthMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: LengthMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> LengthMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: LengthMass[float, S], other: W, /
+    ) -> LengthMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> LengthMass[V, S]: ...
+    @override
+    def item(self) -> LengthMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

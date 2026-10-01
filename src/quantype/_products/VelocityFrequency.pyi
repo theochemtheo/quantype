@@ -179,6 +179,37 @@ class VelocityFrequency(Quantity[Mul[VelocityKind, FrequencyKind], V, S]):
     ) -> Dimensionless[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityFrequency[float, S], other: Time[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: VelocityFrequency[float, S], other: Mass[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityFrequency[float, S], other: W, /
+    ) -> VelocityFrequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityFrequency[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityFrequency[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, FrequencyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, FrequencyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityFrequency[V, S]: ...
     @overload
     def __rmul__(
@@ -190,6 +221,19 @@ class VelocityFrequency(Quantity[Mul[VelocityKind, FrequencyKind], V, S]):
     ) -> VelocityFrequency[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityFrequency[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityFrequency[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityFrequency[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityFrequency[float, S], other: W, /
+    ) -> VelocityFrequency[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityFrequency[V, S]: ...
+    @override
+    def item(self) -> VelocityFrequency[float, S]: ...
     @overload
     @override
     def __rtruediv__(

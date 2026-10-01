@@ -106,6 +106,33 @@ class ElectronDensityPerLength(Quantity[Div[ElectronDensityKind, LengthKind], V,
     ) -> Length[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ElectronDensityPerLength[float, S], other: Length[W, S], /
+    ) -> ElectronDensity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> ElectronDensity[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ElectronDensityPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectronDensityPerLength[float, S], other: W, /
+    ) -> ElectronDensityPerLength[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ElectronDensityPerLength[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectronDensityPerLength[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, LengthKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, LengthKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectronDensityPerLength[V, S]: ...
     @overload
     def __rmul__(
@@ -117,6 +144,19 @@ class ElectronDensityPerLength(Quantity[Div[ElectronDensityKind, LengthKind], V,
     ) -> ElectronDensityPerLength[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectronDensityPerLength[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectronDensityPerLength[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ElectronDensityPerLength[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectronDensityPerLength[float, S], other: W, /
+    ) -> ElectronDensityPerLength[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ElectronDensityPerLength[V, S]: ...
+    @override
+    def item(self) -> ElectronDensityPerLength[float, S]: ...
     @overload
     @override
     def __rtruediv__(

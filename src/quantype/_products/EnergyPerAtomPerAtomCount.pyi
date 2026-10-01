@@ -112,6 +112,35 @@ class EnergyPerAtomPerAtomCount(Quantity[Div[EnergyPerAtomKind, AtomCountKind], 
     ) -> AtomCount[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyPerAtomPerAtomCount[float, S], other: AtomCount[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyPerAtomPerAtomCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerAtomPerAtomCount[float, S], other: W, /
+    ) -> EnergyPerAtomPerAtomCount[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerAtomPerAtomCount[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerAtomPerAtomCount[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, AtomCountKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, AtomCountKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerAtomPerAtomCount[V, S]: ...
     @overload
     def __rmul__(
@@ -125,6 +154,21 @@ class EnergyPerAtomPerAtomCount(Quantity[Div[EnergyPerAtomKind, AtomCountKind], 
     ) -> EnergyPerAtomPerAtomCount[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerAtomPerAtomCount[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerAtomPerAtomCount[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> EnergyPerAtomPerAtomCount[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerAtomPerAtomCount[float, S], other: W, /
+    ) -> EnergyPerAtomPerAtomCount[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerAtomPerAtomCount[V, S]: ...
+    @override
+    def item(self) -> EnergyPerAtomPerAtomCount[float, S]: ...
     @overload
     @override
     def __rtruediv__(

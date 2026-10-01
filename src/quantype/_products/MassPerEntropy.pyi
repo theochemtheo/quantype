@@ -98,6 +98,31 @@ class MassPerEntropy(Quantity[Div[MassKind, EntropyKind], V, S]):
     def _rtruediv_Mass(self, other: Mass[V, S], /) -> Entropy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: MassPerEntropy[float, S], other: Entropy[W, S], /
+    ) -> Mass[W, S]: ...
+    @overload
+    def __matmul__(self, other: Entropy[V, S] | Entropy[float, S], /) -> Mass[V, S]: ...
+    @overload
+    def __matmul__(
+        self: MassPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MassPerEntropy[float, S], other: W, /
+    ) -> MassPerEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MassPerEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MassPerEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[MassKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[MassKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MassPerEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +134,19 @@ class MassPerEntropy(Quantity[Div[MassKind, EntropyKind], V, S]):
     ) -> MassPerEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MassPerEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MassPerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MassPerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MassPerEntropy[float, S], other: W, /
+    ) -> MassPerEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MassPerEntropy[V, S]: ...
+    @override
+    def item(self) -> MassPerEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

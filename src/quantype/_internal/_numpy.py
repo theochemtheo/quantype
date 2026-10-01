@@ -26,6 +26,7 @@ from quantype._internal._semantics import (
     Semantic,
     dimensionless_kind,
     named_kind,
+    power,
     product,
 )
 from quantype._internal._storage import keep_storage
@@ -52,6 +53,9 @@ __all__ = [
     "arcsin",
     "arctan",
     "arctan2",
+    "argmax",
+    "argmin",
+    "argsort",
     "clip",
     "concatenate",
     "cos",
@@ -63,24 +67,42 @@ __all__ = [
     "exp",
     "expand_dims",
     "expm1",
+    "fabs",
+    "hypot",
     "isclose",
     "isfinite",
     "isinf",
     "isnan",
     "linalg",
+    "linspace",
     "log",
     "log1p",
     "log2",
     "log10",
+    "matmul",
     "max",
     "maximum",
     "mean",
+    "median",
     "min",
     "minimum",
+    "nanmax",
+    "nanmean",
+    "nanmedian",
+    "nanmin",
+    "nanstd",
+    "nansum",
+    "nanvar",
+    "outer",
+    "percentile",
+    "quantile",
     "reshape",
+    "sign",
     "sin",
     "sinh",
+    "sort",
     "sqrt",
+    "square",
     "squeeze",
     "stack",
     "std",
@@ -88,6 +110,8 @@ __all__ = [
     "tan",
     "tanh",
     "transpose",
+    "trapezoid",
+    "var",
     "where",
     "zeros_like",
 ]
@@ -149,6 +173,74 @@ class _Torch:
         self, value: Any, axis: int | None = None, *, keepdims: bool = False
     ) -> Any:
         return self.module().linalg.vector_norm(value, dim=axis, keepdim=keepdims)
+
+    def sort(self, value: Any, axis: int = -1) -> Any:
+        return self.module().sort(value, dim=axis).values
+
+    def argsort(self, value: Any, axis: int = -1) -> Any:
+        return self.module().argsort(value, dim=axis)
+
+    def argmin(self, value: Any, axis: int | None = None) -> Any:
+        return self.module().argmin(value, dim=axis)
+
+    def argmax(self, value: Any, axis: int | None = None) -> Any:
+        return self.module().argmax(value, dim=axis)
+
+    def quantile(
+        self, value: Any, q: Any, axis: int | None = None, *, keepdims: bool = False
+    ) -> Any:
+        fraction = self.module().as_tensor(q, dtype=value.dtype, device=value.device)
+        return self.module().quantile(value, fraction, dim=axis, keepdim=keepdims)
+
+    def percentile(
+        self, value: Any, q: Any, axis: int | None = None, *, keepdims: bool = False
+    ) -> Any:
+        fraction = self.module().as_tensor(q, dtype=value.dtype) / 100
+        return self.quantile(value, fraction, axis, keepdims=keepdims)
+
+    def median(
+        self, value: Any, axis: int | None = None, *, keepdims: bool = False
+    ) -> Any:
+        # Torch's own median is the lower of two middle values; NumPy averages.
+        return self.quantile(value, 0.5, axis, keepdims=keepdims)
+
+    def nanmedian(
+        self, value: Any, axis: int | None = None, *, keepdims: bool = False
+    ) -> Any:
+        fraction = self.module().as_tensor(0.5, dtype=value.dtype)
+        return self.module().nanquantile(value, fraction, dim=axis, keepdim=keepdims)
+
+    def nanmean(
+        self, value: Any, axis: int | None = None, *, keepdims: bool = False
+    ) -> Any:
+        return self.module().nanmean(value, dim=axis, keepdim=keepdims)
+
+    def nansum(
+        self, value: Any, axis: int | None = None, *, keepdims: bool = False
+    ) -> Any:
+        return self.module().nansum(value, dim=axis, keepdim=keepdims)
+
+    def var(
+        self,
+        value: Any,
+        axis: int | None = None,
+        *,
+        ddof: int = 0,
+        keepdims: bool = False,
+    ) -> Any:
+        return self.module().var(value, dim=axis, correction=ddof, keepdim=keepdims)
+
+    def linspace(
+        self, start: Any, stop: Any, num: int = 50, *, endpoint: bool = True
+    ) -> Any:
+        if endpoint:
+            return self.module().linspace(start, stop, num)
+        return self.module().linspace(start, stop, num + 1)[:-1]
+
+    def trapezoid(self, y: Any, x: Any = None, dx: Any = 1.0, axis: int = -1) -> Any:
+        if x is not None:
+            return self.module().trapezoid(y, x, dim=axis)
+        return self.module().trapezoid(y, dx=dx, dim=axis)
 
 
 _TORCH = _Torch()
@@ -403,7 +495,7 @@ def dot(a: Any, b: Any, /) -> Any:
     first._same_system(second)
     kind = product("mul", first._semantic, second._semantic)
     raw = _xp(first.value, second.value).dot(_raw(first), _raw(second))
-    return _result(kind, raw, first.system, first.value)
+    return _result(kind, _as_like(first.value, raw), first.system, first.value)
 
 
 def cross(a: Any, b: Any, /, axis: int = -1) -> Any:
@@ -553,6 +645,203 @@ def _as_like(like: Any, result: Any) -> Any:
     return result
 
 
+def _kept(quantity: _Quantity, raw: Any) -> _Quantity:
+    """A same-kind result, keeping the display unit and array storage."""
+    return quantity._with(keep_storage(quantity.value, _as_like(quantity.value, raw)))
+
+
+def sort(x: Any, axis: int = -1) -> Any:
+    """Sorted along an axis, keeping the kind."""
+    if not _is_quantity(x):
+        return _xp(x).sort(x, axis=axis)
+    return x._with(_xp(x.value).sort(x.value, axis=axis))
+
+
+def _same_kind_reduction(name: str, *, affine: bool) -> Callable[..., Any]:
+    def function(x: Any, axis: int | None = None, *, keepdims: bool = False) -> Any:
+        if not _is_quantity(x):
+            return getattr(_xp(x), name)(x, axis=axis, keepdims=keepdims)
+        if not affine:
+            _not_affine(x, name)
+        raw = getattr(_xp(x.value), name)(x.value, axis=axis, keepdims=keepdims)
+        return _kept(x, raw)
+
+    function.__name__ = function.__qualname__ = name
+    function.__doc__ = f"``{name}`` over an axis, keeping the kind."
+    return function
+
+
+median = _same_kind_reduction("median", affine=True)
+nanmean = _same_kind_reduction("nanmean", affine=True)
+nanmax = _same_kind_reduction("nanmax", affine=True)
+nanmin = _same_kind_reduction("nanmin", affine=True)
+nanmedian = _same_kind_reduction("nanmedian", affine=True)
+nansum = _same_kind_reduction("nansum", affine=False)
+
+
+def _quantile(name: str) -> Callable[..., Any]:
+    def function(
+        x: Any, q: Any, axis: int | None = None, *, keepdims: bool = False
+    ) -> Any:
+        if not _is_quantity(x):
+            return getattr(_xp(x), name)(x, q, axis=axis, keepdims=keepdims)
+        raw = getattr(_xp(x.value), name)(x.value, q, axis=axis, keepdims=keepdims)
+        return _kept(x, raw)
+
+    function.__name__ = function.__qualname__ = name
+    function.__doc__ = f"``{name}`` along an axis, keeping the kind."
+    return function
+
+
+percentile = _quantile("percentile")
+quantile = _quantile("quantile")
+
+
+def nanstd(
+    x: Any, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+) -> Any:
+    """Standard deviation ignoring NaNs; of absolute temperatures, a difference."""
+    if not _is_quantity(x):
+        return _xp(x).nanstd(x, axis=axis, ddof=ddof, keepdims=keepdims)
+    raw = _xp(x.value).nanstd(x.value, axis=axis, ddof=ddof, keepdims=keepdims)
+    raw = keep_storage(x.value, _as_like(x.value, raw))
+    return _wrap(_spread(x), raw, x.system)
+
+
+def _variance(name: str) -> Callable[..., Any]:
+    def function(
+        x: Any, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False
+    ) -> Any:
+        if not _is_quantity(x):
+            return getattr(_xp(x), name)(x, axis=axis, ddof=ddof, keepdims=keepdims)
+        raw = getattr(_xp(x.value), name)(
+            _raw(x), axis=axis, ddof=ddof, keepdims=keepdims
+        )
+        kind = power(_spread(x), 2)
+        return _result(kind, _as_like(x.value, raw), x.system, x.value)
+
+    function.__name__ = function.__qualname__ = name
+    function.__doc__ = (
+        f"``{name}``: the square of the kind; of absolute temperatures, the square "
+        "of a temperature difference."
+    )
+    return function
+
+
+var = _variance("var")
+nanvar = _variance("nanvar")
+
+
+def square(x: Any, /) -> Any:
+    """Element-wise square, of the squared kind, as ``x ** 2`` is."""
+    if not _is_quantity(x):
+        return _xp(x).square(x)
+    kind = power(x._semantic, 2)
+    return _result(kind, _xp(x.value).square(_raw(x)), x.system, x.value)
+
+
+def hypot(a: Any, b: Any, /) -> Any:
+    """``sqrt(a**2 + b**2)`` element-wise, for quantities of one kind."""
+    if not _is_quantity(a):
+        return _xp(a, b).hypot(a, b)
+    _same("hypot", a, b)
+    _not_affine(a, "hypot")
+    second = cast("_Quantity", b)
+    return a._with(_xp(a.value, second.value).hypot(a.value, second.value))
+
+
+fabs = absolute
+
+
+def _plain_result(name: str) -> Callable[..., Any]:
+    def function(x: Any, *args: Any, **kwargs: Any) -> Any:
+        raw = x.value if _is_quantity(x) else x
+        return getattr(_xp(raw), name)(raw, *args, **kwargs)
+
+    function.__name__ = function.__qualname__ = name
+    function.__doc__ = f"``{name}`` of the numbers, which carry no unit."
+    return function
+
+
+argsort = _plain_result("argsort")
+argmin = _plain_result("argmin")
+argmax = _plain_result("argmax")
+
+
+def sign(x: Any, /) -> Any:
+    """Element-wise signs of the numbers, which carry no unit."""
+    raw = x.value if _is_quantity(x) else x
+    return _xp(raw).sign(raw)
+
+
+def linspace(start: Any, stop: Any, num: int = 50, *, endpoint: bool = True) -> Any:
+    """Evenly spaced quantities from ``start`` to ``stop``, of one kind."""
+    if not _is_quantity(start):
+        return _xp(start, stop).linspace(start, stop, num, endpoint=endpoint)
+    _same("linspace", start, stop)
+    end = cast("_Quantity", stop)
+    namespace = _xp(start.value, end.value)
+    return start._with(
+        namespace.linspace(start.value, end.value, num, endpoint=endpoint)
+    )
+
+
+def _product_of(name: str) -> Callable[..., Any]:
+    """A product of two operands: kinds as for ``*``, plain arrays scale."""
+
+    def call(namespace: Any, a: Any, b: Any) -> Any:
+        return getattr(namespace, name)(a, b)
+
+    def function(a: Any, b: Any, /) -> Any:
+        if not _is_quantity(a) and not _is_quantity(b):
+            return call(_xp(a, b), a, b)
+        if not _is_quantity(a) or not _is_quantity(b):
+            quantity = a if _is_quantity(a) else b
+            other = b if quantity is a else a
+            first, second = (
+                (quantity.value, other) if quantity is a else (other, quantity.value)
+            )
+            raw = call(_xp(first, second), first, second)
+            return _kept(quantity, raw)
+        a._same_system(b)
+        kind = product("mul", a._semantic, b._semantic)
+        raw = call(_xp(a.value, b.value), _raw(a), _raw(b))
+        return _result(kind, _as_like(a.value, raw), a.system, a.value)
+
+    function.__name__ = function.__qualname__ = name
+    function.__doc__ = f"``{name}``; declared products name the result, as for ``*``."
+    return function
+
+
+matmul = _product_of("matmul")
+outer = _product_of("outer")
+
+
+def trapezoid(y: Any, x: Any = None, dx: Any = 1.0, axis: int = -1) -> Any:
+    """The integral of ``y`` over ``x`` (or a spacing ``dx``): the product kind."""
+    step = x if x is not None else dx
+    if not _is_quantity(y) and not _is_quantity(step):
+        return _xp(y).trapezoid(y, x=x, dx=dx, axis=axis)
+    raw_y = _raw(y) if _is_quantity(y) else y
+    raw_step = _raw(step) if _is_quantity(step) else step
+    namespace = _xp(raw_y, raw_step)
+    if x is not None:
+        raw = namespace.trapezoid(raw_y, x=raw_step, axis=axis)
+    else:
+        raw = namespace.trapezoid(raw_y, dx=raw_step, axis=axis)
+    if not _is_quantity(step):
+        return _result(
+            y._semantic, _as_like(y.value, raw), y.system, y.value, display=y._display
+        )
+    if not _is_quantity(y):
+        return _result(
+            step._semantic, _as_like(step.value, raw), step.system, step.value
+        )
+    y._same_system(step)
+    kind = product("mul", y._semantic, step._semantic)
+    return _result(kind, _as_like(y.value, raw), y.system, y.value)
+
+
 # NumPy's ufuncs and array functions, by name, that quantities support.
 UFUNCS: dict[str, Callable[..., Any]] = {
     **{
@@ -576,6 +865,11 @@ UFUNCS: dict[str, Callable[..., Any]] = {
             "tanh",
             "sqrt",
             "absolute",
+            "fabs",
+            "hypot",
+            "matmul",
+            "sign",
+            "square",
             "maximum",
             "minimum",
             "isnan",
@@ -626,6 +920,24 @@ FUNCTIONS: dict[str, Callable[..., Any]] = {
         "zeros_like",
         "isclose",
         "allclose",
+        "sort",
+        "argsort",
+        "argmin",
+        "argmax",
+        "median",
+        "percentile",
+        "quantile",
+        "nanmean",
+        "nanmax",
+        "nanmin",
+        "nanmedian",
+        "nansum",
+        "nanstd",
+        "nanvar",
+        "var",
+        "linspace",
+        "outer",
+        "trapezoid",
     )
 }
 FUNCTIONS["amax"], FUNCTIONS["amin"] = max, min
@@ -644,6 +956,7 @@ LINALG: dict[str, Callable[..., Any]] = {"norm": _norm_of}
 
 # Reflected operators for ufuncs whose left operand is a plain array.
 REFLECTED = {
+    "matmul": "__rmatmul__",
     "add": "__radd__",
     "subtract": "__rsub__",
     "multiply": "__rmul__",
@@ -668,12 +981,14 @@ _TORCH_NAMES = {
     "cat": "concatenate",
     "concat": "concatenate",
     "unsqueeze": "expand_dims",
-    "matmul": "dot",
+    "matmul": "matmul",
     "linalg_cross": "cross",
     "linalg_vector_norm": "norm",
     "vector_norm": "norm",
 }
 _TORCH_KEYWORDS = {"dim": "axis", "keepdim": "keepdims", "correction": "ddof"}
+# Torch's own versions return values and indices; qnp gives the NumPy behaviour.
+_TORCH_DIFFERENT = frozenset({"sort", "median", "nanmedian"})
 
 
 def torch_function(func: Any, args: Sequence[Any], kwargs: dict[str, Any]) -> Any:
@@ -684,7 +999,7 @@ def torch_function(func: Any, args: Sequence[Any], kwargs: dict[str, Any]) -> An
         return NotImplemented
     name = _TORCH_NAMES.get(name, name)
     function = UFUNCS.get(name) or FUNCTIONS.get(name) or LINALG.get(name)
-    if function is None:
+    if function is None or name in _TORCH_DIFFERENT:
         raise TypeError(
             f"torch.{name} does not know the units of a quantity; use "
             "quantype.numpy, quantity methods, or .value and .magnitude(unit)"
@@ -694,7 +1009,7 @@ def torch_function(func: Any, args: Sequence[Any], kwargs: dict[str, Any]) -> An
     if name == "clip":
         arguments += [keywords.pop("min", None), keywords.pop("max", None)]
         arguments = arguments[:3]
-    if name == "std" and "ddof" not in keywords:
+    if name in {"std", "var"} and "ddof" not in keywords:
         # Torch's standard deviation is unbiased unless told otherwise.
         keywords["ddof"] = 0 if keywords.pop("unbiased", True) is False else 1
     return function(*arguments, **keywords)

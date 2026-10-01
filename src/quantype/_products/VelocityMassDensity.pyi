@@ -116,6 +116,33 @@ class VelocityMassDensity(Quantity[Mul[VelocityKind, MassDensityKind], V, S]):
     def _rtruediv_Momentum(self, other: Momentum[V, S], /) -> Volume[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VelocityMassDensity[float, S], other: Volume[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Volume[V, S] | Volume[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VelocityMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VelocityMassDensity[float, S], other: W, /
+    ) -> VelocityMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VelocityMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VelocityMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, MassDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VelocityKind, MassDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VelocityMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -127,6 +154,19 @@ class VelocityMassDensity(Quantity[Mul[VelocityKind, MassDensityKind], V, S]):
     ) -> VelocityMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VelocityMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VelocityMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VelocityMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VelocityMassDensity[float, S], other: W, /
+    ) -> VelocityMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VelocityMassDensity[V, S]: ...
+    @override
+    def item(self) -> VelocityMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

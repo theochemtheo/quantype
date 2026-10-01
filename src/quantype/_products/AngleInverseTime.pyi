@@ -125,6 +125,31 @@ class AngleInverseTime(Quantity[Mul[AngleKind, InverseTimeKind], V, S]):
     def _rtruediv_Angle(self, other: Angle[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AngleInverseTime[float, S], other: Time[W, S], /
+    ) -> Angle[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Angle[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AngleInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AngleInverseTime[float, S], other: W, /
+    ) -> AngleInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AngleInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AngleInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[AngleKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AngleInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -136,6 +161,19 @@ class AngleInverseTime(Quantity[Mul[AngleKind, InverseTimeKind], V, S]):
     ) -> AngleInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AngleInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AngleInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AngleInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AngleInverseTime[float, S], other: W, /
+    ) -> AngleInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AngleInverseTime[V, S]: ...
+    @override
+    def item(self) -> AngleInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

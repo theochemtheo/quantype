@@ -321,6 +321,91 @@ class FrequencyPerVelocity(Quantity[Div[FrequencyKind, VelocityKind], V, S]):
     ) -> ElectricPotential[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerVelocity[float, S], other: Length[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Length[V, S] | Length[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerVelocity[float, S], other: Area[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Area[V, S] | Area[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerVelocity[float, S], other: Volume[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Area[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerVelocity[float, S], other: Velocity[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerVelocity[float, S], other: Energy[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Energy[V, S] | Energy[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerVelocity[float, S], other: Force[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Force[V, S] | Force[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerVelocity[float, S], other: ElectricPotential[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerVelocity[float, S], other: DipoleMoment[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: DipoleMoment[V, S] | DipoleMoment[float, S], /
+    ) -> Charge[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerVelocity[float, S], other: Action[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Action[V, S] | Action[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerVelocity[float, S], other: W, /
+    ) -> FrequencyPerVelocity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerVelocity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerVelocity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, VelocityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, VelocityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerVelocity[V, S]: ...
     @overload
     def __rmul__(
@@ -332,6 +417,19 @@ class FrequencyPerVelocity(Quantity[Div[FrequencyKind, VelocityKind], V, S]):
     ) -> FrequencyPerVelocity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerVelocity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerVelocity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerVelocity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerVelocity[float, S], other: W, /
+    ) -> FrequencyPerVelocity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerVelocity[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerVelocity[float, S]: ...
     @overload
     @override
     def __rtruediv__(

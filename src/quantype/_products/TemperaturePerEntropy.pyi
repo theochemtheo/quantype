@@ -116,6 +116,33 @@ class TemperaturePerEntropy(Quantity[Div[TemperatureKind, EntropyKind], V, S]):
     ) -> Entropy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperaturePerEntropy[float, S], other: Entropy[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Entropy[V, S] | Entropy[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperaturePerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperaturePerEntropy[float, S], other: W, /
+    ) -> TemperaturePerEntropy[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperaturePerEntropy[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperaturePerEntropy[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, EntropyKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, EntropyKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperaturePerEntropy[V, S]: ...
     @overload
     def __rmul__(
@@ -127,6 +154,19 @@ class TemperaturePerEntropy(Quantity[Div[TemperatureKind, EntropyKind], V, S]):
     ) -> TemperaturePerEntropy[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperaturePerEntropy[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperaturePerEntropy[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TemperaturePerEntropy[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperaturePerEntropy[float, S], other: W, /
+    ) -> TemperaturePerEntropy[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperaturePerEntropy[V, S]: ...
+    @override
+    def item(self) -> TemperaturePerEntropy[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -98,6 +98,33 @@ class TimePerPressure(Quantity[Div[TimeKind, PressureKind], V, S]):
     def _rtruediv_Time(self, other: Time[V, S], /) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimePerPressure[float, S], other: Pressure[W, S], /
+    ) -> Time[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> Time[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimePerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimePerPressure[float, S], other: W, /
+    ) -> TimePerPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimePerPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimePerPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TimeKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TimeKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimePerPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -109,6 +136,19 @@ class TimePerPressure(Quantity[Div[TimeKind, PressureKind], V, S]):
     ) -> TimePerPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimePerPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimePerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimePerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimePerPressure[float, S], other: W, /
+    ) -> TimePerPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimePerPressure[V, S]: ...
+    @override
+    def item(self) -> TimePerPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -135,6 +135,41 @@ class EnergyPerAtomPerPressure(Quantity[Div[EnergyPerAtomKind, PressureKind], V,
     ) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyPerAtomPerPressure[float, S], other: Pressure[W, S], /
+    ) -> EnergyPerAtom[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Pressure[V, S] | Pressure[float, S], /
+    ) -> EnergyPerAtom[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EnergyPerAtomPerPressure[float, S], other: AtomCount[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: AtomCount[V, S] | AtomCount[float, S], /
+    ) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyPerAtomPerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerAtomPerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerAtomPerPressure[float, S], other: W, /
+    ) -> EnergyPerAtomPerPressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerAtomPerPressure[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerAtomPerPressure[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, PressureKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, PressureKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerAtomPerPressure[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +181,19 @@ class EnergyPerAtomPerPressure(Quantity[Div[EnergyPerAtomKind, PressureKind], V,
     ) -> EnergyPerAtomPerPressure[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerAtomPerPressure[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerAtomPerPressure[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerAtomPerPressure[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerAtomPerPressure[float, S], other: W, /
+    ) -> EnergyPerAtomPerPressure[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerAtomPerPressure[V, S]: ...
+    @override
+    def item(self) -> EnergyPerAtomPerPressure[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -135,6 +135,33 @@ class FrequencyElectricField(Quantity[Mul[FrequencyKind, ElectricFieldKind], V, 
     def _rtruediv_ElectricField(self, other: ElectricField[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyElectricField[float, S], other: Time[W, S], /
+    ) -> ElectricField[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Time[V, S] | Time[float, S], /
+    ) -> ElectricField[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyElectricField[float, S], other: W, /
+    ) -> FrequencyElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[FrequencyKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -146,6 +173,19 @@ class FrequencyElectricField(Quantity[Mul[FrequencyKind, ElectricFieldKind], V, 
     ) -> FrequencyElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyElectricField[float, S], other: W, /
+    ) -> FrequencyElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyElectricField[V, S]: ...
+    @override
+    def item(self) -> FrequencyElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

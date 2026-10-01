@@ -207,6 +207,57 @@ class EnergyPerAcceleration(Quantity[Div[EnergyKind, AccelerationKind], V, S]):
     def _rtruediv_Action(self, other: Action[V, S], /) -> Velocity[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: EnergyPerAcceleration[float, S], other: Velocity[W, S], /
+    ) -> Action[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Velocity[V, S] | Velocity[float, S], /
+    ) -> Action[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EnergyPerAcceleration[float, S], other: Frequency[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EnergyPerAcceleration[float, S], other: InverseTime[W, S], /
+    ) -> Momentum[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> Momentum[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: EnergyPerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> Energy[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Energy[V, S]: ...
+    @overload
+    def __matmul__(
+        self: EnergyPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyPerAcceleration[float, S], other: W, /
+    ) -> EnergyPerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyPerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyPerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[EnergyKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[EnergyKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyPerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -218,6 +269,19 @@ class EnergyPerAcceleration(Quantity[Div[EnergyKind, AccelerationKind], V, S]):
     ) -> EnergyPerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyPerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyPerAcceleration[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyPerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyPerAcceleration[float, S], other: W, /
+    ) -> EnergyPerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyPerAcceleration[V, S]: ...
+    @override
+    def item(self) -> EnergyPerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

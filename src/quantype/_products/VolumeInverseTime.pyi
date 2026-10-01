@@ -151,6 +151,31 @@ class VolumeInverseTime(Quantity[Mul[VolumeKind, InverseTimeKind], V, S]):
     def _rtruediv_Volume(self, other: Volume[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: VolumeInverseTime[float, S], other: Time[W, S], /
+    ) -> Volume[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Volume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: VolumeInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: VolumeInverseTime[float, S], other: W, /
+    ) -> VolumeInverseTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> VolumeInverseTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: VolumeInverseTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, InverseTimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[VolumeKind, InverseTimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> VolumeInverseTime[V, S]: ...
     @overload
     def __rmul__(
@@ -162,6 +187,19 @@ class VolumeInverseTime(Quantity[Mul[VolumeKind, InverseTimeKind], V, S]):
     ) -> VolumeInverseTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> VolumeInverseTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: VolumeInverseTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> VolumeInverseTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: VolumeInverseTime[float, S], other: W, /
+    ) -> VolumeInverseTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> VolumeInverseTime[V, S]: ...
+    @override
+    def item(self) -> VolumeInverseTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

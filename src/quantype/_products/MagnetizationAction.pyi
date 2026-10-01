@@ -94,6 +94,25 @@ class MagnetizationAction(Quantity[Mul[MagnetizationKind, ActionKind], V, S]):
     ) -> Quantity[Div[Mul[MagnetizationKind, ActionKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: MagnetizationAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagnetizationAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: MagnetizationAction[float, S], other: W, /
+    ) -> MagnetizationAction[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> MagnetizationAction[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: MagnetizationAction[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, ActionKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, ActionKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> MagnetizationAction[V, S]: ...
     @overload
     def __rmul__(
@@ -105,6 +124,19 @@ class MagnetizationAction(Quantity[Mul[MagnetizationKind, ActionKind], V, S]):
     ) -> MagnetizationAction[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> MagnetizationAction[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: MagnetizationAction[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> MagnetizationAction[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: MagnetizationAction[float, S], other: W, /
+    ) -> MagnetizationAction[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> MagnetizationAction[V, S]: ...
+    @override
+    def item(self) -> MagnetizationAction[float, S]: ...
     @overload
     @override
     def __rtruediv__(

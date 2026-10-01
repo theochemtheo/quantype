@@ -141,6 +141,29 @@ class ElectricPotentialDipoleMoment(
     ) -> Quantity[Div[Mul[ElectricPotentialKind, DipoleMomentKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: ElectricPotentialDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ElectricPotentialDipoleMoment[float, S], other: W, /
+    ) -> ElectricPotentialDipoleMoment[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> ElectricPotentialDipoleMoment[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ElectricPotentialDipoleMoment[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[ElectricPotentialKind, DipoleMomentKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[ElectricPotentialKind, DipoleMomentKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ElectricPotentialDipoleMoment[V, S]: ...
     @overload
     def __rmul__(
@@ -154,6 +177,23 @@ class ElectricPotentialDipoleMoment(
     ) -> ElectricPotentialDipoleMoment[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ElectricPotentialDipoleMoment[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ElectricPotentialDipoleMoment[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> ElectricPotentialDipoleMoment[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ElectricPotentialDipoleMoment[float, S], other: W, /
+    ) -> ElectricPotentialDipoleMoment[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> ElectricPotentialDipoleMoment[V, S]: ...
+    @override
+    def item(self) -> ElectricPotentialDipoleMoment[float, S]: ...
     @overload
     @override
     def __rtruediv__(

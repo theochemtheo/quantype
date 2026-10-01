@@ -141,6 +141,39 @@ class FrequencyPerMass(Quantity[Div[FrequencyKind, MassKind], V, S]):
     ) -> Momentum[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: FrequencyPerMass[float, S], other: Mass[W, S], /
+    ) -> Frequency[W, S]: ...
+    @overload
+    def __matmul__(self, other: Mass[V, S] | Mass[float, S], /) -> Frequency[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: FrequencyPerMass[float, S], other: Momentum[W, S], /
+    ) -> Acceleration[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Acceleration[V, S]: ...
+    @overload
+    def __matmul__(
+        self: FrequencyPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: FrequencyPerMass[float, S], other: W, /
+    ) -> FrequencyPerMass[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> FrequencyPerMass[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: FrequencyPerMass[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, MassKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[FrequencyKind, MassKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> FrequencyPerMass[V, S]: ...
     @overload
     def __rmul__(
@@ -152,6 +185,19 @@ class FrequencyPerMass(Quantity[Div[FrequencyKind, MassKind], V, S]):
     ) -> FrequencyPerMass[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> FrequencyPerMass[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: FrequencyPerMass[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> FrequencyPerMass[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: FrequencyPerMass[float, S], other: W, /
+    ) -> FrequencyPerMass[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> FrequencyPerMass[V, S]: ...
+    @override
+    def item(self) -> FrequencyPerMass[float, S]: ...
     @overload
     @override
     def __rtruediv__(

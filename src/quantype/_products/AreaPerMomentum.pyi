@@ -154,6 +154,41 @@ class AreaPerMomentum(Quantity[Div[AreaKind, MomentumKind], V, S]):
     def _rtruediv_InverseTime(self, other: InverseTime[V, S], /) -> Pressure[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: AreaPerMomentum[float, S], other: ForceConstant[W, S], /
+    ) -> Velocity[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ForceConstant[V, S] | ForceConstant[float, S], /
+    ) -> Velocity[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: AreaPerMomentum[float, S], other: Momentum[W, S], /
+    ) -> Area[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Momentum[V, S] | Momentum[float, S], /
+    ) -> Area[V, S]: ...
+    @overload
+    def __matmul__(
+        self: AreaPerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AreaPerMomentum[float, S], other: W, /
+    ) -> AreaPerMomentum[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AreaPerMomentum[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AreaPerMomentum[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[AreaKind, MomentumKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[AreaKind, MomentumKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AreaPerMomentum[V, S]: ...
     @overload
     def __rmul__(
@@ -165,6 +200,19 @@ class AreaPerMomentum(Quantity[Div[AreaKind, MomentumKind], V, S]):
     ) -> AreaPerMomentum[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AreaPerMomentum[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AreaPerMomentum[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AreaPerMomentum[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AreaPerMomentum[float, S], other: W, /
+    ) -> AreaPerMomentum[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AreaPerMomentum[V, S]: ...
+    @override
+    def item(self) -> AreaPerMomentum[float, S]: ...
     @overload
     @override
     def __rtruediv__(

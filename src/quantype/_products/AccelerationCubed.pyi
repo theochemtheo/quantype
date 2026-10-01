@@ -74,6 +74,25 @@ class AccelerationCubed(Quantity[Pow[AccelerationKind, Literal[3]], V, S]):
     ) -> Quantity[Div[Pow[AccelerationKind, Literal[3]], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: AccelerationCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: AccelerationCubed[float, S], other: W, /
+    ) -> AccelerationCubed[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> AccelerationCubed[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: AccelerationCubed[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[AccelerationKind, Literal[3]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[AccelerationKind, Literal[3]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> AccelerationCubed[V, S]: ...
     @overload
     def __rmul__(
@@ -85,6 +104,19 @@ class AccelerationCubed(Quantity[Pow[AccelerationKind, Literal[3]], V, S]):
     ) -> AccelerationCubed[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> AccelerationCubed[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: AccelerationCubed[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> AccelerationCubed[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: AccelerationCubed[float, S], other: W, /
+    ) -> AccelerationCubed[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> AccelerationCubed[V, S]: ...
+    @override
+    def item(self) -> AccelerationCubed[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -122,6 +122,25 @@ class EnergyElectricField(Quantity[Mul[EnergyKind, ElectricFieldKind], V, S]):
     ) -> Quantity[Div[Mul[EnergyKind, ElectricFieldKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: EnergyElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: EnergyElectricField[float, S], other: W, /
+    ) -> EnergyElectricField[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> EnergyElectricField[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: EnergyElectricField[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, ElectricFieldKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[EnergyKind, ElectricFieldKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> EnergyElectricField[V, S]: ...
     @overload
     def __rmul__(
@@ -133,6 +152,19 @@ class EnergyElectricField(Quantity[Mul[EnergyKind, ElectricFieldKind], V, S]):
     ) -> EnergyElectricField[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> EnergyElectricField[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: EnergyElectricField[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> EnergyElectricField[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: EnergyElectricField[float, S], other: W, /
+    ) -> EnergyElectricField[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> EnergyElectricField[V, S]: ...
+    @override
+    def item(self) -> EnergyElectricField[float, S]: ...
     @overload
     @override
     def __rtruediv__(

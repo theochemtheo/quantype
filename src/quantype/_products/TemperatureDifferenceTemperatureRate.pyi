@@ -141,6 +141,35 @@ class TemperatureDifferenceTemperatureRate(
     ]: ...
     @overload
     @override
+    def __matmul__(
+        self: TemperatureDifferenceTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperatureDifferenceTemperatureRate[float, S], other: W, /
+    ) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperatureDifferenceTemperatureRate[float, S],
+        other: Quantity[K, W, S],
+        /,
+    ) -> Quantity[
+        Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], W, S
+    ]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[
+        Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], V, S
+    ]: ...
+    @overload
+    @override
     def __rmul__(
         self, other: _Scalar, /
     ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
@@ -158,6 +187,23 @@ class TemperatureDifferenceTemperatureRate(
     def __rmul__(
         self, other: _Numerical, /
     ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperatureDifferenceTemperatureRate[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperatureDifferenceTemperatureRate[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperatureDifferenceTemperatureRate[float, S], other: W, /
+    ) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    @override
+    def item(self) -> TemperatureDifferenceTemperatureRate[float, S]: ...
     @overload
     @override
     def __rtruediv__(

@@ -178,6 +178,45 @@ class InverseTimePerElectricPotential(
     def _rtruediv_Charge(self, other: Charge[V, S], /) -> Action[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: InverseTimePerElectricPotential[float, S],
+        other: ElectricPotential[W, S],
+        /,
+    ) -> InverseTime[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: ElectricPotential[V, S] | ElectricPotential[float, S], /
+    ) -> InverseTime[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: InverseTimePerElectricPotential[float, S], other: Action[W, S], /
+    ) -> Charge[W, S]: ...
+    @overload
+    def __matmul__(self, other: Action[V, S] | Action[float, S], /) -> Charge[V, S]: ...
+    @overload
+    def __matmul__(
+        self: InverseTimePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> InverseTimePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: InverseTimePerElectricPotential[float, S], other: W, /
+    ) -> InverseTimePerElectricPotential[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: _Numerical, /
+    ) -> InverseTimePerElectricPotential[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: InverseTimePerElectricPotential[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, ElectricPotentialKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, ElectricPotentialKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> InverseTimePerElectricPotential[V, S]: ...
     @overload
     def __rmul__(
@@ -193,6 +232,23 @@ class InverseTimePerElectricPotential(
     def __rmul__(
         self, other: _Numerical, /
     ) -> InverseTimePerElectricPotential[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: InverseTimePerElectricPotential[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> InverseTimePerElectricPotential[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: InverseTimePerElectricPotential[float, S], other: W, /
+    ) -> InverseTimePerElectricPotential[W, S]: ...
+    @overload
+    def __rmatmul__(
+        self, other: _Numerical, /
+    ) -> InverseTimePerElectricPotential[V, S]: ...
+    @override
+    def item(self) -> InverseTimePerElectricPotential[float, S]: ...
     @overload
     @override
     def __rtruediv__(

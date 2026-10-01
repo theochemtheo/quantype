@@ -122,6 +122,35 @@ class TemperaturePerAcceleration(
     ) -> Acceleration[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TemperaturePerAcceleration[float, S], other: Acceleration[W, S], /
+    ) -> Temperature[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Acceleration[V, S] | Acceleration[float, S], /
+    ) -> Temperature[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TemperaturePerAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperaturePerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TemperaturePerAcceleration[float, S], other: W, /
+    ) -> TemperaturePerAcceleration[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TemperaturePerAcceleration[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TemperaturePerAcceleration[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, AccelerationKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[TemperatureKind, AccelerationKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TemperaturePerAcceleration[V, S]: ...
     @overload
     def __rmul__(
@@ -135,6 +164,21 @@ class TemperaturePerAcceleration(
     ) -> TemperaturePerAcceleration[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TemperaturePerAcceleration[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TemperaturePerAcceleration[float, S],
+        other: npt.NDArray[np.integer[Any]],
+        /,
+    ) -> TemperaturePerAcceleration[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TemperaturePerAcceleration[float, S], other: W, /
+    ) -> TemperaturePerAcceleration[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TemperaturePerAcceleration[V, S]: ...
+    @override
+    def item(self) -> TemperaturePerAcceleration[float, S]: ...
     @overload
     @override
     def __rtruediv__(

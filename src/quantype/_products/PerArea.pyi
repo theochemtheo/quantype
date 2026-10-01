@@ -164,6 +164,53 @@ class PerArea(Quantity[Pow[AreaKind, Literal[-1]], V, S]):
     ) -> Energy[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: PerArea[float, S], other: Area[W, S], /
+    ) -> Dimensionless[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Area[V, S] | Area[float, S], /
+    ) -> Dimensionless[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerArea[float, S], other: Volume[W, S], /
+    ) -> Length[W, S]: ...
+    @overload
+    def __matmul__(self, other: Volume[V, S] | Volume[float, S], /) -> Length[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerArea[float, S], other: Energy[W, S], /
+    ) -> ForceConstant[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Energy[V, S] | Energy[float, S], /
+    ) -> ForceConstant[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: PerArea[float, S], other: Force[W, S], /
+    ) -> Pressure[W, S]: ...
+    @overload
+    def __matmul__(self, other: Force[V, S] | Force[float, S], /) -> Pressure[V, S]: ...
+    @overload
+    def __matmul__(
+        self: PerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PerArea[float, S], other: W, /
+    ) -> PerArea[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PerArea[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PerArea[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Pow[AreaKind, Literal[-1]], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Pow[AreaKind, Literal[-1]], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PerArea[V, S]: ...
     @overload
     def __rmul__(
@@ -175,6 +222,19 @@ class PerArea(Quantity[Pow[AreaKind, Literal[-1]], V, S]):
     ) -> PerArea[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PerArea[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PerArea[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PerArea[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PerArea[float, S], other: W, /
+    ) -> PerArea[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PerArea[V, S]: ...
+    @override
+    def item(self) -> PerArea[float, S]: ...
     @overload
     @override
     def __rtruediv__(

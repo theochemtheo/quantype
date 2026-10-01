@@ -152,6 +152,41 @@ class TimeEnergyPerVolume(Quantity[Mul[TimeKind, EnergyPerVolumeKind], V, S]):
     ) -> InverseTime[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: TimeEnergyPerVolume[float, S], other: Frequency[W, S], /
+    ) -> EnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: Frequency[V, S] | Frequency[float, S], /
+    ) -> EnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[W](
+        self: TimeEnergyPerVolume[float, S], other: InverseTime[W, S], /
+    ) -> EnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(
+        self, other: InverseTime[V, S] | InverseTime[float, S], /
+    ) -> EnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__(
+        self: TimeEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: TimeEnergyPerVolume[float, S], other: W, /
+    ) -> TimeEnergyPerVolume[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> TimeEnergyPerVolume[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: TimeEnergyPerVolume[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, EnergyPerVolumeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[TimeKind, EnergyPerVolumeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> TimeEnergyPerVolume[V, S]: ...
     @overload
     def __rmul__(
@@ -163,6 +198,19 @@ class TimeEnergyPerVolume(Quantity[Mul[TimeKind, EnergyPerVolumeKind], V, S]):
     ) -> TimeEnergyPerVolume[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> TimeEnergyPerVolume[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: TimeEnergyPerVolume[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> TimeEnergyPerVolume[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: TimeEnergyPerVolume[float, S], other: W, /
+    ) -> TimeEnergyPerVolume[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> TimeEnergyPerVolume[V, S]: ...
+    @override
+    def item(self) -> TimeEnergyPerVolume[float, S]: ...
     @overload
     @override
     def __rtruediv__(

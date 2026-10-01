@@ -153,6 +153,31 @@ class ForcePerTime(Quantity[Div[ForceKind, TimeKind], V, S]):
     def _rtruediv_Force(self, other: Force[V, S], /) -> Time[V, S]: ...
     @overload
     @override
+    def __matmul__[W](
+        self: ForcePerTime[float, S], other: Time[W, S], /
+    ) -> Force[W, S]: ...
+    @overload
+    def __matmul__(self, other: Time[V, S] | Time[float, S], /) -> Force[V, S]: ...
+    @overload
+    def __matmul__(
+        self: ForcePerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: ForcePerTime[float, S], other: W, /
+    ) -> ForcePerTime[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> ForcePerTime[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: ForcePerTime[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Div[ForceKind, TimeKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Div[ForceKind, TimeKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> ForcePerTime[V, S]: ...
     @overload
     def __rmul__(
@@ -164,6 +189,19 @@ class ForcePerTime(Quantity[Div[ForceKind, TimeKind], V, S]):
     ) -> ForcePerTime[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> ForcePerTime[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: ForcePerTime[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> ForcePerTime[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: ForcePerTime[float, S], other: W, /
+    ) -> ForcePerTime[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> ForcePerTime[V, S]: ...
+    @override
+    def item(self) -> ForcePerTime[float, S]: ...
     @overload
     @override
     def __rtruediv__(

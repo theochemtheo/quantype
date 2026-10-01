@@ -92,6 +92,25 @@ class PressureMassDensity(Quantity[Mul[PressureKind, MassDensityKind], V, S]):
     ) -> Quantity[Div[Mul[PressureKind, MassDensityKind], K], V, S]: ...
     @overload
     @override
+    def __matmul__(
+        self: PressureMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __matmul__[W: _Numerical](
+        self: PressureMassDensity[float, S], other: W, /
+    ) -> PressureMassDensity[W, S]: ...
+    @overload
+    def __matmul__(self, other: _Numerical, /) -> PressureMassDensity[V, S]: ...
+    @overload
+    def __matmul__[K, W](
+        self: PressureMassDensity[float, S], other: Quantity[K, W, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, MassDensityKind], K], W, S]: ...
+    @overload
+    def __matmul__[K](
+        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
+    ) -> Quantity[Mul[Mul[PressureKind, MassDensityKind], K], V, S]: ...
+    @overload
+    @override
     def __rmul__(self, other: _Scalar, /) -> PressureMassDensity[V, S]: ...
     @overload
     def __rmul__(
@@ -103,6 +122,19 @@ class PressureMassDensity(Quantity[Mul[PressureKind, MassDensityKind], V, S]):
     ) -> PressureMassDensity[W, S]: ...
     @overload
     def __rmul__(self, other: _Numerical, /) -> PressureMassDensity[V, S]: ...
+    @overload
+    @override
+    def __rmatmul__(
+        self: PressureMassDensity[float, S], other: npt.NDArray[np.integer[Any]], /
+    ) -> PressureMassDensity[npt.NDArray[np.float64], S]: ...
+    @overload
+    def __rmatmul__[W: _Numerical](
+        self: PressureMassDensity[float, S], other: W, /
+    ) -> PressureMassDensity[W, S]: ...
+    @overload
+    def __rmatmul__(self, other: _Numerical, /) -> PressureMassDensity[V, S]: ...
+    @override
+    def item(self) -> PressureMassDensity[float, S]: ...
     @overload
     @override
     def __rtruediv__(
