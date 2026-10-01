@@ -10,8 +10,8 @@ Pyright, Pyrefly, and ty check them without a plugin, and the values underneath
 are still plain floats or NumPy, JAX, and Torch arrays.
 
 ```python notest
-force = energy / length                     # Force[float]
-energy + length                             # type error, and a TypeError at runtime
+force = energy / length  # Force[float]
+energy + length  # type error, and a TypeError at runtime
 gradient = ujax.grad(potential)(positions)  # Force[jax.Array]
 ```
 
@@ -65,7 +65,7 @@ the second type argument. Storing everything in one set gives `.value` a single
 meaning, keeps arithmetic free of conversions, and lets JAX compile a function
 once, whatever units its inputs were written in. The default is `Atomistic`
 (Å, eV, and fs). You can choose `SI`, `CGS`, Hartree `Atomic`, LAMMPS's `Metal`
-or `Real`, or [define your own](docs/unit-systems.md), and a type checker tracks
+or `Real`, or [define your own](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md), and a type checker tracks
 which system each value uses.
 
 ```python
@@ -133,7 +133,7 @@ force = -gradient
 The gradient of an `Energy` with respect to a `Length` is a `Force`, under `jit`
 too. Arguments after the first, such as `k`, pass through unchanged. The
 gradient is the positive derivative, so the physical force is `-gradient`.
-[Torch autograd, several inputs, and Hessians](docs/autodiff.md) work the same
+[Torch autograd, several inputs, and Hessians](https://github.com/theochemtheo/quantype/blob/main/docs/autodiff.md) work the same
 way.
 
 ## Physical constants
@@ -151,7 +151,7 @@ assert repr(constants.k_B.to_system(SI)) == "Entropy(1.380649e-23 J/K, SI)"
 Constants have no unit system of their own. They take the system of the
 quantity they combine with, so `k_B` times an SI temperature is an SI energy.
 Values are from CODATA 2022, vendored with quantype. CODATA 2014 and 2018 are
-[one setting away](docs/units.md#codata-edition).
+[one setting away](https://github.com/theochemtheo/quantype/blob/main/docs/units.md#codata-edition).
 
 ## Built-in kinds
 
@@ -164,9 +164,9 @@ Values are from CODATA 2022, vendored with quantype. CODATA 2014 and 2018 are
 | Thermal | `Temperature`, `TemperatureDifference`, `TemperatureRate`, `Entropy` |
 | Magnetism and counts | `MagneticMoment`, `Magnetization`, `AtomCount`, `ElectronCount`, `ParticleDensity`, `ElectronDensity`, `Dimensionless` |
 
-The [catalogue reference](docs/catalogue.md) lists every unit, the named
+The [catalogue reference](https://github.com/theochemtheo/quantype/blob/main/docs/catalogue.md) lists every unit, the named
 products and quotients, and each system's units. You can
-[generate your own catalogue](docs/custom-catalogues.md) with new kinds and
+[generate your own catalogue](https://github.com/theochemtheo/quantype/blob/main/docs/custom-catalogues.md) with new kinds and
 relations.
 
 ## Also included
@@ -183,19 +183,19 @@ relations.
 
 ## Documentation
 
-- [Getting started](docs/getting-started.md)
-- [Units, unit systems, and physical algebra](docs/units.md)
-- [Kinds and units reference](docs/catalogue.md)
-- [Defining unit systems and system-generic code](docs/unit-systems.md)
-- [Serialization: JSON, Pydantic, NPZ, and NPY](docs/serialization.md)
-- [JAX and Torch autodiff](docs/autodiff.md)
-- [Custom catalogues](docs/custom-catalogues.md)
-- [Development and conformance checks](docs/development.md)
+- [Getting started](https://github.com/theochemtheo/quantype/blob/main/docs/getting-started.md)
+- [Units, unit systems, and physical algebra](https://github.com/theochemtheo/quantype/blob/main/docs/units.md)
+- [Kinds and units reference](https://github.com/theochemtheo/quantype/blob/main/docs/catalogue.md)
+- [Defining unit systems and system-generic code](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md)
+- [Serialization: JSON, Pydantic, NPZ, and NPY](https://github.com/theochemtheo/quantype/blob/main/docs/serialization.md)
+- [JAX and Torch autodiff](https://github.com/theochemtheo/quantype/blob/main/docs/autodiff.md)
+- [Custom catalogues](https://github.com/theochemtheo/quantype/blob/main/docs/custom-catalogues.md)
+- [Development and conformance checks](https://github.com/theochemtheo/quantype/blob/main/docs/development.md)
 
 ## Licence
 
-quantype is dual-licensed under the [MIT](LICENSE-MIT) and
-[Apache 2.0](LICENSE-APACHE) licences, at your option.
+quantype is dual-licensed under the [MIT](https://github.com/theochemtheo/quantype/blob/main/LICENSE-MIT) and
+[Apache 2.0](https://github.com/theochemtheo/quantype/blob/main/LICENSE-APACHE) licences, at your option.
 
 ## Development
 
@@ -215,4 +215,4 @@ uv build
 ```
 
 To test the core alone, run `uv sync` and `uv run pytest tests/runtime`. The
-[development guide](docs/development.md) covers hooks and CI.
+[development guide](https://github.com/theochemtheo/quantype/blob/main/docs/development.md) covers hooks and CI.

@@ -50,7 +50,7 @@ class StorageAlias(GenericAlias):
     ) -> Quantity[Any, Any, Any]:
         from quantype._internal._storage import convert, storage_origin
         from quantype._internal._systems import into_system
-        from quantype.core import _wrap
+        from quantype.core import _wrap, require_unit
 
         cls = cast("Any", self.__origin__)
         system = self.unit_system
@@ -59,6 +59,7 @@ class StorageAlias(GenericAlias):
                 "Typed construction requires an input unit; "
                 "use from_value for trusted raw numbers"
             )
+        require_unit(unit, cls._kind)
         if unit.semantic is not cls._semantic:
             raise ValueError(f"Expected {cls._kind}; received {unit.kind}")
         scale, offset = into_system(unit, system)

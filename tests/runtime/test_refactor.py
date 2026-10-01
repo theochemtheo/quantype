@@ -5,12 +5,14 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from importlib import metadata
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import numpy.typing as npt
 import pytest
 
+import quantype
 from quantype import Energy, Length, Temperature, u
 from quantype.serialization import load_npz, save_npz
 
@@ -97,3 +99,9 @@ def test_jax_constructor_and_archive(tmp_path: Path) -> None:
     save_npz(path, length=length, record_backend=True)
     restored = load_npz(path, "length", Length[jax.Array])
     np.testing.assert_array_equal(restored.value, [10, 20])
+
+
+def test_version_matches_the_installed_distribution() -> None:
+    assert quantype.__version__ == metadata.version("quantype")
+    with pytest.raises(AttributeError, match="no attribute 'missing'"):
+        getattr(quantype, "missing")  # noqa: B009

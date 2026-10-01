@@ -607,6 +607,8 @@ def unit_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         stub += f"{identifier}: _{catalogue.units[name].kind}Unit\n"
     runtime += f"\n_NAMES = {names!r}\n"
     runtime += "\ndef __getattr__(name: str) -> 'Unit[Any]':\n    if name not in _NAMES:\n        raise AttributeError(name)\n    unit = _get_unit(_NAMES[name])\n    globals()[name] = unit\n    return unit\n"
+    # Flat names resolve lazily; list them for dir() and completion anyway.
+    runtime += "\ndef __dir__() -> list[str]:\n    return __all__\n"
     namespace_runtime, namespace_stub, namespace_names = namespace_outputs(catalogue)
     exports = sorted([*names, *namespace_names])
     return {

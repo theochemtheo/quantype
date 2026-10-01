@@ -36,6 +36,8 @@ dependencies = [
 ]
 
 [project.urls]
+Changelog = "https://github.com/theochemtheo/quantype/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/theochemtheo/quantype/tree/main/docs"
 Issues = "https://github.com/theochemtheo/quantype/issues"
 Repository = "https://github.com/theochemtheo/quantype"
 

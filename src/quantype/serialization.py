@@ -29,6 +29,7 @@ from quantype._internal._systems import (
     into_system,
     require_system,
 )
+from quantype._internal._unit import known_kinds, units_of
 from quantype.core import Quantity, Unit, _wrap, get_unit
 
 if TYPE_CHECKING:
@@ -64,7 +65,33 @@ def resolve_unit(
                 return unit
     if named:
         return named[0]
-    return get_unit(name, kind=kind)
+    try:
+        return get_unit(name, kind=kind)
+    except ValueError:
+        if kind is None:
+            raise
+        return _by_symbol(name, kind, [*definitions.values(), *_system_units(system)])
+
+
+def _system_units(system: type[UnitSystem]) -> list[Unit[Any]]:
+    return [*system.units, *(system.unit_for(kind) for kind in known_kinds())]
+
+
+def _by_symbol(name: str, kind: Kind, extra: Iterable[Unit[Any]]) -> Unit[Any]:
+    """A unit of ``kind`` whose display symbol is ``name``, so printed values parse."""
+    found = list(
+        dict.fromkeys(
+            unit
+            for unit in (*extra, *units_of(kind))
+            if unit.semantic is kind and unit.symbol == name
+        )
+    )
+    if len(found) > 1:
+        names = ", ".join(unit.name for unit in found)
+        raise ValueError(f"Unit symbol {name!r} is ambiguous; use one of {names}")
+    if not found:
+        raise ValueError(f"Unknown unit {name!r}")
+    return found[0]
 
 
 def _definitions(
@@ -122,13 +149,19 @@ def _json_numbers(value: object) -> object:
     return value
 
 
-# "<number> <unit>", the space optional: "0.5 nm", "0.5nm", "1e-3 eV", "1eV".
-# Also the JSON-schema pattern, so it keeps to syntax ECMA-262 regexes share.
-QUANTITY_STRING = (
-    r"^\s*([-+]?(?:(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?"
-    r"|[iI][nN][fF](?:[iI][nN][iI][tT][yY])?|[nN][aA][nN]))\s*(\S.*?)\s*$"
+_NUMBER = (
+    r"[-+]?(?:(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?"
+    r"|[iI][nN][fF](?:[iI][nN][iI][tT][yY])?|[nN][aA][nN])"
 )
+# "<number> <unit>", the space optional: "0.5 nm", "0.5nm", "1e-3 eV", "1eV".
+# A unit starts with neither a digit nor a point, so "15" is a number without a
+# unit rather than 1 of a unit "5". Also the JSON-schema pattern, so it keeps to
+# syntax ECMA-262 regexes share.
+QUANTITY_STRING = rf"^\s*({_NUMBER})\s*([^\s\d.+-].*?)\s*$"
+# Dimensionless values print as a bare number, so they parse from one too.
+DIMENSIONLESS_STRING = rf"^\s*({_NUMBER})\s*([^\s\d.+-].*?)?\s*$"
 _QUANTITY_STRING = re.compile(QUANTITY_STRING)
+_NUMBER_STRING = re.compile(rf"^\s*({_NUMBER})\s*$")
 
 
 def _is_quantity(value: object) -> TypeGuard[Quantity[Any, Any, Any]]:
@@ -137,6 +170,14 @@ def _is_quantity(value: object) -> TypeGuard[Quantity[Any, Any, Any]]:
 
 def _wire_fields(data: object, expected: str) -> tuple[object, str]:
     if isinstance(data, str):
+        number = _NUMBER_STRING.match(data)
+        if number is not None:
+            if expected != "Dimensionless":
+                raise ValueError(
+                    f"{data!r} has no unit; write it as '<number> <unit>', "
+                    f"such as '{number[1]} nm'"
+                )
+            return float(number[1]), "one"
         match = _QUANTITY_STRING.match(data)
         if match is None:
             raise ValueError(f"Expected '<number> <unit>'; received {data!r}")

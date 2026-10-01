@@ -45,3 +45,16 @@ def test_example(
     monkeypatch.chdir(tmp_path)
     code = compile(source, name, "exec")
     exec(code, {"__name__": "__docs__"})  # noqa: S102 -- the repository's own docs
+
+
+REPOSITORY = "https://github.com/theochemtheo/quantype/blob/main/"
+LINK = re.compile(r"\]\(([^)\s]+)\)")
+
+
+def test_readme_links_work_off_github() -> None:
+    """PyPI shows the README without the repository, so links are absolute."""
+    for target in LINK.findall((ROOT / "README.md").read_text()):
+        assert target.startswith(("https://", "#")), target
+        if target.startswith(REPOSITORY):
+            path = target.removeprefix(REPOSITORY).split("#", 1)[0]
+            assert (ROOT / path).exists(), target

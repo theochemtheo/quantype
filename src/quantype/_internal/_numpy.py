@@ -279,7 +279,8 @@ def sqrt(x: Any, /) -> Any:
 
 def absolute(x: Any, /) -> Any:
     """Magnitude, keeping the kind and display unit."""
-    return abs(x) if _is_quantity(x) else _xp(x).abs(x)
+    # The builtin, which this module rebinds to `abs` below.
+    return operator.abs(x) if _is_quantity(x) else _xp(x).abs(x)
 
 
 abs = absolute  # noqa: A001 -- NumPy's name

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from fractions import Fraction
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -24,6 +24,9 @@ from quantype import (
     u,
 )
 from quantype.systems import SI, Metal
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 
 @pytest.mark.parametrize(
@@ -174,3 +177,24 @@ def test_reinterpret_refuses_different_dimensions_and_temperature_points() -> No
     number: Any = 2.0
     with pytest.raises(TypeError, match="Expected a quantity"):
         Length.reinterpret(number)
+
+
+@pytest.mark.parametrize(
+    "call",
+    [
+        lambda: Length[float](2, cast("Any", "nm")),
+        lambda: (2 * u.nm).to(cast("Any", "nm")),
+        lambda: (2 * u.nm).magnitude(cast("Any", "nm")),
+        lambda: Length.define_unit("lab:x", reference=cast("Any", "nm")),
+    ],
+)
+def test_string_units_get_a_type_error_naming_the_unit_object(
+    call: Callable[[], object],
+) -> None:
+    with pytest.raises(TypeError, match=r"such as u\.nm, not strings"):
+        call()
+
+
+def test_a_device_passed_to_to_explains_display_units() -> None:
+    with pytest.raises(TypeError, match="to move a tensor to another device"):
+        (2 * u.nm).to(cast("Any", "cpu"))

@@ -82,3 +82,12 @@ __all__ = [
     "u",
     "units",
 ]
+
+
+def __getattr__(name: str) -> str:
+    # The installed version, read on first use so that importing stays fast.
+    if name == "__version__":
+        from importlib.metadata import version  # noqa: PLC0415
+
+        return version("quantype")
+    raise AttributeError(f"module 'quantype' has no attribute {name!r}")

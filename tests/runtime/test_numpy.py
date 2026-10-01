@@ -219,3 +219,16 @@ def test_dot_and_cross_need_two_quantities() -> None:
         qnp.cross(length, np.ones(3))
     with pytest.raises(TypeError, match="norm is meaningless"):
         qnp.linalg.norm(Temperature[Array]([300.0], u.K))
+
+
+def test_absolute_values_of_quantities_keep_kind_and_display() -> None:
+    positions = u.nm(np.array([1.0, -2.0]))
+    # NumPy's stubs reject quantities; its dispatch reaches the same rule.
+    dispatched = cast("Length[npt.NDArray[np.float64]]", np.abs(cast("Any", positions)))
+    for result in (qnp.abs(positions), qnp.absolute(positions), dispatched):
+        assert isinstance(result, Length)
+        assert result.unit is u.nm
+        np.testing.assert_allclose(result.magnitude(), [1, 2])
+    assert qnp.abs(-3 * u.eV) == 3 * u.eV
+    energy: Any = np.absolute(cast("Any", -3 * u.eV))
+    assert energy == 3 * u.eV

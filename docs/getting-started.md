@@ -201,7 +201,9 @@ input, and `TypeAdapter` comes from `pydantic`.
 `Length.parse` gives a Python float or a float64 NumPy array.
 `Length[float, SI].parse(...)` chooses the unit system but not the storage; for
 float32, use a `TypeAdapter`. A JSON quantity object must have exactly `kind`,
-`magnitude`, and `unit`. Bare numbers are rejected, because they have no unit.
+`magnitude`, and `unit`. A string takes a unit's name, alias, or printed symbol,
+so `"25 °C"` and `"1 eV/Å^2"` parse as printed. A number needs a unit, except for
+`Dimensionless` values, which print as a bare number.
 
 ## Temperatures and custom units
 
@@ -247,6 +249,8 @@ Serialization saves values; device placement and autodiff graphs are lost.
 | --- | --- |
 | `Expected Length; received Energy` | Check the input's kind and unit. An energy can't be converted to a length. |
 | `Unknown unit` for a custom identifier | Pass its definition when decoding. |
+| `'15' has no unit` | Write the unit, as in `"15 nm"`. |
+| `Units are objects, such as u.nm, not strings` | Pass a unit from `u`, or read the whole string with `Length.parse("2 nm")`. |
 | `u.length.nm` raises `AttributeError` | Namespaces use full names, as in `u.length.nanometer`. Abbreviations are flat, as in `u.nm`. |
 | `np.fft does not know the units of a quantity` | That function has no unit rule. Pass `.value` or `.magnitude(unit)`. `quantype.numpy` lists the functions that have one. |
 | `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists can't scale a quantity. Convert lists with `np.asarray`. |

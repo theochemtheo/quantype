@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import subprocess
+import sys
+
 from quantype import u
 from quantype._internal._registry import unit_specs
 from quantype.catalogue import builtin_catalogue
@@ -38,3 +41,13 @@ def _namespace(kind: str) -> str:
     return "".join(
         ("_" + char.lower()) if char.isupper() else char for char in kind
     ).lstrip("_")
+
+
+def test_dir_lists_flat_units_before_they_are_used() -> None:
+    script = (
+        "from quantype import u; names = dir(u); print('nm' in names, 'eV' in names)"
+    )
+    result = subprocess.run(  # noqa: S603 -- fixed interpreter and script
+        [sys.executable, "-c", script], capture_output=True, text=True, check=True
+    )
+    assert result.stdout.split() == ["True", "True"]

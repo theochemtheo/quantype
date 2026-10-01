@@ -267,6 +267,10 @@ def __getattr__(name: str) -> "Unit[Any]":
     return unit
 
 
+def __dir__() -> list[str]:
+    return __all__
+
+
 class _DimensionlessNamespace:
     @property
     def one(self) -> "Unit[DimensionlessKind]":

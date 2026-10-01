@@ -10,7 +10,12 @@ from pydantic_core import core_schema
 from quantype._internal._storage import convert, storage_origin
 from quantype._internal._systems import Atomistic, require_system
 from quantype.core import _wrap
-from quantype.serialization import QUANTITY_STRING, parse_quantity, to_dict
+from quantype.serialization import (
+    DIMENSIONLESS_STRING,
+    QUANTITY_STRING,
+    parse_quantity,
+    to_dict,
+)
 
 if TYPE_CHECKING:
     from pydantic import GetCoreSchemaHandler
@@ -87,6 +92,8 @@ def pydantic_schema(
         del handler
         return validate(data, info)
 
+    # Dimensionless values print as a bare number, so the schema accepts one.
+    pattern = DIMENSIONLESS_STRING if cls._kind == "Dimensionless" else QUANTITY_STRING
     wrapper = getattr(core_schema, "with_info_wrap_validator_function", None)
     if wrapper is None:
         # Pydantic 2.0 used this name for the same context-aware boundary.
@@ -96,7 +103,7 @@ def pydantic_schema(
         wrapper(
             validate_input,
             schema=core_schema.union_schema(
-                [payload, core_schema.str_schema(pattern=QUANTITY_STRING)]
+                [payload, core_schema.str_schema(pattern=pattern)]
             ),
             serialization=core_schema.plain_serializer_function_ser_schema(
                 to_dict, return_schema=payload

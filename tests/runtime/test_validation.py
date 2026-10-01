@@ -4,15 +4,18 @@ from __future__ import annotations
 
 import math
 import warnings
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
-from quantype import Length, Pressure, Temperature, Time, u
+from quantype import Dimensionless, Force, Length, Pressure, Temperature, Time, u
+from quantype._internal._registry import unit_specs
+from quantype.core import Quantity, Unit, get_unit
 from quantype.serialization import parse_quantity, to_dict
+from quantype.systems import UnitSystem
 
 
 class Simulation(BaseModel):
@@ -189,7 +192,7 @@ def test_quantity_strings_allow_an_optional_space(text: str, expected: float) ->
     )
 
 
-@pytest.mark.parametrize("text", ["nm", "5", "5 ", "five nm", ""])
+@pytest.mark.parametrize("text", ["nm", "five nm", ""])
 def test_quantity_strings_need_a_number_and_a_unit(text: str) -> None:
     with pytest.raises(ValueError, match="Expected '<number> <unit>'"):
         Length.parse(text)
@@ -200,3 +203,51 @@ def test_quantity_string_schema_is_portable() -> None:
     pattern = TypeAdapter(Length[float]).json_schema()["anyOf"][1]["pattern"]
     assert "(?P<" not in pattern
     assert "(?i" not in pattern
+
+
+def _every_unit() -> list[Unit[Any]]:
+    return list(dict.fromkeys(get_unit(name) for name in unit_specs()))
+
+
+@pytest.mark.parametrize("unit", _every_unit(), ids=lambda unit: unit.name)
+def test_printed_quantities_parse_back(unit: Unit[Any]) -> None:
+    # Calls are typed on each kind's own unit class; this test spans all kinds.
+    quantity = cast("Quantity[Any, float, Any]", cast("Any", unit)(1.5))
+    restored = type(quantity).parse(str(quantity))
+    assert restored.unit is unit
+    assert restored == quantity
+
+
+@pytest.mark.parametrize("text", ["5", "5 ", "15", "1.5", "1e5", " -2 "])
+def test_a_number_without_a_unit_says_so(text: str) -> None:
+    with pytest.raises(ValueError, match="has no unit"):
+        Length.parse(text)
+
+
+def test_dimensionless_values_parse_from_a_bare_number() -> None:
+    assert Dimensionless.parse("0.5") == u.one(0.5)
+    assert Dimensionless.parse(str(u.one(0.25))) == u.one(0.25)
+    adapter = TypeAdapter(Dimensionless[float])
+    assert adapter.validate_python("0.5") == u.one(0.5)
+    with pytest.raises(ValidationError, match="has no unit"):
+        TypeAdapter(Length[float]).validate_python("0.5")
+
+
+class _Gromacs(UnitSystem, name="test-validation:gromacs"):
+    length = u.nanometer
+    energy = u.kJ_per_mol
+    time = u.picosecond
+
+
+def test_system_units_parse_from_their_symbols() -> None:
+    force = Force[float, _Gromacs].from_value(2.0)
+    assert force.unit is not None
+    assert force.unit.symbol == "kJ/mol/nm"
+    assert Force[float, _Gromacs].parse(str(force)) == force
+
+
+def test_an_ambiguous_symbol_names_the_candidates() -> None:
+    first = Length.define_unit("lab:first", reference=u.nm, symbol="lu")
+    second = Length.define_unit("lab:second", reference=u.nm, scale=2.0, symbol="lu")
+    with pytest.raises(ValueError, match="lab:first, lab:second"):
+        Length.parse("1 lu", units=(first, second))

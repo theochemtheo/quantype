@@ -114,6 +114,8 @@ Torch's own functions, such as `torch.cos(angle)` and
 `quantype.numpy`. To get host values, use
 `force.magnitude(u.eV_per_angstrom).detach().cpu().numpy()`. That detaches the
 graph; arithmetic on quantities keeps it.
+`.to(unit)` sets the display unit, so to move a quantity to another device,
+move its value: `Length[torch.Tensor].from_value(x.value.to("cuda"))`.
 
 To wrap a raw model's output, use `from_value`. It trusts its input:
 `Energy.from_value(raw)` asserts that `raw` is an energy in the unit system's

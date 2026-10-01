@@ -99,6 +99,31 @@ def _product_scale(
     return (lhs * rhs if op == "mul" else lhs / rhs) / coherence(system, result)
 
 
+def require_unit(unit: object, kind: str, hint: str = "") -> None:
+    """Reject anything but a unit with a message that names the right object.
+
+    ``hint`` explains a likely mix-up when the string isn't a unit name.
+    """
+    if isinstance(unit, Unit):
+        return
+    semantic = KINDS.get(kind)
+    example = f"u.{semantic.canonical_unit}" if semantic is not None else "u.nm"
+    if isinstance(unit, str):
+        try:
+            known: Unit[Any] | None = get_unit(unit)
+        except ValueError:
+            known = None
+        if known is not None and unit.isidentifier():
+            example, hint = f"u.{unit}", ""
+        message = (
+            f"Units are objects, such as {example}, not strings. To read a "
+            f"quantity from text, use {kind or 'Length'}.parse('<number> <unit>')."
+        )
+    else:
+        message = f"Expected a unit, such as {example}; received {type(unit).__name__}."
+    raise TypeError(f"{message} {hint}".rstrip())
+
+
 _CLASSES: dict[Kind, type[Quantity[Any, Any, Any]]] = {}
 _STRUCTURAL_CLASSES: dict[Kind, type[Quantity[Any, Any, Any]]] = {}
 
@@ -210,6 +235,7 @@ class Quantity[K, V, S: UnitSystem]:
         offset: float = 0.0,
         symbol: str | None = None,
     ) -> Unit[K]:
+        require_unit(reference, cls._kind)
         if reference.semantic is not cls._semantic:
             raise ValueError(f"Expected {cls._kind}; received {reference.kind}")
         return Unit(
@@ -304,7 +330,8 @@ class Quantity[K, V, S: UnitSystem]:
 
         return pydantic_schema(cast("Any", cls), source_type, handler)
 
-    def _check_unit(self, unit: Unit[K]) -> None:
+    def _check_unit(self, unit: Unit[K], hint: str = "") -> None:
+        require_unit(unit, self._kind, hint)
         if unit.semantic is not self._semantic:
             raise ValueError(
                 f"Expected {self.kind}; unit {unit.name!r} represents {unit.kind}"
@@ -327,7 +354,11 @@ class Quantity[K, V, S: UnitSystem]:
 
     def to(self, unit: Unit[K]) -> Self:
         """Present in ``unit``; the stored numbers are unchanged."""
-        self._check_unit(unit)
+        self._check_unit(
+            unit,
+            "`.to` sets the display unit; to move a tensor to another device, "
+            "move its `.value` and wrap it again with `from_value`.",
+        )
         return cast(
             "Self", _wrap(self._semantic, self._value, self._system, display=unit)
         )

@@ -49,7 +49,7 @@ def register(kinds: Mapping[str, Kind], pairs: str, entries: str, module: str) -
             elif exponent == -1:
                 PAIRS["div", kinds["Dimensionless"], first] = pair
         else:
-            second = kinds[str(right)]
+            second = kinds[right]
             pair = Expression("mul" if operation == "mul" else "div", first, second)
             PAIRS[operation, first, second] = pair
             if operation == "mul":
