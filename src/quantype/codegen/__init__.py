@@ -10,7 +10,7 @@ from __future__ import annotations
 import keyword
 import shutil
 import subprocess
-from concurrent.futures import ThreadPoolExecutor
+import tempfile
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -55,37 +55,50 @@ def render(catalogue: Catalogue, *, package: str = "quantype") -> dict[str, str]
     return sources
 
 
-def _formatted(formatter: str, package: str, name: str, source: str) -> str:
-    if not name.endswith((".py", ".pyi")):
-        return source
+# Paths per Ruff run: every platform caps the length of a command line.
+_BATCH = 200
+
+
+def _formatted(formatter: str, package: str, sources: dict[str, str]) -> dict[str, str]:
+    """Sort imports and format the Python sources, many files per Ruff run.
+
+    Starting Ruff once per file dominated generation. The files are written
+    under the working directory, so Ruff reads the configuration it would read
+    for files there, as it did for ``--stdin-filename``.
+    """
     # Ruff otherwise classifies imports partly by which modules exist on disk,
     # which changes as generation adds product modules.
     first_party = package.split(".", maxsplit=1)[0]
-    content = subprocess.run(  # noqa: S603 -- resolved formatter, no shell
-        [
-            formatter,
-            "check",
-            "--fix",
-            "--select",
-            "I,RUF022",
-            "--config",
-            f"lint.isort.known-first-party = [{first_party!r}]",
-            "--stdin-filename",
-            name,
-            "-",
-        ],
-        input=source,
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout
-    return subprocess.run(  # noqa: S603 -- resolved formatter, no shell
-        [formatter, "format", "--stdin-filename", name, "-"],
-        input=content,
-        capture_output=True,
-        text=True,
-        check=True,
-    ).stdout
+    python = [name for name in sources if name.endswith((".py", ".pyi"))]
+    formatted = dict(sources)
+    with tempfile.TemporaryDirectory(prefix=".quantype-generate-", dir=".") as scratch:
+        root = Path(scratch).resolve()
+        for name in python:
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(sources[name], encoding="utf-8")
+        paths = [str(root / name) for name in python]
+        for start in range(0, len(paths), _BATCH):
+            batch = paths[start : start + _BATCH]
+            for command in (
+                [
+                    "check",
+                    "--fix",
+                    "--select",
+                    "I,RUF022",
+                    "--config",
+                    f"lint.isort.known-first-party = [{first_party!r}]",
+                ],
+                ["format"],
+            ):
+                subprocess.run(  # noqa: S603 -- resolved formatter, no shell
+                    [formatter, *command, "--quiet", *batch],
+                    capture_output=True,
+                    check=True,
+                )
+        for name in python:
+            formatted[name] = (root / name).read_text(encoding="utf-8")
+    return formatted
 
 
 def generate(
@@ -107,13 +120,7 @@ def generate(
     directory = Path(output)
     sources = render(catalogue, package=package)
 
-    def format_source(item: tuple[str, str]) -> str:
-        return _formatted(formatter, package, *item)
-
-    with ThreadPoolExecutor() as pool:
-        formatted = dict(
-            zip(sources, pool.map(format_source, sources.items()), strict=True)
-        )
+    formatted = _formatted(formatter, package, sources)
     for name, content in formatted.items():
         path = directory / name
         if not path.exists() or path.read_text() != content:

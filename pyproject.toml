@@ -63,7 +63,7 @@ dev = [
   { include-group = "test" },
 ]
 # `test` is split out of `dev` so CI can build deliberately incomplete
-# environments: the optional-dependency tiers in check.yml install only this
+# environments: the optional-dependency tiers in test.yml install only this
 # group plus one extra, and still get the locked pytest. The import guards and
 # skips those tiers exercise only run when a backend is genuinely missing.
 # `dev` includes `test`, so a plain `uv sync` resolves exactly as it did.

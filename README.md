@@ -1,6 +1,7 @@
 # quantype
 
-[![checks](https://github.com/theochemtheo/quantype/actions/workflows/check.yml/badge.svg)](https://github.com/theochemtheo/quantype/actions/workflows/check.yml)
+[![test](https://github.com/theochemtheo/quantype/actions/workflows/test.yml/badge.svg)](https://github.com/theochemtheo/quantype/actions/workflows/test.yml)
+[![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/theochemtheo/quantype/badges/coverage.json)](https://github.com/theochemtheo/quantype/actions/workflows/test.yml)
 [![PyPI](https://img.shields.io/pypi/v/quantype)](https://pypi.org/project/quantype/)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/)
 [![SPEC 0](https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CB05C)](https://scientific-python.org/specs/spec-0000/)
@@ -75,7 +76,7 @@ from quantype.systems import SI, Atomistic
 
 a = Length[float](2, u.nm)
 b = Length[float](20, u.angstrom)
-assert a.value == b.value == 20.0  # Atomistic stores ångströms, whatever the input unit
+assert a.value == b.value == 20.0  # Atomistic stores ångströms
 assert str(a) == "2.0 nm"  # and shows the unit it was given in
 force = (3 * u.eV) / a
 assert force.value == 0.15  # eV/Å, with no conversion in the division
@@ -119,13 +120,13 @@ from typing import assert_type
 from quantype import Energy, Force, ForceConstant, Length, u, ujax
 
 
-def harmonic(x: Length[jax.Array], k: ForceConstant[float]) -> Energy[jax.Array]:
+def spring(x: Length[jax.Array], k: ForceConstant[float]) -> Energy[jax.Array]:
     return 0.5 * k * (x**2).sum()
 
 
 x = Length[jax.Array]([1, 2, 3], u.angstrom)
 k = ForceConstant[float](2, u.eV_per_angstrom_squared)
-energy, gradient = ujax.jit(ujax.value_and_grad(harmonic))(x, k)
+energy, gradient = ujax.jit(ujax.value_and_grad(spring))(x, k)
 assert_type(gradient, Force[jax.Array])
 force = -gradient
 ```
@@ -174,7 +175,8 @@ relations.
 - `quantype.testing.assert_allclose`, which checks kind and unit system before
   comparing numbers.
 - JSON, Pydantic, and NPZ serialization, with no pickle. Values keep the unit
-  they were given in, so a configuration's `"0.5 nm"` is saved as 0.5 nanometres.
+  they were given in, so a configuration's `"0.5 nm"` is saved as 0.5
+  nanometres.
 - Temperatures: 30 °C minus 20 °C is a `TemperatureDifference` of 10 Δ°C, and
   `k_B * T` is an energy.
 - A product is named by its factors, in any order or grouping: `m * v**2`,

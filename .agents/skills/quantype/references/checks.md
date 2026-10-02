@@ -1,6 +1,6 @@
 # Development and conformance checks
 
-Run commands from the repository root. Consult `justfile`, `pyproject.toml`, `docs/development.md`, and `.github/workflows/check.yml` for current definitions.
+Run commands from the repository root. Consult `justfile`, `pyproject.toml`, `docs/development.md`, and `.github/workflows/test.yml` for current definitions.
 
 ## Environment
 

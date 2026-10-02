@@ -55,7 +55,8 @@ structural markers for advanced annotations. Implementations live in
 pytest run with every backend present, including subprocesses the tests start,
 writing `htmlcov/`, `coverage/quantype.lcov`, and `coverage/summary.md`, and
 failing below 95% line-and-branch coverage (`COVERAGE_MIN` overrides it). CI
-posts the summary to the job and to pull requests.
+posts the summary to the job and to pull requests, and on `main` writes the
+README badge's figure to the `badges` branch.
 
 ## Dependency tiers
 

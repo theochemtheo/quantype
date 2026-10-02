@@ -37,7 +37,7 @@ check-generated:
     uv run scripts/generate_docs.py --check
 
 test:
-    uv run --all-extras pytest tests/runtime
+    uv run --all-extras pytest tests/runtime -n auto
 
 coverage:
     uv sync --all-extras

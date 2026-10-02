@@ -29,6 +29,10 @@ if TYPE_CHECKING:
 serialize_quantity = to_dict
 
 
+def _unchanged(value: object) -> object:
+    return value
+
+
 def pydantic_schema(
     cls: type[Quantity[Any, Any, Any]],
     source_type: Any,
@@ -108,10 +112,13 @@ def pydantic_schema(
         "core_schema.CoreSchema",
         wrapper(
             validate_input,
-            # Python-mode dumps pass quantities through this inner schema.
+            # Python-mode dumps pass quantities through this inner schema,
+            # unchanged. Pydantic 2.0 has no "any" serialization schema.
             schema=core_schema.union_schema(
                 [payload, core_schema.str_schema(pattern=pattern)],
-                serialization=core_schema.simple_ser_schema("any"),
+                serialization=core_schema.plain_serializer_function_ser_schema(
+                    _unchanged
+                ),
             ),
             # Python-mode dumps keep quantities, as they keep datetimes; JSON
             # mode writes the kind/magnitude/unit object.

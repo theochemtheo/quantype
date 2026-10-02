@@ -8,7 +8,8 @@
 # leaves it behind.
 #
 # Assumes `uv sync --all-extras` has been run. Outputs: htmlcov/ (browse),
-# coverage/quantype.lcov, coverage/summary.md.
+# coverage/quantype.lcov, coverage/summary.md, and coverage/badge.json (a
+# shields.io endpoint).
 # Run from the repository root:  bash scripts/coverage.sh
 set -euo pipefail
 
@@ -23,5 +24,10 @@ uv run --no-sync pytest tests/runtime -n auto -p no:sugar \
     echo
     uv run --no-sync coverage report --format=markdown
 } > coverage/summary.md
+
+TOTAL="$(uv run --no-sync coverage report --format=total)"
+if ((TOTAL >= MIN)); then COLOR=brightgreen; elif ((TOTAL >= 90)); then COLOR=yellow; else COLOR=red; fi
+printf '{"schemaVersion": 1, "label": "coverage", "message": "%s%%", "color": "%s"}\n' \
+    "$TOTAL" "$COLOR" > coverage/badge.json
 
 uv run --no-sync coverage report --fail-under="$MIN" > /dev/null

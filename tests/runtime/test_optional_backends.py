@@ -45,7 +45,7 @@ assert isinstance(utorch.grad(energy, x), Force)
 
 
 # The dependency tiers CI builds, as the optional backends each should provide.
-# QUANTYPE_TEST_TIER is set by every test job in check.yml; unset (a bare local
+# QUANTYPE_TEST_TIER is set by every test job in test.yml; unset (a bare local
 # run) skips, because there is no declared expectation to check against.
 TIERS: dict[str, set[str]] = {
     "base": set(),
