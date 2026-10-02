@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 from quantype.catalogue import (
     _QUANTITY_BINDINGS,  # pyright: ignore[reportPrivateUsage]
 )
+from quantype.codegen._compact import minify
 from quantype.codegen._package import package_outputs
 from quantype.codegen._products import product_outputs
 from quantype.codegen._render import outputs
@@ -57,18 +58,17 @@ def render(catalogue: Catalogue, *, package: str = "quantype") -> dict[str, str]
 
 # Paths per Ruff run: every platform caps the length of a command line.
 _BATCH = 200
-# The private stub modules are read by type checkers, not people, and they are
-# most of the installed package. Ruff's widest line keeps each signature on one
-# line instead of wrapping it over several indented ones.
-_COMPACT_LINE_LENGTH = 320
 
 
-def _compact(name: str) -> bool:
+def _private_stub(name: str) -> bool:
+    """A module that is minified (see ``quantype.codegen._compact``)."""
     return name.startswith(("_products/", "_constants/")) or name == "_generated.pyi"
 
 
 def _formatted(formatter: str, package: str, sources: dict[str, str]) -> dict[str, str]:
     """Sort imports and format the Python sources, many files per Ruff run.
+
+    The private stub modules are then minified.
 
     Starting Ruff once per file dominated generation. The files are written
     under the working directory, so Ruff reads the configuration it would read
@@ -85,34 +85,28 @@ def _formatted(formatter: str, package: str, sources: dict[str, str]) -> dict[st
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(sources[name], encoding="utf-8")
-        groups: tuple[tuple[list[str], list[str]], ...] = (
-            ([str(root / name) for name in python if not _compact(name)], []),
-            (
-                [str(root / name) for name in python if _compact(name)],
-                ["--line-length", str(_COMPACT_LINE_LENGTH)],
-            ),
-        )
-        for paths, options in groups:
-            for start in range(0, len(paths), _BATCH):
-                batch = paths[start : start + _BATCH]
-                for command in (
-                    [
-                        "check",
-                        "--fix",
-                        "--select",
-                        "I,RUF022",
-                        "--config",
-                        f"lint.isort.known-first-party = [{first_party!r}]",
-                    ],
-                    ["format"],
-                ):
-                    subprocess.run(  # noqa: S603 -- resolved formatter, no shell
-                        [formatter, *command, *options, "--quiet", *batch],
-                        capture_output=True,
-                        check=True,
-                    )
+        paths = [str(root / name) for name in python]
+        for start in range(0, len(paths), _BATCH):
+            batch = paths[start : start + _BATCH]
+            for command in (
+                [
+                    "check",
+                    "--fix",
+                    "--select",
+                    "I,RUF022",
+                    "--config",
+                    f"lint.isort.known-first-party = [{first_party!r}]",
+                ],
+                ["format"],
+            ):
+                subprocess.run(  # noqa: S603 -- resolved formatter, no shell
+                    [formatter, *command, "--quiet", *batch],
+                    capture_output=True,
+                    check=True,
+                )
         for name in python:
-            formatted[name] = (root / name).read_text(encoding="utf-8")
+            text = (root / name).read_text(encoding="utf-8")
+            formatted[name] = minify(text) if _private_stub(name) else text
     return formatted
 
 

@@ -17,7 +17,7 @@ Parent: read [core physical semantics](../quantype-core/SKILL.md), including its
 
 ## Generation ownership
 
-`src/quantype/codegen/_render.py` produces quantity, kind, unit and autodiff contracts. `_package.py` adds application-package scaffolding. `render(...)` returns source strings without running tools. `generate(...)` formats with Ruff and writes changed files; `check=True` returns stale names without writing. Check mode still requires Ruff on PATH.
+`src/quantype/codegen/_render.py` produces quantity, kind, unit and autodiff contracts. `_package.py` adds application-package scaffolding. `render(...)` returns source strings without running tools. `generate(...)` formats with Ruff, minifies the private stub modules (`_products/`, `_constants/`, `_generated.pyi`; `codegen/_compact.py`), and writes changed files; `check=True` returns stale names without writing. Check mode still requires Ruff on PATH.
 
 For built-ins, change definitions or renderers, run `uv run scripts/generate.py`, then `uv run scripts/generate.py --check`. Review the generated diff. See the [ownership map](../../../docs/architecture.md) for generated files and handwritten exports; adding a built-in class may require updating `src/quantype/__init__.py` as well.
 

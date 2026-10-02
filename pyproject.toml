@@ -142,18 +142,16 @@ exclude = [
 [tool.ruff]
 target-version = "py312"
 respect-gitignore = false
-extend-exclude = ["notes"]
-# Apply the exclusions to paths named on the command line too, as hooks name them.
-force-exclude = true
-
-[tool.ruff.format]
-# The generator formats the private stub modules at Ruff's widest line
-# (codegen's `_COMPACT_LINE_LENGTH`), and `check-generated` covers them.
-exclude = [
+# The generator minifies the private stub modules (codegen's `_compact`), and
+# `check-generated` covers them.
+extend-exclude = [
+  "notes",
   "src/quantype/_constants/*.pyi",
   "src/quantype/_generated.pyi",
   "src/quantype/_products/*.pyi",
 ]
+# Apply the exclusions to paths named on the command line too, as hooks name them.
+force-exclude = true
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -182,11 +180,6 @@ flake8-tidy-imports = { "ban-relative-imports" = "all" }
 # Methods for unnamed products return the caller's class through a type variable
 # bound to structural kinds, which Self cannot express.
 "src/quantype/core.pyi" = ["ANN401", "PYI019"]
-# The private stub modules have Ruff's widest lines; see [tool.ruff.format].
-"src/quantype/_generated.pyi" = ["ANN401", "E501", "I001"]
-"src/quantype/_constants/*.pyi" = ["E501", "I001"]
-# Each product module imports its own classes under short names.
-"src/quantype/_products/*.pyi" = ["E501", "I001", "N814"]
 "src/quantype/numpy.pyi" = ["ANN401"]
 "src/quantype/_internal/_numpy.py" = ["ANN401", "PLC0415", "SLF001"]
 # The JAX and Torch adapters are dynamic backend boundaries.
