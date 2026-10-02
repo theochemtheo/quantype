@@ -113,7 +113,7 @@ The implementation, installed the same way:
   per-module "code is too complex to analyze" limit in `_generated.pyi`, so
   each constant class has its own stub module under `_constants/`. The runtime
   table, written as a tuple literal in `products.py`, took Pyright 47 s to
-  analyse; stored as text rows and parsed lazily, the repository's Pyright run
+  analyze; stored as text rows and parsed lazily, the repository's Pyright run
   fell from about 130 s to 19 s.
 
 ## Constant product classes

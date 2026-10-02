@@ -33,7 +33,7 @@ force = -ujax.grad(harmonic)(x, k)
 `value_and_grad` returns the energy and its gradient from one evaluation, which
 is the usual way to get energies and forces together. `grad`, `value_and_grad`,
 and `hessian` differentiate with respect to the first argument. Other
-arguments, such as model parameters or neighbour lists, pass through unchanged
+arguments, such as model parameters or neighbor lists, pass through unchanged
 and keep their static types. Above, `gradient` is a `Force[jax.Array]` and
 `hessian` a `ForceConstant[jax.Array]`.
 

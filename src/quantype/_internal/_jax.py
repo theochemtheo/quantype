@@ -5,7 +5,7 @@ static metadata is the kind and the unit system. Display units are not part of
 the tree structure, so values presented differently still share one trace.
 
 The autodiff adapters differentiate scalar-output functions with respect to the
-quantities at ``argnums``; other arguments, such as model parameters or neighbour
+quantities at ``argnums``; other arguments, such as model parameters or neighbor
 lists, pass through untouched. Gradients are positive derivatives; physical
 forces are their explicit negation. Inside one unit system the raw derivative
 is already in that system's coherent units.

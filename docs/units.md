@@ -10,7 +10,7 @@ Every quantity carries three things:
 
 `.value` holds the raw numbers in the unit system's units: `Length[float]`,
 which is `Length[float, Atomistic]`, stores ångströms, and `Length[float, SI]`
-stores metres. A unit such as `u.nm` converts the input and sets how the
+stores meters. A unit such as `u.nm` converts the input and sets how the
 quantity is shown. It doesn't change the kind or the system.
 
 ## Construction and storage
@@ -33,9 +33,9 @@ positions = Length[npt.NDArray[np.float64]]([[1, 2, 3]], u.length.nanometer)
 energy = Energy[np.float64](3, u.energy.electron_volt)
 assert_type(energy / length, Force[np.float64])
 
-metres = Length[float, SI](2, u.nm)
-assert metres.value == 2e-9
-assert repr(metres) == "Length(2.0 nm, SI)"
+meters = Length[float, SI](2, u.nm)
+assert meters.value == 2e-9
+assert repr(meters) == "Length(2.0 nm, SI)"
 ```
 
 The type arguments convert the input when a quantity is built. The storage

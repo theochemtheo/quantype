@@ -20,7 +20,7 @@ printed `20.0 Å`, and a configuration's `"0.5 nm"` was written back as
 | V2 sticky display | Å, eV, fs | input unit; same-kind operations keep the left operand's | yes |
 | V3 preferences | Å, eV, fs | per-kind application preferences | no |
 | V4 native (as pint) | input unit | storage unit; products compose units | yes |
-| V5 native, normalising | input unit while operands agree | storage unit | yes |
+| V5 native, normalizing | input unit while operands agree | storage unit | yes |
 | V6 sticky, erased | Å, eV, fs | as V2 | no |
 
 | Scenario | V1 | V2 | V3 | V4 | V5 | V6 |

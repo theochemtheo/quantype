@@ -56,7 +56,7 @@ def test_float16_npz_conversion_and_roundtrip(tmp_path: Path) -> None:
     restored = load_npz(path, "length", Length[npt.NDArray[np.float16]])
     np.testing.assert_array_equal(restored.value, [np.float16(30000)])
     assert restored.value.dtype == np.float16
-    # Loading remembers metres, which float16 can hold only as a subnormal.
+    # Loading remembers meters, which float16 can hold only as a subnormal.
     # Presenting in ångströms keeps the round trip exact.
     save_npz(path, length=restored.to(u.angstrom))
     again = load_npz(path, "length", Length[npt.NDArray[np.float16]])

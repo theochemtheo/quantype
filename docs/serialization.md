@@ -54,7 +54,7 @@ restored = Configuration.model_validate_json(config.model_dump_json())
 ```
 
 A field's unit system comes from its annotation, so `cutoff: Length[float, SI]`
-reads `"0.5 nm"` as metres. A quantity object from another system raises;
+reads `"0.5 nm"` as meters. A quantity object from another system raises;
 convert it with `.to_system(...)` first.
 
 Pass custom units through the validation context:
@@ -131,7 +131,7 @@ into `Atomistic`. Restored quantities keep the archived unit for display. Pass
 Dtypes NumPy can't represent, such as Torch's bfloat16, raise `TypeError`.
 JSON and NPZ store values, and unit conversion on the way can add
 floating-point round-off. Low-precision storage shown in a very different unit
-can lose more: float16 ångströms written as metres are subnormal. Switch such
+can lose more: float16 ångströms written as meters are subnormal. Switch such
 values to a nearby unit with `.to(...)` before saving.
 
 An NPY file holds only numbers, so you choose the unit when saving and when

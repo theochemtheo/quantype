@@ -987,7 +987,7 @@ _TORCH_NAMES = {
     "vector_norm": "norm",
 }
 _TORCH_KEYWORDS = {"dim": "axis", "keepdim": "keepdims", "correction": "ddof"}
-# Torch's own versions return values and indices; qnp gives the NumPy behaviour.
+# Torch's own versions return values and indices; qnp gives the NumPy behavior.
 _TORCH_DIFFERENT = frozenset({"sort", "median", "nanmedian"})
 
 
