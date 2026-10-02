@@ -328,11 +328,18 @@ def test_generated_typing(generated_project: Path, command: tuple[str, ...]) -> 
     assert expected <= reported, output
 
 
+_needs_ruff = pytest.mark.skipif(
+    shutil.which("ruff") is None, reason="Generation requires Ruff"
+)
+
+
+@_needs_ruff
 def test_the_builtin_package_is_current() -> None:
     package = Path(__file__).parents[2] / "src" / "quantype"
     assert generate(builtin_catalogue(), package, check=True) == []
 
 
+@_needs_ruff
 def test_checking_an_empty_directory_reports_every_file(tmp_path: Path) -> None:
     stale = generate(builtin_catalogue(), tmp_path, check=True)
     assert {"_generated.pyi", "products.py", "numpy.pyi"} <= set(stale)
