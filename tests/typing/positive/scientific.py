@@ -8,6 +8,7 @@ import numpy as np
 import numpy.typing as npt
 import torch
 
+import quantype.numpy as qnp
 from quantype import (
     Area,
     Dimensionless,
@@ -18,7 +19,6 @@ from quantype import (
     ForceConstant,
     Length,
     Pressure,
-    Quantity,
     Temperature,
     TemperatureDifference,
     TemperatureRate,
@@ -28,7 +28,7 @@ from quantype import (
     utorch,
 )
 from quantype import units as u
-from quantype.kinds import Div, EnergyKind, LengthKind, Mul, TimeKind
+from quantype.products import EnergyPerTime, LengthTime
 
 r = 2.0 * u.angstrom
 t = 4.0 * u.fs
@@ -47,8 +47,8 @@ assert_type(e / r, Force[float])
 assert_type((e / r) * r, Energy[float])
 assert_type((e / r) / (r**2), Pressure[float])
 assert_type(e / (r**3), EnergyDensity[float])
-assert_type(r * t, Quantity[Mul[LengthKind, TimeKind], float])
-assert_type(e / t, Quantity[Div[EnergyKind, TimeKind], float])
+assert_type(r * t, LengthTime[float])
+assert_type(e / t, EnergyPerTime[float])
 
 t1 = 300 * u.K
 t2 = 280 * u.K
@@ -64,9 +64,9 @@ assert_type(positions, Length[npt.NDArray[np.float64]])
 assert_type(u.angstrom * array, Length[npt.NDArray[np.float64]])
 assert_type(positions.sum(), Length[npt.NDArray[np.float64]])
 assert_type(positions.mean(), Length[npt.NDArray[np.float64]])
-assert_type(u.sqrt(positions**2), Length[npt.NDArray[np.float64]])
-assert_type(u.sin(u.degree(array)), Dimensionless[npt.NDArray[np.float64]])
-assert_type(u.exp(u.one(array)), Dimensionless[npt.NDArray[np.float64]])
+assert_type(qnp.sqrt(positions**2), Length[npt.NDArray[np.float64]])
+assert_type(qnp.sin(u.degree(array)), Dimensionless[npt.NDArray[np.float64]])
+assert_type(qnp.exp(u.one(array)), Dimensionless[npt.NDArray[np.float64]])
 
 
 def harmonic_jax(x: Length[jax.Array]) -> Energy[jax.Array]:
@@ -87,7 +87,7 @@ assert_type(
 tx = u.angstrom(torch.tensor([1.0, 2.0, 3.0], requires_grad=True))
 assert_type(tx, Length[torch.Tensor])
 assert_type(utorch.grad(harmonic_torch(tx), tx), Force[torch.Tensor])
-assert_type(Energy.from_canonical(array), Energy[npt.NDArray[np.float64]])
+assert_type(Energy.from_value(array), Energy[npt.NDArray[np.float64]])
 assert_type(
     Length.parse({"kind": "Length", "magnitude": 1.0, "unit": "angstrom"}),
     Length[float | npt.NDArray[np.float64]],

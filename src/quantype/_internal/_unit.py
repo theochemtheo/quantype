@@ -62,10 +62,13 @@ class Unit[K]:
         ):
             object.__setattr__(self, attribute, value)
 
-    def __call__[V](self, value: V) -> Quantity[K, V]:
+    def __call__[V](self, value: V) -> Quantity[K, V, Any]:
+        """Unit-first construction: default-system storage, displayed in this unit."""
+        from quantype._internal._storage import unit_conversion
         from quantype.core import _wrap
 
         raw: Any = value
+        echo: float | None = None
         if isinstance(raw, bool):
             raise TypeError("Boolean values are not physical magnitudes")
         # NumPy float64 is also a Python float: inspect numerical storage first.
@@ -74,24 +77,24 @@ class Unit[K]:
 
             validate_floating_storage(raw)
         elif isinstance(raw, (int, float)):
-            raw = float(raw)
+            raw = echo = float(raw)
         else:
             raise TypeError(
                 "Use a real scalar or numerical array as a magnitude; "
                 "for lists, use a typed quantity constructor or numpy.asarray "
                 "with a floating dtype first"
             )
-        return cast("Quantity[K, V]", _wrap(self.semantic, self.canonical(raw)))
+        # The reference units are the default system's units, so no factor.
+        stored = unit_conversion(raw, self.scale, self.offset)
+        return cast(
+            "Quantity[K, V, Any]",
+            _wrap(self.semantic, stored, None, display=cast("Any", self), echo=echo),
+        )
 
-    def canonical(self, raw: Any) -> Any:
-        from quantype._internal._storage import unit_conversion
-
-        return unit_conversion(raw, self.scale, self.offset)
-
-    def __mul__(self, value: Any) -> Quantity[K, Any]:
+    def __mul__(self, value: Any) -> Quantity[K, Any, Any]:
         return self(value)
 
-    def __rmul__(self, value: Any) -> Quantity[K, Any]:
+    def __rmul__(self, value: Any) -> Quantity[K, Any, Any]:
         return self(value)
 
     def __array_ufunc__(
@@ -107,14 +110,9 @@ class Unit[K]:
         return self.symbol
 
 
-_CANONICAL_UNITS: dict[Kind, Unit[Any]] = {}
 _UNIT_LOOKUPS: dict[Kind, Callable[[str], Unit[Any]]] = {}
-
-
-def canonical_unit(kind: Kind) -> Unit[Any]:
-    if kind in _CANONICAL_UNITS:
-        return _CANONICAL_UNITS[kind]
-    return get_unit(kind.canonical_unit)
+# Units of kinds from explicitly imported generated catalogues, in catalogue order.
+_CATALOGUE_UNITS: dict[Kind, tuple[Unit[Any], ...]] = {}
 
 
 @cache
@@ -136,3 +134,24 @@ def get_unit(name: str, *, kind: Kind | None = None) -> Unit[Any]:
         return _builtin_units()[name]
     except KeyError as exc:
         raise ValueError(f"Unknown unit {name!r}") from exc
+
+
+@cache
+def _builtin_kind_units() -> dict[Kind, tuple[Unit[Any], ...]]:
+    grouped: dict[Kind, list[Unit[Any]]] = {}
+    for unit in dict.fromkeys(_builtin_units().values()):
+        grouped.setdefault(unit.semantic, []).append(unit)
+    return {kind: tuple(units) for kind, units in grouped.items()}
+
+
+def units_of(kind: Kind) -> tuple[Unit[Any], ...]:
+    """Every named catalogue unit of a kind, in catalogue order."""
+    if kind in _CATALOGUE_UNITS:
+        return _CATALOGUE_UNITS[kind]
+    return _builtin_kind_units().get(kind, ())
+
+
+def known_kinds() -> tuple[Kind, ...]:
+    """Built-in kinds, then kinds of generated catalogues imported so far."""
+    builtin = tuple(KINDS.values())
+    return builtin + tuple(kind for kind in _CATALOGUE_UNITS if kind not in builtin)

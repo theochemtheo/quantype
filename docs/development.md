@@ -3,8 +3,9 @@
 ## Setup and commands
 
 From a checkout, [install uv](https://docs.astral.sh/uv/getting-started/installation/)
-and run the following at the repository root. `just` and the type checkers are
-included in the development dependencies; no global `just` installation is needed.
+and run the following at the repository root. `just` and the type checkers
+come with the development dependencies, so you don't need to install `just`
+globally.
 
 ```bash
 git clone https://github.com/theochemtheo/quantype.git
@@ -14,13 +15,22 @@ uv run just generate
 uv run just check-generated
 uv run just test
 uv run just typecheck
+uv run just stubcheck
 uv run just lint
 uv build
 ```
 
-For a lighter, core-only environment, use `uv sync` and
-`uv run pytest tests/runtime` (optional-backend tests skip when unavailable).
-The `just test`, `just typecheck`, and `just lint` recipes request all extras.
+For a lighter environment, install only the `test` dependency group and at
+most one backend, as CI's tier jobs do:
+`uv sync --no-default-groups --group test --extra jax`, then
+`uv run --no-sync pytest tests/runtime` (optional-backend tests skip when
+unavailable). The `dev` group includes `test`, so a plain `uv sync` installs
+everything needed to develop.
+The `just test`, `just typecheck`, `just stubcheck`, and `just lint` recipes
+request all extras. `just typecheck` runs the type checkers and the negative
+conformance suite; `just stubcheck` runs mypy's stubtest, which compares every
+stub with the runtime and takes about a minute, so run it when stubs or the
+generator change. CI runs both.
 To install the repository's commit hooks, run `uv run just setup`.
 
 `just lint` runs [zizmor](https://github.com/zizmorcore/zizmor) offline against the
@@ -29,14 +39,73 @@ GitHub Actions workflows; the pre-commit hook checks workflow changes too.
 ## Package layout
 
 The top-level `quantype` import provides quantities and `u`; `quantype.units`
-holds the unit namespaces. Use `quantype.serialization` for JSON/NPZ boundaries,
-`quantype.ujax` or `quantype.utorch` for optional autodiff, and
-`quantype.catalogue` with `quantype.codegen` for application catalogues.
-`quantype.core` and `quantype.kinds` expose base types and structural markers
-for advanced annotations.
+holds the unit namespaces. `quantype.numpy` has NumPy's names with unit rules,
+`quantype.constants` the physical constants, `quantype.products` the classes
+for unnamed products of two kinds, `quantype.testing` test assertions, `quantype.systems` the unit systems, and
+`quantype.codata` the CODATA edition. Use `quantype.serialization`
+for JSON/NPZ boundaries, `quantype.ujax` or `quantype.utorch` for optional
+autodiff, and `quantype.catalogue` with `quantype.codegen` for application
+catalogues. `quantype.core` and `quantype.kinds` expose base types and
+structural markers for advanced annotations. Implementations live in
+`quantype._internal`; the public modules only re-export them.
+
+## Coverage
+
+`uv run just coverage` syncs every extra and runs `scripts/coverage.sh`: one
+pytest run with every backend present, including subprocesses the tests start,
+writing `htmlcov/`, `coverage/quantype.lcov`, and `coverage/summary.md`, and
+failing below 98% line-and-branch coverage (`COVERAGE_MIN` overrides it). CI
+posts the summary to the job and to pull requests, and on `main` writes the
+README badge's figure to the `badges` branch.
+
+## Dependency tiers
+
+CI runs the suite in the full environment and in deliberately incomplete ones:
+the `test` group alone, with JAX, and with Torch, plus the oldest supported
+NumPy and Pydantic. Each job sets `QUANTYPE_TEST_TIER`, and a canary in
+`tests/runtime/test_optional_backends.py` fails when the installed backends
+differ from the tier's, so a tier cannot pass by quietly skipping. Import guards
+that only run when a backend is missing are tested in-process
+(`test_install_hints.py`), so they count toward coverage.
 
 ## Conformance
 
 The conformance suite checks runtime behavior, positive and negative typing
 examples across mypy, Pyright, Pyrefly, and ty, and runtime/stub agreement.
-CI tests core-only, JAX-only, Torch-only, and minimum-core-dependency environments.
+`tests/runtime` also runs the positive typing examples, which keeps the stubs
+and the runtime in step. CI tests core-only, JAX-only, Torch-only,
+and minimum-core-dependency environments.
+
+The unit-system parameter's default needs PEP 696. The stubs use
+`typing_extensions.TypeVar` for it, since PEP 695 syntax cannot express defaults
+before Python 3.13. The development dependencies pin the oldest checker versions
+tested with it.
+
+## Generated files
+
+`uv run just generate` regenerates, and `uv run just check-generated` checks:
+
+- `src/quantype/_internal/_codata.py`, the vendored CODATA table, from the NIST
+  tables SciPy bundles (`scripts/generate_codata.py`; SciPy is a development
+  dependency only);
+- the built-in API (`_generated.py`/`.pyi`, `kinds.py`, `units.py`/`.pyi`,
+  `numpy.py`/`.pyi`, `ujax.pyi`, `utorch.pyi`), rendered from the built-in
+  catalogue by `quantype.codegen` (`scripts/generate.py`);
+- `docs/catalogue.md`, the kinds and units reference (`scripts/generate_docs.py`).
+
+`docs/units.md` also contains a numerical-range table generated by
+`quantype._internal._systems.range_table`; `tests/runtime/test_systems.py`
+fails when it is stale.
+
+## Documentation examples
+
+`tests/runtime/test_docs.py` runs every Python block in `README.md` and
+`docs/*.md`, each in a fresh namespace and a temporary working directory, so the
+documentation stays in step with the library. Blocks fenced as ` ```python notest `
+are API patterns with placeholders and are skipped; JAX and Torch examples skip
+when their backend is absent.
+
+## Releasing
+
+See [RELEASING.md](../RELEASING.md). A version tag builds, attests, and publishes
+the package through PyPI trusted publishing, then creates the GitHub release.

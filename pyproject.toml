@@ -4,12 +4,42 @@ version = "0.1.0"
 description = "Typed physical quantities for scientific Python and differentiable models"
 readme = "README.md"
 requires-python = ">=3.12"
+license = "MIT OR Apache-2.0"
+license-files = ["LICENSE-APACHE", "LICENSE-MIT"]
 authors = [{ name = "Theo Keane", email = "20931519+theochemtheo@users.noreply.github.com" }]
+keywords = [
+  "atomistic",
+  "dimensional-analysis",
+  "jax",
+  "physical-quantities",
+  "pydantic",
+  "quantities",
+  "torch",
+  "typing",
+  "units",
+]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Typing :: Typed",
+]
 dependencies = [
   "numpy>=2",
   "pydantic>=2.0.3",
-  "scipy>=1.13",
 ]
+
+[project.urls]
+Changelog = "https://github.com/theochemtheo/quantype/blob/main/CHANGELOG.md"
+Documentation = "https://github.com/theochemtheo/quantype/tree/main/docs"
+Issues = "https://github.com/theochemtheo/quantype/issues"
+Repository = "https://github.com/theochemtheo/quantype"
 
 [project.optional-dependencies]
 jax = ["jax>=0.11.2"]
@@ -21,20 +51,52 @@ dev = [
   "prek>=0.5.4",
   "pyrefly>=1.3.2",
   "pyright>=1.1.414",
-  "pytest>=9.1.1",
   "pytest-sugar>=1.1.1",
-  "pytest-xdist>=3.8.0",
   "ruff>=0.16.9",
   "rust-just>=1.58.0",
+  # Only scripts/generate_codata.py reads SciPy's bundled NIST tables.
+  "scipy>=1.13",
   "scipy-stubs>=1.13",
   "tombi>=1.5.8",
   "ty>=0.0.84",
   "zizmor>=1.30.1",
+  { include-group = "test" },
+]
+# `test` is split out of `dev` so CI can build deliberately incomplete
+# environments: the optional-dependency tiers in test.yml install only this
+# group plus one extra, and still get the locked pytest. The import guards and
+# skips those tiers exercise only run when a backend is genuinely missing.
+# `dev` includes `test`, so a plain `uv sync` resolves exactly as it did.
+test = [
+  "pytest>=9.1.1",
+  "pytest-cov>=7.1.0",
+  "pytest-xdist>=3.8.0",
 ]
 
 [build-system]
 requires = ["uv_build>=0.12.13,<0.13.0"]
 build-backend = "uv_build"
+
+[tool.coverage.run]
+source = ["quantype"]
+branch = true
+# Several tests run quantype in a subprocess (the CODATA edition, backend
+# isolation, import laziness); measure those processes too.
+patch = ["subprocess"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = [
+  "if (?:_?typing\\.)?TYPE_CHECKING:",
+  "@(?:typing\\.)?overload",
+]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.lcov]
+output = "coverage/quantype.lcov"
 
 [tool.mypy]
 python_version = "3.12"
@@ -48,6 +110,7 @@ strict = true
 extra_checks = true
 warn_unused_configs = true
 pretty = true
+exclude = ["^notes/"]
 
 [tool.pyrefly]
 python-version = "3.12"
@@ -69,10 +132,17 @@ include = [
   "tests/runtime",
   "tests/typing/positive",
 ]
+exclude = [
+  "**/node_modules",
+  "**/__pycache__",
+  "**/.*",
+  "notes",
+]
 
 [tool.ruff]
 target-version = "py312"
 respect-gitignore = false
+extend-exclude = ["notes"]
 
 [tool.ruff.lint]
 select = ["ALL"]
@@ -91,13 +161,22 @@ flake8-tidy-imports = { "ban-relative-imports" = "all" }
 "tests/**" = ["S101", "PLR2004", "INP001"]
 "scripts/check_mypy.py" = ["INP001"]
 "scripts/generate.py" = ["INP001"]
+"scripts/generate_codata.py" = ["INP001"]
+"scripts/generate_docs.py" = ["INP001"]
 "scripts/benchmark_constants.py" = ["INP001"]
 "src/quantype/_internal/_unit.pyi" = ["ANN401"]
 "scripts/check_typing.py" = ["INP001", "T201"]
 # Numerical dispatch is deliberately dynamic and backend imports stay lazy.
 "src/quantype/core.py" = ["ANN401", "PLC0415", "SLF001"]
-"src/quantype/core.pyi" = ["ANN401"]
-"src/quantype/_internal/_math.py" = ["ANN401", "PLC0415"]
+# Methods for unnamed products return the caller's class through a type variable
+# bound to structural kinds, which Self cannot express.
+"src/quantype/core.pyi" = ["ANN401", "PYI019"]
+"src/quantype/_generated.pyi" = ["ANN401"]
+"src/quantype/numpy.pyi" = ["ANN401"]
+"src/quantype/_internal/_numpy.py" = ["ANN401", "PLC0415", "SLF001"]
+# The JAX and Torch adapters are dynamic backend boundaries.
+"src/quantype/_internal/_jax.py" = ["ANN401"]
+"src/quantype/_internal/_torch.py" = ["ANN401"]
 
 [tool.ty.environment]
 python-version = "3.12"
@@ -110,12 +189,18 @@ include = [
   "tests/runtime",
   "tests/typing/positive",
 ]
+exclude = ["notes"]
 
 [tool.ty.analysis]
 strict-equality-semantics = true
 
 [tool.ty.rules]
 all = "error"
+
+[tool.uv]
+# Pinned exactly, and matched by the `version:` on every setup-uv step: the
+# lockfile is written by one uv version, so CI must not float onto another.
+required-version = "==0.12.17"
 
 [[tool.uv.index]]
 name = "pytorch-cpu"

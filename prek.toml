@@ -31,6 +31,9 @@ stages = ["pre-commit"]
 
 [[repos.hooks]]
 id = "check-added-large-files"
+# Generated sources hold every kind's protocol members and the product table;
+# `just check-generated` keeps them current.
+exclude = "^src/quantype/(_generated\\.pyi|products\\.py)$"
 stages = ["pre-commit"]
 
 [[repos]]

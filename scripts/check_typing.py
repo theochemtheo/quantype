@@ -56,9 +56,9 @@ def main() -> int:
             stderr=subprocess.STDOUT,
             check=False,
         )
-        reported = {
-            int(match) for match in re.findall(r"invalid\.py:(\d+):", result.stdout)
-        }
+        # Checkers colour their output when FORCE_COLOR is set, even into a pipe.
+        output = re.sub(r"\x1b\[[0-9;]*m", "", result.stdout)
+        reported = {int(match) for match in re.findall(r"invalid\.py:(\d+):", output)}
         missing = expected - reported
         if result.returncode != 1 or missing:
             failed = True

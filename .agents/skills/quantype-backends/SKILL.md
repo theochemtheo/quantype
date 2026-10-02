@@ -9,21 +9,23 @@ Parent: read [Quantype shared guidance](../quantype/SKILL.md). For a change to p
 
 ## Construction versus numerical dispatch
 
-`src/quantype/_internal/_construction.py` uses `StorageAlias` to make `Length[V](raw, unit)` an explicit conversion boundary. `_internal/_storage.py` resolves aliases and dispatches storage conversions. Convert the input into the requested storage, apply canonical unit conversion, and retain the requested storage after conversion. Typed construction requires an input unit.
+`src/quantype/_internal/_construction.py` uses `StorageAlias` to make `Length[V, S](raw, unit)` an explicit conversion boundary: storage first, unit system second (default `Atomistic`). `GenericAlias` forwards attribute access to the origin class, so `StorageAlias` overrides `__getattribute__` for `from_value`, `parse`, `storage` and `unit_system`. `_internal/_storage.py` dispatches storage conversions. Convert the input into the requested storage and into the system's units (`_systems.into_system`), and retain the requested storage after conversion. Typed construction requires an input unit, remembers it as the display unit, and echoes Python scalars exactly for `float` storage.
 
-`from_canonical` and `core._wrap` are trusted, coercion-free boundaries. Do not move constructor validation into wrapping: compiled operations and JAX tree reconstruction may carry tracers or sentinel leaves.
+`from_value` and `core._wrap(kind, value, system, display=..., echo=...)` are trusted, coercion-free boundaries. Do not move constructor validation into wrapping: compiled operations and JAX tree reconstruction may carry tracers or sentinel leaves.
 
-Unit-first construction preserves compatible existing numerical storage and promotes Python integers to floats. Use `unit(array)` in cross-backend examples; backend-left multiplication is not promised beyond NumPy. Lists should use typed constructors.
+Unit-first construction always uses the default system. It preserves compatible existing numerical storage and promotes Python integers to floats. Use `unit(array)` in cross-backend examples; backend-left multiplication is not promised beyond NumPy. Lists should use typed constructors.
 
 ## Storage invariants
 
 - Support real floating storage. Reject boolean, complex and nonnumerical magnitudes; integer inputs may be converted to floating storage. Python/NumPy scalar targets reject nonscalar input.
+- Scaling operands go through `real_operand` (any real scalar, or a real NumPy/JAX/Torch array including tracers) and results through `keep_storage`, which keeps the quantity's storage type and dtype.
 - Distinguish NumPy floating scalars from zero-dimensional arrays. `npt.NDArray[np.float64]` remains an array even after a reduction yields a scalar-shaped result.
 - NumPy annotations encode dtype; an explicit conflicting `dtype=` fails. Torch/JAX storage classes need an explicit `dtype=` when requested, since their annotations do not encode dtype.
 - Preserve Torch device placement and graph connectivity when converting existing tensors. List construction does not automatically enable gradients.
 - JAX conversion must avoid host transfer of existing backend arrays. Unavailable explicit dtype requests, including float64 without x64 support, fail rather than silently returning a different dtype.
+- float16/float32 NumPy construction and `.to_system` emit `StorageRangeWarning` when converted values overflow or become subnormal. Do not add checks inside JAX/Torch traces.
 
-Arithmetic delegates to stored values' operators. `_internal/_math.py` dispatches math helpers. `core.Quantity._reduce` maps `axis`/`keepdims` to Torch's `dim`/`keepdim` and preserves NumPy array storage. Shape inference and arbitrary dtype promotion are outside the existing static contract.
+Arithmetic delegates to stored values' operators. `_internal/_numpy.py` holds the unit rules for `quantype.numpy` and NumPy/Torch dispatch, choosing NumPy, `jax.numpy` or a Torch adapter (NumPy's names and keywords) per operand. `core.Quantity._reduce` maps `axis`/`keepdims` to Torch's `dim`/`keepdim` (and `max`/`min` to `amax`/`amin`) and preserves NumPy array storage, as indexing does. Shape inference and arbitrary dtype promotion are outside the existing static contract.
 
 Implicit NumPy coercion, ufuncs and array-function calls on quantities reject loss of physical meaning. Expose `.value` or `.magnitude(unit)` explicitly at unsupported numerical boundaries.
 

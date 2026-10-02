@@ -5,13 +5,14 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from quantype._internal._semantics import (
+    CATALOGUE_KINDS,
     DIMENSIONLESS_KINDS,
     EXPONENTS,
     PRODUCTS,
     TEMPERATURE_DIFFERENCES,
     Kind,
 )
-from quantype._internal._unit import _CANONICAL_UNITS, _UNIT_LOOKUPS, Unit
+from quantype._internal._unit import _CATALOGUE_UNITS, _UNIT_LOOKUPS, Unit
 
 if TYPE_CHECKING:
     from quantype.catalogue import Catalogue
@@ -27,28 +28,28 @@ class RuntimeCatalogue:
             )
             for name, spec in catalogue.quantities.items()
         }
-        if "Temperature" in self.kinds:
-            TEMPERATURE_DIFFERENCES[self.kinds["Temperature"]] = self.kinds[
-                "TemperatureDifference"
-            ]
-        if "Dimensionless" in self.kinds:
-            DIMENSIONLESS_KINDS.update(
-                dict.fromkeys(self.kinds.values(), self.kinds["Dimensionless"])
-            )
+        TEMPERATURE_DIFFERENCES[self.kinds["Temperature"]] = self.kinds[
+            "TemperatureDifference"
+        ]
+        DIMENSIONLESS_KINDS.update(
+            dict.fromkeys(self.kinds.values(), self.kinds["Dimensionless"])
+        )
+        CATALOGUE_KINDS[self.kinds["Dimensionless"]] = self.kinds
         self.units: dict[str, Unit[Any]] = {}
+        by_kind: dict[Kind, list[Unit[Any]]] = {
+            kind: [] for kind in self.kinds.values()
+        }
         for name, spec in catalogue.units.items():
             kind = self.kinds[spec.kind]
             unit: Unit[Any] = Unit(name, kind, spec.scale, spec.offset, spec.symbol)
+            by_kind[kind].append(unit)
             for identifier in (name, *spec.aliases):
                 self.units[identifier] = unit
-            if name == kind.canonical_unit:
-                _CANONICAL_UNITS[kind] = unit
-        for kind in self.kinds.values():
+        for kind, units in by_kind.items():
             _UNIT_LOOKUPS[kind] = self.get_unit
-        for (op, left, right), result in catalogue.relations.items():
+            _CATALOGUE_UNITS[kind] = tuple(units)
+        for (op, left, right), result in catalogue.algebra.items():
             PRODUCTS[op, self.kinds[left], self.kinds[right]] = self.kinds[result]
-            if op == "mul":
-                PRODUCTS[op, self.kinds[right], self.kinds[left]] = self.kinds[result]
         for (name, exponent), result in catalogue.powers.items():
             EXPONENTS[self.kinds[name], exponent] = self.kinds[result]
 

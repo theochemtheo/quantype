@@ -9,16 +9,12 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
-from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
+from quantype.catalogue import Catalogue, QuantitySpec, UnitSpec, builtin_catalogue
 from quantype.codegen import generate, render
-
-if TYPE_CHECKING:
-    from quantype.catalogue import Catalogue
 
 PROJECT_FIXTURE = Path(__file__).parents[1] / "fixtures" / "generated_catalogue"
 
@@ -27,7 +23,7 @@ PROJECT_FIXTURE = Path(__file__).parents[1] / "fixtures" / "generated_catalogue"
 def catalogue() -> Catalogue:
     return builtin_catalogue().extend(
         quantities={
-            "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0), "surface_tension")
+            "SurfaceTension": QuantitySpec((-2, 1, 0, 0, 0, 0, 0, 0), "surface_tension")
         },
         units={
             "surface_tension": UnitSpec("SurfaceTension"),
@@ -80,13 +76,13 @@ def test_invalid_catalogue_extension() -> None:
 @pytest.mark.parametrize(
     "name",
     [
-        "sqrt",
-        "sin",
-        "exp",
-        "get_unit",
-        "runtime",
+        "_typing",
+        "_get_unit",
+        "_runtime",
+        "_NAMES",
+        "overload",
         "Unit",
-        "cast",
+        "np",
         "Any",
         "globals",
         "__name__",
@@ -116,11 +112,11 @@ def test_unit_identifiers_cannot_shadow_generated_bindings(
         builtin_catalogue().extend(quantities={}, units=units)
 
 
-@pytest.mark.parametrize("kind", ["Sqrt", "Sin", "Exp", "GetUnit", "Runtime"])
+@pytest.mark.parametrize("kind", ["Overload", "Np", "Globals"])
 def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None:
     with pytest.raises(ValueError, match="Conflicting quantity namespace"):
         builtin_catalogue().extend(
-            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
+            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), "lab_unit")},
             units={"lab_unit": UnitSpec(kind)},
         )
 
@@ -139,14 +135,13 @@ def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None
         "_BaseQuantity",
         "_StructuralQuantity",
         "Quantity",
-        "NonAffineKind",
         "units",
         "kinds",
         "ujax",
         "utorch",
         "_generated",
         "_catalogue",
-        "_math",
+        "numpy",
         "Callable",
         "Array",
         "Tensor",
@@ -161,7 +156,7 @@ def test_quantity_namespaces_cannot_shadow_generated_bindings(kind: str) -> None
 def test_quantity_names_cannot_shadow_generated_bindings(kind: str) -> None:
     with pytest.raises(ValueError, match="Invalid quantity definition"):
         builtin_catalogue().extend(
-            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
+            quantities={kind: QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), "lab_unit")},
             units={"lab_unit": UnitSpec(kind)},
         )
 
@@ -173,7 +168,7 @@ def test_quantity_marker_collision_is_order_independent() -> None:
         ):
             builtin_catalogue().extend(
                 quantities={
-                    name: QuantitySpec((1, 0, 0, 0, 0, 0, 0), f"lab_{name}")
+                    name: QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), f"lab_{name}")
                     for name in names
                 },
                 units={f"lab_{name}": UnitSpec(name) for name in names},
@@ -183,7 +178,7 @@ def test_quantity_marker_collision_is_order_independent() -> None:
 def test_quantity_namespaces_are_unique() -> None:
     with pytest.raises(ValueError, match="Conflicting quantity namespace 'length'"):
         builtin_catalogue().extend(
-            quantities={"length": QuantitySpec((1, 0, 0, 0, 0, 0, 0), "lab_unit")},
+            quantities={"length": QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), "lab_unit")},
             units={"lab_unit": UnitSpec("length")},
         )
 
@@ -191,7 +186,7 @@ def test_quantity_namespaces_are_unique() -> None:
 def test_canonical_unit_cannot_override_namespace_constructor() -> None:
     with pytest.raises(ValueError, match="conflicts with a generated API binding"):
         builtin_catalogue().extend(
-            quantities={"Sample": QuantitySpec((0, 0, 0, 0, 0, 0, 0), "__init__")},
+            quantities={"Sample": QuantitySpec((0, 0, 0, 0, 0, 0, 0, 0), "__init__")},
             units={"__init__": UnitSpec("Sample")},
         )
 
@@ -243,6 +238,22 @@ def test_stale_check_does_not_rewrite_files(
     assert stale_file.read_text() == stale_source
 
 
+def test_unrendered_product_modules_are_stale_and_removed(
+    tmp_path: Path, generated_project: Path, catalogue: Catalogue
+) -> None:
+    package = tmp_path / "labquantities"
+    shutil.copytree(generated_project / "labquantities", package)
+    leftover = package / "_products" / "RenamedQuantityTime.pyi"
+    leftover.write_text("# A product class from an older catalogue.\n")
+
+    assert generate(catalogue, package, package="labquantities", check=True) == [
+        "_products/RenamedQuantityTime.pyi"
+    ]
+    assert leftover.exists()
+    generate(catalogue, package, package="labquantities")
+    assert not leftover.exists()
+
+
 @pytest.mark.parametrize(
     "case",
     [
@@ -252,6 +263,7 @@ def test_stale_check_does_not_rewrite_files(
         "temperature_difference",
         "structural_reciprocals",
         "portable_unit_factors",
+        "unit_systems_cover_new_kinds",
     ],
 )
 def test_generated_runtime(generated_project: Path, case: str) -> None:
@@ -309,7 +321,46 @@ def test_generated_typing(generated_project: Path, command: tuple[str, ...]) -> 
         text=True,
         check=False,
     )
-    output = result.stdout + result.stderr
+    # Checkers colour their output when FORCE_COLOR is set, even into a pipe.
+    output = re.sub(r"\x1b\[[0-9;]*m", "", result.stdout + result.stderr)
     reported = {int(line) for line in re.findall(r"invalid\.py:(\d+):", output)}
     assert result.returncode == 1, output
     assert expected <= reported, output
+
+
+_needs_ruff = pytest.mark.skipif(
+    shutil.which("ruff") is None, reason="Generation requires Ruff"
+)
+
+
+@_needs_ruff
+def test_the_builtin_package_is_current() -> None:
+    package = Path(__file__).parents[2] / "src" / "quantype"
+    assert generate(builtin_catalogue(), package, check=True) == []
+
+
+@_needs_ruff
+def test_checking_an_empty_directory_reports_every_file(tmp_path: Path) -> None:
+    stale = generate(builtin_catalogue(), tmp_path, check=True)
+    assert {"_generated.pyi", "products.py", "numpy.pyi"} <= set(stale)
+    assert not any(tmp_path.iterdir())
+
+
+def _missing(name: str) -> None:
+    del name
+
+
+def test_generation_needs_a_package_name_ruff_and_the_core_kinds(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    with pytest.raises(ValueError, match="Expected a Python package name"):
+        render(builtin_catalogue(), package="lab-quantities")
+    alone = Catalogue(
+        quantities={"Length": QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), "angstrom")},
+        units={"angstrom": UnitSpec("Length")},
+    )
+    with pytest.raises(ValueError, match="combined builtin catalogue"):
+        render(alone, package="lengths")
+    monkeypatch.setattr(shutil, "which", _missing)
+    with pytest.raises(RuntimeError, match="Ruff on PATH"):
+        generate(builtin_catalogue(), tmp_path)

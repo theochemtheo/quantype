@@ -35,26 +35,8 @@ def package_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         "from quantype._internal._runtime_catalogue import RuntimeCatalogue\n"
         f"runtime = RuntimeCatalogue(Catalogue({dict(catalogue.quantities)!r}, {{{units}}}, {dict(catalogue.relations)!r}, {dict(catalogue.powers)!r}))\n"
     )
-    math_runtime = (
-        "from typing import Any\nfrom quantype.core import Quantity, _wrap\n"
-        "from quantype._internal._math import _unary\n"
-        f"from {package}._catalogue import runtime\n"
-    )
-    math_stub = f"from {package}._generated import Area, Length, Angle, Dimensionless\n"
-    for name, source, result in (
-        ("sqrt", "Area", "Length"),
-        ("sin", "Angle", "Dimensionless"),
-        ("exp", "Dimensionless", "Dimensionless"),
-    ):
-        math_runtime += (
-            f"def {name}(quantity: Quantity[Any, Any]) -> Quantity[Any, Any]:\n"
-            f"    if quantity._semantic is not runtime.kinds[{source!r}]:\n"
-            f"        raise TypeError('Expected {source}')\n"
-            f"    return _wrap(runtime.kinds[{result!r}], _unary({name!r}, quantity.value))\n"
-        )
-        math_stub += f"def {name}[V](quantity: {source}[V]) -> {result}[V]: ...\n"
     jax_runtime = (
-        "from quantype.ujax import grad as grad, hessian as hessian, jit as jit, vmap as vmap, _register_quantity\n"
+        "from quantype.ujax import grad as grad, hessian as hessian, jit as jit, value_and_grad as value_and_grad, vmap as vmap, _register_quantity\n"
         f"from {package} import _generated\n"
     )
     for name in ("Quantity", *catalogue.quantities):
@@ -64,8 +46,6 @@ def package_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
         "__init__.py": f"from {package}._generated import (Quantity as Quantity, "
         + ", ".join(f"{name} as {name}" for name in catalogue.quantities)
         + f")\nfrom {package} import units as u\n",
-        "_math.py": math_runtime,
-        "_math.pyi": math_stub,
         "ujax.py": jax_runtime,
         "utorch.py": "from quantype.utorch import grad as grad\n",
         "py.typed": "",

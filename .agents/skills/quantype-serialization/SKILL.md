@@ -11,7 +11,7 @@ Parent: read [Quantype shared guidance](../quantype/SKILL.md). Public behavior i
 
 Serialization transfers values to host storage; it does not preserve graphs, device placement or model state. `_internal/_storage.host_array` intentionally detaches Torch tensors and copies them to CPU. Keep that behavior at the boundary; read [backends](../quantype-backends/SKILL.md) if changing numerical conversion shared with construction.
 
-Serialization currently requires a named semantic kind. Structural expression quantities have no named wire representation. Selected units follow an explicit override, then display choice, then canonical units. Noncanonical conversion may introduce floating-point roundoff; these formats are not bit-exact model snapshots.
+Serialization currently requires a named semantic kind. Structural expression quantities have no named wire representation. Selected units follow an explicit override, then the display unit, then the quantity system's unit for the kind. The wire format records units, never a system: the target type chooses the storage system, so any payload decodes into any system. Unit conversion may introduce floating-point roundoff; these formats are not bit-exact model snapshots.
 
 ## JSON and Pydantic
 
@@ -19,7 +19,7 @@ Quantity objects contain exactly `kind`, `magnitude` and `unit`. Validate nomina
 
 `QuantityClass.parse` returns scalar/float64-array storage. Typed Pydantic fields and `TypeAdapter` convert into the annotated storage, including NumPy dtype; bare quantity annotations have a runtime schema but are not a substitute for precise static storage annotations. Preserve scalar versus zero-dimensional array schema and restoration behavior.
 
-Custom units are explicit decoding inputs: `units=(...)` for parsing/archives and `context={"units": (...)}` for Pydantic. Reject duplicate definitions and built-in identifier shadowing. Do not install custom definitions into a global public namespace. For definition/affine conversion changes, read [core](../quantype-core/SKILL.md).
+Custom units are explicit decoding inputs: `units=(...)` for parsing/archives and `context={"units": (...)}` for Pydantic. `resolve_unit` also finds a typed target system's own units (custom bases, `system:Kind` identifiers) automatically, and prefers definitions of the requested kind when identifiers repeat across kinds. Decoding remembers the wire unit as the display unit; a quantity object from another system is rejected, not converted. Reject duplicate definitions and built-in identifier shadowing. Do not install custom definitions into a global public namespace. For definition/affine conversion changes, read [core](../quantype-core/SKILL.md).
 
 ## Binary arrays
 

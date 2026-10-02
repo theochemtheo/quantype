@@ -1,40 +1,14 @@
-"""PyTorch autograd on canonical tensors without graph-detaching conversions."""
+"""PyTorch autograd with physical derivative kinds.
 
-from typing import Any
+``grad`` differentiates a scalar output with respect to one quantity, or to a
+sequence of them, keeping the graph unless asked to detach.
+"""
 
 try:
-    import torch
+    from quantype._internal._torch import grad
 except ModuleNotFoundError as exc:
     if exc.name != "torch":
         raise
     raise ModuleNotFoundError("Install quantype[torch] to use quantype.utorch") from exc
 
-from quantype.core import (
-    Quantity,
-    _wrap,  # pyright: ignore[reportPrivateUsage]
-    result_kind,
-)
-
-
-def grad(
-    output: Quantity[Any, torch.Tensor],
-    inputs: Quantity[Any, torch.Tensor],
-    *,
-    create_graph: bool = False,
-    retain_graph: bool | None = None,
-) -> Quantity[Any, torch.Tensor]:
-    """Differentiate one scalar output with respect to one quantity.
-
-    The result is the positive derivative, not the negative physical force.
-    ``create_graph=True`` keeps the derivative differentiable for higher orders;
-    ``retain_graph`` follows PyTorch's normal semantics (including its default).
-    """
-    if output.value.ndim != 0:
-        raise ValueError("utorch.grad requires a scalar (zero-dimensional) output.")
-    (value,) = torch.autograd.grad(
-        output.value,
-        inputs.value,
-        create_graph=create_graph,
-        retain_graph=retain_graph,
-    )
-    return _wrap(result_kind("div", output._semantic, inputs._semantic), value)  # noqa: SLF001
+__all__ = ["grad"]

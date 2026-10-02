@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import numbers
+import warnings
 from typing import TYPE_CHECKING, Any, TypeAliasType, cast, get_args, get_origin
 
 if TYPE_CHECKING:
@@ -9,6 +11,41 @@ if TYPE_CHECKING:
 
 # Backend APIs and NumPy's runtime dtype generics form a dynamic boundary.
 # ruff: noqa: ANN401, PLC0415
+
+
+# float16 and float32: narrow enough that ordinary conversions can leave range.
+_NARROW_ITEMSIZE = 4
+
+
+class StorageRangeWarning(RuntimeWarning):
+    """Converted values overflowed, or lost precision as subnormals, in storage."""
+
+
+def warn_if_out_of_range(working: Any, stored: Any) -> None:
+    """Check narrow NumPy storage on the host; traced backends are not checked."""
+    import numpy as np
+
+    dtype = getattr(stored, "dtype", None)
+    if (
+        not isinstance(dtype, np.dtype)
+        or dtype.kind != "f"
+        or dtype.itemsize > _NARROW_ITEMSIZE  # pyright: ignore[reportUnknownMemberType]
+    ):
+        return
+    exact = np.asarray(working, dtype=np.float64)
+    narrow = np.asarray(stored)
+    tiny = float(np.finfo(cast("Any", dtype)).tiny)
+    with np.errstate(all="ignore"):
+        overflow = bool((np.isfinite(exact) & ~np.isfinite(narrow)).any())
+        underflow = bool(((exact != 0) & (np.abs(narrow) < tiny)).any())
+    if overflow or underflow:
+        problem = "overflow" if overflow else "become subnormal or zero"
+        warnings.warn(
+            f"Converted values {problem} in {dtype.name} storage; use a wider "
+            "dtype or another unit system (see UnitSystem.check_range)",
+            StorageRangeWarning,
+            stacklevel=4,
+        )
 
 
 def reject_booleans(value: Any) -> None:
@@ -41,6 +78,76 @@ def validate_floating_storage(value: Any) -> None:
         )
 
 
+def real_operand(value: Any) -> Any | None:
+    """A real number or numerical array that may scale a quantity, else None.
+
+    Python and NumPy scalars, and real NumPy, JAX (including traced) and Torch
+    arrays qualify; booleans, complex numbers and other objects do not.
+    """
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, (int, float)):
+        return value
+    module = type(value).__module__
+    if module.startswith(("numpy", "torch", "jax", "jaxlib")):
+        return value if _real_numerical(value, module) else None
+    # Fraction and other registered reals.
+    return float(value) if isinstance(value, numbers.Real) else None
+
+
+def _real_numerical(value: Any, module: str) -> bool:
+    if module.startswith("numpy"):
+        import numpy as np
+
+        if not isinstance(value, (np.ndarray, np.generic)):
+            return False
+        return str(cast("Any", value).dtype.kind) in "iuf"
+    if module.startswith("torch"):
+        import torch
+
+        return isinstance(value, torch.Tensor) and not (
+            value.is_complex() or value.dtype == torch.bool
+        )
+    import jax.numpy as jnp
+
+    dtype = getattr(value, "dtype", None)
+    return dtype is not None and (
+        jnp.issubdtype(dtype, jnp.floating) or jnp.issubdtype(dtype, jnp.integer)
+    )
+
+
+def keep_storage(raw: Any, result: Any) -> Any:
+    """Scaling keeps the quantity's storage type and dtype, as conversion does.
+
+    A scalar quantity scaled by an array becomes an array of that result.
+    """
+    if type(raw) is float:
+        if type(result).__module__.startswith("numpy"):
+            import numpy as np
+
+            if isinstance(result, np.generic):
+                result = float(cast("Any", result))
+        return result
+    dtype = getattr(raw, "dtype", None)
+    if dtype is None or getattr(result, "dtype", dtype) == dtype:
+        return result
+    return _as_dtype(raw, result, dtype)
+
+
+def _as_dtype(raw: Any, result: Any, dtype: Any) -> Any:
+    module = type(raw).__module__
+    if module.startswith("torch"):
+        return result.to(dtype)
+    if not module.startswith("numpy"):
+        return result.astype(dtype)
+    import numpy as np
+
+    if not isinstance(raw, np.generic):
+        return np.asarray(result).astype(dtype, copy=False)
+    scalar_type: Any = cast("Any", raw).dtype.type
+    return scalar_type(result) if isinstance(result, np.generic) else result
+
+
 def storage_origin(storage: Any) -> Any:
     origin = get_origin(storage) or storage
     while isinstance(origin, TypeAliasType):
@@ -60,7 +167,10 @@ def _numpy(value: Any, storage: Any, dtype: Any, scale: float, offset: float) ->
             raise TypeError("Scalar dtype is already specified by the storage type")
         if array.ndim != 0:
             raise ValueError("Expected scalar storage, received an array")
-        return origin(_numpy_units(array, origin, scale, offset))
+        working = _numpy_units(array, origin, scale, offset)
+        scalar_result = origin(working)
+        warn_if_out_of_range(working, scalar_result)
+        return scalar_result
     arguments = get_args(storage)
     scalar = arguments[-1] if arguments else np.float64
     if get_origin(scalar) is np.dtype:
@@ -71,7 +181,10 @@ def _numpy(value: Any, storage: Any, dtype: Any, scale: float, offset: float) ->
         raise ValueError("Quantity storage must use a real floating dtype")
     if dtype is not None and np.dtype(dtype) != np.dtype(scalar):
         raise ValueError("dtype conflicts with the NumPy storage annotation")
-    return np.asarray(_numpy_units(array, scalar, scale, offset), dtype=scalar)
+    working = _numpy_units(array, scalar, scale, offset)
+    result = np.asarray(working, dtype=scalar)
+    warn_if_out_of_range(working, result)
+    return result
 
 
 def _numpy_units(value: Any, dtype: Any, scale: float, offset: float) -> Any:

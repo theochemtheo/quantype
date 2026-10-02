@@ -56,7 +56,9 @@ def test_float16_npz_conversion_and_roundtrip(tmp_path: Path) -> None:
     restored = load_npz(path, "length", Length[npt.NDArray[np.float16]])
     np.testing.assert_array_equal(restored.value, [np.float16(30000)])
     assert restored.value.dtype == np.float16
-    save_npz(path, length=restored)
+    # Loading remembers metres, which float16 can hold only as a subnormal.
+    # Presenting in ångströms keeps the round trip exact.
+    save_npz(path, length=restored.to(u.angstrom))
     again = load_npz(path, "length", Length[npt.NDArray[np.float16]])
     np.testing.assert_array_equal(again.value, restored.value)
     # Noncanonical float16 wire magnitudes round normally in their final dtype.
@@ -108,6 +110,8 @@ if not {x64!r}:
 unit = Length.define_unit('lab:huge', reference=u.angstrom, scale=1e100)
 if {x64!r}:
     np.testing.assert_array_equal(Length[jax.Array]([1e-100], unit).value, [1])
+    narrow = Length[jax.Array]([1.0], u.angstrom, dtype='float32')
+    assert (narrow * jnp.array(2.0, dtype=jnp.float64)).value.dtype == jnp.float32
 else:
     try:
         with np.errstate(over='raise', invalid='raise'):

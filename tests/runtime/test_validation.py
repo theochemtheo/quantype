@@ -4,15 +4,27 @@ from __future__ import annotations
 
 import math
 import warnings
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 import pytest
 from numpy.typing import NDArray
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
-from quantype import Length, Pressure, Temperature, Time, u
-from quantype.serialization import parse_quantity, to_dict
+from quantype import (
+    Dimensionless,
+    Energy,
+    Force,
+    Length,
+    Pressure,
+    Temperature,
+    Time,
+    u,
+)
+from quantype._internal._registry import unit_specs
+from quantype.core import Quantity, Unit, get_unit
+from quantype.serialization import parse_quantity, resolve_unit, to_dict
+from quantype.systems import UnitSystem
 
 
 class Simulation(BaseModel):
@@ -25,8 +37,14 @@ class Simulation(BaseModel):
 def test_scalar_roundtrip_and_display_unit() -> None:
     length = Length.parse({"kind": "Length", "magnitude": 0.5, "unit": "nm"})
     assert length.value == pytest.approx(5)
-    assert to_dict(length) == {"kind": "Length", "magnitude": 5.0, "unit": "angstrom"}
+    # The input unit is remembered, so a config's "0.5 nm" is written back as-is.
     wire = {"kind": "Length", "magnitude": 0.5, "unit": "nanometer"}
+    assert to_dict(length) == wire
+    assert to_dict(length, u.angstrom) == {
+        "kind": "Length",
+        "magnitude": 5.0,
+        "unit": "angstrom",
+    }
     assert to_dict(length, u.nm) == wire
     assert length.to(u.nm).to_dict() == wire
     assert parse_quantity(Length, length) is length
@@ -52,8 +70,32 @@ def test_schema_and_bare_annotation() -> None:
     adapter: TypeAdapter[Any] = TypeAdapter(Length)
     assert adapter.validate_python("5 angstrom").value == 5
     schema = Simulation.model_json_schema()["properties"]["cutoff"]["anyOf"][0]
-    assert set(schema["required"]) == {"kind", "magnitude", "unit"}
+    assert set(schema["required"]) == {"magnitude", "unit"}  # the field names the kind
     assert schema["properties"]["magnitude"]["type"] == "number"
+    written = Simulation.model_json_schema(mode="serialization")["properties"]
+    assert set(written["cutoff"]["required"]) == {"kind", "magnitude", "unit"}
+
+
+def test_objects_may_leave_out_the_kind_their_field_names() -> None:
+    assert Length.parse({"magnitude": 2, "unit": "nm"}) == 2 * u.nm
+    adapter = TypeAdapter(Length[float])
+    assert adapter.validate_python({"magnitude": 2, "unit": "nm"}) == 2 * u.nm
+    with pytest.raises(ValidationError, match="Expected Length; received Energy"):
+        adapter.validate_python({"kind": "Energy", "magnitude": 2, "unit": "eV"})
+    with pytest.raises(ValidationError, match="and optionally 'kind'"):
+        adapter.validate_python({"magnitude": 2})
+
+
+def test_python_mode_dumps_keep_quantities() -> None:
+    adapter = TypeAdapter(Length[float])
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        assert adapter.dump_python(2 * u.nm) == 2 * u.nm
+        assert adapter.dump_python(2 * u.nm, mode="json") == {
+            "kind": "Length",
+            "magnitude": 2.0,
+            "unit": "nanometer",
+        }
 
 
 @pytest.mark.parametrize("storage", [float, np.float16, np.float32, np.float64])
@@ -163,3 +205,105 @@ def test_invalid_unit_definitions() -> None:
             Length.define_unit("invalid", reference=u.nm, scale=scale)
     with pytest.raises(ValueError, match="offset"):
         Length.define_unit("shifted", reference=u.nm, offset=1)
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("5 nm", 50.0),
+        ("5nm", 50.0),
+        ("  -1.5e-1  nm ", -1.5),
+        ("1e-9m", 10.0),
+        (".5 Angstrom", 0.5),
+        ("2 Ang", 2.0),
+    ],
+)
+def test_quantity_strings_allow_an_optional_space(text: str, expected: float) -> None:
+    assert Length.parse(text).value == pytest.approx(expected)
+    assert TypeAdapter(Length[float]).validate_python(text).value == pytest.approx(
+        expected
+    )
+
+
+@pytest.mark.parametrize("text", ["nm", "five nm", ""])
+def test_quantity_strings_need_a_number_and_a_unit(text: str) -> None:
+    with pytest.raises(ValueError, match="Expected '<number> <unit>'"):
+        Length.parse(text)
+
+
+def test_quantity_string_schema_is_portable() -> None:
+    # JSON Schema patterns are ECMA-262: no Python-only named groups or flags.
+    pattern = TypeAdapter(Length[float]).json_schema()["anyOf"][1]["pattern"]
+    assert "(?P<" not in pattern
+    assert "(?i" not in pattern
+
+
+def _every_unit() -> list[Unit[Any]]:
+    return list(dict.fromkeys(get_unit(name) for name in unit_specs()))
+
+
+@pytest.mark.parametrize("unit", _every_unit(), ids=lambda unit: unit.name)
+def test_printed_quantities_parse_back(unit: Unit[Any]) -> None:
+    # Calls are typed on each kind's own unit class; this test spans all kinds.
+    quantity = cast("Quantity[Any, float, Any]", cast("Any", unit)(1.5))
+    restored = type(quantity).parse(str(quantity))
+    assert restored.unit is unit
+    assert restored == quantity
+
+
+@pytest.mark.parametrize("text", ["5", "5 ", "15", "1.5", "1e5", " -2 "])
+def test_a_number_without_a_unit_says_so(text: str) -> None:
+    with pytest.raises(ValueError, match="has no unit"):
+        Length.parse(text)
+
+
+def test_dimensionless_values_parse_from_a_bare_number() -> None:
+    assert Dimensionless.parse("0.5") == u.one(0.5)
+    assert Dimensionless.parse(str(u.one(0.25))) == u.one(0.25)
+    adapter = TypeAdapter(Dimensionless[float])
+    assert adapter.validate_python("0.5") == u.one(0.5)
+    with pytest.raises(ValidationError, match="has no unit"):
+        TypeAdapter(Length[float]).validate_python("0.5")
+
+
+class _Gromacs(UnitSystem, name="test-validation:gromacs"):
+    length = u.nanometer
+    energy = u.kJ_per_mol
+    time = u.picosecond
+
+
+def test_system_units_parse_from_their_symbols() -> None:
+    force = Force[float, _Gromacs].from_value(2.0)
+    assert force.unit is not None
+    assert force.unit.symbol == "kJ/mol/nm"
+    assert Force[float, _Gromacs].parse(str(force)) == force
+
+
+def test_an_ambiguous_symbol_names_the_candidates() -> None:
+    first = Length.define_unit("lab:first", reference=u.nm, symbol="lu")
+    second = Length.define_unit("lab:second", reference=u.nm, scale=2.0, symbol="lu")
+    with pytest.raises(ValueError, match="lab:first, lab:second"):
+        Length.parse("1 lu", units=(first, second))
+
+
+def test_units_must_be_named_by_strings_of_the_expected_kind() -> None:
+    with pytest.raises(ValueError, match="Unit identifier must be a string"):
+        Length.parse({"magnitude": 1, "unit": 5})
+    custom = Energy.define_unit("lab:spark", reference=u.eV, scale=2.0)
+    with pytest.raises(ValueError, match="Expected Length; received Energy"):
+        Length.parse({"magnitude": 1, "unit": "lab:spark"}, units=(custom,))
+    with pytest.raises(ValueError, match="Unknown unit"):
+        resolve_unit("lab:nothing")
+
+
+def test_parse_restores_float64_array_storage() -> None:
+    narrow = Length[NDArray[np.float32]]([1.0], u.nm)
+    restored = Length.parse(narrow).value
+    assert isinstance(restored, np.ndarray)
+    assert restored.dtype == np.float64
+
+
+def test_parse_keeps_float64_arrays_as_they_are() -> None:
+    restored = Length.parse({"magnitude": [1.0, 2.0], "unit": "nm"}).value
+    assert isinstance(restored, np.ndarray)
+    assert restored.dtype == np.float64

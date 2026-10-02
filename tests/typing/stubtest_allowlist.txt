@@ -1,25 +1,35 @@
 # Python 3.12 generic runtime metadata is not represented by mypy's PEP 695 stubs.
+# PEP 695 cannot declare the defaulted unit-system parameter before Python 3.13,
+# so the stubs declare typing_extensions TypeVars that the runtime has no use for.
+^quantype\.(core|_generated)\.(K|V|S)$
 ^quantype\._generated\.[A-Za-z]+\.__type_params__$
 ^quantype\.core\.Quantity\.__type_params__$
+^quantype\.core\.Constant\.__type_params__$
 ^quantype\._internal\._unit\.Unit\.__type_params__$
 ^quantype\._internal\._kind_types\.(Div|Mul|Pow)\.__type_params__$
 
 # A type alias has no runtime tuple base class (stubtest treats it as a class).
 ^quantype\._internal\._registry\.Dimensions$
 ^quantype\._internal\._semantics\.Semantic$
+^quantype\._internal\._codata\.Edition$
+^quantype\._internal\._registry\.Relations$
+^quantype\._internal\._(jax|numpy|torch)\._(Argnums|Metadata|Quantity|RawFunction)$
+^quantype\.codegen\._table\.(Monomial|Operation|Product)$
 
 # functools.cache exposes a variadic checker signature but preserves runtime __wrapped__.
-^quantype\._internal\._registry\.unit_specs$
+^quantype\._internal\._registry\._unit_specs$
 
 # Standard static generics are retained; the runtime alias adds conversion on call.
 ^quantype\.core\.Quantity\.__class_getitem__$
 
-# NumPy coercion/dispatch methods intentionally reject implicit unit loss.
-^quantype\.core\.Quantity\.(__array__|__array_function__|__array_priority__|__array_ufunc__)$
+# Runtime-only: truthiness always raises, and float() converts only a scalar
+# Dimensionless quantity, whose generated class declares it; elsewhere float()
+# stays a static error.
+^quantype\.core\.Quantity\.(__bool__|__float__)$
 
-# Runtime abs(Temperature) always raises; its static special method is disabled
-# explicitly because mypy ignores self restrictions through SupportsAbs.
-^quantype\._generated\.Temperature\.__abs__$
+# NumPy and Torch dispatch methods: unit rules at runtime; NumPy's and Torch's
+# stubs do not accept quantities, so declaring them would type results as arrays.
+^quantype\.core\.Quantity\.(__array__|__array_function__|__array_priority__|__array_ufunc__|__torch_function__)$
 
 # Unit calls/operators have kind-specific overloads on the generated unit types.
 # NumPy dispatch and array priority are runtime-only implementation details.
@@ -27,4 +37,22 @@
 
 # The unit catalogue's stub variables use kind-specific static subclasses of
 # Unit so unit calls return named quantities; runtime instances are plain Unit.
-^quantype\.units\.(GPa|Ha|Hz|J|J_per_atom|K|N|Pa|Ry|THz|ampere_meter_squared|angstrom|angstrom2|angstrom3|angstrom_cubed|angstrom_per_fs|angstrom_squared|atom|atom_per_angstrom_cubed|bohr|bohr_magneton|bohr_magneton_per_angstrom_cubed|celsius|centimeter|cm|deg|degC|degree|delta_K|delta_celsius|delta_degC|delta_kelvin|dimensionless|eV|eV_per_angstrom|eV_per_angstrom_cubed|eV_per_angstrom_squared|eV_per_atom|electron|electron_per_angstrom_cubed|electron_volt|energy_density|energy_per_volume|femtosecond|frequency_per_fs|fs|gigapascal|hartree|hartree_per_atom|hartree_per_bohr|hartree_per_bohr_cubed|hertz|joule|kelvin|kelvin_per_fs|m|meV|meter|metre|millielectron_volt|mu_B|nanometer|newton|nm|one|pascal|per_fs|picosecond|ps|rad|radian|rydberg|s|second|terahertz)$
+^quantype\.units\.(?!_)(?!(exp|sin|sqrt)$)[A-Za-z0-9_]+$
+
+# UnitSystem subclasses must pass name=, which stubtest's probe subclass omits.
+^quantype\._internal\._systems\.(UnitSystem|Atomistic|Metal|Real|SI|CGS|Atomic)$
+# The static signature requires name=; the runtime default gives a clearer error.
+^quantype\._internal\._systems\.UnitSystem\.__init_subclass__$
+# A descriptor: each concrete system computes its own units on access.
+^quantype\._internal\._systems\.UnitSystem\.units$
+
+# The stub types qnp.linalg's functions with its catalogue's classes; at runtime
+# every catalogue shares one namespace object.
+^quantype\.numpy\.linalg$
+
+# Products dispatch through protocol members that exist only in the stubs: each
+# class's _rmul_*/_rtruediv_* members, and the stub-only modules
+# holding one product or constant class each (the runtime defines those classes
+# in quantype.products and quantype._generated).
+^quantype\.(_generated|products)\.\w+\._r(mul|truediv)_\w+$
+^quantype\.(_products|_constants)(\..*)?$

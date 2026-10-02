@@ -1,5 +1,6 @@
 """Run with pytest after generating labquantities in this fixture project."""
 
+import labquantities.numpy as qnp
 import pytest
 from labquantities import (
     InverseTime,
@@ -13,6 +14,7 @@ from labquantities import (
 
 from quantype import Length as OriginalLength
 from quantype import u as original_units
+from quantype.systems import SI, Atomistic
 
 
 def test_physical_algebra() -> None:
@@ -30,7 +32,7 @@ def test_physical_algebra() -> None:
     assert isinstance(inverse, InverseTime)
     assert inverse.value == 0.5
     inverse_tension = 1.0 / (length * pressure)
-    assert inverse_tension.kind == "Div[Dimensionless,SurfaceTension]"
+    assert inverse_tension.kind == "Pow[SurfaceTension,-1]"  # as tension ** -1
     assert inverse_tension.value == 1.0 / (length * pressure).value
 
 
@@ -41,7 +43,8 @@ def test_structural_reciprocals() -> None:
         (2 * u.angstrom) ** 4,
     )
     for q in quantities:
-        assert type(q) is Quantity
+        # Product classes belong to this catalogue's structural base.
+        assert isinstance(q, Quantity)
         scalar_inverse = 1 / q
         assert type(scalar_inverse) is Quantity
         explicit_inverse = u.one(1) / q
@@ -56,6 +59,24 @@ def test_structural_reciprocals() -> None:
     other = original_units.one(1) / quantities[0]
     with pytest.raises(TypeError, match="Cannot add"):
         other + 1 / quantities[0]
+
+
+def test_unit_systems_cover_new_kinds() -> None:
+    tension = Length[float, SI](2, u.nm) * Pressure[float, SI](3, u.pascal)
+    assert isinstance(tension, SurfaceTension)
+    assert tension.system is SI
+    assert tension.value == pytest.approx(6e-9)
+    unit = SI.unit_for(SurfaceTension)
+    assert unit.name == "si:SurfaceTension"
+    assert unit.symbol == "J/m^2"
+    assert Atomistic.unit_for(SurfaceTension) is u.surface_tension.surface_tension
+    assert tension.to_system(Atomistic).magnitude(unit) == pytest.approx(6e-9)
+    wire = tension.to_dict()
+    assert wire["unit"] == "si:SurfaceTension"
+    assert SurfaceTension[float, SI].parse(wire).value == pytest.approx(6e-9)
+    restored = SurfaceTension.parse(wire, units=SI.units)
+    assert restored.magnitude(unit) == pytest.approx(6e-9)
+    assert qnp.sqrt(Length[float, SI](2, u.nm) ** 2).system is SI
 
 
 def test_portable_unit_factors() -> None:
@@ -80,10 +101,13 @@ def test_serialization_roundtrip() -> None:
 def test_math_preserves_catalogue() -> None:
     length = Length[float](2, u.length.angstrom)
 
-    result = u.sqrt(length**2)
+    result = qnp.sqrt(length**2)
 
     assert isinstance(result, Length)
     assert result.value == length.value
+    ratio = length / length
+    assert type(qnp.exp(ratio)) is type(ratio)  # the catalogue's own Dimensionless
+    assert type(qnp.arccos(ratio)).__module__.startswith("labquantities")
 
 
 def test_temperature_difference() -> None:
