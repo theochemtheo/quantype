@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+# The range estimate for unlisted kinds is tested directly.
+# pyright: reportPrivateUsage=false
 import json
 import math
 import re
@@ -25,8 +27,8 @@ from quantype import (
     u,
 )
 from quantype._internal._registry import RELATIONS, close_relations
-from quantype._internal._semantics import KINDS
-from quantype._internal._systems import coherence, range_table
+from quantype._internal._semantics import KINDS, Kind
+from quantype._internal._systems import _AXIS_TYPICAL, _typical, coherence, range_table
 from quantype._internal._unit import known_kinds
 from quantype.core import get_unit
 from quantype.serialization import load_npz, save_npz
@@ -357,3 +359,33 @@ def test_pydantic_fields_choose_their_system() -> None:
         ValueError, match=r"Expected a quantity in SI; received one in Atomistic"
     ):
         SIConfig(cutoff=u.nm(1.0), timestep=Time[float, Metal](1, u.fs))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
+
+
+def test_base_units_must_be_units() -> None:
+    wrong: Any = 3.0
+    with pytest.raises(
+        TypeError, match=r"Numbers\.length must be a unit; received float"
+    ):
+
+        class Numbers(UnitSystem, name="numbers"):  # pyright: ignore[reportUnusedClass]
+            length = wrong
+            energy = u.eV
+            time = u.fs
+
+
+def test_the_base_class_has_no_units_to_decode() -> None:
+    assert UnitSystem.units == ()
+
+
+def test_range_reports_mark_only_squared_magnitudes() -> None:
+    plain = next(i for i in SI.check_range(np.float16) if not i.squared)
+    assert "²" not in str(plain)
+
+
+def test_kinds_without_a_listed_range_derive_one_from_their_dimensions() -> None:
+    unlisted = Kind("ApplicationArea", (2, 0, 0, 0, 0, 0, 0, 0), "square_angstrom")
+    low, high = _AXIS_TYPICAL[0]
+    assert _typical(unlisted) == pytest.approx((low**2, high**2))
+    inverse = Kind("ApplicationInverseTime", (0, 0, -1, 0, 0, 0, 0, 0), "per_fs")
+    low, high = _AXIS_TYPICAL[2]
+    assert _typical(inverse) == pytest.approx((1 / high, 1 / low))

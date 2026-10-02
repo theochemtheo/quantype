@@ -338,8 +338,6 @@ def _overrides(cls: type[UnitSystem]) -> dict[Kind, Unit[Any]]:
                 f"{cls.__name__} overrides {unit.kind}, a base axis; "
                 f"set its base unit instead"
             )
-        if unit.offset:
-            raise ValueError(f"{cls.__name__} overrides {unit.kind} with an offset")
         if unit.semantic in overridden:
             raise TypeError(f"{cls.__name__} overrides {unit.kind} twice")
         overridden[unit.semantic] = unit

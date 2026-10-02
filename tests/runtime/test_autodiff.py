@@ -216,3 +216,21 @@ def test_jax_grad_requires_one_system() -> None:
     untyped: Any = ujax.grad
     with pytest.raises(TypeError, match=r"argument's unit system \(SI\)"):
         untyped(leaks)(Length[jax.Array, SI](_jnp.array(1.0), u.nm))
+
+
+def test_jax_storage_rejects_complex_and_integer_dtypes() -> None:
+    untyped: Any = jnp
+    complex_values = untyped.array([1j])
+    with pytest.raises(ValueError, match="magnitudes must be real numbers"):
+        Length[jax.Array](complex_values, u.nm)
+    with pytest.raises(ValueError, match="real floating dtype"):
+        Length[jax.Array]([1.0], u.nm, dtype=jnp.int32)
+
+
+def test_jax_differentiates_only_functions_returning_quantities() -> None:
+    def raw(x: Length[jax.Array]) -> jax.Array:
+        return x.value.sum()
+
+    grad: Any = ujax.grad
+    with pytest.raises(TypeError, match="must return a Quantity"):
+        grad(raw)(Length[jax.Array]([1.0], u.nm))

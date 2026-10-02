@@ -23,6 +23,7 @@ from quantype import (
     utorch,
 )
 from quantype.systems import SI
+from quantype.testing import assert_allclose
 
 
 def _torch_harmonic(x: Length[torch.Tensor]) -> Energy[torch.Tensor]:
@@ -187,3 +188,41 @@ def test_statistics_products_and_ranges_on_tensors() -> None:
     assert lengths.size == 3
     assert lengths.copy().value is not lengths.value
     assert type(lengths[0].item().value) is float
+
+
+def test_tensor_reductions_ranges_and_clipping() -> None:
+    lengths = Length[torch.Tensor](torch.tensor([[1.0, 3.0], [2.0, 0.5]]), u.nm)
+    assert torch.equal(lengths.max(axis=1).magnitude(), torch.tensor([3.0, 2.0]))
+    assert torch.equal(lengths.min().magnitude(), torch.tensor(0.5))
+    start = Length[torch.Tensor](torch.tensor(0.0), u.nm)
+    grid = qnp.linspace(start, start + 1 * u.nm, 4, endpoint=False)
+    assert torch.allclose(grid.magnitude(), torch.tensor([0.0, 0.25, 0.5, 0.75]))
+    area = qnp.trapezoid(lengths[0], dx=2.0)
+    assert float(area.magnitude()) == 4.0
+    clip: Any = torch.clip
+    clipped = clip(lengths, min=1 * u.nm, max=2 * u.nm)
+    assert torch.equal(clipped.magnitude(), torch.tensor([[1.0, 2.0], [2.0, 1.0]]))
+
+
+def test_tensors_on_the_left_and_storage_dtypes() -> None:
+    narrow = Length[torch.Tensor](torch.tensor([1.0], dtype=torch.float32), u.angstrom)
+    scaled = cast("Any", torch.ones(1)) * narrow
+    assert isinstance(scaled, Length)
+    wide = narrow * torch.tensor([2.0], dtype=torch.float64)
+    assert wide.value.dtype == torch.float32
+    with pytest.raises(TypeError, match="unhashable array storage: Tensor"):
+        hash(narrow)
+    with pytest.raises(TypeError, match="parse accepts scalar/NumPy storage"):
+        Length.parse(narrow)
+
+
+def test_tensor_storage_rejects_complex_and_integer_dtypes() -> None:
+    with pytest.raises(ValueError, match="magnitudes must be real numbers"):
+        Length[torch.Tensor](torch.tensor([1j]), u.nm)
+    with pytest.raises(ValueError, match="real floating dtype"):
+        Length[torch.Tensor]([1.0], u.nm, dtype=torch.int64)
+
+
+def test_assert_allclose_accepts_tensors_that_require_gradients() -> None:
+    tracked = torch.tensor([1.0, 2.0], requires_grad=True)
+    assert_allclose(Length[torch.Tensor](tracked, u.nm), u.nm(torch.tensor([1.0, 2.0])))

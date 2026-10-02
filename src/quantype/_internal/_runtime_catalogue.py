@@ -28,15 +28,13 @@ class RuntimeCatalogue:
             )
             for name, spec in catalogue.quantities.items()
         }
-        if "Temperature" in self.kinds:
-            TEMPERATURE_DIFFERENCES[self.kinds["Temperature"]] = self.kinds[
-                "TemperatureDifference"
-            ]
-        if "Dimensionless" in self.kinds:
-            DIMENSIONLESS_KINDS.update(
-                dict.fromkeys(self.kinds.values(), self.kinds["Dimensionless"])
-            )
-            CATALOGUE_KINDS[self.kinds["Dimensionless"]] = self.kinds
+        TEMPERATURE_DIFFERENCES[self.kinds["Temperature"]] = self.kinds[
+            "TemperatureDifference"
+        ]
+        DIMENSIONLESS_KINDS.update(
+            dict.fromkeys(self.kinds.values(), self.kinds["Dimensionless"])
+        )
+        CATALOGUE_KINDS[self.kinds["Dimensionless"]] = self.kinds
         self.units: dict[str, Unit[Any]] = {}
         by_kind: dict[Kind, list[Unit[Any]]] = {
             kind: [] for kind in self.kinds.values()

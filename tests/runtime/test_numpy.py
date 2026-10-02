@@ -211,6 +211,17 @@ def test_every_function_passes_plain_arrays_to_numpy() -> None:
     assert qnp.std(a) == np.std(a)
     assert qnp.absolute(-2.0) == 2
     assert qnp.sqrt(4.0) == 2
+    np.testing.assert_allclose(qnp.sort(a), [0, 1, 2])
+    assert qnp.median(a) == 1
+    assert qnp.nansum(a) == 3
+    assert qnp.quantile(a, 0.5) == 1
+    assert qnp.nanstd(a) == np.std(a)
+    assert qnp.var(a) == np.var(a)
+    np.testing.assert_allclose(qnp.square(a), [1, 4, 0])
+    np.testing.assert_allclose(qnp.hypot(a, b), np.hypot(a, b))
+    np.testing.assert_allclose(qnp.linspace(0.0, 1.0, 3), [0, 0.5, 1])
+    assert qnp.matmul(a, b) == 2
+    assert qnp.trapezoid(a) == 2.5
 
 
 def test_dot_and_cross_need_two_quantities() -> None:
@@ -341,3 +352,36 @@ def test_array_conveniences() -> None:
     assert positions.argmax() == 3
     np.testing.assert_array_equal(positions[0].argsort(), [0, 1])
     assert isinstance(positions.var(), Area)
+
+
+def test_quantities_and_plain_numbers_do_not_mix_in_functions() -> None:
+    with pytest.raises(TypeError, match="maximum expects quantities of one kind"):
+        qnp.maximum(2 * u.nm, cast("Any", 3.0))
+    with pytest.raises(TypeError, match="linspace expects quantities of one kind"):
+        qnp.linspace(0 * u.nm, cast("Any", 1.0))
+
+
+def test_square_roots_of_squared_products_and_ratios() -> None:
+    product = (2 * u.nm) * (3 * u.fs) * u.eV(1)
+    untyped: Any = qnp
+    root = untyped.sqrt(product * product)
+    assert root.kind == product.kind
+    assert root.value == pytest.approx(product.value)
+    assert qnp.sqrt(u.one(4.0)) == u.one(2.0)
+
+
+def test_shape_helpers_keep_the_kind() -> None:
+    positions = _lengths([[1.0, 2.0], [3.0, 4.0]], u.nm)
+    zeros = qnp.zeros_like(positions)
+    assert isinstance(zeros, Length)
+    assert zeros.unit is u.nm
+    np.testing.assert_array_equal(zeros.value, 0)
+    assert numpy.ndim(positions) == 2
+    assert isinstance(qnp.var(Length[np.float64](2, u.nm)).value, np.float64)
+
+
+def test_integrating_plain_numbers_over_a_quantity_keeps_its_kind() -> None:
+    times = Time[Array]([0.0, 1.0, 2.0], u.fs)
+    total = qnp.trapezoid(np.ones(3), times)
+    assert isinstance(total, Time)
+    assert total.magnitude(u.fs) == pytest.approx(2)

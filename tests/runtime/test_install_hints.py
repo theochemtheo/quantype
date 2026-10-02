@@ -68,3 +68,43 @@ def test_missing_backend_names_the_extra(root: str, adapter: str) -> None:
     ):
         importlib.import_module(adapter)
     assert not any(isinstance(finder, _Blocker) for finder in sys.meta_path)
+
+
+class _ModuleBlocker:
+    """A meta-path finder that makes one module unimportable."""
+
+    def __init__(self, name: str) -> None:
+        self._name = name
+
+    def find_spec(
+        self, fullname: str, path: object = None, target: ModuleType | None = None
+    ) -> ModuleSpec | None:
+        del path, target
+        if fullname == self._name:
+            raise ModuleNotFoundError(f"No module named {fullname!r}", name=fullname)
+        return None
+
+
+@pytest.mark.parametrize(
+    ("root", "adapter"), [("jax", "quantype.ujax"), ("torch", "quantype.utorch")]
+)
+def test_other_missing_modules_are_not_reported_as_the_extra(
+    root: str, adapter: str
+) -> None:
+    internal = f"quantype._internal._{root}"
+    saved = {
+        name: sys.modules.pop(name)
+        for name in (adapter, internal)
+        if name in sys.modules
+    }
+    blocker = _ModuleBlocker(internal)
+    sys.meta_path.insert(0, blocker)
+    try:
+        with pytest.raises(ModuleNotFoundError) as raised:
+            importlib.import_module(adapter)
+        assert raised.value.name == internal
+    finally:
+        sys.meta_path.remove(blocker)
+        for name in (adapter, internal):
+            sys.modules.pop(name, None)
+        sys.modules.update(saved)

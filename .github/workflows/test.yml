@@ -183,3 +183,31 @@ jobs:
       - run: uv run --no-sync pytest tests/runtime
         env:
           QUANTYPE_TEST_TIER: base
+
+  test-gate:
+    needs:
+      - lint
+      - typecheck
+      - coverage
+      - coverage-badge
+      - python-versions
+      - tiers
+      - minimum-core
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every test job to pass or be skipped
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          echo "test job results: $RESULTS"
+          for result in $RESULTS; do
+            case "$result" in
+              success | skipped) ;;
+              *)
+                echo "::error::a test job did not pass ($result)"
+                exit 1
+                ;;
+            esac
+          done

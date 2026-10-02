@@ -1070,6 +1070,7 @@ def numpy_products(catalogue: Catalogue, quantity: str) -> str:
                 "trapezoid", "y", "x", ", dx: float = ..., axis: int = ..."
             ),
             f"def trapezoid[Q: {quantity}](y: Q, x: _Numerical | None = ..., dx: float = ..., axis: int = ...) -> Q: ...",
+            f"def trapezoid[Q: {quantity}](y: _Numerical, x: Q, dx: float = ..., axis: int = ...) -> Q: ...",
             "def trapezoid(y: _Numerical, x: _Numerical | None = ..., dx: float = ..., axis: int = ...) -> Any: ...",
         ],
         indent="",

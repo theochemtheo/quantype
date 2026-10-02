@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 # Runtime boundary tests deliberately inspect the internal algebra.
 # pyright: reportPrivateUsage=false
@@ -9,6 +9,7 @@ import numpy.typing as npt
 import pytest
 
 import quantype.numpy as qnp
+import quantype.products
 from quantype import (
     Area,
     Energy,
@@ -26,7 +27,9 @@ from quantype import (
 )
 from quantype import units as u
 from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS, UNITS
-from quantype.core import _wrap, dimensions, get_unit
+from quantype._internal._semantics import KINDS
+from quantype.core import _wrap, dimensions, get_unit, result_kind
+from quantype.systems import SI
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -226,3 +229,66 @@ def test_registry_is_dimensionally_consistent() -> None:
         assert UNITS[spec.canonical_unit].kind == kind
         assert UNITS[spec.canonical_unit].scale == 1
         assert UNITS[spec.canonical_unit].offset == 0
+
+
+def test_misused_constructors_and_classes_explain_themselves() -> None:
+    with pytest.raises(TypeError, match=r"Expected a unit, such as u\.angstrom"):
+        Length[float](2, cast("Any", 3))
+    with pytest.raises(TypeError, match="dtype requires a parameterized"):
+        Length(2.0, u.nm, dtype=cast("Any", np.float32))
+    with pytest.raises(TypeError, match="Construct a named quantity"):
+        Quantity(2.0, u.nm)
+    with pytest.raises(TypeError, match="from_value requires a named quantity"):
+        Quantity.from_value(1.0)
+    with pytest.raises(TypeError, match="reinterpret requires a named quantity"):
+        Quantity.reinterpret(2 * u.nm)
+    with pytest.raises(ValueError, match="Expected Length; received Energy"):
+        Length.define_unit("lab:wrong", reference=cast("Any", u.eV))
+    with pytest.raises(ValueError, match="must not be empty"):
+        Length.define_unit(" ", reference=u.nm)
+
+
+def test_operations_without_physical_meaning_raise() -> None:
+    length = 2 * u.nm
+    with pytest.raises(TypeError, match="absolute Temperature from 0"):
+        _ = 0 - cast("Any", 300 * u.K)
+    with pytest.raises(TypeError, match="Cannot subtract Temperature and Length"):
+        _ = cast("Any", 300 * u.K) - length
+    with pytest.raises(TypeError, match="Only integer quantity powers"):
+        _ = length ** cast("Any", 1.5)
+    with pytest.raises(TypeError, match="not supported between"):
+        _ = length < cast("Any", "short")
+    with pytest.raises(ValueError, match="A scalar has no reduction axis"):
+        length.sum(axis=0)
+    flag: Any = True
+    with pytest.raises(TypeError, match="Boolean values are not physical"):
+        u.nm(flag)
+    with pytest.raises(TypeError, match="scale by real numbers"):
+        _ = length * cast("Any", np.dtype("float64"))
+
+
+def test_scalar_storage_hashes_by_value_and_arrays_do_not_hash() -> None:
+    first = Length[np.float64](2, u.nm)
+    assert hash(first) == hash(Length[np.float64](20, u.angstrom))
+    with pytest.raises(TypeError, match="unhashable array storage: ndarray"):
+        hash(u.nm(np.array([1.0])))
+
+
+def test_structural_results_display_their_units() -> None:
+    product = (2 * u.nm) * (3 * u.fs) * u.eV(1)
+    assert repr(product**2) == "Quantity(3600.0 (((Å * fs) * eV))^2)"
+    assert repr(product - product) == "Quantity(0.0 ((Å * fs) * eV))"
+    assert repr(u.nm) == "nm"
+
+
+def test_internal_entry_points_reject_unsupported_requests() -> None:
+    with pytest.raises(ValueError, match="Unknown physical operation 'add'"):
+        result_kind("add", KINDS["Length"], KINDS["Length"])
+    with pytest.raises(TypeError, match="from_value requires a named quantity"):
+        Quantity[Any, float, SI].from_value(1.0)
+    with pytest.raises(TypeError, match="NotImplemented"):
+        np.add(cast("Any", u.nm), 1)
+
+
+def test_product_classes_are_listed_for_completion() -> None:
+    assert "LengthTime" in dir(quantype.products)

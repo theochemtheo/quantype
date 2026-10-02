@@ -110,6 +110,8 @@ if not {x64!r}:
 unit = Length.define_unit('lab:huge', reference=u.angstrom, scale=1e100)
 if {x64!r}:
     np.testing.assert_array_equal(Length[jax.Array]([1e-100], unit).value, [1])
+    narrow = Length[jax.Array]([1.0], u.angstrom, dtype='float32')
+    assert (narrow * jnp.array(2.0, dtype=jnp.float64)).value.dtype == jnp.float32
 else:
     try:
         with np.errstate(over='raise', invalid='raise'):

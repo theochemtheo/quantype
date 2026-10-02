@@ -128,3 +128,28 @@ def test_importing_constants_does_not_fix_the_edition() -> None:
         [sys.executable, "-c", code], capture_output=True, text=True, check=False
     )
     assert result.returncode == 0, result.stderr
+
+
+def test_constants_divide_and_raise_to_powers() -> None:
+    boltzmann = constants.k_B
+    assert (boltzmann.kind, boltzmann.dimensions) == (
+        "Entropy",
+        (0, 1, 0, -1, 0, 0, 0, 0),
+    )
+    halved = boltzmann / 2
+    assert type(halved) is type(boltzmann)
+    assert halved.magnitude(u.eV_per_kelvin) == pytest.approx(
+        boltzmann.magnitude(u.eV_per_kelvin) / 2
+    )
+    temperature = Temperature[float](300, u.K)
+    reciprocal: Any = 2 / boltzmann
+    assert (reciprocal * (boltzmann * temperature)).magnitude(u.K) == pytest.approx(600)
+    assert (boltzmann**2).kind == "Pow[Entropy,2]"
+    untyped: Any = boltzmann
+    with pytest.raises(TypeError, match="can't multiply"):
+        _ = untyped * "two"
+
+
+def test_electrostatic_constants_are_reciprocal_kinds() -> None:
+    assert constants.k_e.kind == "Div[Mul[Length,Energy],Pow[Charge,2]]"
+    assert constants.epsilon_0.kind == "Div[Pow[Charge,2],Mul[Length,Energy]]"

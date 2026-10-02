@@ -9,16 +9,12 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from typing import TYPE_CHECKING
 
 import numpy as np
 import pytest
 
-from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
+from quantype.catalogue import Catalogue, QuantitySpec, UnitSpec, builtin_catalogue
 from quantype.codegen import generate, render
-
-if TYPE_CHECKING:
-    from quantype.catalogue import Catalogue
 
 PROJECT_FIXTURE = Path(__file__).parents[1] / "fixtures" / "generated_catalogue"
 
@@ -330,3 +326,34 @@ def test_generated_typing(generated_project: Path, command: tuple[str, ...]) -> 
     reported = {int(line) for line in re.findall(r"invalid\.py:(\d+):", output)}
     assert result.returncode == 1, output
     assert expected <= reported, output
+
+
+def test_the_builtin_package_is_current() -> None:
+    package = Path(__file__).parents[2] / "src" / "quantype"
+    assert generate(builtin_catalogue(), package, check=True) == []
+
+
+def test_checking_an_empty_directory_reports_every_file(tmp_path: Path) -> None:
+    stale = generate(builtin_catalogue(), tmp_path, check=True)
+    assert {"_generated.pyi", "products.py", "numpy.pyi"} <= set(stale)
+    assert not any(tmp_path.iterdir())
+
+
+def _missing(name: str) -> None:
+    del name
+
+
+def test_generation_needs_a_package_name_ruff_and_the_core_kinds(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    with pytest.raises(ValueError, match="Expected a Python package name"):
+        render(builtin_catalogue(), package="lab-quantities")
+    alone = Catalogue(
+        quantities={"Length": QuantitySpec((1, 0, 0, 0, 0, 0, 0, 0), "angstrom")},
+        units={"angstrom": UnitSpec("Length")},
+    )
+    with pytest.raises(ValueError, match="combined builtin catalogue"):
+        render(alone, package="lengths")
+    monkeypatch.setattr(shutil, "which", _missing)
+    with pytest.raises(RuntimeError, match="Ruff on PATH"):
+        generate(builtin_catalogue(), tmp_path)

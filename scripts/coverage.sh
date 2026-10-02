@@ -14,7 +14,7 @@
 set -euo pipefail
 
 # Minimum line-and-branch coverage, percent. Override per run via the environment.
-MIN="${COVERAGE_MIN:-95}"
+MIN="${COVERAGE_MIN:-98}"
 
 mkdir -p coverage
 uv run --no-sync pytest tests/runtime -n auto -p no:sugar \

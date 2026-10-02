@@ -11,10 +11,19 @@ import pytest
 from numpy.typing import NDArray
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
-from quantype import Dimensionless, Force, Length, Pressure, Temperature, Time, u
+from quantype import (
+    Dimensionless,
+    Energy,
+    Force,
+    Length,
+    Pressure,
+    Temperature,
+    Time,
+    u,
+)
 from quantype._internal._registry import unit_specs
 from quantype.core import Quantity, Unit, get_unit
-from quantype.serialization import parse_quantity, to_dict
+from quantype.serialization import parse_quantity, resolve_unit, to_dict
 from quantype.systems import UnitSystem
 
 
@@ -275,3 +284,20 @@ def test_an_ambiguous_symbol_names_the_candidates() -> None:
     second = Length.define_unit("lab:second", reference=u.nm, scale=2.0, symbol="lu")
     with pytest.raises(ValueError, match="lab:first, lab:second"):
         Length.parse("1 lu", units=(first, second))
+
+
+def test_units_must_be_named_by_strings_of_the_expected_kind() -> None:
+    with pytest.raises(ValueError, match="Unit identifier must be a string"):
+        Length.parse({"magnitude": 1, "unit": 5})
+    custom = Energy.define_unit("lab:spark", reference=u.eV, scale=2.0)
+    with pytest.raises(ValueError, match="Expected Length; received Energy"):
+        Length.parse({"magnitude": 1, "unit": "lab:spark"}, units=(custom,))
+    with pytest.raises(ValueError, match="Unknown unit"):
+        resolve_unit("lab:nothing")
+
+
+def test_parse_restores_float64_array_storage() -> None:
+    narrow = Length[NDArray[np.float32]]([1.0], u.nm)
+    restored = Length.parse(narrow).value
+    assert isinstance(restored, np.ndarray)
+    assert restored.dtype == np.float64
