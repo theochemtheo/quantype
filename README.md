@@ -82,7 +82,7 @@ force = (3 * u.eV) / a
 assert force.value == 0.15  # eV/Å, with no conversion in the division
 
 x = Length[float, SI](2, u.nm)
-assert x.value == 2e-9  # SI stores metres
+assert x.value == 2e-9  # SI stores meters
 assert_type(Energy[float, SI](3, u.eV) / x, Force[float, SI])  # newtons
 assert (a + x.to_system(Atomistic)).magnitude(u.nm) == 4.0
 ```
@@ -176,7 +176,7 @@ relations.
   comparing numbers.
 - JSON, Pydantic, and NPZ serialization, with no pickle. Values keep the unit
   they were given in, so a configuration's `"0.5 nm"` is saved as 0.5
-  nanometres.
+  nanometers.
 - Temperatures: 30 °C minus 20 °C is a `TemperatureDifference` of 10 Δ°C, and
   `k_B * T` is an energy.
 - A product is named by its factors, in any order or grouping: `m * v**2`,
@@ -196,10 +196,10 @@ relations.
 - [Custom catalogues](https://github.com/theochemtheo/quantype/blob/main/docs/custom-catalogues.md)
 - [Development and conformance checks](https://github.com/theochemtheo/quantype/blob/main/docs/development.md)
 
-## Licence
+## License
 
 quantype is dual-licensed under the [MIT](https://github.com/theochemtheo/quantype/blob/main/LICENSE-MIT) and
-[Apache 2.0](https://github.com/theochemtheo/quantype/blob/main/LICENSE-APACHE) licences, at your option.
+[Apache 2.0](https://github.com/theochemtheo/quantype/blob/main/LICENSE-APACHE) licenses, at your option.
 
 ## Development
 

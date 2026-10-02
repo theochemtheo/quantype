@@ -24,7 +24,7 @@ option where each static type gives `.value` one meaning, systems never mix
 silently, and existing annotations keep their meaning.
 
 `Length[float]` is `Length[float, Atomistic]`, and `Length[float, SI]` stores
-metres. Combining systems is rejected by all four checkers and raises
+meters. Combining systems is rejected by all four checkers and raises
 `TypeError` at runtime; `.to_system(T)` is the only bridge. The prototypes
 behind this are in [unit storage](../design/unit-storage.md).
 

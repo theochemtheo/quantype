@@ -47,7 +47,7 @@ class Gromacs(UnitSystem, name="gromacs"):
 
 
 cutoff = Length[float, Gromacs](1.2, u.nm)
-assert cutoff.value == 1.2  # raw numbers are in nanometres
+assert cutoff.value == 1.2  # raw numbers are in nanometers
 
 raw = np.zeros((100, 3), dtype=np.float32)  # from a GROMACS kernel
 forces = Force[npt.NDArray[np.float32], Gromacs].from_value(raw)  # kJ/mol/nm

@@ -1,6 +1,6 @@
 """Unit systems: what a quantity's raw numbers mean.
 
-``Length[float, SI]`` stores metres and ``Length[float]`` stores ångströms,
+``Length[float, SI]`` stores meters and ``Length[float]`` stores ångströms,
 because ``Atomistic`` is the default system. Systems never mix implicitly;
 ``.to_system(...)`` is the explicit bridge. Subclass ``UnitSystem`` to define
 your own.

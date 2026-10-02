@@ -297,7 +297,7 @@ def load_npz[Q](
 ) -> Q:
     """Restore to the explicit quantity/storage/system type, whatever the source.
 
-    ``Length[NDArray[np.float64], SI]`` restores metres. Archives are system
+    ``Length[NDArray[np.float64], SI]`` restores meters. Archives are system
     independent: one written from any system decodes into any other.
     """
     cls = get_origin(target) or target

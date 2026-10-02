@@ -31,7 +31,7 @@ development dependency only.
 
 * Good, because conversions are reproducible across environments, and NPZ
   archives record the edition as provenance.
-* Good, because the editions are a `Literal` type, so a misspelt edition is a
+* Good, because the editions are a `Literal` type, so a misspelled edition is a
   type error.
 * Bad, because changing the edition after the first unit is used raises
   `RuntimeError`, so a process can't compare editions directly.

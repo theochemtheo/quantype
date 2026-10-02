@@ -31,7 +31,7 @@ float. Product classes inherit kind-preserving methods from the base class.
 Constant classes carry protocol members too, and each has its own stub module
 under `_constants/`, because together they exceed Pyright's per-module
 complexity limit. The runtime table is stored as text rows and parsed lazily,
-because a tuple literal took Pyright 47 s to analyse.
+because a tuple literal took Pyright 47 s to analyze.
 
 ### Consequences
 

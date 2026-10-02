@@ -21,9 +21,11 @@ Each kind of information has one home. Link to it rather than restating it.
 - Generated files come from the catalogue and the renderers. Change those, run
   `uv run just generate`, and commit the output; `uv run just check-generated`
   fails on drift.
-- Runtime behaviour and static types agree. A change to either needs a runtime
+- Runtime behavior and static types agree. A change to either needs a runtime
   test and a typing test
   ([ADR-002](docs/decisions/ADR-002-generated-stubs-for-four-checkers.md)).
+- Prose uses American spelling, except "catalogue", which follows the API
+  ([ADR-012](docs/decisions/ADR-012-american-spelling-except-catalogue.md)).
 - A change that contradicts an accepted decision starts as a proposal in
   `docs/proposals/`; see [decisions](docs/decisions/README.md).
 - `notes/`, where present, is local design history that git ignores and can't

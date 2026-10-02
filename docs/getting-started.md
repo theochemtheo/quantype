@@ -69,7 +69,7 @@ from quantype import Energy, Length, u
 from quantype.systems import SI, Real
 
 x = Length[float, SI](2, u.nm)
-assert x.value == 2e-9  # SI storage: metres
+assert x.value == 2e-9  # SI storage: meters
 assert repr(x) == "Length(2.0 nm, SI)"
 
 kernel_input = (1.0 * u.eV).to_system(Real)  # LAMMPS real units
