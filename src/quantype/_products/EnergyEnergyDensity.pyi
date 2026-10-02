@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.EnergyDensity import _EnergyDensityConstant
 from quantype._generated import Dimensionless, Energy, EnergyDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyDensityKind, EnergyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -70,7 +71,11 @@ class EnergyEnergyDensity(Quantity[Mul[EnergyKind, EnergyDensityKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EnergyEnergyDensity[V, S] | EnergyEnergyDensity[float, S], /
+        self,
+        other: EnergyEnergyDensity[V, S]
+        | EnergyEnergyDensity[float, S]
+        | _EnergyEnergyDensityConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EnergyEnergyDensity[V, S]: ...
@@ -193,3 +198,77 @@ class EnergyEnergyDensity(Quantity[Mul[EnergyKind, EnergyDensityKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyEnergyDensity[W, S]: ...
+
+class _EnergyEnergyDensityConstant(Constant[Mul[EnergyKind, EnergyDensityKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyEnergyDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyKind, EnergyDensityKind]]
+    ) -> EnergyEnergyDensity[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyKind, EnergyDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyEnergyDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyKind, EnergyDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _EnergyConstant, /) -> _EnergyDensityConstant: ...
+    @overload
+    def __truediv__(self, other: _EnergyDensityConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyEnergyDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyKind, EnergyDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyEnergyDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyEnergyDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyKind, EnergyDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyEnergyDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyKind, EnergyDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[EnergyKind, EnergyDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyKind, EnergyDensityKind]], W, T]: ...

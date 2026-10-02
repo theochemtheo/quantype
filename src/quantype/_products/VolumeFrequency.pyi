@@ -13,6 +13,7 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Time import _TimeConstant
@@ -27,7 +28,7 @@ from quantype._generated import (
     Velocity,
     Volume,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, FrequencyKind, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -120,7 +121,11 @@ class VolumeFrequency(Quantity[Mul[VolumeKind, FrequencyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: VolumeFrequency[V, S] | VolumeFrequency[float, S], /
+        self,
+        other: VolumeFrequency[V, S]
+        | VolumeFrequency[float, S]
+        | _VolumeFrequencyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> VolumeFrequency[V, S]: ...
@@ -254,3 +259,107 @@ class VolumeFrequency(Quantity[Mul[VolumeKind, FrequencyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VolumeFrequency[W, S]: ...
+
+class _VolumeFrequencyConstant(Constant[Mul[VolumeKind, FrequencyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> VolumeFrequency[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[VolumeKind, FrequencyKind]]
+    ) -> VolumeFrequency[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TimeConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[VolumeKind, FrequencyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeFrequencyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[VolumeKind, FrequencyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AreaConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __truediv__(self, other: _VolumeConstant, /) -> _FrequencyConstant: ...
+    @overload
+    def __truediv__(self, other: _VelocityConstant, /) -> _AreaConstant: ...
+    @overload
+    def __truediv__(self, other: _FrequencyConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __truediv__(self, other: _InverseTimeConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _VolumeFrequencyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[VolumeKind, FrequencyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeFrequencyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Velocity[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VolumeFrequency[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[VolumeKind, FrequencyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeFrequencyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[VolumeKind, FrequencyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[VolumeKind, FrequencyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[VolumeKind, FrequencyKind]], W, T]: ...
+    def _rmul_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rmul_Time[W, T: UnitSystem](self, other: Time[W, T], /) -> Volume[W, T]: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _VolumeConstant: ...
+    def _rtruediv_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Time[float, T]: ...
+    def _rtruediv_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Time[W, T]: ...
+    def _ctruediv_Volume(self, other: _VolumeConstant, /) -> _TimeConstant: ...

@@ -14,6 +14,10 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._generated import (
     Action,
     AtomCount,
@@ -22,7 +26,7 @@ from quantype._generated import (
     Frequency,
     InverseTime,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, DimensionlessKind, Div, EnergyPerAtomKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -90,7 +94,11 @@ class EnergyPerAtomPerAction(Quantity[Div[EnergyPerAtomKind, ActionKind], V, S])
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EnergyPerAtomPerAction[V, S] | EnergyPerAtomPerAction[float, S], /
+        self,
+        other: EnergyPerAtomPerAction[V, S]
+        | EnergyPerAtomPerAction[float, S]
+        | _EnergyPerAtomPerActionConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EnergyPerAtomPerAction[V, S]: ...
@@ -258,3 +266,118 @@ class EnergyPerAtomPerAction(Quantity[Div[EnergyPerAtomKind, ActionKind], V, S])
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerAtomPerAction[W, S]: ...
+
+class _EnergyPerAtomPerActionConstant(Constant[Div[EnergyPerAtomKind, ActionKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerAtomPerAction[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[EnergyPerAtomKind, ActionKind]]
+    ) -> EnergyPerAtomPerAction[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AtomCountConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __mul__(self, other: _ActionConstant, /) -> _EnergyPerAtomConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[EnergyPerAtomKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomPerActionConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EnergyPerAtomPerActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[EnergyPerAtomKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomPerActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtomPerAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[EnergyPerAtomKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomPerActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[EnergyPerAtomKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[EnergyPerAtomKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[EnergyPerAtomKind, ActionKind]], W, T]: ...
+    def _rmul_AtomCount_f[T: UnitSystem](
+        self, other: AtomCount[float, T], /
+    ) -> InverseTime[float, T]: ...
+    def _rmul_AtomCount[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> InverseTime[W, T]: ...
+    def _cmul_AtomCount(self, other: _AtomCountConstant, /) -> _InverseTimeConstant: ...
+    def _rmul_Action_f[T: UnitSystem](
+        self, other: Action[float, T], /
+    ) -> EnergyPerAtom[float, T]: ...
+    def _rmul_Action[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    def _cmul_Action(self, other: _ActionConstant, /) -> _EnergyPerAtomConstant: ...
+    def _rtruediv_EnergyPerAtom_f[T: UnitSystem](
+        self, other: EnergyPerAtom[float, T], /
+    ) -> Action[float, T]: ...
+    def _rtruediv_EnergyPerAtom[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Action[W, T]: ...
+    def _ctruediv_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _ActionConstant: ...
+    def _rtruediv_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rtruediv_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> AtomCount[W, T]: ...
+    def _ctruediv_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _AtomCountConstant: ...
+    def _rtruediv_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rtruediv_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> AtomCount[W, T]: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _AtomCountConstant: ...

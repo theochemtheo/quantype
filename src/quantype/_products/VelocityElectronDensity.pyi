@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronDensity import _ElectronDensityConstant
 from quantype._constants.Velocity import _VelocityConstant
 from quantype._generated import Dimensionless, ElectronDensity, Velocity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -79,7 +80,9 @@ class VelocityElectronDensity(Quantity[Mul[VelocityKind, ElectronDensityKind], V
     @overload
     def __truediv__(
         self,
-        other: VelocityElectronDensity[V, S] | VelocityElectronDensity[float, S],
+        other: VelocityElectronDensity[V, S]
+        | VelocityElectronDensity[float, S]
+        | _VelocityElectronDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -209,3 +212,79 @@ class VelocityElectronDensity(Quantity[Mul[VelocityKind, ElectronDensityKind], V
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VelocityElectronDensity[W, S]: ...
+
+class _VelocityElectronDensityConstant(
+    Constant[Mul[VelocityKind, ElectronDensityKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> VelocityElectronDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[VelocityKind, ElectronDensityKind]]
+    ) -> VelocityElectronDensity[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[VelocityKind, ElectronDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityElectronDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[VelocityKind, ElectronDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _VelocityConstant, /) -> _ElectronDensityConstant: ...
+    @overload
+    def __truediv__(self, other: _ElectronDensityConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _VelocityElectronDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[VelocityKind, ElectronDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityElectronDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VelocityElectronDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[VelocityKind, ElectronDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityElectronDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[VelocityKind, ElectronDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[VelocityKind, ElectronDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[VelocityKind, ElectronDensityKind]], W, T]: ...

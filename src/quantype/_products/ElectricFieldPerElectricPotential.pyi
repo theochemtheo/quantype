@@ -13,11 +13,18 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.ElectricField import _ElectricFieldConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.Force import _ForceConstant
+from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Length import _LengthConstant
+from quantype._constants.Velocity import _VelocityConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
     Area,
@@ -35,7 +42,7 @@ from quantype._generated import (
     Velocity,
     Volume,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -210,7 +217,8 @@ class ElectricFieldPerElectricPotential(
     def __truediv__(
         self,
         other: ElectricFieldPerElectricPotential[V, S]
-        | ElectricFieldPerElectricPotential[float, S],
+        | ElectricFieldPerElectricPotential[float, S]
+        | _ElectricFieldPerElectricPotentialConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -480,3 +488,218 @@ class ElectricFieldPerElectricPotential(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectricFieldPerElectricPotential[W, S]: ...
+
+class _ElectricFieldPerElectricPotentialConstant(
+    Constant[Div[ElectricFieldKind, ElectricPotentialKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectricFieldPerElectricPotential[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ElectricFieldKind, ElectricPotentialKind]]
+    ) -> ElectricFieldPerElectricPotential[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _LengthConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __mul__(self, other: _AreaConstant, /) -> _LengthConstant: ...
+    @overload
+    def __mul__(self, other: _VolumeConstant, /) -> _AreaConstant: ...
+    @overload
+    def __mul__(self, other: _EnergyConstant, /) -> _ForceConstant: ...
+    @overload
+    def __mul__(self, other: _ForceConstant, /) -> _ForceConstantConstant: ...
+    @overload
+    def __mul__(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _ElectricFieldConstant: ...
+    @overload
+    def __mul__(self, other: _DipoleMomentConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ElectricFieldKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldPerElectricPotentialConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Area[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectricFieldPerElectricPotentialConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ElectricFieldKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldPerElectricPotentialConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricFieldPerElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ElectricFieldKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldPerElectricPotentialConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ElectricFieldKind, ElectricPotentialKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[ElectricFieldKind, ElectricPotentialKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ElectricFieldKind, ElectricPotentialKind]], W, T]: ...
+    def _rmul_Length_f[T: UnitSystem](
+        self, other: Length[float, T], /
+    ) -> Dimensionless[float, T]: ...
+    def _rmul_Length[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    def _cmul_Length(self, other: _LengthConstant, /) -> _DimensionlessConstant: ...
+    def _rmul_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> Length[float, T]: ...
+    def _rmul_Area[W, T: UnitSystem](self, other: Area[W, T], /) -> Length[W, T]: ...
+    def _cmul_Area(self, other: _AreaConstant, /) -> _LengthConstant: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Area[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](self, other: Volume[W, T], /) -> Area[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _AreaConstant: ...
+    def _rmul_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> Force[float, T]: ...
+    def _rmul_Energy[W, T: UnitSystem](self, other: Energy[W, T], /) -> Force[W, T]: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _ForceConstant: ...
+    def _rmul_Force_f[T: UnitSystem](
+        self, other: Force[float, T], /
+    ) -> ForceConstant[float, T]: ...
+    def _rmul_Force[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    def _cmul_Force(self, other: _ForceConstant, /) -> _ForceConstantConstant: ...
+    def _rmul_ElectricPotential_f[T: UnitSystem](
+        self, other: ElectricPotential[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rmul_ElectricPotential[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _cmul_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _ElectricFieldConstant: ...
+    def _rmul_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rmul_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Charge[W, T]: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _ChargeConstant: ...
+    def _rtruediv_Length_f[T: UnitSystem](
+        self, other: Length[float, T], /
+    ) -> Area[float, T]: ...
+    def _rtruediv_Length[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Area[W, T]: ...
+    def _ctruediv_Length(self, other: _LengthConstant, /) -> _AreaConstant: ...
+    def _rtruediv_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_Area[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_Area(self, other: _AreaConstant, /) -> _VolumeConstant: ...
+    def _rtruediv_Force_f[T: UnitSystem](
+        self, other: Force[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_Force[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_Force(self, other: _ForceConstant, /) -> _EnergyConstant: ...
+    def _rtruediv_ForceConstant_f[T: UnitSystem](
+        self, other: ForceConstant[float, T], /
+    ) -> Force[float, T]: ...
+    def _rtruediv_ForceConstant[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Force[W, T]: ...
+    def _ctruediv_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ForceConstant: ...
+    def _rtruediv_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Velocity[float, T]: ...
+    def _rtruediv_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Velocity[W, T]: ...
+    def _ctruediv_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _VelocityConstant: ...
+    def _rtruediv_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Velocity[float, T]: ...
+    def _rtruediv_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Velocity[W, T]: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _VelocityConstant: ...
+    def _rtruediv_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rtruediv_Charge[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _ctruediv_Charge(self, other: _ChargeConstant, /) -> _DipoleMomentConstant: ...
+    def _rtruediv_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> ElectricPotential[float, T]: ...
+    def _rtruediv_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _ElectricPotentialConstant: ...

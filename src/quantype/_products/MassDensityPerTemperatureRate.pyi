@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.MassDensity import _MassDensityConstant
 from quantype._constants.TemperatureRate import _TemperatureRateConstant
 from quantype._generated import Dimensionless, MassDensity, TemperatureRate
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -89,7 +91,8 @@ class MassDensityPerTemperatureRate(
     def __truediv__(
         self,
         other: MassDensityPerTemperatureRate[V, S]
-        | MassDensityPerTemperatureRate[float, S],
+        | MassDensityPerTemperatureRate[float, S]
+        | _MassDensityPerTemperatureRateConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -254,3 +257,93 @@ class MassDensityPerTemperatureRate(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassDensityPerTemperatureRate[W, S]: ...
+
+class _MassDensityPerTemperatureRateConstant(
+    Constant[Div[MassDensityKind, TemperatureRateKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MassDensityPerTemperatureRate[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MassDensityKind, TemperatureRateKind]]
+    ) -> MassDensityPerTemperatureRate[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TemperatureRateConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MassDensityKind, TemperatureRateKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerTemperatureRateConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MassDensityKind, TemperatureRateKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MassDensityPerTemperatureRateConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MassDensityKind, TemperatureRateKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerTemperatureRateConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensityPerTemperatureRate[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MassDensityKind, TemperatureRateKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerTemperatureRateConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MassDensityKind, TemperatureRateKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[MassDensityKind, TemperatureRateKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MassDensityKind, TemperatureRateKind]], W, T]: ...
+    def _rmul_TemperatureRate_f[T: UnitSystem](
+        self, other: TemperatureRate[float, T], /
+    ) -> MassDensity[float, T]: ...
+    def _rmul_TemperatureRate[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> MassDensity[W, T]: ...
+    def _cmul_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _MassDensityConstant: ...
+    def _rtruediv_MassDensity_f[T: UnitSystem](
+        self, other: MassDensity[float, T], /
+    ) -> TemperatureRate[float, T]: ...
+    def _rtruediv_MassDensity[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _TemperatureRateConstant: ...

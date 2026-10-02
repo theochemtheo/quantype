@@ -13,10 +13,11 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Area, Charge, Dimensionless, DipoleMoment, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -88,7 +89,9 @@ class VolumeCharge(Quantity[Mul[VolumeKind, ChargeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: VolumeCharge[V, S] | VolumeCharge[float, S], /
+        self,
+        other: VolumeCharge[V, S] | VolumeCharge[float, S] | _VolumeChargeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> VolumeCharge[V, S]: ...
@@ -207,3 +210,81 @@ class VolumeCharge(Quantity[Mul[VolumeKind, ChargeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VolumeCharge[W, S]: ...
+
+class _VolumeChargeConstant(Constant[Mul[VolumeKind, ChargeKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> VolumeCharge[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[VolumeKind, ChargeKind]]) -> VolumeCharge[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[VolumeKind, ChargeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeChargeConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[VolumeKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AreaConstant, /) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__(self, other: _VolumeConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __truediv__(self, other: _ChargeConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __truediv__(self, other: _DipoleMomentConstant, /) -> _AreaConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _VolumeChargeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[VolumeKind, ChargeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeChargeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VolumeCharge[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[VolumeKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeChargeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[VolumeKind, ChargeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[VolumeKind, ChargeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[VolumeKind, ChargeKind]], W, T]: ...

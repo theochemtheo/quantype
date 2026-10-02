@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._generated import Action, Dimensionless, ElectronCount
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, DimensionlessKind, Div, ElectronCountKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -70,7 +71,11 @@ class ElectronCountAction(Quantity[Mul[ElectronCountKind, ActionKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ElectronCountAction[V, S] | ElectronCountAction[float, S], /
+        self,
+        other: ElectronCountAction[V, S]
+        | ElectronCountAction[float, S]
+        | _ElectronCountActionConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ElectronCountAction[V, S]: ...
@@ -193,3 +198,77 @@ class ElectronCountAction(Quantity[Mul[ElectronCountKind, ActionKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectronCountAction[W, S]: ...
+
+class _ElectronCountActionConstant(Constant[Mul[ElectronCountKind, ActionKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronCountAction[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ElectronCountKind, ActionKind]]
+    ) -> ElectronCountAction[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ElectronCountKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountActionConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ElectronCountKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ElectronCountConstant, /) -> _ActionConstant: ...
+    @overload
+    def __truediv__(self, other: _ActionConstant, /) -> _ElectronCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectronCountActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ElectronCountKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCountAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ElectronCountKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ElectronCountKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ElectronCountKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ElectronCountKind, ActionKind]], W, T]: ...

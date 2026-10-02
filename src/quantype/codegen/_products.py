@@ -12,11 +12,13 @@ import re
 from typing import TYPE_CHECKING
 
 from quantype.codegen._render import (
+    CONSTANT_PROTOCOLS,
     HEADER,
     OVERLAPS,
     PROTOCOL_MEMBERS,
     PROTOCOLS,
     QUANTITY_OVERRIDES,
+    SCALARS,
     binary,
     method_overloads,
     overloads,
@@ -32,7 +34,7 @@ if TYPE_CHECKING:
 # ruff: noqa: E501
 
 _TYPING = ("Any", "Literal", "overload", "override")
-_CORE = ("_Numerical", "_Scalar")
+_CORE = ("Constant", "Unit", "_Numerical", "_Operand", "_Scalar")
 
 
 def _entry_signatures(method: str, pair: str, right: str, result: str) -> list[str]:
@@ -61,7 +63,7 @@ def pair_class(pair: Pair, table: Table) -> str:
                 signatures += _entry_signatures(method, name, right, result)
         if operation == "div":
             # A product over itself is Dimensionless, as K / K is.
-            signatures += binary(method, name, name, "Dimensionless")
+            signatures += _entry_signatures(method, name, name, "Dimensionless")
         signatures += scaling(method, name, lambda storage: f"{name}[{storage}, S]")
         signatures += structural_fallback(
             method, name, f"Quantity[{expression}[{pair.marker}, K], {{}}, S]"
@@ -122,8 +124,67 @@ def pair_class(pair: Pair, table: Table) -> str:
     return text
 
 
+def constant_class(pair: Pair, table: Table) -> str:
+    """The stub for constants of one product class, such as ``hbar * c``.
+
+    A constant acts as a float quantity of its kind in its operand's system, so
+    its results follow the product class's own table entries.
+    """
+    name, marker = pair.name, pair.marker
+    own = f"_{name}Constant"
+    text = f"\nclass {own}(Constant[{marker}]):\n"
+    text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[float, T]: ...\n"
+    text += (
+        f"    @override\n    def to(self, unit: Unit[{marker}]) -> {name}[float]: ...\n"
+    )
+    for operation, method, expression, _, _ in PROTOCOLS:
+        entries = [
+            (right, result)
+            for (op, left, right), result in table.entries.items()
+            if op == operation and left == name
+        ]
+        if operation == "div":
+            entries.append((name, "Dimensionless"))
+        signatures = [
+            f"def {method}(self, other: _{right}Constant, /) -> _{result}Constant: ..."
+            for right, result in entries
+        ]
+        signatures += [
+            f"def {method}[L](self, other: Constant[L], /) -> Constant[{expression}[{marker}, L]]: ...",
+            f"def {method}(self, other: {SCALARS}, /) -> {own}: ...",
+        ]
+        signatures += [
+            f"def {method}[W, T: UnitSystem](self, other: {right}[W, T], /) -> {result}[W, T]: ..."
+            for right, result in entries
+        ]
+        signatures.append(
+            f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{marker}, L], W, T]: ..."
+        )
+        text += overloads(signatures, overrides=True)
+    for method, expression, scalar in (
+        ("__rmul__", "Mul", own),
+        ("__rtruediv__", "Div", f"Constant[Div[DimensionlessKind, {marker}]]"),
+    ):
+        text += overloads(
+            [
+                f"def {method}(self, other: {SCALARS}, /) -> {scalar}: ...",
+                f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[L, {marker}], W, T]: ...",
+            ],
+            overrides=True,
+        )
+    for (operation, _, _, _, member), (_, _, _, _, constant_member) in zip(
+        PROTOCOLS, CONSTANT_PROTOCOLS, strict=True
+    ):
+        for (op, left, right), result in table.entries.items():
+            if op == operation and right == name:
+                text += f"    def {member}{left}_f[T: UnitSystem](self, other: {left}[float, T], /) -> {result}[float, T]: ...\n"
+                text += f"    def {member}{left}[W, T: UnitSystem](self, other: {left}[W, T], /) -> {result}[W, T]: ...\n"
+                text += f"    def {constant_member}{left}(self, other: _{left}Constant, /) -> _{result}Constant: ...\n"
+    return text
+
+
 def _pair_module(pair: Pair, catalogue: Catalogue, package: str, table: Table) -> str:
-    body = pair_class(pair, table)
+    body = pair_class(pair, table) + constant_class(pair, table)
     used: set[str] = set(re.findall(r"\b\w+\b", body))
     text = (
         HEADER

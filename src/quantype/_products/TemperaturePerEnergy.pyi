@@ -12,8 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.Temperature import _TemperatureConstant
+from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import (
     Dimensionless,
     Energy,
@@ -21,7 +24,7 @@ from quantype._generated import (
     Temperature,
     TemperatureDifference,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyKind, Mul, TemperatureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -89,7 +92,11 @@ class TemperaturePerEnergy(Quantity[Div[TemperatureKind, EnergyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TemperaturePerEnergy[V, S] | TemperaturePerEnergy[float, S], /
+        self,
+        other: TemperaturePerEnergy[V, S]
+        | TemperaturePerEnergy[float, S]
+        | _TemperaturePerEnergyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TemperaturePerEnergy[V, S]: ...
@@ -248,3 +255,109 @@ class TemperaturePerEnergy(Quantity[Div[TemperatureKind, EnergyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperaturePerEnergy[W, S]: ...
+
+class _TemperaturePerEnergyConstant(Constant[Div[TemperatureKind, EnergyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperaturePerEnergy[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[TemperatureKind, EnergyKind]]
+    ) -> TemperaturePerEnergy[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __mul__(self, other: _EntropyConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TemperatureKind, EnergyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerEnergyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TemperatureKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperaturePerEnergyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TemperatureKind, EnergyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerEnergyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperaturePerEnergy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TemperatureKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerEnergyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TemperatureKind, EnergyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[TemperatureKind, EnergyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TemperatureKind, EnergyKind]], W, T]: ...
+    def _rmul_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rmul_Energy[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _TemperatureConstant: ...
+    def _rmul_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> Dimensionless[float, T]: ...
+    def _rmul_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    def _cmul_Entropy(self, other: _EntropyConstant, /) -> _DimensionlessConstant: ...
+    def _rtruediv_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _EnergyConstant: ...
+    def _rtruediv_TemperatureDifference_f[T: UnitSystem](
+        self, other: TemperatureDifference[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_TemperatureDifference[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _EnergyConstant: ...

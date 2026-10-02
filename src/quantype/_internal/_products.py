@@ -21,7 +21,7 @@ from quantype._internal._semantics import (
 if TYPE_CHECKING:
     from collections.abc import Callable, Mapping
 
-    from quantype.core import Quantity
+    from quantype.core import Constant, Quantity
 
 _CLASSES: dict[tuple[str, str], type[Quantity[Any, Any, Any]]] = {}
 _SEMANTICS: dict[tuple[str, str], Expression] = {}
@@ -92,6 +92,22 @@ def class_for(semantic: Expression) -> type[Quantity[Any, Any, Any]] | None:
 
         cls = getattr(importlib.import_module(owner[0]), owner[1])
     return cls
+
+
+def constant_class_for(semantic: Expression) -> type[Constant[Any]] | None:
+    """The constant class of a pair, created on first use, or None."""
+    owner = PAIR_CLASSES.get(semantic)
+    if owner is None:
+        return None
+    from quantype.core import Constant  # noqa: PLC0415 -- core imports this module
+
+    module, name = owner
+    # Creating the class registers it for the pair's kind (Constant.__init_subclass__).
+    return type(
+        f"_{name}Constant",
+        (Constant,),
+        {"__module__": module, "__slots__": (), "_constant_semantic": semantic},
+    )
 
 
 def created() -> tuple[type[Quantity[Any, Any, Any]], ...]:

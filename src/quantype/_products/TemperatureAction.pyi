@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Temperature import _TemperatureConstant
 from quantype._generated import Action, Dimensionless, Temperature
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, DimensionlessKind, Div, Mul, TemperatureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,11 @@ class TemperatureAction(Quantity[Mul[TemperatureKind, ActionKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TemperatureAction[V, S] | TemperatureAction[float, S], /
+        self,
+        other: TemperatureAction[V, S]
+        | TemperatureAction[float, S]
+        | _TemperatureActionConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TemperatureAction[V, S]: ...
@@ -189,3 +194,77 @@ class TemperatureAction(Quantity[Mul[TemperatureKind, ActionKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureAction[W, S]: ...
+
+class _TemperatureActionConstant(Constant[Mul[TemperatureKind, ActionKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureAction[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TemperatureKind, ActionKind]]
+    ) -> TemperatureAction[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TemperatureKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureActionConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _TemperatureConstant, /) -> _ActionConstant: ...
+    @overload
+    def __truediv__(self, other: _ActionConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TemperatureKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TemperatureKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TemperatureKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[TemperatureKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TemperatureKind, ActionKind]], W, T]: ...

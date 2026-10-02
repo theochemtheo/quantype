@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Length import _LengthConstant
 from quantype._generated import Angle, Dimensionless, Length
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, LengthKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class AnglePerLength(Quantity[Div[AngleKind, LengthKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AnglePerLength[V, S] | AnglePerLength[float, S], /
+        self,
+        other: AnglePerLength[V, S]
+        | AnglePerLength[float, S]
+        | _AnglePerLengthConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AnglePerLength[V, S]: ...
@@ -199,3 +205,77 @@ class AnglePerLength(Quantity[Div[AngleKind, LengthKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AnglePerLength[W, S]: ...
+
+class _AnglePerLengthConstant(Constant[Div[AngleKind, LengthKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AnglePerLength[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[AngleKind, LengthKind]]) -> AnglePerLength[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _LengthConstant, /) -> _AngleConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AngleKind, LengthKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerLengthConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Length[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AngleKind, LengthKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AnglePerLengthConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AngleKind, LengthKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerLengthConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AnglePerLength[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AngleKind, LengthKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerLengthConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AngleKind, LengthKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AngleKind, LengthKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AngleKind, LengthKind]], W, T]: ...
+    def _rmul_Length_f[T: UnitSystem](
+        self, other: Length[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rmul_Length[W, T: UnitSystem](self, other: Length[W, T], /) -> Angle[W, T]: ...
+    def _cmul_Length(self, other: _LengthConstant, /) -> _AngleConstant: ...
+    def _rtruediv_Angle_f[T: UnitSystem](
+        self, other: Angle[float, T], /
+    ) -> Length[float, T]: ...
+    def _rtruediv_Angle[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> Length[W, T]: ...
+    def _ctruediv_Angle(self, other: _AngleConstant, /) -> _LengthConstant: ...

@@ -115,3 +115,23 @@ The implementation, installed the same way:
   table, written as a tuple literal in `products.py`, took Pyright 47 s to
   analyse; stored as text rows and parsed lazily, the repository's Pyright run
   fell from about 130 s to 19 s.
+
+## Constant product classes
+
+Evidence for
+[ADR-011](../decisions/ADR-011-constant-product-classes.md): each product module gained a constant class with the product's
+entries, and each named constant gained `_cmul_`/`_ctruediv_` members, typed
+power overloads, and a typed reciprocal. Installed the same way on 2026-10-02,
+against the stubs before the change:
+
+| Checker, workload | before | constant classes |
+| --- | --- | --- |
+| Pyright, trivial / suite / stress | 1.12 s / 1.95 s / 1.93 s | 1.11 s / 1.97 s / 2.06 s |
+| Pyrefly, trivial / suite / stress | 0.34 s / 0.41 s / 0.59 s | 0.41 s / 0.46 s / 0.71 s |
+| ty, trivial / suite / stress | 0.24 s / 0.27 s / 0.47 s | 0.24 s / 0.28 s / 0.57 s |
+| mypy cold, trivial / suite / stress | 9.17 s / 19.3 s / 9.32 s | 11.5 s / 22.2 s / 12.2 s |
+| mypy edit, trivial / suite / stress | 0.53 s / 0.95 s / 0.94 s | 0.63 s / 1.02 s / 1.07 s |
+
+mypy's cold peak memory rose from 1.25–1.80 GB to 1.62–2.26 GB, and the
+installed package from 22 MB to 31 MB. No modules were added, so the cost is
+stub volume, which mypy alone feels on a cold run.

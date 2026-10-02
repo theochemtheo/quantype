@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._generated import Angle, Dimensionless, MagneticMoment
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, MagneticMomentKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class MagneticMomentPerAngle(Quantity[Div[MagneticMomentKind, AngleKind], V, S])
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MagneticMomentPerAngle[V, S] | MagneticMomentPerAngle[float, S], /
+        self,
+        other: MagneticMomentPerAngle[V, S]
+        | MagneticMomentPerAngle[float, S]
+        | _MagneticMomentPerAngleConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MagneticMomentPerAngle[V, S]: ...
@@ -209,3 +215,87 @@ class MagneticMomentPerAngle(Quantity[Div[MagneticMomentKind, AngleKind], V, S])
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MagneticMomentPerAngle[W, S]: ...
+
+class _MagneticMomentPerAngleConstant(Constant[Div[MagneticMomentKind, AngleKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagneticMomentPerAngle[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MagneticMomentKind, AngleKind]]
+    ) -> MagneticMomentPerAngle[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AngleConstant, /) -> _MagneticMomentConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MagneticMomentKind, AngleKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentPerAngleConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MagneticMomentKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MagneticMomentPerAngleConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MagneticMomentKind, AngleKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentPerAngleConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMomentPerAngle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MagneticMomentKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentPerAngleConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MagneticMomentKind, AngleKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MagneticMomentKind, AngleKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MagneticMomentKind, AngleKind]], W, T]: ...
+    def _rmul_Angle_f[T: UnitSystem](
+        self, other: Angle[float, T], /
+    ) -> MagneticMoment[float, T]: ...
+    def _rmul_Angle[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    def _cmul_Angle(self, other: _AngleConstant, /) -> _MagneticMomentConstant: ...
+    def _rtruediv_MagneticMoment_f[T: UnitSystem](
+        self, other: MagneticMoment[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rtruediv_MagneticMoment[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Angle[W, T]: ...
+    def _ctruediv_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _AngleConstant: ...

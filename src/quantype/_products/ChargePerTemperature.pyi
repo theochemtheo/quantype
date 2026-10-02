@@ -12,7 +12,10 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
+from quantype._constants.Entropy import _EntropyConstant
 from quantype._constants.Temperature import _TemperatureConstant
 from quantype._generated import (
     Charge,
@@ -21,7 +24,7 @@ from quantype._generated import (
     Entropy,
     Temperature,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, Mul, TemperatureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -97,7 +100,11 @@ class ChargePerTemperature(Quantity[Div[ChargeKind, TemperatureKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ChargePerTemperature[V, S] | ChargePerTemperature[float, S], /
+        self,
+        other: ChargePerTemperature[V, S]
+        | ChargePerTemperature[float, S]
+        | _ChargePerTemperatureConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ChargePerTemperature[V, S]: ...
@@ -252,3 +259,109 @@ class ChargePerTemperature(Quantity[Div[ChargeKind, TemperatureKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ChargePerTemperature[W, S]: ...
+
+class _ChargePerTemperatureConstant(Constant[Div[ChargeKind, TemperatureKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ChargePerTemperature[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ChargeKind, TemperatureKind]]
+    ) -> ChargePerTemperature[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TemperatureConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __mul__(self, other: _ElectricPotentialConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ChargeKind, TemperatureKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerTemperatureConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ChargeKind, TemperatureKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ChargePerTemperatureConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ChargeKind, TemperatureKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerTemperatureConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ChargePerTemperature[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ChargeKind, TemperatureKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerTemperatureConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ChargeKind, TemperatureKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ChargeKind, TemperatureKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ChargeKind, TemperatureKind]], W, T]: ...
+    def _rmul_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rmul_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Charge[W, T]: ...
+    def _cmul_Temperature(self, other: _TemperatureConstant, /) -> _ChargeConstant: ...
+    def _rmul_ElectricPotential_f[T: UnitSystem](
+        self, other: ElectricPotential[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rmul_ElectricPotential[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _cmul_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _EntropyConstant: ...
+    def _rtruediv_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rtruediv_Charge[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _ctruediv_Charge(self, other: _ChargeConstant, /) -> _TemperatureConstant: ...
+    def _rtruediv_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> ElectricPotential[float, T]: ...
+    def _rtruediv_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    def _ctruediv_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _ElectricPotentialConstant: ...

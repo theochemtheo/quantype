@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
 from quantype._constants.ForceConstant import _ForceConstantConstant
 from quantype._generated import Dimensionless, EnergyPerVolume, ForceConstant
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -88,7 +89,8 @@ class ForceConstantEnergyPerVolume(
     def __truediv__(
         self,
         other: ForceConstantEnergyPerVolume[V, S]
-        | ForceConstantEnergyPerVolume[float, S],
+        | ForceConstantEnergyPerVolume[float, S]
+        | _ForceConstantEnergyPerVolumeConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -234,3 +236,85 @@ class ForceConstantEnergyPerVolume(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ForceConstantEnergyPerVolume[W, S]: ...
+
+class _ForceConstantEnergyPerVolumeConstant(
+    Constant[Mul[ForceConstantKind, EnergyPerVolumeKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ForceConstantEnergyPerVolume[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ForceConstantKind, EnergyPerVolumeKind]]
+    ) -> ForceConstantEnergyPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ForceConstantKind, EnergyPerVolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstantEnergyPerVolumeConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ForceConstantKind, EnergyPerVolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ForceConstantConstant, /
+    ) -> _EnergyPerVolumeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _ForceConstantConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ForceConstantEnergyPerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ForceConstantKind, EnergyPerVolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstantEnergyPerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceConstantEnergyPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ForceConstantKind, EnergyPerVolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstantEnergyPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ForceConstantKind, EnergyPerVolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[ForceConstantKind, EnergyPerVolumeKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ForceConstantKind, EnergyPerVolumeKind]], W, T]: ...

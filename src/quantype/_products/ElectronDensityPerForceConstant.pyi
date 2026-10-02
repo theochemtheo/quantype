@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.ElectronDensity import _ElectronDensityConstant
 from quantype._constants.ForceConstant import _ForceConstantConstant
 from quantype._generated import Dimensionless, ElectronDensity, ForceConstant
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -89,7 +91,8 @@ class ElectronDensityPerForceConstant(
     def __truediv__(
         self,
         other: ElectronDensityPerForceConstant[V, S]
-        | ElectronDensityPerForceConstant[float, S],
+        | ElectronDensityPerForceConstant[float, S]
+        | _ElectronDensityPerForceConstantConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -258,3 +261,93 @@ class ElectronDensityPerForceConstant(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectronDensityPerForceConstant[W, S]: ...
+
+class _ElectronDensityPerForceConstantConstant(
+    Constant[Div[ElectronDensityKind, ForceConstantKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronDensityPerForceConstant[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ElectronDensityKind, ForceConstantKind]]
+    ) -> ElectronDensityPerForceConstant[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ForceConstantConstant, /) -> _ElectronDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ElectronDensityKind, ForceConstantKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityPerForceConstantConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, ForceConstantKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectronDensityPerForceConstantConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ElectronDensityKind, ForceConstantKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityPerForceConstantConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensityPerForceConstant[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ElectronDensityKind, ForceConstantKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityPerForceConstantConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ElectronDensityKind, ForceConstantKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[ElectronDensityKind, ForceConstantKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ElectronDensityKind, ForceConstantKind]], W, T]: ...
+    def _rmul_ForceConstant_f[T: UnitSystem](
+        self, other: ForceConstant[float, T], /
+    ) -> ElectronDensity[float, T]: ...
+    def _rmul_ForceConstant[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    def _cmul_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ElectronDensityConstant: ...
+    def _rtruediv_ElectronDensity_f[T: UnitSystem](
+        self, other: ElectronDensity[float, T], /
+    ) -> ForceConstant[float, T]: ...
+    def _rtruediv_ElectronDensity[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    def _ctruediv_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ForceConstantConstant: ...

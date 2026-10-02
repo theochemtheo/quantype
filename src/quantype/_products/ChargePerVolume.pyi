@@ -12,7 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
+from quantype._constants.EnergyDensity import _EnergyDensityConstant
+from quantype._constants.Pressure import _PressureConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
     Charge,
@@ -22,7 +26,7 @@ from quantype._generated import (
     Pressure,
     Volume,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -98,7 +102,11 @@ class ChargePerVolume(Quantity[Div[ChargeKind, VolumeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ChargePerVolume[V, S] | ChargePerVolume[float, S], /
+        self,
+        other: ChargePerVolume[V, S]
+        | ChargePerVolume[float, S]
+        | _ChargePerVolumeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ChargePerVolume[V, S]: ...
@@ -249,3 +257,107 @@ class ChargePerVolume(Quantity[Div[ChargeKind, VolumeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ChargePerVolume[W, S]: ...
+
+class _ChargePerVolumeConstant(Constant[Div[ChargeKind, VolumeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ChargePerVolume[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[ChargeKind, VolumeKind]]) -> ChargePerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VolumeConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __mul__(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _EnergyDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ChargeKind, VolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ChargeKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ChargePerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ChargeKind, VolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ChargePerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ChargeKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ChargeKind, VolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ChargeKind, VolumeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ChargeKind, VolumeKind]], W, T]: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Charge[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _ChargeConstant: ...
+    def _rmul_ElectricPotential_f[T: UnitSystem](
+        self, other: ElectricPotential[float, T], /
+    ) -> EnergyDensity[float, T]: ...
+    def _rmul_ElectricPotential[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    def _cmul_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _EnergyDensityConstant: ...
+    def _rtruediv_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> ElectricPotential[float, T]: ...
+    def _rtruediv_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    def _ctruediv_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    def _rtruediv_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_Charge[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_Charge(self, other: _ChargeConstant, /) -> _VolumeConstant: ...

@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._constants.TemperatureRate import _TemperatureRateConstant
 from quantype._generated import Dimensionless, ParticleDensity, TemperatureRate
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -90,7 +91,8 @@ class TemperatureRateParticleDensity(
     def __truediv__(
         self,
         other: TemperatureRateParticleDensity[V, S]
-        | TemperatureRateParticleDensity[float, S],
+        | TemperatureRateParticleDensity[float, S]
+        | _TemperatureRateParticleDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -240,3 +242,85 @@ class TemperatureRateParticleDensity(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureRateParticleDensity[W, S]: ...
+
+class _TemperatureRateParticleDensityConstant(
+    Constant[Mul[TemperatureRateKind, ParticleDensityKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureRateParticleDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TemperatureRateKind, ParticleDensityKind]]
+    ) -> TemperatureRateParticleDensity[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TemperatureRateKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureRateParticleDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TemperatureRateKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperatureRateConstant, /
+    ) -> _ParticleDensityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ParticleDensityConstant, /
+    ) -> _TemperatureRateConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureRateParticleDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TemperatureRateKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureRateParticleDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureRateParticleDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TemperatureRateKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureRateParticleDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TemperatureRateKind, ParticleDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[TemperatureRateKind, ParticleDensityKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TemperatureRateKind, ParticleDensityKind]], W, T]: ...

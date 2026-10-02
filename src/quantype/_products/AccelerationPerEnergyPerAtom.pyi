@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
 from quantype._generated import Acceleration, Dimensionless, EnergyPerAtom
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AccelerationKind,
     DimensionlessKind,
@@ -87,7 +89,8 @@ class AccelerationPerEnergyPerAtom(
     def __truediv__(
         self,
         other: AccelerationPerEnergyPerAtom[V, S]
-        | AccelerationPerEnergyPerAtom[float, S],
+        | AccelerationPerEnergyPerAtom[float, S]
+        | _AccelerationPerEnergyPerAtomConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -252,3 +255,91 @@ class AccelerationPerEnergyPerAtom(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AccelerationPerEnergyPerAtom[W, S]: ...
+
+class _AccelerationPerEnergyPerAtomConstant(
+    Constant[Div[AccelerationKind, EnergyPerAtomKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AccelerationPerEnergyPerAtom[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[AccelerationKind, EnergyPerAtomKind]]
+    ) -> AccelerationPerEnergyPerAtom[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyPerAtomConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AccelerationKind, EnergyPerAtomKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationPerEnergyPerAtomConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AccelerationKind, EnergyPerAtomKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AccelerationPerEnergyPerAtomConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AccelerationKind, EnergyPerAtomKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationPerEnergyPerAtomConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AccelerationPerEnergyPerAtom[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AccelerationKind, EnergyPerAtomKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationPerEnergyPerAtomConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AccelerationKind, EnergyPerAtomKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AccelerationKind, EnergyPerAtomKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AccelerationKind, EnergyPerAtomKind]], W, T]: ...
+    def _rmul_EnergyPerAtom_f[T: UnitSystem](
+        self, other: EnergyPerAtom[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rmul_EnergyPerAtom[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _cmul_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _AccelerationConstant: ...
+    def _rtruediv_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> EnergyPerAtom[float, T]: ...
+    def _rtruediv_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _EnergyPerAtomConstant: ...

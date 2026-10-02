@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Entropy import _EntropyConstant
 from quantype._constants.Magnetization import _MagnetizationConstant
 from quantype._generated import Dimensionless, Entropy, Magnetization
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EntropyKind, MagnetizationKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -72,7 +74,9 @@ class EntropyPerMagnetization(Quantity[Div[EntropyKind, MagnetizationKind], V, S
     @overload
     def __truediv__(
         self,
-        other: EntropyPerMagnetization[V, S] | EntropyPerMagnetization[float, S],
+        other: EntropyPerMagnetization[V, S]
+        | EntropyPerMagnetization[float, S]
+        | _EntropyPerMagnetizationConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -219,3 +223,89 @@ class EntropyPerMagnetization(Quantity[Div[EntropyKind, MagnetizationKind], V, S
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EntropyPerMagnetization[W, S]: ...
+
+class _EntropyPerMagnetizationConstant(Constant[Div[EntropyKind, MagnetizationKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EntropyPerMagnetization[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[EntropyKind, MagnetizationKind]]
+    ) -> EntropyPerMagnetization[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _MagnetizationConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[EntropyKind, MagnetizationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyPerMagnetizationConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[EntropyKind, MagnetizationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EntropyPerMagnetizationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[EntropyKind, MagnetizationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyPerMagnetizationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EntropyPerMagnetization[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[EntropyKind, MagnetizationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyPerMagnetizationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[EntropyKind, MagnetizationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[EntropyKind, MagnetizationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[EntropyKind, MagnetizationKind]], W, T]: ...
+    def _rmul_Magnetization_f[T: UnitSystem](
+        self, other: Magnetization[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rmul_Magnetization[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _cmul_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _EntropyConstant: ...
+    def _rtruediv_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> Magnetization[float, T]: ...
+    def _rtruediv_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Magnetization[W, T]: ...
+    def _ctruediv_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _MagnetizationConstant: ...

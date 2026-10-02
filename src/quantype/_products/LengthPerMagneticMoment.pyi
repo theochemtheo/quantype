@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Length import _LengthConstant
 from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._generated import Dimensionless, Length, MagneticMoment
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, LengthKind, MagneticMomentKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -74,7 +76,9 @@ class LengthPerMagneticMoment(Quantity[Div[LengthKind, MagneticMomentKind], V, S
     @overload
     def __truediv__(
         self,
-        other: LengthPerMagneticMoment[V, S] | LengthPerMagneticMoment[float, S],
+        other: LengthPerMagneticMoment[V, S]
+        | LengthPerMagneticMoment[float, S]
+        | _LengthPerMagneticMomentConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -221,3 +225,89 @@ class LengthPerMagneticMoment(Quantity[Div[LengthKind, MagneticMomentKind], V, S
     @classmethod
     @override
     def from_value[W](cls, value: W) -> LengthPerMagneticMoment[W, S]: ...
+
+class _LengthPerMagneticMomentConstant(Constant[Div[LengthKind, MagneticMomentKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> LengthPerMagneticMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[LengthKind, MagneticMomentKind]]
+    ) -> LengthPerMagneticMoment[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _MagneticMomentConstant, /) -> _LengthConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[LengthKind, MagneticMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthPerMagneticMomentConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[LengthKind, MagneticMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _LengthPerMagneticMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[LengthKind, MagneticMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthPerMagneticMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: LengthPerMagneticMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[LengthKind, MagneticMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthPerMagneticMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[LengthKind, MagneticMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[LengthKind, MagneticMomentKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[LengthKind, MagneticMomentKind]], W, T]: ...
+    def _rmul_MagneticMoment_f[T: UnitSystem](
+        self, other: MagneticMoment[float, T], /
+    ) -> Length[float, T]: ...
+    def _rmul_MagneticMoment[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Length[W, T]: ...
+    def _cmul_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _LengthConstant: ...
+    def _rtruediv_Length_f[T: UnitSystem](
+        self, other: Length[float, T], /
+    ) -> MagneticMoment[float, T]: ...
+    def _rtruediv_Length[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    def _ctruediv_Length(
+        self, other: _LengthConstant, /
+    ) -> _MagneticMomentConstant: ...

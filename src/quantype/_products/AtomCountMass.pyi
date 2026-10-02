@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Mass import _MassConstant
 from quantype._generated import AtomCount, Dimensionless, Mass
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AtomCountKind, DimensionlessKind, Div, MassKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,9 @@ class AtomCountMass(Quantity[Mul[AtomCountKind, MassKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AtomCountMass[V, S] | AtomCountMass[float, S], /
+        self,
+        other: AtomCountMass[V, S] | AtomCountMass[float, S] | _AtomCountMassConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AtomCountMass[V, S]: ...
@@ -187,3 +190,73 @@ class AtomCountMass(Quantity[Mul[AtomCountKind, MassKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AtomCountMass[W, S]: ...
+
+class _AtomCountMassConstant(Constant[Mul[AtomCountKind, MassKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AtomCountMass[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[AtomCountKind, MassKind]]) -> AtomCountMass[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AtomCountKind, MassKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountMassConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AtomCountConstant, /) -> _MassConstant: ...
+    @overload
+    def __truediv__(self, other: _MassConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AtomCountMassConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AtomCountKind, MassKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountMassConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Mass[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCountMass[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AtomCountKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountMassConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AtomCountKind, MassKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AtomCountKind, MassKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AtomCountKind, MassKind]], W, T]: ...

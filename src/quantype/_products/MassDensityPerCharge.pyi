@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.MassDensity import _MassDensityConstant
 from quantype._generated import Charge, Dimensionless, MassDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, MassDensityKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class MassDensityPerCharge(Quantity[Div[MassDensityKind, ChargeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MassDensityPerCharge[V, S] | MassDensityPerCharge[float, S], /
+        self,
+        other: MassDensityPerCharge[V, S]
+        | MassDensityPerCharge[float, S]
+        | _MassDensityPerChargeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MassDensityPerCharge[V, S]: ...
@@ -207,3 +213,87 @@ class MassDensityPerCharge(Quantity[Div[MassDensityKind, ChargeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassDensityPerCharge[W, S]: ...
+
+class _MassDensityPerChargeConstant(Constant[Div[MassDensityKind, ChargeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MassDensityPerCharge[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MassDensityKind, ChargeKind]]
+    ) -> MassDensityPerCharge[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ChargeConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MassDensityKind, ChargeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerChargeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MassDensityKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MassDensityPerChargeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MassDensityKind, ChargeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerChargeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensityPerCharge[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MassDensityKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerChargeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MassDensityKind, ChargeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MassDensityKind, ChargeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MassDensityKind, ChargeKind]], W, T]: ...
+    def _rmul_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> MassDensity[float, T]: ...
+    def _rmul_Charge[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> MassDensity[W, T]: ...
+    def _cmul_Charge(self, other: _ChargeConstant, /) -> _MassDensityConstant: ...
+    def _rtruediv_MassDensity_f[T: UnitSystem](
+        self, other: MassDensity[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rtruediv_MassDensity[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> Charge[W, T]: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _ChargeConstant: ...

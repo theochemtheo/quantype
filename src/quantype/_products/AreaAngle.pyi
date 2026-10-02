@@ -13,8 +13,9 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Angle, Area, Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, AreaKind, DimensionlessKind, Div, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,7 @@ class AreaAngle(Quantity[Mul[AreaKind, AngleKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AreaAngle[V, S] | AreaAngle[float, S], /
+        self, other: AreaAngle[V, S] | AreaAngle[float, S] | _AreaAngleConstant, /
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AreaAngle[V, S]: ...
@@ -183,3 +184,67 @@ class AreaAngle(Quantity[Mul[AreaKind, AngleKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AreaAngle[W, S]: ...
+
+class _AreaAngleConstant(Constant[Mul[AreaKind, AngleKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AreaAngle[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[AreaKind, AngleKind]]) -> AreaAngle[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AreaKind, AngleKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaAngleConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AreaKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AreaConstant, /) -> _AngleConstant: ...
+    @overload
+    def __truediv__(self, other: _AngleConstant, /) -> _AreaConstant: ...
+    @overload
+    def __truediv__(self, other: _AreaAngleConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AreaKind, AngleKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaAngleConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AreaAngle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AreaKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaAngleConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AreaKind, AngleKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AreaKind, AngleKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AreaKind, AngleKind]], W, T]: ...

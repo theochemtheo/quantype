@@ -12,9 +12,14 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Area import _AreaConstant
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.EnergyDensity import _EnergyDensityConstant
 from quantype._constants.Pressure import _PressureConstant
+from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
     Area,
     Charge,
@@ -25,7 +30,7 @@ from quantype._generated import (
     Pressure,
     Volume,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, DipoleMomentKind, Div, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -112,7 +117,11 @@ class VolumePerDipoleMoment(Quantity[Div[VolumeKind, DipoleMomentKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: VolumePerDipoleMoment[V, S] | VolumePerDipoleMoment[float, S], /
+        self,
+        other: VolumePerDipoleMoment[V, S]
+        | VolumePerDipoleMoment[float, S]
+        | _VolumePerDipoleMomentConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> VolumePerDipoleMoment[V, S]: ...
@@ -282,3 +291,125 @@ class VolumePerDipoleMoment(Quantity[Div[VolumeKind, DipoleMomentKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VolumePerDipoleMoment[W, S]: ...
+
+class _VolumePerDipoleMomentConstant(Constant[Div[VolumeKind, DipoleMomentKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> VolumePerDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[VolumeKind, DipoleMomentKind]]
+    ) -> VolumePerDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _PressureConstant, /) -> _ElectricFieldConstant: ...
+    @overload
+    def __mul__(self, other: _ChargeConstant, /) -> _AreaConstant: ...
+    @overload
+    def __mul__(self, other: _DipoleMomentConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[VolumeKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumePerDipoleMomentConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[VolumeKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _VolumePerDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[VolumeKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumePerDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VolumePerDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[VolumeKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumePerDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[VolumeKind, DipoleMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[VolumeKind, DipoleMomentKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[VolumeKind, DipoleMomentKind]], W, T]: ...
+    def _rmul_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rmul_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _cmul_Pressure(self, other: _PressureConstant, /) -> _ElectricFieldConstant: ...
+    def _rmul_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> Area[float, T]: ...
+    def _rmul_Charge[W, T: UnitSystem](self, other: Charge[W, T], /) -> Area[W, T]: ...
+    def _cmul_Charge(self, other: _ChargeConstant, /) -> _AreaConstant: ...
+    def _rmul_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rmul_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Volume[W, T]: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _VolumeConstant: ...
+    def _rtruediv_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rtruediv_Area[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> Charge[W, T]: ...
+    def _ctruediv_Area(self, other: _AreaConstant, /) -> _ChargeConstant: ...
+    def _rtruediv_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rtruediv_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _ctruediv_Volume(self, other: _VolumeConstant, /) -> _DipoleMomentConstant: ...
+    def _rtruediv_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> EnergyDensity[float, T]: ...
+    def _rtruediv_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _EnergyDensityConstant: ...

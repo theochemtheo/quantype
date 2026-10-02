@@ -13,7 +13,11 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._generated import (
     Action,
     Area,
@@ -22,7 +26,7 @@ from quantype._generated import (
     Frequency,
     InverseTime,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, AreaKind, DimensionlessKind, Div, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -96,7 +100,9 @@ class AreaPerAction(Quantity[Div[AreaKind, ActionKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AreaPerAction[V, S] | AreaPerAction[float, S], /
+        self,
+        other: AreaPerAction[V, S] | AreaPerAction[float, S] | _AreaPerActionConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AreaPerAction[V, S]: ...
@@ -256,3 +262,110 @@ class AreaPerAction(Quantity[Div[AreaKind, ActionKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AreaPerAction[W, S]: ...
+
+class _AreaPerActionConstant(Constant[Div[AreaKind, ActionKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AreaPerAction[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[AreaKind, ActionKind]]) -> AreaPerAction[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ForceConstantConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __mul__(self, other: _ActionConstant, /) -> _AreaConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AreaKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaPerActionConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Action[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AreaKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AreaPerActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AreaKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaPerActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AreaPerAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AreaKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaPerActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AreaKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AreaKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AreaKind, ActionKind]], W, T]: ...
+    def _rmul_ForceConstant_f[T: UnitSystem](
+        self, other: ForceConstant[float, T], /
+    ) -> InverseTime[float, T]: ...
+    def _rmul_ForceConstant[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> InverseTime[W, T]: ...
+    def _cmul_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _InverseTimeConstant: ...
+    def _rmul_Action_f[T: UnitSystem](
+        self, other: Action[float, T], /
+    ) -> Area[float, T]: ...
+    def _rmul_Action[W, T: UnitSystem](self, other: Action[W, T], /) -> Area[W, T]: ...
+    def _cmul_Action(self, other: _ActionConstant, /) -> _AreaConstant: ...
+    def _rtruediv_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> Action[float, T]: ...
+    def _rtruediv_Area[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> Action[W, T]: ...
+    def _ctruediv_Area(self, other: _AreaConstant, /) -> _ActionConstant: ...
+    def _rtruediv_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> ForceConstant[float, T]: ...
+    def _rtruediv_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    def _ctruediv_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _ForceConstantConstant: ...
+    def _rtruediv_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> ForceConstant[float, T]: ...
+    def _rtruediv_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _ForceConstantConstant: ...

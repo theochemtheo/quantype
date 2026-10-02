@@ -12,10 +12,13 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.Pressure import _PressureConstant
 from quantype._constants.Temperature import _TemperatureConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Dimensionless, Entropy, Pressure, Temperature, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, Mul, PressureKind, TemperatureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -85,7 +88,11 @@ class PressurePerTemperature(Quantity[Div[PressureKind, TemperatureKind], V, S])
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PressurePerTemperature[V, S] | PressurePerTemperature[float, S], /
+        self,
+        other: PressurePerTemperature[V, S]
+        | PressurePerTemperature[float, S]
+        | _PressurePerTemperatureConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PressurePerTemperature[V, S]: ...
@@ -240,3 +247,107 @@ class PressurePerTemperature(Quantity[Div[PressureKind, TemperatureKind], V, S])
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PressurePerTemperature[W, S]: ...
+
+class _PressurePerTemperatureConstant(Constant[Div[PressureKind, TemperatureKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PressurePerTemperature[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[PressureKind, TemperatureKind]]
+    ) -> PressurePerTemperature[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VolumeConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __mul__(self, other: _TemperatureConstant, /) -> _PressureConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[PressureKind, TemperatureKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressurePerTemperatureConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Entropy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[PressureKind, TemperatureKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PressurePerTemperatureConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[PressureKind, TemperatureKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressurePerTemperatureConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PressurePerTemperature[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[PressureKind, TemperatureKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressurePerTemperatureConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[PressureKind, TemperatureKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[PressureKind, TemperatureKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[PressureKind, TemperatureKind]], W, T]: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _EntropyConstant: ...
+    def _rmul_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> Pressure[float, T]: ...
+    def _rmul_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Pressure[W, T]: ...
+    def _cmul_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _PressureConstant: ...
+    def _rtruediv_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rtruediv_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _ctruediv_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _TemperatureConstant: ...
+    def _rtruediv_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_Entropy(self, other: _EntropyConstant, /) -> _VolumeConstant: ...

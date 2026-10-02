@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._generated import Dimensionless, ElectricPotential, ElectronCount
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -90,7 +91,8 @@ class ElectronCountElectricPotential(
     def __truediv__(
         self,
         other: ElectronCountElectricPotential[V, S]
-        | ElectronCountElectricPotential[float, S],
+        | ElectronCountElectricPotential[float, S]
+        | _ElectronCountElectricPotentialConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -240,3 +242,85 @@ class ElectronCountElectricPotential(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectronCountElectricPotential[W, S]: ...
+
+class _ElectronCountElectricPotentialConstant(
+    Constant[Mul[ElectronCountKind, ElectricPotentialKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronCountElectricPotential[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ElectronCountKind, ElectricPotentialKind]]
+    ) -> ElectronCountElectricPotential[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ElectronCountKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountElectricPotentialConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ElectronCountKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectronCountConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _ElectronCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectronCountElectricPotentialConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ElectronCountKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountElectricPotentialConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCountElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ElectronCountKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountElectricPotentialConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ElectronCountKind, ElectricPotentialKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[ElectronCountKind, ElectricPotentialKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ElectronCountKind, ElectricPotentialKind]], W, T]: ...

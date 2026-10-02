@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyDensity import _EnergyDensityConstant
+from quantype._constants.Velocity import _VelocityConstant
 from quantype._generated import Dimensionless, EnergyDensity, Velocity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyDensityKind, Mul, VelocityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -74,7 +76,9 @@ class VelocityPerEnergyDensity(Quantity[Div[VelocityKind, EnergyDensityKind], V,
     @overload
     def __truediv__(
         self,
-        other: VelocityPerEnergyDensity[V, S] | VelocityPerEnergyDensity[float, S],
+        other: VelocityPerEnergyDensity[V, S]
+        | VelocityPerEnergyDensity[float, S]
+        | _VelocityPerEnergyDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -221,3 +225,89 @@ class VelocityPerEnergyDensity(Quantity[Div[VelocityKind, EnergyDensityKind], V,
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VelocityPerEnergyDensity[W, S]: ...
+
+class _VelocityPerEnergyDensityConstant(Constant[Div[VelocityKind, EnergyDensityKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> VelocityPerEnergyDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[VelocityKind, EnergyDensityKind]]
+    ) -> VelocityPerEnergyDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyDensityConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[VelocityKind, EnergyDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityPerEnergyDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[VelocityKind, EnergyDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _VelocityPerEnergyDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[VelocityKind, EnergyDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityPerEnergyDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VelocityPerEnergyDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[VelocityKind, EnergyDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityPerEnergyDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[VelocityKind, EnergyDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[VelocityKind, EnergyDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[VelocityKind, EnergyDensityKind]], W, T]: ...
+    def _rmul_EnergyDensity_f[T: UnitSystem](
+        self, other: EnergyDensity[float, T], /
+    ) -> Velocity[float, T]: ...
+    def _rmul_EnergyDensity[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> Velocity[W, T]: ...
+    def _cmul_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _VelocityConstant: ...
+    def _rtruediv_Velocity_f[T: UnitSystem](
+        self, other: Velocity[float, T], /
+    ) -> EnergyDensity[float, T]: ...
+    def _rtruediv_Velocity[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    def _ctruediv_Velocity(
+        self, other: _VelocityConstant, /
+    ) -> _EnergyDensityConstant: ...

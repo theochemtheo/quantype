@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
 from quantype._generated import Dimensionless, ElectricField, EnergyPerVolume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -89,7 +91,8 @@ class EnergyPerVolumePerElectricField(
     def __truediv__(
         self,
         other: EnergyPerVolumePerElectricField[V, S]
-        | EnergyPerVolumePerElectricField[float, S],
+        | EnergyPerVolumePerElectricField[float, S]
+        | _EnergyPerVolumePerElectricFieldConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -258,3 +261,93 @@ class EnergyPerVolumePerElectricField(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerVolumePerElectricField[W, S]: ...
+
+class _EnergyPerVolumePerElectricFieldConstant(
+    Constant[Div[EnergyPerVolumeKind, ElectricFieldKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerVolumePerElectricField[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[EnergyPerVolumeKind, ElectricFieldKind]]
+    ) -> EnergyPerVolumePerElectricField[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ElectricFieldConstant, /) -> _EnergyPerVolumeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[EnergyPerVolumeKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumePerElectricFieldConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[EnergyPerVolumeKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EnergyPerVolumePerElectricFieldConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[EnergyPerVolumeKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumePerElectricFieldConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolumePerElectricField[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[EnergyPerVolumeKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumePerElectricFieldConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[EnergyPerVolumeKind, ElectricFieldKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[EnergyPerVolumeKind, ElectricFieldKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[EnergyPerVolumeKind, ElectricFieldKind]], W, T]: ...
+    def _rmul_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> EnergyPerVolume[float, T]: ...
+    def _rmul_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    def _cmul_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _EnergyPerVolumeConstant: ...
+    def _rtruediv_EnergyPerVolume_f[T: UnitSystem](
+        self, other: EnergyPerVolume[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rtruediv_EnergyPerVolume[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _ctruediv_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _ElectricFieldConstant: ...

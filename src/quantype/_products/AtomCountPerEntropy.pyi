@@ -12,8 +12,12 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
 from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.Temperature import _TemperatureConstant
+from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import (
     AtomCount,
     Dimensionless,
@@ -22,7 +26,7 @@ from quantype._generated import (
     Temperature,
     TemperatureDifference,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AtomCountKind, DimensionlessKind, Div, EntropyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -96,7 +100,11 @@ class AtomCountPerEntropy(Quantity[Div[AtomCountKind, EntropyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AtomCountPerEntropy[V, S] | AtomCountPerEntropy[float, S], /
+        self,
+        other: AtomCountPerEntropy[V, S]
+        | AtomCountPerEntropy[float, S]
+        | _AtomCountPerEntropyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AtomCountPerEntropy[V, S]: ...
@@ -264,3 +272,116 @@ class AtomCountPerEntropy(Quantity[Div[AtomCountKind, EntropyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AtomCountPerEntropy[W, S]: ...
+
+class _AtomCountPerEntropyConstant(Constant[Div[AtomCountKind, EntropyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AtomCountPerEntropy[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[AtomCountKind, EntropyKind]]
+    ) -> AtomCountPerEntropy[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyPerAtomConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __mul__(self, other: _EntropyConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AtomCountKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerEntropyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AtomCountKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AtomCountPerEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AtomCountKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCountPerEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AtomCountKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AtomCountKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AtomCountKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AtomCountKind, EntropyKind]], W, T]: ...
+    def _rmul_EnergyPerAtom_f[T: UnitSystem](
+        self, other: EnergyPerAtom[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rmul_EnergyPerAtom[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _cmul_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _TemperatureConstant: ...
+    def _rmul_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rmul_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> AtomCount[W, T]: ...
+    def _cmul_Entropy(self, other: _EntropyConstant, /) -> _AtomCountConstant: ...
+    def _rtruediv_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> EnergyPerAtom[float, T]: ...
+    def _rtruediv_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _EnergyPerAtomConstant: ...
+    def _rtruediv_TemperatureDifference_f[T: UnitSystem](
+        self, other: TemperatureDifference[float, T], /
+    ) -> EnergyPerAtom[float, T]: ...
+    def _rtruediv_TemperatureDifference[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _EnergyPerAtomConstant: ...
+    def _rtruediv_AtomCount_f[T: UnitSystem](
+        self, other: AtomCount[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rtruediv_AtomCount[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _ctruediv_AtomCount(self, other: _AtomCountConstant, /) -> _EntropyConstant: ...

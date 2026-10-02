@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._generated import Angle, Dimensionless, ElectricPotential
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, ElectricPotentialKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -72,7 +73,11 @@ class AngleElectricPotential(Quantity[Mul[AngleKind, ElectricPotentialKind], V, 
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AngleElectricPotential[V, S] | AngleElectricPotential[float, S], /
+        self,
+        other: AngleElectricPotential[V, S]
+        | AngleElectricPotential[float, S]
+        | _AngleElectricPotentialConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AngleElectricPotential[V, S]: ...
@@ -201,3 +206,77 @@ class AngleElectricPotential(Quantity[Mul[AngleKind, ElectricPotentialKind], V, 
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AngleElectricPotential[W, S]: ...
+
+class _AngleElectricPotentialConstant(Constant[Mul[AngleKind, ElectricPotentialKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AngleElectricPotential[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[AngleKind, ElectricPotentialKind]]
+    ) -> AngleElectricPotential[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AngleKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleElectricPotentialConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AngleKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AngleConstant, /) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(self, other: _ElectricPotentialConstant, /) -> _AngleConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AngleElectricPotentialConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AngleKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleElectricPotentialConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Angle[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AngleElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AngleKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleElectricPotentialConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AngleKind, ElectricPotentialKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AngleKind, ElectricPotentialKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AngleKind, ElectricPotentialKind]], W, T]: ...

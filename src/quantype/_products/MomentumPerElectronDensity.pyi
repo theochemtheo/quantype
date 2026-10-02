@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronDensity import _ElectronDensityConstant
+from quantype._constants.Momentum import _MomentumConstant
 from quantype._generated import Dimensionless, ElectronDensity, Momentum
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -88,7 +90,9 @@ class MomentumPerElectronDensity(
     @overload
     def __truediv__(
         self,
-        other: MomentumPerElectronDensity[V, S] | MomentumPerElectronDensity[float, S],
+        other: MomentumPerElectronDensity[V, S]
+        | MomentumPerElectronDensity[float, S]
+        | _MomentumPerElectronDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -245,3 +249,91 @@ class MomentumPerElectronDensity(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MomentumPerElectronDensity[W, S]: ...
+
+class _MomentumPerElectronDensityConstant(
+    Constant[Div[MomentumKind, ElectronDensityKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MomentumPerElectronDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MomentumKind, ElectronDensityKind]]
+    ) -> MomentumPerElectronDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ElectronDensityConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MomentumKind, ElectronDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumPerElectronDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MomentumKind, ElectronDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MomentumPerElectronDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MomentumKind, ElectronDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumPerElectronDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MomentumPerElectronDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MomentumKind, ElectronDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumPerElectronDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MomentumKind, ElectronDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MomentumKind, ElectronDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MomentumKind, ElectronDensityKind]], W, T]: ...
+    def _rmul_ElectronDensity_f[T: UnitSystem](
+        self, other: ElectronDensity[float, T], /
+    ) -> Momentum[float, T]: ...
+    def _rmul_ElectronDensity[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> Momentum[W, T]: ...
+    def _cmul_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _MomentumConstant: ...
+    def _rtruediv_Momentum_f[T: UnitSystem](
+        self, other: Momentum[float, T], /
+    ) -> ElectronDensity[float, T]: ...
+    def _rtruediv_Momentum[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    def _ctruediv_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _ElectronDensityConstant: ...

@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Acceleration, Dimensionless, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AccelerationKind, DimensionlessKind, Div, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class AccelerationPerVolume(Quantity[Div[AccelerationKind, VolumeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AccelerationPerVolume[V, S] | AccelerationPerVolume[float, S], /
+        self,
+        other: AccelerationPerVolume[V, S]
+        | AccelerationPerVolume[float, S]
+        | _AccelerationPerVolumeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AccelerationPerVolume[V, S]: ...
@@ -207,3 +213,87 @@ class AccelerationPerVolume(Quantity[Div[AccelerationKind, VolumeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AccelerationPerVolume[W, S]: ...
+
+class _AccelerationPerVolumeConstant(Constant[Div[AccelerationKind, VolumeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AccelerationPerVolume[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[AccelerationKind, VolumeKind]]
+    ) -> AccelerationPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VolumeConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AccelerationKind, VolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationPerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AccelerationKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AccelerationPerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AccelerationKind, VolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationPerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AccelerationPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AccelerationKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AccelerationKind, VolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AccelerationKind, VolumeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AccelerationKind, VolumeKind]], W, T]: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _AccelerationConstant: ...
+    def _rtruediv_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _VolumeConstant: ...

@@ -12,6 +12,7 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricField import _ElectricFieldConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
@@ -23,7 +24,7 @@ from quantype._generated import (
     InverseTime,
     Time,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -111,7 +112,9 @@ class InverseTimeElectricField(Quantity[Mul[InverseTimeKind, ElectricFieldKind],
     @overload
     def __truediv__(
         self,
-        other: InverseTimeElectricField[V, S] | InverseTimeElectricField[float, S],
+        other: InverseTimeElectricField[V, S]
+        | InverseTimeElectricField[float, S]
+        | _InverseTimeElectricFieldConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -258,3 +261,107 @@ class InverseTimeElectricField(Quantity[Mul[InverseTimeKind, ElectricFieldKind],
     @classmethod
     @override
     def from_value[W](cls, value: W) -> InverseTimeElectricField[W, S]: ...
+
+class _InverseTimeElectricFieldConstant(
+    Constant[Mul[InverseTimeKind, ElectricFieldKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> InverseTimeElectricField[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[InverseTimeKind, ElectricFieldKind]]
+    ) -> InverseTimeElectricField[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TimeConstant, /) -> _ElectricFieldConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[InverseTimeKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeElectricFieldConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[InverseTimeKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _FrequencyConstant, /) -> _ElectricFieldConstant: ...
+    @overload
+    def __truediv__(self, other: _InverseTimeConstant, /) -> _ElectricFieldConstant: ...
+    @overload
+    def __truediv__(self, other: _ElectricFieldConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _InverseTimeElectricFieldConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[InverseTimeKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeElectricFieldConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTimeElectricField[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[InverseTimeKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeElectricFieldConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[InverseTimeKind, ElectricFieldKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[InverseTimeKind, ElectricFieldKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[InverseTimeKind, ElectricFieldKind]], W, T]: ...
+    def _rmul_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rmul_Time[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _ElectricFieldConstant: ...
+    def _rtruediv_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> Time[float, T]: ...
+    def _rtruediv_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Time[W, T]: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _TimeConstant: ...

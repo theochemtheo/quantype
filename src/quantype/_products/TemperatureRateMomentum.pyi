@@ -11,6 +11,7 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Force import _ForceConstant
 from quantype._constants.Momentum import _MomentumConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
@@ -22,7 +23,7 @@ from quantype._generated import (
     TemperatureDifference,
     TemperatureRate,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -107,7 +108,9 @@ class TemperatureRateMomentum(Quantity[Mul[TemperatureRateKind, MomentumKind], V
     @overload
     def __truediv__(
         self,
-        other: TemperatureRateMomentum[V, S] | TemperatureRateMomentum[float, S],
+        other: TemperatureRateMomentum[V, S]
+        | TemperatureRateMomentum[float, S]
+        | _TemperatureRateMomentumConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -237,3 +240,95 @@ class TemperatureRateMomentum(Quantity[Mul[TemperatureRateKind, MomentumKind], V
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureRateMomentum[W, S]: ...
+
+class _TemperatureRateMomentumConstant(
+    Constant[Mul[TemperatureRateKind, MomentumKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureRateMomentum[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TemperatureRateKind, MomentumKind]]
+    ) -> TemperatureRateMomentum[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TemperatureRateKind, MomentumKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureRateMomentumConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TemperatureRateKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ForceConstant, /
+    ) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _ForceConstant: ...
+    @overload
+    def __truediv__(self, other: _TemperatureRateConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __truediv__(self, other: _MomentumConstant, /) -> _TemperatureRateConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureRateMomentumConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TemperatureRateKind, MomentumKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureRateMomentumConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureRateMomentum[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TemperatureRateKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureRateMomentumConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TemperatureRateKind, MomentumKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[TemperatureRateKind, MomentumKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TemperatureRateKind, MomentumKind]], W, T]: ...

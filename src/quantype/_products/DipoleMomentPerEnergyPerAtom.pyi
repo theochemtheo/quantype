@@ -12,6 +12,9 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.ElectricField import _ElectricFieldConstant
 from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
 from quantype._generated import (
@@ -21,7 +24,7 @@ from quantype._generated import (
     ElectricField,
     EnergyPerAtom,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     DipoleMomentKind,
@@ -113,7 +116,8 @@ class DipoleMomentPerEnergyPerAtom(
     def __truediv__(
         self,
         other: DipoleMomentPerEnergyPerAtom[V, S]
-        | DipoleMomentPerEnergyPerAtom[float, S],
+        | DipoleMomentPerEnergyPerAtom[float, S]
+        | _DipoleMomentPerEnergyPerAtomConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -295,3 +299,115 @@ class DipoleMomentPerEnergyPerAtom(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> DipoleMomentPerEnergyPerAtom[W, S]: ...
+
+class _DipoleMomentPerEnergyPerAtomConstant(
+    Constant[Div[DipoleMomentKind, EnergyPerAtomKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> DipoleMomentPerEnergyPerAtom[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[DipoleMomentKind, EnergyPerAtomKind]]
+    ) -> DipoleMomentPerEnergyPerAtom[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyPerAtomConstant, /) -> _DipoleMomentConstant: ...
+    @overload
+    def __mul__(self, other: _ElectricFieldConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[DipoleMomentKind, EnergyPerAtomKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerEnergyPerAtomConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, EnergyPerAtomKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _DipoleMomentPerEnergyPerAtomConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[DipoleMomentKind, EnergyPerAtomKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerEnergyPerAtomConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMomentPerEnergyPerAtom[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[DipoleMomentKind, EnergyPerAtomKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerEnergyPerAtomConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[DipoleMomentKind, EnergyPerAtomKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[DipoleMomentKind, EnergyPerAtomKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[DipoleMomentKind, EnergyPerAtomKind]], W, T]: ...
+    def _rmul_EnergyPerAtom_f[T: UnitSystem](
+        self, other: EnergyPerAtom[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rmul_EnergyPerAtom[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _cmul_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _DipoleMomentConstant: ...
+    def _rmul_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rmul_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> AtomCount[W, T]: ...
+    def _cmul_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _AtomCountConstant: ...
+    def _rtruediv_AtomCount_f[T: UnitSystem](
+        self, other: AtomCount[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rtruediv_AtomCount[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _ctruediv_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _ElectricFieldConstant: ...
+    def _rtruediv_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> EnergyPerAtom[float, T]: ...
+    def _rtruediv_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    def _ctruediv_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _EnergyPerAtomConstant: ...

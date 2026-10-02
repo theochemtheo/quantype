@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Magnetization import _MagnetizationConstant
 from quantype._generated import Acceleration, Dimensionless, Magnetization
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AccelerationKind,
     DimensionlessKind,
@@ -87,7 +89,8 @@ class MagnetizationPerAcceleration(
     def __truediv__(
         self,
         other: MagnetizationPerAcceleration[V, S]
-        | MagnetizationPerAcceleration[float, S],
+        | MagnetizationPerAcceleration[float, S]
+        | _MagnetizationPerAccelerationConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -252,3 +255,91 @@ class MagnetizationPerAcceleration(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MagnetizationPerAcceleration[W, S]: ...
+
+class _MagnetizationPerAccelerationConstant(
+    Constant[Div[MagnetizationKind, AccelerationKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagnetizationPerAcceleration[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MagnetizationKind, AccelerationKind]]
+    ) -> MagnetizationPerAcceleration[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AccelerationConstant, /) -> _MagnetizationConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MagnetizationKind, AccelerationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationPerAccelerationConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MagnetizationPerAccelerationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MagnetizationKind, AccelerationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationPerAccelerationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagnetizationPerAcceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MagnetizationKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationPerAccelerationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MagnetizationKind, AccelerationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MagnetizationKind, AccelerationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MagnetizationKind, AccelerationKind]], W, T]: ...
+    def _rmul_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> Magnetization[float, T]: ...
+    def _rmul_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Magnetization[W, T]: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _MagnetizationConstant: ...
+    def _rtruediv_Magnetization_f[T: UnitSystem](
+        self, other: Magnetization[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rtruediv_Magnetization[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _ctruediv_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _AccelerationConstant: ...

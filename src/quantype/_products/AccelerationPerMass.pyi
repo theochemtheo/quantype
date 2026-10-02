@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Mass import _MassConstant
 from quantype._generated import Acceleration, Dimensionless, Mass
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AccelerationKind, DimensionlessKind, Div, MassKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class AccelerationPerMass(Quantity[Div[AccelerationKind, MassKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AccelerationPerMass[V, S] | AccelerationPerMass[float, S], /
+        self,
+        other: AccelerationPerMass[V, S]
+        | AccelerationPerMass[float, S]
+        | _AccelerationPerMassConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AccelerationPerMass[V, S]: ...
@@ -207,3 +213,85 @@ class AccelerationPerMass(Quantity[Div[AccelerationKind, MassKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AccelerationPerMass[W, S]: ...
+
+class _AccelerationPerMassConstant(Constant[Div[AccelerationKind, MassKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AccelerationPerMass[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[AccelerationKind, MassKind]]
+    ) -> AccelerationPerMass[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _MassConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AccelerationKind, MassKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationPerMassConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Acceleration[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AccelerationKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AccelerationPerMassConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AccelerationKind, MassKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationPerMassConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AccelerationPerMass[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AccelerationKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationPerMassConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AccelerationKind, MassKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AccelerationKind, MassKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AccelerationKind, MassKind]], W, T]: ...
+    def _rmul_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rmul_Mass[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _cmul_Mass(self, other: _MassConstant, /) -> _AccelerationConstant: ...
+    def _rtruediv_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rtruediv_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Mass[W, T]: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _MassConstant: ...

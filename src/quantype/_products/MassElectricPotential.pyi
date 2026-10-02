@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.Mass import _MassConstant
 from quantype._generated import Dimensionless, ElectricPotential, Mass
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ElectricPotentialKind, MassKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -72,7 +73,11 @@ class MassElectricPotential(Quantity[Mul[MassKind, ElectricPotentialKind], V, S]
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MassElectricPotential[V, S] | MassElectricPotential[float, S], /
+        self,
+        other: MassElectricPotential[V, S]
+        | MassElectricPotential[float, S]
+        | _MassElectricPotentialConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MassElectricPotential[V, S]: ...
@@ -201,3 +206,77 @@ class MassElectricPotential(Quantity[Mul[MassKind, ElectricPotentialKind], V, S]
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassElectricPotential[W, S]: ...
+
+class _MassElectricPotentialConstant(Constant[Mul[MassKind, ElectricPotentialKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MassElectricPotential[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[MassKind, ElectricPotentialKind]]
+    ) -> MassElectricPotential[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[MassKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassElectricPotentialConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[MassKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _MassConstant, /) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(self, other: _ElectricPotentialConstant, /) -> _MassConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MassElectricPotentialConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[MassKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassElectricPotentialConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Mass[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[MassKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassElectricPotentialConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[MassKind, ElectricPotentialKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[MassKind, ElectricPotentialKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[MassKind, ElectricPotentialKind]], W, T]: ...

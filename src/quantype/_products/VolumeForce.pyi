@@ -12,11 +12,12 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.Force import _ForceConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Area, Dimensionless, Energy, Force, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ForceKind, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -86,7 +87,7 @@ class VolumeForce(Quantity[Mul[VolumeKind, ForceKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: VolumeForce[V, S] | VolumeForce[float, S], /
+        self, other: VolumeForce[V, S] | VolumeForce[float, S] | _VolumeForceConstant, /
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> VolumeForce[V, S]: ...
@@ -205,3 +206,75 @@ class VolumeForce(Quantity[Mul[VolumeKind, ForceKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VolumeForce[W, S]: ...
+
+class _VolumeForceConstant(Constant[Mul[VolumeKind, ForceKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> VolumeForce[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[VolumeKind, ForceKind]]) -> VolumeForce[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[VolumeKind, ForceKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeForceConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[VolumeKind, ForceKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AreaConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(self, other: _VolumeConstant, /) -> _ForceConstant: ...
+    @overload
+    def __truediv__(self, other: _EnergyConstant, /) -> _AreaConstant: ...
+    @overload
+    def __truediv__(self, other: _ForceConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __truediv__(self, other: _VolumeForceConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[VolumeKind, ForceKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeForceConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VolumeForce[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[VolumeKind, ForceKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeForceConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[VolumeKind, ForceKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[VolumeKind, ForceKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[VolumeKind, ForceKind]], W, T]: ...

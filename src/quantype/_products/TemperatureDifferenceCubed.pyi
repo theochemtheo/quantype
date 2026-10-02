@@ -11,8 +11,9 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, Mul, Pow, TemperatureDifferenceKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -57,7 +58,9 @@ class TemperatureDifferenceCubed(
     @overload
     def __truediv__(
         self,
-        other: TemperatureDifferenceCubed[V, S] | TemperatureDifferenceCubed[float, S],
+        other: TemperatureDifferenceCubed[V, S]
+        | TemperatureDifferenceCubed[float, S]
+        | _TemperatureDifferenceCubedConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -197,3 +200,69 @@ class TemperatureDifferenceCubed(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureDifferenceCubed[W, S]: ...
+
+class _TemperatureDifferenceCubedConstant(
+    Constant[Pow[TemperatureDifferenceKind, Literal[3]]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureDifferenceCubed[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[TemperatureDifferenceKind, Literal[3]]]
+    ) -> TemperatureDifferenceCubed[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[TemperatureDifferenceKind, Literal[3]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceCubedConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[TemperatureDifferenceKind, Literal[3]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperatureDifferenceCubedConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[TemperatureDifferenceKind, Literal[3]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceCubedConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifferenceCubed[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[TemperatureDifferenceKind, Literal[3]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceCubedConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[TemperatureDifferenceKind, Literal[3]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Pow[TemperatureDifferenceKind, Literal[3]]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[TemperatureDifferenceKind, Literal[3]]], W, T]: ...

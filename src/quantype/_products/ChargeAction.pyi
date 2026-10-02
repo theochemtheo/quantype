@@ -13,8 +13,9 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Action, Charge, Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, ChargeKind, DimensionlessKind, Div, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,9 @@ class ChargeAction(Quantity[Mul[ChargeKind, ActionKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ChargeAction[V, S] | ChargeAction[float, S], /
+        self,
+        other: ChargeAction[V, S] | ChargeAction[float, S] | _ChargeActionConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ChargeAction[V, S]: ...
@@ -187,3 +190,69 @@ class ChargeAction(Quantity[Mul[ChargeKind, ActionKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ChargeAction[W, S]: ...
+
+class _ChargeActionConstant(Constant[Mul[ChargeKind, ActionKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ChargeAction[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[ChargeKind, ActionKind]]) -> ChargeAction[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ChargeKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeActionConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ChargeKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ChargeConstant, /) -> _ActionConstant: ...
+    @overload
+    def __truediv__(self, other: _ActionConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ChargeActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ChargeKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Action[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ChargeAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ChargeKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ChargeKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ChargeKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ChargeKind, ActionKind]], W, T]: ...

@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.TemperatureRate import _TemperatureRateConstant
 from quantype._generated import AtomCount, Dimensionless, TemperatureRate
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AtomCountKind,
     DimensionlessKind,
@@ -89,7 +91,8 @@ class AtomCountPerTemperatureRate(
     def __truediv__(
         self,
         other: AtomCountPerTemperatureRate[V, S]
-        | AtomCountPerTemperatureRate[float, S],
+        | AtomCountPerTemperatureRate[float, S]
+        | _AtomCountPerTemperatureRateConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -252,3 +255,91 @@ class AtomCountPerTemperatureRate(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AtomCountPerTemperatureRate[W, S]: ...
+
+class _AtomCountPerTemperatureRateConstant(
+    Constant[Div[AtomCountKind, TemperatureRateKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AtomCountPerTemperatureRate[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[AtomCountKind, TemperatureRateKind]]
+    ) -> AtomCountPerTemperatureRate[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TemperatureRateConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AtomCountKind, TemperatureRateKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerTemperatureRateConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AtomCountKind, TemperatureRateKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AtomCountPerTemperatureRateConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AtomCountKind, TemperatureRateKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerTemperatureRateConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCountPerTemperatureRate[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AtomCountKind, TemperatureRateKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerTemperatureRateConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AtomCountKind, TemperatureRateKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AtomCountKind, TemperatureRateKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AtomCountKind, TemperatureRateKind]], W, T]: ...
+    def _rmul_TemperatureRate_f[T: UnitSystem](
+        self, other: TemperatureRate[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rmul_TemperatureRate[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> AtomCount[W, T]: ...
+    def _cmul_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _AtomCountConstant: ...
+    def _rtruediv_AtomCount_f[T: UnitSystem](
+        self, other: AtomCount[float, T], /
+    ) -> TemperatureRate[float, T]: ...
+    def _rtruediv_AtomCount[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    def _ctruediv_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _TemperatureRateConstant: ...

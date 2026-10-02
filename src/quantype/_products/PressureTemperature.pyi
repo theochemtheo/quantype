@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Pressure import _PressureConstant
 from quantype._constants.Temperature import _TemperatureConstant
 from quantype._generated import Dimensionless, Pressure, Temperature
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, Mul, PressureKind, TemperatureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,11 @@ class PressureTemperature(Quantity[Mul[PressureKind, TemperatureKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PressureTemperature[V, S] | PressureTemperature[float, S], /
+        self,
+        other: PressureTemperature[V, S]
+        | PressureTemperature[float, S]
+        | _PressureTemperatureConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PressureTemperature[V, S]: ...
@@ -191,3 +196,77 @@ class PressureTemperature(Quantity[Mul[PressureKind, TemperatureKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PressureTemperature[W, S]: ...
+
+class _PressureTemperatureConstant(Constant[Mul[PressureKind, TemperatureKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PressureTemperature[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[PressureKind, TemperatureKind]]
+    ) -> PressureTemperature[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[PressureKind, TemperatureKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureTemperatureConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[PressureKind, TemperatureKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _PressureConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __truediv__(self, other: _TemperatureConstant, /) -> _PressureConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _PressureTemperatureConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[PressureKind, TemperatureKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureTemperatureConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PressureTemperature[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[PressureKind, TemperatureKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureTemperatureConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[PressureKind, TemperatureKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[PressureKind, TemperatureKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[PressureKind, TemperatureKind]], W, T]: ...

@@ -12,10 +12,12 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._constants.Magnetization import _MagnetizationConstant
+from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Dimensionless, MagneticMoment, Magnetization, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MagneticMomentKind, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -96,7 +98,9 @@ class VolumePerMagneticMoment(Quantity[Div[VolumeKind, MagneticMomentKind], V, S
     @overload
     def __truediv__(
         self,
-        other: VolumePerMagneticMoment[V, S] | VolumePerMagneticMoment[float, S],
+        other: VolumePerMagneticMoment[V, S]
+        | VolumePerMagneticMoment[float, S]
+        | _VolumePerMagneticMomentConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -251,3 +255,104 @@ class VolumePerMagneticMoment(Quantity[Div[VolumeKind, MagneticMomentKind], V, S
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VolumePerMagneticMoment[W, S]: ...
+
+class _VolumePerMagneticMomentConstant(Constant[Div[VolumeKind, MagneticMomentKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> VolumePerMagneticMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[VolumeKind, MagneticMomentKind]]
+    ) -> VolumePerMagneticMoment[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _MagneticMomentConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __mul__(self, other: _MagnetizationConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[VolumeKind, MagneticMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumePerMagneticMomentConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[VolumeKind, MagneticMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _VolumePerMagneticMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[VolumeKind, MagneticMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumePerMagneticMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VolumePerMagneticMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[VolumeKind, MagneticMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumePerMagneticMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[VolumeKind, MagneticMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[VolumeKind, MagneticMomentKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[VolumeKind, MagneticMomentKind]], W, T]: ...
+    def _rmul_MagneticMoment_f[T: UnitSystem](
+        self, other: MagneticMoment[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rmul_MagneticMoment[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Volume[W, T]: ...
+    def _cmul_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _VolumeConstant: ...
+    def _rmul_Magnetization_f[T: UnitSystem](
+        self, other: Magnetization[float, T], /
+    ) -> Dimensionless[float, T]: ...
+    def _rmul_Magnetization[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    def _cmul_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _DimensionlessConstant: ...
+    def _rtruediv_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> MagneticMoment[float, T]: ...
+    def _rtruediv_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    def _ctruediv_Volume(
+        self, other: _VolumeConstant, /
+    ) -> _MagneticMomentConstant: ...

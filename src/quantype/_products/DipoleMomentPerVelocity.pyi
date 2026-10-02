@@ -13,9 +13,12 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.ElectricField import _ElectricFieldConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
+from quantype._constants.Momentum import _MomentumConstant
 from quantype._constants.Time import _TimeConstant
 from quantype._constants.Velocity import _VelocityConstant
 from quantype._generated import (
@@ -29,7 +32,7 @@ from quantype._generated import (
     Time,
     Velocity,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, DipoleMomentKind, Div, Mul, VelocityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -148,7 +151,9 @@ class DipoleMomentPerVelocity(Quantity[Div[DipoleMomentKind, VelocityKind], V, S
     @overload
     def __truediv__(
         self,
-        other: DipoleMomentPerVelocity[V, S] | DipoleMomentPerVelocity[float, S],
+        other: DipoleMomentPerVelocity[V, S]
+        | DipoleMomentPerVelocity[float, S]
+        | _DipoleMomentPerVelocityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -330,3 +335,143 @@ class DipoleMomentPerVelocity(Quantity[Div[DipoleMomentKind, VelocityKind], V, S
     @classmethod
     @override
     def from_value[W](cls, value: W) -> DipoleMomentPerVelocity[W, S]: ...
+
+class _DipoleMomentPerVelocityConstant(Constant[Div[DipoleMomentKind, VelocityKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> DipoleMomentPerVelocity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[DipoleMomentKind, VelocityKind]]
+    ) -> DipoleMomentPerVelocity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VelocityConstant, /) -> _DipoleMomentConstant: ...
+    @overload
+    def __mul__(self, other: _FrequencyConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __mul__(self, other: _InverseTimeConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __mul__(self, other: _ElectricFieldConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[DipoleMomentKind, VelocityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerVelocityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Frequency[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, VelocityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _TimeConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __truediv__(self, other: _ChargeConstant, /) -> _TimeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _DipoleMomentPerVelocityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[DipoleMomentKind, VelocityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerVelocityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Time[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMomentPerVelocity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[DipoleMomentKind, VelocityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerVelocityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[DipoleMomentKind, VelocityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[DipoleMomentKind, VelocityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[DipoleMomentKind, VelocityKind]], W, T]: ...
+    def _rmul_Velocity_f[T: UnitSystem](
+        self, other: Velocity[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rmul_Velocity[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _cmul_Velocity(self, other: _VelocityConstant, /) -> _DipoleMomentConstant: ...
+    def _rmul_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rmul_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Charge[W, T]: ...
+    def _cmul_Frequency(self, other: _FrequencyConstant, /) -> _ChargeConstant: ...
+    def _rmul_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rmul_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Charge[W, T]: ...
+    def _cmul_InverseTime(self, other: _InverseTimeConstant, /) -> _ChargeConstant: ...
+    def _rmul_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> Momentum[float, T]: ...
+    def _rmul_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Momentum[W, T]: ...
+    def _cmul_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _MomentumConstant: ...
+    def _rtruediv_Momentum_f[T: UnitSystem](
+        self, other: Momentum[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rtruediv_Momentum[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _ctruediv_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _ElectricFieldConstant: ...
+    def _rtruediv_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> Velocity[float, T]: ...
+    def _rtruediv_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Velocity[W, T]: ...
+    def _ctruediv_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _VelocityConstant: ...

@@ -12,7 +12,10 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.Entropy import _EntropyConstant
 from quantype._constants.Temperature import _TemperatureConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import (
@@ -23,7 +26,7 @@ from quantype._generated import (
     Temperature,
     TemperatureDifference,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ElectricFieldKind, EntropyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -121,7 +124,9 @@ class EntropyPerElectricField(Quantity[Div[EntropyKind, ElectricFieldKind], V, S
     @overload
     def __truediv__(
         self,
-        other: EntropyPerElectricField[V, S] | EntropyPerElectricField[float, S],
+        other: EntropyPerElectricField[V, S]
+        | EntropyPerElectricField[float, S]
+        | _EntropyPerElectricFieldConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -295,3 +300,130 @@ class EntropyPerElectricField(Quantity[Div[EntropyKind, ElectricFieldKind], V, S
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EntropyPerElectricField[W, S]: ...
+
+class _EntropyPerElectricFieldConstant(Constant[Div[EntropyKind, ElectricFieldKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EntropyPerElectricField[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[EntropyKind, ElectricFieldKind]]
+    ) -> EntropyPerElectricField[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TemperatureConstant, /) -> _DipoleMomentConstant: ...
+    @overload
+    def __mul__(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _DipoleMomentConstant: ...
+    @overload
+    def __mul__(self, other: _ElectricFieldConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[EntropyKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyPerElectricFieldConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[EntropyKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EntropyPerElectricFieldConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[EntropyKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyPerElectricFieldConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EntropyPerElectricField[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[EntropyKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyPerElectricFieldConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[EntropyKind, ElectricFieldKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[EntropyKind, ElectricFieldKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[EntropyKind, ElectricFieldKind]], W, T]: ...
+    def _rmul_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rmul_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _cmul_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _DipoleMomentConstant: ...
+    def _rmul_TemperatureDifference_f[T: UnitSystem](
+        self, other: TemperatureDifference[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rmul_TemperatureDifference[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _cmul_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _DipoleMomentConstant: ...
+    def _rmul_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rmul_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _cmul_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _EntropyConstant: ...
+    def _rtruediv_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rtruediv_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _ctruediv_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _TemperatureConstant: ...
+    def _rtruediv_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rtruediv_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _ctruediv_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _ElectricFieldConstant: ...

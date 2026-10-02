@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronDensity import _ElectronDensityConstant
 from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
 from quantype._generated import Dimensionless, ElectronDensity, EnergyPerAtom
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -88,7 +89,8 @@ class EnergyPerAtomElectronDensity(
     def __truediv__(
         self,
         other: EnergyPerAtomElectronDensity[V, S]
-        | EnergyPerAtomElectronDensity[float, S],
+        | EnergyPerAtomElectronDensity[float, S]
+        | _EnergyPerAtomElectronDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -234,3 +236,85 @@ class EnergyPerAtomElectronDensity(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerAtomElectronDensity[W, S]: ...
+
+class _EnergyPerAtomElectronDensityConstant(
+    Constant[Mul[EnergyPerAtomKind, ElectronDensityKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerAtomElectronDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyPerAtomKind, ElectronDensityKind]]
+    ) -> EnergyPerAtomElectronDensity[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyPerAtomKind, ElectronDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomElectronDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyPerAtomKind, ElectronDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _ElectronDensityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectronDensityConstant, /
+    ) -> _EnergyPerAtomConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyPerAtomElectronDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyPerAtomKind, ElectronDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomElectronDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtomElectronDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyPerAtomKind, ElectronDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomElectronDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyPerAtomKind, ElectronDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[EnergyPerAtomKind, ElectronDensityKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyPerAtomKind, ElectronDensityKind]], W, T]: ...

@@ -12,9 +12,12 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyDensity import _EnergyDensityConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._generated import Dimensionless, EnergyDensity, Frequency, InverseTime
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyDensityKind, FrequencyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -76,7 +79,9 @@ class FrequencyPerEnergyDensity(Quantity[Div[FrequencyKind, EnergyDensityKind], 
     @overload
     def __truediv__(
         self,
-        other: FrequencyPerEnergyDensity[V, S] | FrequencyPerEnergyDensity[float, S],
+        other: FrequencyPerEnergyDensity[V, S]
+        | FrequencyPerEnergyDensity[float, S]
+        | _FrequencyPerEnergyDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -244,3 +249,100 @@ class FrequencyPerEnergyDensity(Quantity[Div[FrequencyKind, EnergyDensityKind], 
     @classmethod
     @override
     def from_value[W](cls, value: W) -> FrequencyPerEnergyDensity[W, S]: ...
+
+class _FrequencyPerEnergyDensityConstant(
+    Constant[Div[FrequencyKind, EnergyDensityKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> FrequencyPerEnergyDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[FrequencyKind, EnergyDensityKind]]
+    ) -> FrequencyPerEnergyDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyDensityConstant, /) -> _FrequencyConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[FrequencyKind, EnergyDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyPerEnergyDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[FrequencyKind, EnergyDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _FrequencyPerEnergyDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[FrequencyKind, EnergyDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyPerEnergyDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: FrequencyPerEnergyDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[FrequencyKind, EnergyDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyPerEnergyDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[FrequencyKind, EnergyDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[FrequencyKind, EnergyDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[FrequencyKind, EnergyDensityKind]], W, T]: ...
+    def _rmul_EnergyDensity_f[T: UnitSystem](
+        self, other: EnergyDensity[float, T], /
+    ) -> Frequency[float, T]: ...
+    def _rmul_EnergyDensity[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> Frequency[W, T]: ...
+    def _cmul_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _FrequencyConstant: ...
+    def _rtruediv_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> EnergyDensity[float, T]: ...
+    def _rtruediv_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    def _ctruediv_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _EnergyDensityConstant: ...
+    def _rtruediv_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> EnergyDensity[float, T]: ...
+    def _rtruediv_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _EnergyDensityConstant: ...

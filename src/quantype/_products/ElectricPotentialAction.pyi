@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._generated import Action, Dimensionless, ElectricPotential
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     ActionKind,
     DimensionlessKind,
@@ -79,7 +80,9 @@ class ElectricPotentialAction(Quantity[Mul[ElectricPotentialKind, ActionKind], V
     @overload
     def __truediv__(
         self,
-        other: ElectricPotentialAction[V, S] | ElectricPotentialAction[float, S],
+        other: ElectricPotentialAction[V, S]
+        | ElectricPotentialAction[float, S]
+        | _ElectricPotentialActionConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -209,3 +212,79 @@ class ElectricPotentialAction(Quantity[Mul[ElectricPotentialKind, ActionKind], V
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectricPotentialAction[W, S]: ...
+
+class _ElectricPotentialActionConstant(
+    Constant[Mul[ElectricPotentialKind, ActionKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectricPotentialAction[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ElectricPotentialKind, ActionKind]]
+    ) -> ElectricPotentialAction[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ElectricPotentialKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialActionConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ElectricPotentialKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ElectricPotentialConstant, /) -> _ActionConstant: ...
+    @overload
+    def __truediv__(self, other: _ActionConstant, /) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricPotentialActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ElectricPotentialKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotentialAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ElectricPotentialKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ElectricPotentialKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ElectricPotentialKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ElectricPotentialKind, ActionKind]], W, T]: ...

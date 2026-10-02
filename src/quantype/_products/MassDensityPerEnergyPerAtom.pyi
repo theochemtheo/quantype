@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
+from quantype._constants.MassDensity import _MassDensityConstant
 from quantype._generated import Dimensionless, EnergyPerAtom, MassDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -87,7 +89,8 @@ class MassDensityPerEnergyPerAtom(
     def __truediv__(
         self,
         other: MassDensityPerEnergyPerAtom[V, S]
-        | MassDensityPerEnergyPerAtom[float, S],
+        | MassDensityPerEnergyPerAtom[float, S]
+        | _MassDensityPerEnergyPerAtomConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -250,3 +253,91 @@ class MassDensityPerEnergyPerAtom(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassDensityPerEnergyPerAtom[W, S]: ...
+
+class _MassDensityPerEnergyPerAtomConstant(
+    Constant[Div[MassDensityKind, EnergyPerAtomKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MassDensityPerEnergyPerAtom[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MassDensityKind, EnergyPerAtomKind]]
+    ) -> MassDensityPerEnergyPerAtom[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyPerAtomConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MassDensityKind, EnergyPerAtomKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerEnergyPerAtomConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MassDensityKind, EnergyPerAtomKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MassDensityPerEnergyPerAtomConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MassDensityKind, EnergyPerAtomKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerEnergyPerAtomConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensityPerEnergyPerAtom[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MassDensityKind, EnergyPerAtomKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerEnergyPerAtomConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MassDensityKind, EnergyPerAtomKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MassDensityKind, EnergyPerAtomKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MassDensityKind, EnergyPerAtomKind]], W, T]: ...
+    def _rmul_EnergyPerAtom_f[T: UnitSystem](
+        self, other: EnergyPerAtom[float, T], /
+    ) -> MassDensity[float, T]: ...
+    def _rmul_EnergyPerAtom[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> MassDensity[W, T]: ...
+    def _cmul_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _MassDensityConstant: ...
+    def _rtruediv_MassDensity_f[T: UnitSystem](
+        self, other: MassDensity[float, T], /
+    ) -> EnergyPerAtom[float, T]: ...
+    def _rtruediv_MassDensity[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _EnergyPerAtomConstant: ...

@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ParticleDensity import _ParticleDensityConstant
+from quantype._constants.Temperature import _TemperatureConstant
 from quantype._generated import Dimensionless, ParticleDensity, Temperature
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -89,7 +91,8 @@ class TemperaturePerParticleDensity(
     def __truediv__(
         self,
         other: TemperaturePerParticleDensity[V, S]
-        | TemperaturePerParticleDensity[float, S],
+        | TemperaturePerParticleDensity[float, S]
+        | _TemperaturePerParticleDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -254,3 +257,93 @@ class TemperaturePerParticleDensity(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperaturePerParticleDensity[W, S]: ...
+
+class _TemperaturePerParticleDensityConstant(
+    Constant[Div[TemperatureKind, ParticleDensityKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperaturePerParticleDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[TemperatureKind, ParticleDensityKind]]
+    ) -> TemperaturePerParticleDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ParticleDensityConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TemperatureKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerParticleDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TemperatureKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperaturePerParticleDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TemperatureKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerParticleDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperaturePerParticleDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TemperatureKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerParticleDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TemperatureKind, ParticleDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[TemperatureKind, ParticleDensityKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TemperatureKind, ParticleDensityKind]], W, T]: ...
+    def _rmul_ParticleDensity_f[T: UnitSystem](
+        self, other: ParticleDensity[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rmul_ParticleDensity[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _cmul_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _TemperatureConstant: ...
+    def _rtruediv_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> ParticleDensity[float, T]: ...
+    def _rtruediv_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _ParticleDensityConstant: ...

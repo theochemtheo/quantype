@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronDensity import _ElectronDensityConstant
 from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._generated import Dimensionless, ElectronDensity, ParticleDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -90,7 +91,8 @@ class ParticleDensityElectronDensity(
     def __truediv__(
         self,
         other: ParticleDensityElectronDensity[V, S]
-        | ParticleDensityElectronDensity[float, S],
+        | ParticleDensityElectronDensity[float, S]
+        | _ParticleDensityElectronDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -240,3 +242,85 @@ class ParticleDensityElectronDensity(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ParticleDensityElectronDensity[W, S]: ...
+
+class _ParticleDensityElectronDensityConstant(
+    Constant[Mul[ParticleDensityKind, ElectronDensityKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ParticleDensityElectronDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ParticleDensityKind, ElectronDensityKind]]
+    ) -> ParticleDensityElectronDensity[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ParticleDensityKind, ElectronDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityElectronDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ParticleDensityKind, ElectronDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ParticleDensityConstant, /
+    ) -> _ElectronDensityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ParticleDensityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ParticleDensityElectronDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ParticleDensityKind, ElectronDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityElectronDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensityElectronDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ParticleDensityKind, ElectronDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityElectronDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ParticleDensityKind, ElectronDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[ParticleDensityKind, ElectronDensityKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ParticleDensityKind, ElectronDensityKind]], W, T]: ...

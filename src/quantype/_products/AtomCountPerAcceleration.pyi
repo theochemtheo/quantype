@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Acceleration, AtomCount, Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AccelerationKind, AtomCountKind, DimensionlessKind, Div, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -74,7 +76,9 @@ class AtomCountPerAcceleration(Quantity[Div[AtomCountKind, AccelerationKind], V,
     @overload
     def __truediv__(
         self,
-        other: AtomCountPerAcceleration[V, S] | AtomCountPerAcceleration[float, S],
+        other: AtomCountPerAcceleration[V, S]
+        | AtomCountPerAcceleration[float, S]
+        | _AtomCountPerAccelerationConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -221,3 +225,89 @@ class AtomCountPerAcceleration(Quantity[Div[AtomCountKind, AccelerationKind], V,
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AtomCountPerAcceleration[W, S]: ...
+
+class _AtomCountPerAccelerationConstant(Constant[Div[AtomCountKind, AccelerationKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AtomCountPerAcceleration[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[AtomCountKind, AccelerationKind]]
+    ) -> AtomCountPerAcceleration[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AccelerationConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AtomCountKind, AccelerationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerAccelerationConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AtomCountKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AtomCountPerAccelerationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AtomCountKind, AccelerationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerAccelerationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCountPerAcceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AtomCountKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerAccelerationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AtomCountKind, AccelerationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AtomCountKind, AccelerationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AtomCountKind, AccelerationKind]], W, T]: ...
+    def _rmul_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rmul_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> AtomCount[W, T]: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _AtomCountConstant: ...
+    def _rtruediv_AtomCount_f[T: UnitSystem](
+        self, other: AtomCount[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rtruediv_AtomCount[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _ctruediv_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _AccelerationConstant: ...

@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._generated import Acceleration, Dimensionless, ElectronCount
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AccelerationKind,
     DimensionlessKind,
@@ -87,7 +89,8 @@ class ElectronCountPerAcceleration(
     def __truediv__(
         self,
         other: ElectronCountPerAcceleration[V, S]
-        | ElectronCountPerAcceleration[float, S],
+        | ElectronCountPerAcceleration[float, S]
+        | _ElectronCountPerAccelerationConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -252,3 +255,91 @@ class ElectronCountPerAcceleration(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectronCountPerAcceleration[W, S]: ...
+
+class _ElectronCountPerAccelerationConstant(
+    Constant[Div[ElectronCountKind, AccelerationKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronCountPerAcceleration[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ElectronCountKind, AccelerationKind]]
+    ) -> ElectronCountPerAcceleration[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AccelerationConstant, /) -> _ElectronCountConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ElectronCountKind, AccelerationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountPerAccelerationConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectronCountPerAccelerationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ElectronCountKind, AccelerationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountPerAccelerationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCountPerAcceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ElectronCountKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountPerAccelerationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ElectronCountKind, AccelerationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ElectronCountKind, AccelerationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ElectronCountKind, AccelerationKind]], W, T]: ...
+    def _rmul_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> ElectronCount[float, T]: ...
+    def _rmul_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _ElectronCountConstant: ...
+    def _rtruediv_ElectronCount_f[T: UnitSystem](
+        self, other: ElectronCount[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rtruediv_ElectronCount[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _ctruediv_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _AccelerationConstant: ...

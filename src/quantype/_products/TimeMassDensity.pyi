@@ -12,12 +12,13 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.MassDensity import _MassDensityConstant
 from quantype._constants.Time import _TimeConstant
 from quantype._generated import Dimensionless, Frequency, InverseTime, MassDensity, Time
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MassDensityKind, Mul, TimeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -103,7 +104,11 @@ class TimeMassDensity(Quantity[Mul[TimeKind, MassDensityKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TimeMassDensity[V, S] | TimeMassDensity[float, S], /
+        self,
+        other: TimeMassDensity[V, S]
+        | TimeMassDensity[float, S]
+        | _TimeMassDensityConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TimeMassDensity[V, S]: ...
@@ -251,3 +256,114 @@ class TimeMassDensity(Quantity[Mul[TimeKind, MassDensityKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TimeMassDensity[W, S]: ...
+
+class _TimeMassDensityConstant(Constant[Mul[TimeKind, MassDensityKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TimeMassDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TimeKind, MassDensityKind]]
+    ) -> TimeMassDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _FrequencyConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __mul__(self, other: _InverseTimeConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TimeKind, MassDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeMassDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TimeKind, MassDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _TimeConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __truediv__(self, other: _MassDensityConstant, /) -> _TimeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TimeMassDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TimeKind, MassDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeMassDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TimeMassDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TimeKind, MassDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeMassDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TimeKind, MassDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[TimeKind, MassDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TimeKind, MassDensityKind]], W, T]: ...
+    def _rmul_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> MassDensity[float, T]: ...
+    def _rmul_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> MassDensity[W, T]: ...
+    def _cmul_Frequency(self, other: _FrequencyConstant, /) -> _MassDensityConstant: ...
+    def _rmul_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> MassDensity[float, T]: ...
+    def _rmul_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> MassDensity[W, T]: ...
+    def _cmul_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _MassDensityConstant: ...
+    def _rtruediv_MassDensity_f[T: UnitSystem](
+        self, other: MassDensity[float, T], /
+    ) -> InverseTime[float, T]: ...
+    def _rtruediv_MassDensity[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> InverseTime[W, T]: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _InverseTimeConstant: ...

@@ -12,7 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.EnergyDensity import _EnergyDensityConstant
 from quantype._constants.MassDensity import _MassDensityConstant
+from quantype._constants.Momentum import _MomentumConstant
+from quantype._constants.Pressure import _PressureConstant
 from quantype._constants.Velocity import _VelocityConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
@@ -24,7 +28,7 @@ from quantype._generated import (
     Velocity,
     Volume,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MomentumKind, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -108,7 +112,11 @@ class MomentumPerVolume(Quantity[Div[MomentumKind, VolumeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MomentumPerVolume[V, S] | MomentumPerVolume[float, S], /
+        self,
+        other: MomentumPerVolume[V, S]
+        | MomentumPerVolume[float, S]
+        | _MomentumPerVolumeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MomentumPerVolume[V, S]: ...
@@ -259,3 +267,115 @@ class MomentumPerVolume(Quantity[Div[MomentumKind, VolumeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MomentumPerVolume[W, S]: ...
+
+class _MomentumPerVolumeConstant(Constant[Div[MomentumKind, VolumeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MomentumPerVolume[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MomentumKind, VolumeKind]]
+    ) -> MomentumPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VolumeConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __mul__(self, other: _VelocityConstant, /) -> _EnergyDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MomentumKind, VolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumPerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MomentumKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _VelocityConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __truediv__(self, other: _MassDensityConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MomentumPerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MomentumKind, VolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumPerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MomentumPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MomentumKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MomentumKind, VolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MomentumKind, VolumeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MomentumKind, VolumeKind]], W, T]: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Momentum[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Momentum[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _MomentumConstant: ...
+    def _rmul_Velocity_f[T: UnitSystem](
+        self, other: Velocity[float, T], /
+    ) -> EnergyDensity[float, T]: ...
+    def _rmul_Velocity[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    def _cmul_Velocity(self, other: _VelocityConstant, /) -> _EnergyDensityConstant: ...
+    def _rtruediv_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> Velocity[float, T]: ...
+    def _rtruediv_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Velocity[W, T]: ...
+    def _ctruediv_Pressure(self, other: _PressureConstant, /) -> _VelocityConstant: ...
+    def _rtruediv_Momentum_f[T: UnitSystem](
+        self, other: Momentum[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_Momentum[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_Momentum(self, other: _MomentumConstant, /) -> _VolumeConstant: ...

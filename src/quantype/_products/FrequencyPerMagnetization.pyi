@@ -12,9 +12,12 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Magnetization import _MagnetizationConstant
 from quantype._generated import Dimensionless, Frequency, InverseTime, Magnetization
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, FrequencyKind, MagnetizationKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -76,7 +79,9 @@ class FrequencyPerMagnetization(Quantity[Div[FrequencyKind, MagnetizationKind], 
     @overload
     def __truediv__(
         self,
-        other: FrequencyPerMagnetization[V, S] | FrequencyPerMagnetization[float, S],
+        other: FrequencyPerMagnetization[V, S]
+        | FrequencyPerMagnetization[float, S]
+        | _FrequencyPerMagnetizationConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -244,3 +249,100 @@ class FrequencyPerMagnetization(Quantity[Div[FrequencyKind, MagnetizationKind], 
     @classmethod
     @override
     def from_value[W](cls, value: W) -> FrequencyPerMagnetization[W, S]: ...
+
+class _FrequencyPerMagnetizationConstant(
+    Constant[Div[FrequencyKind, MagnetizationKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> FrequencyPerMagnetization[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[FrequencyKind, MagnetizationKind]]
+    ) -> FrequencyPerMagnetization[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _MagnetizationConstant, /) -> _FrequencyConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[FrequencyKind, MagnetizationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyPerMagnetizationConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[FrequencyKind, MagnetizationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _FrequencyPerMagnetizationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[FrequencyKind, MagnetizationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyPerMagnetizationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: FrequencyPerMagnetization[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[FrequencyKind, MagnetizationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyPerMagnetizationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[FrequencyKind, MagnetizationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[FrequencyKind, MagnetizationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[FrequencyKind, MagnetizationKind]], W, T]: ...
+    def _rmul_Magnetization_f[T: UnitSystem](
+        self, other: Magnetization[float, T], /
+    ) -> Frequency[float, T]: ...
+    def _rmul_Magnetization[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Frequency[W, T]: ...
+    def _cmul_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _FrequencyConstant: ...
+    def _rtruediv_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Magnetization[float, T]: ...
+    def _rtruediv_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Magnetization[W, T]: ...
+    def _ctruediv_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _MagnetizationConstant: ...
+    def _rtruediv_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Magnetization[float, T]: ...
+    def _rtruediv_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Magnetization[W, T]: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _MagnetizationConstant: ...

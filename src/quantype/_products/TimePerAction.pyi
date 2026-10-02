@@ -13,9 +13,11 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.Time import _TimeConstant
 from quantype._generated import Action, Dimensionless, Energy, Time
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, DimensionlessKind, Div, Mul, TimeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -83,7 +85,9 @@ class TimePerAction(Quantity[Div[TimeKind, ActionKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TimePerAction[V, S] | TimePerAction[float, S], /
+        self,
+        other: TimePerAction[V, S] | TimePerAction[float, S] | _TimePerActionConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TimePerAction[V, S]: ...
@@ -223,3 +227,90 @@ class TimePerAction(Quantity[Div[TimeKind, ActionKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TimePerAction[W, S]: ...
+
+class _TimePerActionConstant(Constant[Div[TimeKind, ActionKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> TimePerAction[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[TimeKind, ActionKind]]) -> TimePerAction[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __mul__(self, other: _ActionConstant, /) -> _TimeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TimeKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerActionConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Action[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TimeKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TimePerActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TimeKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TimePerAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TimeKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TimeKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[TimeKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TimeKind, ActionKind]], W, T]: ...
+    def _rmul_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> Dimensionless[float, T]: ...
+    def _rmul_Energy[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _DimensionlessConstant: ...
+    def _rmul_Action_f[T: UnitSystem](
+        self, other: Action[float, T], /
+    ) -> Time[float, T]: ...
+    def _rmul_Action[W, T: UnitSystem](self, other: Action[W, T], /) -> Time[W, T]: ...
+    def _cmul_Action(self, other: _ActionConstant, /) -> _TimeConstant: ...
+    def _rtruediv_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> Action[float, T]: ...
+    def _rtruediv_Time[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Action[W, T]: ...
+    def _ctruediv_Time(self, other: _TimeConstant, /) -> _ActionConstant: ...

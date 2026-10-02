@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._generated import Charge, Dimensionless, ElectronCount
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, ElectronCountKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -71,7 +73,11 @@ class ChargePerElectronCount(Quantity[Div[ChargeKind, ElectronCountKind], V, S])
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ChargePerElectronCount[V, S] | ChargePerElectronCount[float, S], /
+        self,
+        other: ChargePerElectronCount[V, S]
+        | ChargePerElectronCount[float, S]
+        | _ChargePerElectronCountConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ChargePerElectronCount[V, S]: ...
@@ -209,3 +215,87 @@ class ChargePerElectronCount(Quantity[Div[ChargeKind, ElectronCountKind], V, S])
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ChargePerElectronCount[W, S]: ...
+
+class _ChargePerElectronCountConstant(Constant[Div[ChargeKind, ElectronCountKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ChargePerElectronCount[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ChargeKind, ElectronCountKind]]
+    ) -> ChargePerElectronCount[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ElectronCountConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ChargeKind, ElectronCountKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerElectronCountConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ChargeKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ChargePerElectronCountConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ChargeKind, ElectronCountKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerElectronCountConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ChargePerElectronCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ChargeKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerElectronCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ChargeKind, ElectronCountKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ChargeKind, ElectronCountKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ChargeKind, ElectronCountKind]], W, T]: ...
+    def _rmul_ElectronCount_f[T: UnitSystem](
+        self, other: ElectronCount[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rmul_ElectronCount[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Charge[W, T]: ...
+    def _cmul_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _ChargeConstant: ...
+    def _rtruediv_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> ElectronCount[float, T]: ...
+    def _rtruediv_Charge[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    def _ctruediv_Charge(self, other: _ChargeConstant, /) -> _ElectronCountConstant: ...

@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import Angle, Dimensionless, TemperatureDifference
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AngleKind,
     DimensionlessKind,
@@ -87,7 +88,9 @@ class TemperatureDifferenceAngle(
     @overload
     def __truediv__(
         self,
-        other: TemperatureDifferenceAngle[V, S] | TemperatureDifferenceAngle[float, S],
+        other: TemperatureDifferenceAngle[V, S]
+        | TemperatureDifferenceAngle[float, S]
+        | _TemperatureDifferenceAngleConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -227,3 +230,85 @@ class TemperatureDifferenceAngle(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureDifferenceAngle[W, S]: ...
+
+class _TemperatureDifferenceAngleConstant(
+    Constant[Mul[TemperatureDifferenceKind, AngleKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureDifferenceAngle[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TemperatureDifferenceKind, AngleKind]]
+    ) -> TemperatureDifferenceAngle[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TemperatureDifferenceKind, AngleKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceAngleConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _AngleConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AngleConstant, /
+    ) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureDifferenceAngleConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TemperatureDifferenceKind, AngleKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceAngleConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Angle[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifferenceAngle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TemperatureDifferenceKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceAngleConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TemperatureDifferenceKind, AngleKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, AngleKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TemperatureDifferenceKind, AngleKind]], W, T]: ...

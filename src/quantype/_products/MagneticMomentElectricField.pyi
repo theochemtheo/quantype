@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricField import _ElectricFieldConstant
 from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._generated import Dimensionless, ElectricField, MagneticMoment
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -88,7 +89,8 @@ class MagneticMomentElectricField(
     def __truediv__(
         self,
         other: MagneticMomentElectricField[V, S]
-        | MagneticMomentElectricField[float, S],
+        | MagneticMomentElectricField[float, S]
+        | _MagneticMomentElectricFieldConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -232,3 +234,85 @@ class MagneticMomentElectricField(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MagneticMomentElectricField[W, S]: ...
+
+class _MagneticMomentElectricFieldConstant(
+    Constant[Mul[MagneticMomentKind, ElectricFieldKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagneticMomentElectricField[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[MagneticMomentKind, ElectricFieldKind]]
+    ) -> MagneticMomentElectricField[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[MagneticMomentKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentElectricFieldConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MagneticMomentConstant, /
+    ) -> _ElectricFieldConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricFieldConstant, /
+    ) -> _MagneticMomentConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MagneticMomentElectricFieldConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[MagneticMomentKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentElectricFieldConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMomentElectricField[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[MagneticMomentKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentElectricFieldConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[MagneticMomentKind, ElectricFieldKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[MagneticMomentKind, ElectricFieldKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[MagneticMomentKind, ElectricFieldKind]], W, T]: ...

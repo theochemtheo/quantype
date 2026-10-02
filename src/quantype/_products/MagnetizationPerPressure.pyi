@@ -12,7 +12,10 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.MagneticMoment import _MagneticMomentConstant
+from quantype._constants.Magnetization import _MagnetizationConstant
 from quantype._constants.Pressure import _PressureConstant
 from quantype._generated import (
     Dimensionless,
@@ -21,7 +24,7 @@ from quantype._generated import (
     Magnetization,
     Pressure,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MagnetizationKind, Mul, PressureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -92,7 +95,9 @@ class MagnetizationPerPressure(Quantity[Div[MagnetizationKind, PressureKind], V,
     @overload
     def __truediv__(
         self,
-        other: MagnetizationPerPressure[V, S] | MagnetizationPerPressure[float, S],
+        other: MagnetizationPerPressure[V, S]
+        | MagnetizationPerPressure[float, S]
+        | _MagnetizationPerPressureConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -260,3 +265,109 @@ class MagnetizationPerPressure(Quantity[Div[MagnetizationKind, PressureKind], V,
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MagnetizationPerPressure[W, S]: ...
+
+class _MagnetizationPerPressureConstant(Constant[Div[MagnetizationKind, PressureKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagnetizationPerPressure[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MagnetizationKind, PressureKind]]
+    ) -> MagnetizationPerPressure[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyConstant, /) -> _MagneticMomentConstant: ...
+    @overload
+    def __mul__(self, other: _PressureConstant, /) -> _MagnetizationConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MagnetizationKind, PressureKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationPerPressureConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, PressureKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MagnetizationPerPressureConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MagnetizationKind, PressureKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationPerPressureConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagnetizationPerPressure[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MagnetizationKind, PressureKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationPerPressureConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MagnetizationKind, PressureKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MagnetizationKind, PressureKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MagnetizationKind, PressureKind]], W, T]: ...
+    def _rmul_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> MagneticMoment[float, T]: ...
+    def _rmul_Energy[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _MagneticMomentConstant: ...
+    def _rmul_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> Magnetization[float, T]: ...
+    def _rmul_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Magnetization[W, T]: ...
+    def _cmul_Pressure(self, other: _PressureConstant, /) -> _MagnetizationConstant: ...
+    def _rtruediv_MagneticMoment_f[T: UnitSystem](
+        self, other: MagneticMoment[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_MagneticMoment[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _EnergyConstant: ...
+    def _rtruediv_Magnetization_f[T: UnitSystem](
+        self, other: Magnetization[float, T], /
+    ) -> Pressure[float, T]: ...
+    def _rtruediv_Magnetization[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Pressure[W, T]: ...
+    def _ctruediv_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _PressureConstant: ...

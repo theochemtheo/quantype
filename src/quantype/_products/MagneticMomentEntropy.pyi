@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
 from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._generated import Dimensionless, Entropy, MagneticMoment
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EntropyKind, MagneticMomentKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -72,7 +73,11 @@ class MagneticMomentEntropy(Quantity[Mul[MagneticMomentKind, EntropyKind], V, S]
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MagneticMomentEntropy[V, S] | MagneticMomentEntropy[float, S], /
+        self,
+        other: MagneticMomentEntropy[V, S]
+        | MagneticMomentEntropy[float, S]
+        | _MagneticMomentEntropyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MagneticMomentEntropy[V, S]: ...
@@ -201,3 +206,77 @@ class MagneticMomentEntropy(Quantity[Mul[MagneticMomentKind, EntropyKind], V, S]
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MagneticMomentEntropy[W, S]: ...
+
+class _MagneticMomentEntropyConstant(Constant[Mul[MagneticMomentKind, EntropyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagneticMomentEntropy[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[MagneticMomentKind, EntropyKind]]
+    ) -> MagneticMomentEntropy[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[MagneticMomentKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentEntropyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _MagneticMomentConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __truediv__(self, other: _EntropyConstant, /) -> _MagneticMomentConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MagneticMomentEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[MagneticMomentKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMomentEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[MagneticMomentKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[MagneticMomentKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[MagneticMomentKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[MagneticMomentKind, EntropyKind]], W, T]: ...

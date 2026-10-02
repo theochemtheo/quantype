@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Force import _ForceConstant
+from quantype._constants.MassDensity import _MassDensityConstant
 from quantype._generated import Dimensionless, Force, MassDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ForceKind, MassDensityKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class MassDensityPerForce(Quantity[Div[MassDensityKind, ForceKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MassDensityPerForce[V, S] | MassDensityPerForce[float, S], /
+        self,
+        other: MassDensityPerForce[V, S]
+        | MassDensityPerForce[float, S]
+        | _MassDensityPerForceConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MassDensityPerForce[V, S]: ...
@@ -207,3 +213,85 @@ class MassDensityPerForce(Quantity[Div[MassDensityKind, ForceKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassDensityPerForce[W, S]: ...
+
+class _MassDensityPerForceConstant(Constant[Div[MassDensityKind, ForceKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MassDensityPerForce[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MassDensityKind, ForceKind]]
+    ) -> MassDensityPerForce[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ForceConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MassDensityKind, ForceKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerForceConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Force[W, T], /) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MassDensityKind, ForceKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MassDensityPerForceConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MassDensityKind, ForceKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerForceConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensityPerForce[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MassDensityKind, ForceKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerForceConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MassDensityKind, ForceKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MassDensityKind, ForceKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MassDensityKind, ForceKind]], W, T]: ...
+    def _rmul_Force_f[T: UnitSystem](
+        self, other: Force[float, T], /
+    ) -> MassDensity[float, T]: ...
+    def _rmul_Force[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> MassDensity[W, T]: ...
+    def _cmul_Force(self, other: _ForceConstant, /) -> _MassDensityConstant: ...
+    def _rtruediv_MassDensity_f[T: UnitSystem](
+        self, other: MassDensity[float, T], /
+    ) -> Force[float, T]: ...
+    def _rtruediv_MassDensity[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> Force[W, T]: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _ForceConstant: ...

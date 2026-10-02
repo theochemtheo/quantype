@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricField import _ElectricFieldConstant
 from quantype._generated import Acceleration, Dimensionless, ElectricField
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AccelerationKind,
     DimensionlessKind,
@@ -85,7 +86,9 @@ class AccelerationElectricField(
     @overload
     def __truediv__(
         self,
-        other: AccelerationElectricField[V, S] | AccelerationElectricField[float, S],
+        other: AccelerationElectricField[V, S]
+        | AccelerationElectricField[float, S]
+        | _AccelerationElectricFieldConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -225,3 +228,83 @@ class AccelerationElectricField(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AccelerationElectricField[W, S]: ...
+
+class _AccelerationElectricFieldConstant(
+    Constant[Mul[AccelerationKind, ElectricFieldKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AccelerationElectricField[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[AccelerationKind, ElectricFieldKind]]
+    ) -> AccelerationElectricField[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AccelerationKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationElectricFieldConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AccelerationKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AccelerationConstant, /
+    ) -> _ElectricFieldConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricFieldConstant, /
+    ) -> _AccelerationConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AccelerationElectricFieldConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AccelerationKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationElectricFieldConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AccelerationElectricField[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AccelerationKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AccelerationElectricFieldConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AccelerationKind, ElectricFieldKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AccelerationKind, ElectricFieldKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AccelerationKind, ElectricFieldKind]], W, T]: ...

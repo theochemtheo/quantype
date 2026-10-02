@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Magnetization import _MagnetizationConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Dimensionless, Magnetization, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MagnetizationKind, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class MagnetizationPerVolume(Quantity[Div[MagnetizationKind, VolumeKind], V, S])
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MagnetizationPerVolume[V, S] | MagnetizationPerVolume[float, S], /
+        self,
+        other: MagnetizationPerVolume[V, S]
+        | MagnetizationPerVolume[float, S]
+        | _MagnetizationPerVolumeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MagnetizationPerVolume[V, S]: ...
@@ -209,3 +215,87 @@ class MagnetizationPerVolume(Quantity[Div[MagnetizationKind, VolumeKind], V, S])
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MagnetizationPerVolume[W, S]: ...
+
+class _MagnetizationPerVolumeConstant(Constant[Div[MagnetizationKind, VolumeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagnetizationPerVolume[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MagnetizationKind, VolumeKind]]
+    ) -> MagnetizationPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VolumeConstant, /) -> _MagnetizationConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MagnetizationKind, VolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationPerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MagnetizationKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MagnetizationPerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MagnetizationKind, VolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationPerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagnetizationPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MagnetizationKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MagnetizationKind, VolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MagnetizationKind, VolumeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MagnetizationKind, VolumeKind]], W, T]: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Magnetization[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Magnetization[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _MagnetizationConstant: ...
+    def _rtruediv_Magnetization_f[T: UnitSystem](
+        self, other: Magnetization[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_Magnetization[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _VolumeConstant: ...

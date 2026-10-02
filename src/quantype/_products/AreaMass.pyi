@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Mass import _MassConstant
 from quantype._generated import Area, Dimensionless, Mass
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AreaKind, DimensionlessKind, Div, MassKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,7 @@ class AreaMass(Quantity[Mul[AreaKind, MassKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AreaMass[V, S] | AreaMass[float, S], /
+        self, other: AreaMass[V, S] | AreaMass[float, S] | _AreaMassConstant, /
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AreaMass[V, S]: ...
@@ -183,3 +184,67 @@ class AreaMass(Quantity[Mul[AreaKind, MassKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AreaMass[W, S]: ...
+
+class _AreaMassConstant(Constant[Mul[AreaKind, MassKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AreaMass[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[AreaKind, MassKind]]) -> AreaMass[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AreaKind, MassKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaMassConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AreaKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AreaConstant, /) -> _MassConstant: ...
+    @overload
+    def __truediv__(self, other: _MassConstant, /) -> _AreaConstant: ...
+    @overload
+    def __truediv__(self, other: _AreaMassConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AreaKind, MassKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaMassConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AreaMass[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AreaKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaMassConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AreaKind, MassKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AreaKind, MassKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AreaKind, MassKind]], W, T]: ...

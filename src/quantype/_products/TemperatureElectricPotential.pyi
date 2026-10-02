@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.Temperature import _TemperatureConstant
 from quantype._generated import Dimensionless, ElectricPotential, Temperature
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -86,7 +87,8 @@ class TemperatureElectricPotential(
     def __truediv__(
         self,
         other: TemperatureElectricPotential[V, S]
-        | TemperatureElectricPotential[float, S],
+        | TemperatureElectricPotential[float, S]
+        | _TemperatureElectricPotentialConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -232,3 +234,85 @@ class TemperatureElectricPotential(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureElectricPotential[W, S]: ...
+
+class _TemperatureElectricPotentialConstant(
+    Constant[Mul[TemperatureKind, ElectricPotentialKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureElectricPotential[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TemperatureKind, ElectricPotentialKind]]
+    ) -> TemperatureElectricPotential[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TemperatureKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureElectricPotentialConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperatureConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _TemperatureConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureElectricPotentialConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TemperatureKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureElectricPotentialConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TemperatureKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureElectricPotentialConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TemperatureKind, ElectricPotentialKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[TemperatureKind, ElectricPotentialKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TemperatureKind, ElectricPotentialKind]], W, T]: ...

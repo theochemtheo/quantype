@@ -12,11 +12,12 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.Force import _ForceConstant
 from quantype._constants.Momentum import _MomentumConstant
 from quantype._generated import Action, Dimensionless, Energy, Force, Momentum
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyKind, MomentumKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -86,7 +87,11 @@ class EnergyMomentum(Quantity[Mul[EnergyKind, MomentumKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EnergyMomentum[V, S] | EnergyMomentum[float, S], /
+        self,
+        other: EnergyMomentum[V, S]
+        | EnergyMomentum[float, S]
+        | _EnergyMomentumConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EnergyMomentum[V, S]: ...
@@ -207,3 +212,83 @@ class EnergyMomentum(Quantity[Mul[EnergyKind, MomentumKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyMomentum[W, S]: ...
+
+class _EnergyMomentumConstant(Constant[Mul[EnergyKind, MomentumKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> EnergyMomentum[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyKind, MomentumKind]]
+    ) -> EnergyMomentum[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyKind, MomentumKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyMomentumConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _EnergyConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __truediv__(self, other: _ForceConstant, /) -> _ActionConstant: ...
+    @overload
+    def __truediv__(self, other: _MomentumConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(self, other: _ActionConstant, /) -> _ForceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyMomentumConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyKind, MomentumKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyMomentumConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Action[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyMomentum[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyMomentumConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyKind, MomentumKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[EnergyKind, MomentumKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyKind, MomentumKind]], W, T]: ...

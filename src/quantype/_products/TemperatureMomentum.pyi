@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Momentum import _MomentumConstant
 from quantype._constants.Temperature import _TemperatureConstant
 from quantype._generated import Dimensionless, Momentum, Temperature
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MomentumKind, Mul, TemperatureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,11 @@ class TemperatureMomentum(Quantity[Mul[TemperatureKind, MomentumKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TemperatureMomentum[V, S] | TemperatureMomentum[float, S], /
+        self,
+        other: TemperatureMomentum[V, S]
+        | TemperatureMomentum[float, S]
+        | _TemperatureMomentumConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TemperatureMomentum[V, S]: ...
@@ -191,3 +196,77 @@ class TemperatureMomentum(Quantity[Mul[TemperatureKind, MomentumKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureMomentum[W, S]: ...
+
+class _TemperatureMomentumConstant(Constant[Mul[TemperatureKind, MomentumKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureMomentum[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TemperatureKind, MomentumKind]]
+    ) -> TemperatureMomentum[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TemperatureKind, MomentumKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureMomentumConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _TemperatureConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __truediv__(self, other: _MomentumConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureMomentumConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TemperatureKind, MomentumKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureMomentumConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureMomentum[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TemperatureKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureMomentumConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TemperatureKind, MomentumKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[TemperatureKind, MomentumKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TemperatureKind, MomentumKind]], W, T]: ...

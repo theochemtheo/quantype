@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.TemperatureRate import _TemperatureRateConstant
 from quantype._generated import Dimensionless, Energy, TemperatureRate
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyKind, Mul, TemperatureRateKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -72,7 +73,11 @@ class EnergyTemperatureRate(Quantity[Mul[EnergyKind, TemperatureRateKind], V, S]
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EnergyTemperatureRate[V, S] | EnergyTemperatureRate[float, S], /
+        self,
+        other: EnergyTemperatureRate[V, S]
+        | EnergyTemperatureRate[float, S]
+        | _EnergyTemperatureRateConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EnergyTemperatureRate[V, S]: ...
@@ -201,3 +206,77 @@ class EnergyTemperatureRate(Quantity[Mul[EnergyKind, TemperatureRateKind], V, S]
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyTemperatureRate[W, S]: ...
+
+class _EnergyTemperatureRateConstant(Constant[Mul[EnergyKind, TemperatureRateKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyTemperatureRate[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyKind, TemperatureRateKind]]
+    ) -> EnergyTemperatureRate[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyKind, TemperatureRateKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyTemperatureRateConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyKind, TemperatureRateKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _EnergyConstant, /) -> _TemperatureRateConstant: ...
+    @overload
+    def __truediv__(self, other: _TemperatureRateConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyTemperatureRateConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyKind, TemperatureRateKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyTemperatureRateConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyTemperatureRate[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyKind, TemperatureRateKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyTemperatureRateConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyKind, TemperatureRateKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[EnergyKind, TemperatureRateKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyKind, TemperatureRateKind]], W, T]: ...

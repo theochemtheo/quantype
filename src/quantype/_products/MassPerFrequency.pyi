@@ -13,9 +13,11 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Mass import _MassConstant
+from quantype._constants.Momentum import _MomentumConstant
 from quantype._constants.Time import _TimeConstant
 from quantype._generated import (
     Acceleration,
@@ -26,7 +28,7 @@ from quantype._generated import (
     Momentum,
     Time,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, FrequencyKind, MassKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -129,7 +131,11 @@ class MassPerFrequency(Quantity[Div[MassKind, FrequencyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MassPerFrequency[V, S] | MassPerFrequency[float, S], /
+        self,
+        other: MassPerFrequency[V, S]
+        | MassPerFrequency[float, S]
+        | _MassPerFrequencyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MassPerFrequency[V, S]: ...
@@ -288,3 +294,126 @@ class MassPerFrequency(Quantity[Div[MassKind, FrequencyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassPerFrequency[W, S]: ...
+
+class _MassPerFrequencyConstant(Constant[Div[MassKind, FrequencyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MassPerFrequency[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MassKind, FrequencyKind]]
+    ) -> MassPerFrequency[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _FrequencyConstant, /) -> _MassConstant: ...
+    @overload
+    def __mul__(self, other: _InverseTimeConstant, /) -> _MassConstant: ...
+    @overload
+    def __mul__(self, other: _AccelerationConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MassKind, FrequencyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerFrequencyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Frequency[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: InverseTime[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MassKind, FrequencyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _TimeConstant, /) -> _MassConstant: ...
+    @overload
+    def __truediv__(self, other: _MassConstant, /) -> _TimeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MassPerFrequencyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MassKind, FrequencyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerFrequencyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Time[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassPerFrequency[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MassKind, FrequencyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerFrequencyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MassKind, FrequencyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MassKind, FrequencyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MassKind, FrequencyKind]], W, T]: ...
+    def _rmul_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rmul_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Mass[W, T]: ...
+    def _cmul_Frequency(self, other: _FrequencyConstant, /) -> _MassConstant: ...
+    def _rmul_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rmul_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Mass[W, T]: ...
+    def _cmul_InverseTime(self, other: _InverseTimeConstant, /) -> _MassConstant: ...
+    def _rmul_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> Momentum[float, T]: ...
+    def _rmul_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Momentum[W, T]: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _MomentumConstant: ...
+    def _rtruediv_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> Frequency[float, T]: ...
+    def _rtruediv_Mass[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> Frequency[W, T]: ...
+    def _ctruediv_Mass(self, other: _MassConstant, /) -> _FrequencyConstant: ...
+    def _rtruediv_Momentum_f[T: UnitSystem](
+        self, other: Momentum[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rtruediv_Momentum[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _ctruediv_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _AccelerationConstant: ...

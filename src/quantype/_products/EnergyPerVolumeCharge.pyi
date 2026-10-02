@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
 from quantype._generated import Charge, Dimensionless, EnergyPerVolume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, EnergyPerVolumeKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -72,7 +73,11 @@ class EnergyPerVolumeCharge(Quantity[Mul[EnergyPerVolumeKind, ChargeKind], V, S]
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EnergyPerVolumeCharge[V, S] | EnergyPerVolumeCharge[float, S], /
+        self,
+        other: EnergyPerVolumeCharge[V, S]
+        | EnergyPerVolumeCharge[float, S]
+        | _EnergyPerVolumeChargeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EnergyPerVolumeCharge[V, S]: ...
@@ -201,3 +206,77 @@ class EnergyPerVolumeCharge(Quantity[Mul[EnergyPerVolumeKind, ChargeKind], V, S]
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerVolumeCharge[W, S]: ...
+
+class _EnergyPerVolumeChargeConstant(Constant[Mul[EnergyPerVolumeKind, ChargeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerVolumeCharge[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyPerVolumeKind, ChargeKind]]
+    ) -> EnergyPerVolumeCharge[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyPerVolumeKind, ChargeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumeChargeConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyPerVolumeKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _EnergyPerVolumeConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __truediv__(self, other: _ChargeConstant, /) -> _EnergyPerVolumeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyPerVolumeChargeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyPerVolumeKind, ChargeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumeChargeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolumeCharge[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyPerVolumeKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumeChargeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyPerVolumeKind, ChargeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[EnergyPerVolumeKind, ChargeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyPerVolumeKind, ChargeKind]], W, T]: ...

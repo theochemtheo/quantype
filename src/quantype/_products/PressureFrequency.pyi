@@ -12,12 +12,13 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Pressure import _PressureConstant
 from quantype._constants.Time import _TimeConstant
 from quantype._generated import Dimensionless, Frequency, InverseTime, Pressure, Time
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, FrequencyKind, Mul, PressureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -94,7 +95,11 @@ class PressureFrequency(Quantity[Mul[PressureKind, FrequencyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PressureFrequency[V, S] | PressureFrequency[float, S], /
+        self,
+        other: PressureFrequency[V, S]
+        | PressureFrequency[float, S]
+        | _PressureFrequencyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PressureFrequency[V, S]: ...
@@ -228,3 +233,99 @@ class PressureFrequency(Quantity[Mul[PressureKind, FrequencyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PressureFrequency[W, S]: ...
+
+class _PressureFrequencyConstant(Constant[Mul[PressureKind, FrequencyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PressureFrequency[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[PressureKind, FrequencyKind]]
+    ) -> PressureFrequency[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TimeConstant, /) -> _PressureConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[PressureKind, FrequencyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureFrequencyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Pressure[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[PressureKind, FrequencyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _PressureConstant, /) -> _FrequencyConstant: ...
+    @overload
+    def __truediv__(self, other: _FrequencyConstant, /) -> _PressureConstant: ...
+    @overload
+    def __truediv__(self, other: _InverseTimeConstant, /) -> _PressureConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _PressureFrequencyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[PressureKind, FrequencyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureFrequencyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Frequency[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PressureFrequency[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[PressureKind, FrequencyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureFrequencyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[PressureKind, FrequencyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[PressureKind, FrequencyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[PressureKind, FrequencyKind]], W, T]: ...
+    def _rmul_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> Pressure[float, T]: ...
+    def _rmul_Time[W, T: UnitSystem](self, other: Time[W, T], /) -> Pressure[W, T]: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _PressureConstant: ...
+    def _rtruediv_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> Time[float, T]: ...
+    def _rtruediv_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Time[W, T]: ...
+    def _ctruediv_Pressure(self, other: _PressureConstant, /) -> _TimeConstant: ...

@@ -14,8 +14,11 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.Mass import _MassConstant
 from quantype._generated import Acceleration, Charge, Dimensionless, ElectricField, Mass
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AccelerationKind,
     DimensionlessKind,
@@ -103,7 +106,8 @@ class ElectricFieldPerAcceleration(
     def __truediv__(
         self,
         other: ElectricFieldPerAcceleration[V, S]
-        | ElectricFieldPerAcceleration[float, S],
+        | ElectricFieldPerAcceleration[float, S]
+        | _ElectricFieldPerAccelerationConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -281,3 +285,107 @@ class ElectricFieldPerAcceleration(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectricFieldPerAcceleration[W, S]: ...
+
+class _ElectricFieldPerAccelerationConstant(
+    Constant[Div[ElectricFieldKind, AccelerationKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectricFieldPerAcceleration[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ElectricFieldKind, AccelerationKind]]
+    ) -> ElectricFieldPerAcceleration[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AccelerationConstant, /) -> _ElectricFieldConstant: ...
+    @overload
+    def __mul__(self, other: _ChargeConstant, /) -> _MassConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ElectricFieldKind, AccelerationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldPerAccelerationConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectricFieldPerAccelerationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ElectricFieldKind, AccelerationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldPerAccelerationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricFieldPerAcceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ElectricFieldKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldPerAccelerationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ElectricFieldKind, AccelerationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ElectricFieldKind, AccelerationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ElectricFieldKind, AccelerationKind]], W, T]: ...
+    def _rmul_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rmul_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _ElectricFieldConstant: ...
+    def _rmul_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rmul_Charge[W, T: UnitSystem](self, other: Charge[W, T], /) -> Mass[W, T]: ...
+    def _cmul_Charge(self, other: _ChargeConstant, /) -> _MassConstant: ...
+    def _rtruediv_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rtruediv_Mass[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> Charge[W, T]: ...
+    def _ctruediv_Mass(self, other: _MassConstant, /) -> _ChargeConstant: ...
+    def _rtruediv_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rtruediv_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _AccelerationConstant: ...

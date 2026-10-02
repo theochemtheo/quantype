@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
 from quantype._generated import Angle, Dimensionless, Entropy
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, EntropyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,9 @@ class AngleEntropy(Quantity[Mul[AngleKind, EntropyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AngleEntropy[V, S] | AngleEntropy[float, S], /
+        self,
+        other: AngleEntropy[V, S] | AngleEntropy[float, S] | _AngleEntropyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AngleEntropy[V, S]: ...
@@ -187,3 +190,69 @@ class AngleEntropy(Quantity[Mul[AngleKind, EntropyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AngleEntropy[W, S]: ...
+
+class _AngleEntropyConstant(Constant[Mul[AngleKind, EntropyKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AngleEntropy[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[AngleKind, EntropyKind]]) -> AngleEntropy[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AngleKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleEntropyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AngleKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AngleConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __truediv__(self, other: _EntropyConstant, /) -> _AngleConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AngleEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AngleKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AngleEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AngleKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AngleKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AngleKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AngleKind, EntropyKind]], W, T]: ...

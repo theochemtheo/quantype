@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.TemperatureRate import _TemperatureRateConstant
 from quantype._generated import Dimensionless, DipoleMoment, TemperatureRate
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     DipoleMomentKind,
@@ -89,7 +91,8 @@ class DipoleMomentPerTemperatureRate(
     def __truediv__(
         self,
         other: DipoleMomentPerTemperatureRate[V, S]
-        | DipoleMomentPerTemperatureRate[float, S],
+        | DipoleMomentPerTemperatureRate[float, S]
+        | _DipoleMomentPerTemperatureRateConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -258,3 +261,93 @@ class DipoleMomentPerTemperatureRate(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> DipoleMomentPerTemperatureRate[W, S]: ...
+
+class _DipoleMomentPerTemperatureRateConstant(
+    Constant[Div[DipoleMomentKind, TemperatureRateKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> DipoleMomentPerTemperatureRate[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[DipoleMomentKind, TemperatureRateKind]]
+    ) -> DipoleMomentPerTemperatureRate[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TemperatureRateConstant, /) -> _DipoleMomentConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[DipoleMomentKind, TemperatureRateKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerTemperatureRateConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, TemperatureRateKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _DipoleMomentPerTemperatureRateConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[DipoleMomentKind, TemperatureRateKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerTemperatureRateConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMomentPerTemperatureRate[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[DipoleMomentKind, TemperatureRateKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerTemperatureRateConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[DipoleMomentKind, TemperatureRateKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[DipoleMomentKind, TemperatureRateKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[DipoleMomentKind, TemperatureRateKind]], W, T]: ...
+    def _rmul_TemperatureRate_f[T: UnitSystem](
+        self, other: TemperatureRate[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rmul_TemperatureRate[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _cmul_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _DipoleMomentConstant: ...
+    def _rtruediv_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> TemperatureRate[float, T]: ...
+    def _rtruediv_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> TemperatureRate[W, T]: ...
+    def _ctruediv_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _TemperatureRateConstant: ...

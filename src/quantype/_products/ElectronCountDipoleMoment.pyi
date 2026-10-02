@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._generated import Dimensionless, DipoleMoment, ElectronCount
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     DipoleMomentKind,
@@ -85,7 +86,9 @@ class ElectronCountDipoleMoment(
     @overload
     def __truediv__(
         self,
-        other: ElectronCountDipoleMoment[V, S] | ElectronCountDipoleMoment[float, S],
+        other: ElectronCountDipoleMoment[V, S]
+        | ElectronCountDipoleMoment[float, S]
+        | _ElectronCountDipoleMomentConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -225,3 +228,83 @@ class ElectronCountDipoleMoment(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectronCountDipoleMoment[W, S]: ...
+
+class _ElectronCountDipoleMomentConstant(
+    Constant[Mul[ElectronCountKind, DipoleMomentKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronCountDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ElectronCountKind, DipoleMomentKind]]
+    ) -> ElectronCountDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ElectronCountKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountDipoleMomentConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ElectronCountKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectronCountConstant, /
+    ) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _DipoleMomentConstant, /
+    ) -> _ElectronCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectronCountDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ElectronCountKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCountDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ElectronCountKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ElectronCountKind, DipoleMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ElectronCountKind, DipoleMomentKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ElectronCountKind, DipoleMomentKind]], W, T]: ...

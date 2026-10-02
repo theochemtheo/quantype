@@ -12,6 +12,8 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
@@ -26,7 +28,7 @@ from quantype._generated import (
     Temperature,
     Time,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, FrequencyKind, Mul, TemperatureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -128,7 +130,9 @@ class TemperaturePerFrequency(Quantity[Div[TemperatureKind, FrequencyKind], V, S
     @overload
     def __truediv__(
         self,
-        other: TemperaturePerFrequency[V, S] | TemperaturePerFrequency[float, S],
+        other: TemperaturePerFrequency[V, S]
+        | TemperaturePerFrequency[float, S]
+        | _TemperaturePerFrequencyConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -298,3 +302,132 @@ class TemperaturePerFrequency(Quantity[Div[TemperatureKind, FrequencyKind], V, S
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperaturePerFrequency[W, S]: ...
+
+class _TemperaturePerFrequencyConstant(Constant[Div[TemperatureKind, FrequencyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperaturePerFrequency[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[TemperatureKind, FrequencyKind]]
+    ) -> TemperaturePerFrequency[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _FrequencyConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __mul__(self, other: _InverseTimeConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __mul__(self, other: _EntropyConstant, /) -> _ActionConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TemperatureKind, FrequencyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerFrequencyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TemperatureKind, FrequencyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _TimeConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __truediv__(self, other: _TemperatureConstant, /) -> _TimeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperaturePerFrequencyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TemperatureKind, FrequencyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerFrequencyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperaturePerFrequency[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TemperatureKind, FrequencyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerFrequencyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TemperatureKind, FrequencyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[TemperatureKind, FrequencyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TemperatureKind, FrequencyKind]], W, T]: ...
+    def _rmul_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rmul_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _cmul_Frequency(self, other: _FrequencyConstant, /) -> _TemperatureConstant: ...
+    def _rmul_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rmul_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _cmul_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _TemperatureConstant: ...
+    def _rmul_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> Action[float, T]: ...
+    def _rmul_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Action[W, T]: ...
+    def _cmul_Entropy(self, other: _EntropyConstant, /) -> _ActionConstant: ...
+    def _rtruediv_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> Frequency[float, T]: ...
+    def _rtruediv_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Frequency[W, T]: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _FrequencyConstant: ...
+    def _rtruediv_Action_f[T: UnitSystem](
+        self, other: Action[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rtruediv_Action[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _ctruediv_Action(self, other: _ActionConstant, /) -> _EntropyConstant: ...

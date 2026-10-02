@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Momentum import _MomentumConstant
 from quantype._generated import AtomCount, Dimensionless, Momentum
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AtomCountKind, DimensionlessKind, Div, MomentumKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,11 @@ class AtomCountMomentum(Quantity[Mul[AtomCountKind, MomentumKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AtomCountMomentum[V, S] | AtomCountMomentum[float, S], /
+        self,
+        other: AtomCountMomentum[V, S]
+        | AtomCountMomentum[float, S]
+        | _AtomCountMomentumConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AtomCountMomentum[V, S]: ...
@@ -189,3 +194,77 @@ class AtomCountMomentum(Quantity[Mul[AtomCountKind, MomentumKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AtomCountMomentum[W, S]: ...
+
+class _AtomCountMomentumConstant(Constant[Mul[AtomCountKind, MomentumKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AtomCountMomentum[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[AtomCountKind, MomentumKind]]
+    ) -> AtomCountMomentum[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AtomCountKind, MomentumKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountMomentumConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AtomCountConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __truediv__(self, other: _MomentumConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AtomCountMomentumConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AtomCountKind, MomentumKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountMomentumConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCountMomentum[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AtomCountKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountMomentumConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AtomCountKind, MomentumKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AtomCountKind, MomentumKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AtomCountKind, MomentumKind]], W, T]: ...

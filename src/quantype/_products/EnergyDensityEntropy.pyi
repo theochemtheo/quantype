@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyDensity import _EnergyDensityConstant
 from quantype._constants.Entropy import _EntropyConstant
 from quantype._generated import Dimensionless, EnergyDensity, Entropy
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyDensityKind, EntropyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -70,7 +71,11 @@ class EnergyDensityEntropy(Quantity[Mul[EnergyDensityKind, EntropyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EnergyDensityEntropy[V, S] | EnergyDensityEntropy[float, S], /
+        self,
+        other: EnergyDensityEntropy[V, S]
+        | EnergyDensityEntropy[float, S]
+        | _EnergyDensityEntropyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EnergyDensityEntropy[V, S]: ...
@@ -199,3 +204,77 @@ class EnergyDensityEntropy(Quantity[Mul[EnergyDensityKind, EntropyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyDensityEntropy[W, S]: ...
+
+class _EnergyDensityEntropyConstant(Constant[Mul[EnergyDensityKind, EntropyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyDensityEntropy[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyDensityKind, EntropyKind]]
+    ) -> EnergyDensityEntropy[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyDensityKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyDensityEntropyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyDensityKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _EnergyDensityConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __truediv__(self, other: _EntropyConstant, /) -> _EnergyDensityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyDensityEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyDensityKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyDensityEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyDensity[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyDensityEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyDensityKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyDensityEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyDensityKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[EnergyDensityKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyDensityKind, EntropyKind]], W, T]: ...

@@ -6,10 +6,44 @@
 # pyright: reportIncompatibleMethodOverride=false
 # pyright: reportPrivateUsage=false
 # ruff: noqa: N802
-from typing import Any, overload, override
+from typing import Any, Literal, overload, override
 
 import numpy as np
 
+from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Action import _ActionConstant
+from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Area import _AreaConstant
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.ElectricPotential import _ElectricPotentialConstant
+from quantype._constants.ElectronCount import _ElectronCountConstant
+from quantype._constants.ElectronDensity import _ElectronDensityConstant
+from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.EnergyDensity import _EnergyDensityConstant
+from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
+from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
+from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.Force import _ForceConstant
+from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
+from quantype._constants.Length import _LengthConstant
+from quantype._constants.MagneticMoment import _MagneticMomentConstant
+from quantype._constants.Magnetization import _MagnetizationConstant
+from quantype._constants.Mass import _MassConstant
+from quantype._constants.MassDensity import _MassDensityConstant
+from quantype._constants.Momentum import _MomentumConstant
+from quantype._constants.ParticleDensity import _ParticleDensityConstant
+from quantype._constants.Pressure import _PressureConstant
+from quantype._constants.Temperature import _TemperatureConstant
+from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
+from quantype._constants.TemperatureRate import _TemperatureRateConstant
+from quantype._constants.Time import _TimeConstant
+from quantype._constants.Velocity import _VelocityConstant
+from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
     Acceleration,
     Action,
@@ -46,11 +80,91 @@ from quantype._generated import (
     Time,
     Velocity,
     Volume,
+    _CMulCharge,
+    _CTrueDivCharge,
     _RMulChargeF,
     _RTrueDivChargeF,
 )
+from quantype._products.AccelerationCharge import _AccelerationChargeConstant
+from quantype._products.AccelerationPerCharge import _AccelerationPerChargeConstant
+from quantype._products.ActionPerCharge import _ActionPerChargeConstant
+from quantype._products.AngleCharge import _AngleChargeConstant
+from quantype._products.AnglePerCharge import _AnglePerChargeConstant
+from quantype._products.AreaCharge import _AreaChargeConstant
+from quantype._products.AreaPerCharge import _AreaPerChargeConstant
+from quantype._products.AtomCountCharge import _AtomCountChargeConstant
+from quantype._products.AtomCountPerCharge import _AtomCountPerChargeConstant
+from quantype._products.ChargeAction import _ChargeActionConstant
+from quantype._products.ChargeCubed import _ChargeCubedConstant
+from quantype._products.ChargeDipoleMoment import _ChargeDipoleMomentConstant
+from quantype._products.ChargeEntropy import _ChargeEntropyConstant
+from quantype._products.ChargeSquared import _ChargeSquaredConstant
+from quantype._products.ElectricFieldPerCharge import _ElectricFieldPerChargeConstant
+from quantype._products.ElectricPotentialPerCharge import (
+    _ElectricPotentialPerChargeConstant,
+)
+from quantype._products.ElectronCountCharge import _ElectronCountChargeConstant
+from quantype._products.ElectronCountPerCharge import _ElectronCountPerChargeConstant
+from quantype._products.ElectronDensityCharge import _ElectronDensityChargeConstant
+from quantype._products.ElectronDensityPerCharge import (
+    _ElectronDensityPerChargeConstant,
+)
+from quantype._products.EnergyCharge import _EnergyChargeConstant
+from quantype._products.EnergyDensityCharge import _EnergyDensityChargeConstant
+from quantype._products.EnergyDensityPerCharge import _EnergyDensityPerChargeConstant
+from quantype._products.EnergyPerAtomCharge import _EnergyPerAtomChargeConstant
+from quantype._products.EnergyPerAtomPerCharge import _EnergyPerAtomPerChargeConstant
+from quantype._products.EnergyPerVolumeCharge import _EnergyPerVolumeChargeConstant
+from quantype._products.EnergyPerVolumePerCharge import (
+    _EnergyPerVolumePerChargeConstant,
+)
+from quantype._products.EntropyPerCharge import _EntropyPerChargeConstant
+from quantype._products.ForceCharge import _ForceChargeConstant
+from quantype._products.ForceConstantCharge import _ForceConstantChargeConstant
+from quantype._products.ForceConstantPerCharge import _ForceConstantPerChargeConstant
+from quantype._products.FrequencyCharge import _FrequencyChargeConstant
+from quantype._products.FrequencyPerCharge import _FrequencyPerChargeConstant
+from quantype._products.InverseTimeCharge import _InverseTimeChargeConstant
+from quantype._products.InverseTimePerCharge import _InverseTimePerChargeConstant
+from quantype._products.LengthPerCharge import _LengthPerChargeConstant
+from quantype._products.MagneticMomentCharge import _MagneticMomentChargeConstant
+from quantype._products.MagneticMomentPerCharge import _MagneticMomentPerChargeConstant
+from quantype._products.MagnetizationCharge import _MagnetizationChargeConstant
+from quantype._products.MagnetizationPerCharge import _MagnetizationPerChargeConstant
+from quantype._products.MassCharge import _MassChargeConstant
+from quantype._products.MassDensityCharge import _MassDensityChargeConstant
+from quantype._products.MassDensityPerCharge import _MassDensityPerChargeConstant
+from quantype._products.MassPerCharge import _MassPerChargeConstant
+from quantype._products.MomentumCharge import _MomentumChargeConstant
+from quantype._products.MomentumPerCharge import _MomentumPerChargeConstant
+from quantype._products.ParticleDensityCharge import _ParticleDensityChargeConstant
+from quantype._products.ParticleDensityPerCharge import (
+    _ParticleDensityPerChargeConstant,
+)
+from quantype._products.PerCharge import _PerChargeConstant
+from quantype._products.PerChargeSquared import _PerChargeSquaredConstant
+from quantype._products.PressureCharge import _PressureChargeConstant
+from quantype._products.PressurePerCharge import _PressurePerChargeConstant
+from quantype._products.TemperatureCharge import _TemperatureChargeConstant
+from quantype._products.TemperatureDifferenceCharge import (
+    _TemperatureDifferenceChargeConstant,
+)
+from quantype._products.TemperatureDifferencePerCharge import (
+    _TemperatureDifferencePerChargeConstant,
+)
+from quantype._products.TemperaturePerCharge import _TemperaturePerChargeConstant
+from quantype._products.TemperatureRateCharge import _TemperatureRateChargeConstant
+from quantype._products.TemperatureRatePerCharge import (
+    _TemperatureRatePerChargeConstant,
+)
+from quantype._products.TimeCharge import _TimeChargeConstant
+from quantype._products.TimePerCharge import _TimePerChargeConstant
+from quantype._products.VelocityCharge import _VelocityChargeConstant
+from quantype._products.VelocityPerCharge import _VelocityPerChargeConstant
+from quantype._products.VolumeCharge import _VolumeChargeConstant
+from quantype._products.VolumePerCharge import _VolumePerChargeConstant
 from quantype.core import Constant, Quantity, Unit, _Operand
-from quantype.kinds import ChargeKind, DimensionlessKind, Div, Mul
+from quantype.kinds import ChargeKind, Div, Mul, Pow
 from quantype.products import (
     AccelerationCharge,
     AccelerationPerCharge,
@@ -124,6 +238,8 @@ class _ChargeConstant(Constant[ChargeKind]):
     def to(self, unit: Unit[ChargeKind]) -> Charge[float]: ...
     @overload
     @override
+    def __mul__[R](self, other: _CMulCharge[R], /) -> R: ...
+    @overload
     def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[ChargeKind, L]]: ...
     @overload
     def __mul__[R, T: UnitSystem](self, other: _RMulChargeF[T, R], /) -> R: ...
@@ -146,6 +262,8 @@ class _ChargeConstant(Constant[ChargeKind]):
     ) -> Quantity[Mul[L, ChargeKind], W, T]: ...
     @overload
     @override
+    def __truediv__[R](self, other: _CTrueDivCharge[R], /) -> R: ...
+    @overload
     def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[ChargeKind, L]]: ...
     @overload
     def __truediv__[R, T: UnitSystem](self, other: _RTrueDivChargeF[T, R], /) -> R: ...
@@ -159,13 +277,25 @@ class _ChargeConstant(Constant[ChargeKind]):
     ) -> Quantity[Div[ChargeKind, L], W, T]: ...
     @overload
     @override
+    # pyrefly: ignore[bad-override]
     def __rtruediv__(
         self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> Constant[Div[DimensionlessKind, ChargeKind]]: ...
+    ) -> _PerChargeConstant: ...
     @overload
     def __rtruediv__[L, W, T: UnitSystem](
         self, other: _Operand[L, W, T], /
-    ) -> Quantity[Div[L, ChargeKind], W, T]: ...
+    ) -> Quantity[Div[L, ChargeKind], W, T]: ...  # ty: ignore[invalid-method-override]
+    @overload
+    @override
+    def __pow__(self, exponent: Literal[-2], /) -> _PerChargeSquaredConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[-1], /) -> _PerChargeConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[2], /) -> _ChargeSquaredConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[3], /) -> _ChargeCubedConstant: ...
+    @overload
+    def __pow__[N: int](self, exponent: N, /) -> Constant[Pow[ChargeKind, N]]: ...
     def _rmul_Dimensionless_f[T: UnitSystem](
         self, other: Dimensionless[float, T], /
     ) -> Charge[float, T]: ...
@@ -586,3 +716,179 @@ class _ChargeConstant(Constant[ChargeKind]):
     def _rtruediv_Action[W, T: UnitSystem](
         self, other: Action[W, T], /
     ) -> ActionPerCharge[W, T]: ...
+    def _cmul_Dimensionless(
+        self, other: _DimensionlessConstant, /
+    ) -> _ChargeConstant: ...
+    def _cmul_Length(self, other: _LengthConstant, /) -> _DipoleMomentConstant: ...
+    def _cmul_Area(self, other: _AreaConstant, /) -> _AreaChargeConstant: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _VolumeChargeConstant: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _TimeChargeConstant: ...
+    def _cmul_Velocity(
+        self, other: _VelocityConstant, /
+    ) -> _VelocityChargeConstant: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _EnergyChargeConstant: ...
+    def _cmul_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _EnergyPerAtomChargeConstant: ...
+    def _cmul_Force(self, other: _ForceConstant, /) -> _ForceChargeConstant: ...
+    def _cmul_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ForceConstantChargeConstant: ...
+    def _cmul_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _PressureChargeConstant: ...
+    def _cmul_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _EnergyDensityChargeConstant: ...
+    def _cmul_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _EnergyPerVolumeChargeConstant: ...
+    def _cmul_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _TemperatureChargeConstant: ...
+    def _cmul_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _TemperatureDifferenceChargeConstant: ...
+    def _cmul_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _TemperatureRateChargeConstant: ...
+    def _cmul_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _MagneticMomentChargeConstant: ...
+    def _cmul_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _MagnetizationChargeConstant: ...
+    def _cmul_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _ParticleDensityChargeConstant: ...
+    def _cmul_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ElectronDensityChargeConstant: ...
+    def _cmul_Angle(self, other: _AngleConstant, /) -> _AngleChargeConstant: ...
+    def _cmul_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _FrequencyChargeConstant: ...
+    def _cmul_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _InverseTimeChargeConstant: ...
+    def _cmul_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _AtomCountChargeConstant: ...
+    def _cmul_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _ElectronCountChargeConstant: ...
+    def _cmul_Mass(self, other: _MassConstant, /) -> _MassChargeConstant: ...
+    def _cmul_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _MassDensityChargeConstant: ...
+    def _cmul_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _MomentumChargeConstant: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _AccelerationChargeConstant: ...
+    def _cmul_Charge(self, other: _ChargeConstant, /) -> _ChargeSquaredConstant: ...
+    def _cmul_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _EnergyConstant: ...
+    def _cmul_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _ForceConstant: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _ChargeDipoleMomentConstant: ...
+    def _cmul_Entropy(self, other: _EntropyConstant, /) -> _ChargeEntropyConstant: ...
+    def _cmul_Action(self, other: _ActionConstant, /) -> _ChargeActionConstant: ...
+    def _ctruediv_Dimensionless(
+        self, other: _DimensionlessConstant, /
+    ) -> _PerChargeConstant: ...
+    def _ctruediv_Length(
+        self, other: _LengthConstant, /
+    ) -> _LengthPerChargeConstant: ...
+    def _ctruediv_Area(self, other: _AreaConstant, /) -> _AreaPerChargeConstant: ...
+    def _ctruediv_Volume(
+        self, other: _VolumeConstant, /
+    ) -> _VolumePerChargeConstant: ...
+    def _ctruediv_Time(self, other: _TimeConstant, /) -> _TimePerChargeConstant: ...
+    def _ctruediv_Velocity(
+        self, other: _VelocityConstant, /
+    ) -> _VelocityPerChargeConstant: ...
+    def _ctruediv_Energy(
+        self, other: _EnergyConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    def _ctruediv_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _EnergyPerAtomPerChargeConstant: ...
+    def _ctruediv_Force(self, other: _ForceConstant, /) -> _ElectricFieldConstant: ...
+    def _ctruediv_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ForceConstantPerChargeConstant: ...
+    def _ctruediv_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _PressurePerChargeConstant: ...
+    def _ctruediv_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _EnergyDensityPerChargeConstant: ...
+    def _ctruediv_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _EnergyPerVolumePerChargeConstant: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _TemperaturePerChargeConstant: ...
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _TemperatureDifferencePerChargeConstant: ...
+    def _ctruediv_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _TemperatureRatePerChargeConstant: ...
+    def _ctruediv_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _MagneticMomentPerChargeConstant: ...
+    def _ctruediv_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _MagnetizationPerChargeConstant: ...
+    def _ctruediv_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _ParticleDensityPerChargeConstant: ...
+    def _ctruediv_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ElectronDensityPerChargeConstant: ...
+    def _ctruediv_Angle(self, other: _AngleConstant, /) -> _AnglePerChargeConstant: ...
+    def _ctruediv_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _FrequencyPerChargeConstant: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _InverseTimePerChargeConstant: ...
+    def _ctruediv_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _AtomCountPerChargeConstant: ...
+    def _ctruediv_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _ElectronCountPerChargeConstant: ...
+    def _ctruediv_Mass(self, other: _MassConstant, /) -> _MassPerChargeConstant: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _MassDensityPerChargeConstant: ...
+    def _ctruediv_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _MomentumPerChargeConstant: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _AccelerationPerChargeConstant: ...
+    def _ctruediv_Charge(self, other: _ChargeConstant, /) -> _DimensionlessConstant: ...
+    def _ctruediv_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _ElectricPotentialPerChargeConstant: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _ElectricFieldPerChargeConstant: ...
+    def _ctruediv_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _LengthConstant: ...
+    def _ctruediv_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _EntropyPerChargeConstant: ...
+    def _ctruediv_Action(
+        self, other: _ActionConstant, /
+    ) -> _ActionPerChargeConstant: ...

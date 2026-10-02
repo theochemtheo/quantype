@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._generated import AtomCount, Dimensionless, ElectricPotential
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AtomCountKind,
     DimensionlessKind,
@@ -85,7 +86,9 @@ class AtomCountElectricPotential(
     @overload
     def __truediv__(
         self,
-        other: AtomCountElectricPotential[V, S] | AtomCountElectricPotential[float, S],
+        other: AtomCountElectricPotential[V, S]
+        | AtomCountElectricPotential[float, S]
+        | _AtomCountElectricPotentialConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -225,3 +228,85 @@ class AtomCountElectricPotential(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AtomCountElectricPotential[W, S]: ...
+
+class _AtomCountElectricPotentialConstant(
+    Constant[Mul[AtomCountKind, ElectricPotentialKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AtomCountElectricPotential[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[AtomCountKind, ElectricPotentialKind]]
+    ) -> AtomCountElectricPotential[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AtomCountKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountElectricPotentialConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AtomCountConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _AtomCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AtomCountElectricPotentialConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AtomCountKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountElectricPotentialConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCountElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AtomCountKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountElectricPotentialConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AtomCountKind, ElectricPotentialKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[AtomCountKind, ElectricPotentialKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AtomCountKind, ElectricPotentialKind]], W, T]: ...

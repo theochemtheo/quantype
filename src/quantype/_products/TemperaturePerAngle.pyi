@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Temperature import _TemperatureConstant
 from quantype._generated import Angle, Dimensionless, Temperature
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, Mul, TemperatureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class TemperaturePerAngle(Quantity[Div[TemperatureKind, AngleKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TemperaturePerAngle[V, S] | TemperaturePerAngle[float, S], /
+        self,
+        other: TemperaturePerAngle[V, S]
+        | TemperaturePerAngle[float, S]
+        | _TemperaturePerAngleConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TemperaturePerAngle[V, S]: ...
@@ -207,3 +213,85 @@ class TemperaturePerAngle(Quantity[Div[TemperatureKind, AngleKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperaturePerAngle[W, S]: ...
+
+class _TemperaturePerAngleConstant(Constant[Div[TemperatureKind, AngleKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperaturePerAngle[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[TemperatureKind, AngleKind]]
+    ) -> TemperaturePerAngle[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AngleConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TemperatureKind, AngleKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerAngleConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Temperature[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TemperatureKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperaturePerAngleConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TemperatureKind, AngleKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerAngleConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperaturePerAngle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TemperatureKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperaturePerAngleConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TemperatureKind, AngleKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[TemperatureKind, AngleKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TemperatureKind, AngleKind]], W, T]: ...
+    def _rmul_Angle_f[T: UnitSystem](
+        self, other: Angle[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rmul_Angle[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _cmul_Angle(self, other: _AngleConstant, /) -> _TemperatureConstant: ...
+    def _rtruediv_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rtruediv_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Angle[W, T]: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _AngleConstant: ...

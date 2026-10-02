@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Dimensionless, Entropy, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EntropyKind, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,9 @@ class VolumeEntropy(Quantity[Mul[VolumeKind, EntropyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: VolumeEntropy[V, S] | VolumeEntropy[float, S], /
+        self,
+        other: VolumeEntropy[V, S] | VolumeEntropy[float, S] | _VolumeEntropyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> VolumeEntropy[V, S]: ...
@@ -187,3 +190,73 @@ class VolumeEntropy(Quantity[Mul[VolumeKind, EntropyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VolumeEntropy[W, S]: ...
+
+class _VolumeEntropyConstant(Constant[Mul[VolumeKind, EntropyKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> VolumeEntropy[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[VolumeKind, EntropyKind]]) -> VolumeEntropy[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[VolumeKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeEntropyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[VolumeKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _VolumeConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __truediv__(self, other: _EntropyConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _VolumeEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[VolumeKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VolumeEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[VolumeKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumeEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[VolumeKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[VolumeKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[VolumeKind, EntropyKind]], W, T]: ...

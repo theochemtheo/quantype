@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._generated import Dimensionless, Entropy, ParticleDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EntropyKind, Mul, ParticleDensityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -72,7 +74,9 @@ class ParticleDensityPerEntropy(Quantity[Div[ParticleDensityKind, EntropyKind], 
     @overload
     def __truediv__(
         self,
-        other: ParticleDensityPerEntropy[V, S] | ParticleDensityPerEntropy[float, S],
+        other: ParticleDensityPerEntropy[V, S]
+        | ParticleDensityPerEntropy[float, S]
+        | _ParticleDensityPerEntropyConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -231,3 +235,89 @@ class ParticleDensityPerEntropy(Quantity[Div[ParticleDensityKind, EntropyKind], 
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ParticleDensityPerEntropy[W, S]: ...
+
+class _ParticleDensityPerEntropyConstant(
+    Constant[Div[ParticleDensityKind, EntropyKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ParticleDensityPerEntropy[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ParticleDensityKind, EntropyKind]]
+    ) -> ParticleDensityPerEntropy[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EntropyConstant, /) -> _ParticleDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ParticleDensityKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityPerEntropyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ParticleDensityPerEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ParticleDensityKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityPerEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensityPerEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ParticleDensityKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityPerEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ParticleDensityKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ParticleDensityKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ParticleDensityKind, EntropyKind]], W, T]: ...
+    def _rmul_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> ParticleDensity[float, T]: ...
+    def _rmul_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    def _cmul_Entropy(self, other: _EntropyConstant, /) -> _ParticleDensityConstant: ...
+    def _rtruediv_ParticleDensity_f[T: UnitSystem](
+        self, other: ParticleDensity[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rtruediv_ParticleDensity[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _ctruediv_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _EntropyConstant: ...

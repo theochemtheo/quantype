@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._constants.Temperature import _TemperatureConstant
 from quantype._generated import Dimensionless, ElectronCount, Temperature
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -79,7 +80,9 @@ class TemperatureElectronCount(Quantity[Mul[TemperatureKind, ElectronCountKind],
     @overload
     def __truediv__(
         self,
-        other: TemperatureElectronCount[V, S] | TemperatureElectronCount[float, S],
+        other: TemperatureElectronCount[V, S]
+        | TemperatureElectronCount[float, S]
+        | _TemperatureElectronCountConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -209,3 +212,79 @@ class TemperatureElectronCount(Quantity[Mul[TemperatureKind, ElectronCountKind],
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureElectronCount[W, S]: ...
+
+class _TemperatureElectronCountConstant(
+    Constant[Mul[TemperatureKind, ElectronCountKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureElectronCount[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TemperatureKind, ElectronCountKind]]
+    ) -> TemperatureElectronCount[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TemperatureKind, ElectronCountKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureElectronCountConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TemperatureKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _TemperatureConstant, /) -> _ElectronCountConstant: ...
+    @overload
+    def __truediv__(self, other: _ElectronCountConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureElectronCountConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TemperatureKind, ElectronCountKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureElectronCountConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureElectronCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TemperatureKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureElectronCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TemperatureKind, ElectronCountKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[TemperatureKind, ElectronCountKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TemperatureKind, ElectronCountKind]], W, T]: ...

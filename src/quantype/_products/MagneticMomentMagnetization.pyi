@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._constants.Magnetization import _MagnetizationConstant
 from quantype._generated import Dimensionless, MagneticMoment, Magnetization
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -88,7 +89,8 @@ class MagneticMomentMagnetization(
     def __truediv__(
         self,
         other: MagneticMomentMagnetization[V, S]
-        | MagneticMomentMagnetization[float, S],
+        | MagneticMomentMagnetization[float, S]
+        | _MagneticMomentMagnetizationConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -232,3 +234,85 @@ class MagneticMomentMagnetization(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MagneticMomentMagnetization[W, S]: ...
+
+class _MagneticMomentMagnetizationConstant(
+    Constant[Mul[MagneticMomentKind, MagnetizationKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagneticMomentMagnetization[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[MagneticMomentKind, MagnetizationKind]]
+    ) -> MagneticMomentMagnetization[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[MagneticMomentKind, MagnetizationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentMagnetizationConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[MagneticMomentKind, MagnetizationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MagneticMomentConstant, /
+    ) -> _MagnetizationConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MagnetizationConstant, /
+    ) -> _MagneticMomentConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MagneticMomentMagnetizationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[MagneticMomentKind, MagnetizationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentMagnetizationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMomentMagnetization[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[MagneticMomentKind, MagnetizationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentMagnetizationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[MagneticMomentKind, MagnetizationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[MagneticMomentKind, MagnetizationKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[MagneticMomentKind, MagnetizationKind]], W, T]: ...

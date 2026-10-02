@@ -13,6 +13,8 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Force import _ForceConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Mass import _MassConstant
@@ -28,7 +30,7 @@ from quantype._generated import (
     Time,
     Velocity,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, InverseTimeKind, Mul, VelocityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -130,7 +132,11 @@ class VelocityInverseTime(Quantity[Mul[VelocityKind, InverseTimeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: VelocityInverseTime[V, S] | VelocityInverseTime[float, S], /
+        self,
+        other: VelocityInverseTime[V, S]
+        | VelocityInverseTime[float, S]
+        | _VelocityInverseTimeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> VelocityInverseTime[V, S]: ...
@@ -290,3 +296,132 @@ class VelocityInverseTime(Quantity[Mul[VelocityKind, InverseTimeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VelocityInverseTime[W, S]: ...
+
+class _VelocityInverseTimeConstant(Constant[Mul[VelocityKind, InverseTimeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> VelocityInverseTime[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[VelocityKind, InverseTimeKind]]
+    ) -> VelocityInverseTime[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TimeConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __mul__(self, other: _MassConstant, /) -> _ForceConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[VelocityKind, InverseTimeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityInverseTimeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Velocity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[VelocityKind, InverseTimeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _VelocityConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __truediv__(self, other: _FrequencyConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __truediv__(self, other: _InverseTimeConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AccelerationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _VelocityInverseTimeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[VelocityKind, InverseTimeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityInverseTimeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VelocityInverseTime[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[VelocityKind, InverseTimeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityInverseTimeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[VelocityKind, InverseTimeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[VelocityKind, InverseTimeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[VelocityKind, InverseTimeKind]], W, T]: ...
+    def _rmul_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> Velocity[float, T]: ...
+    def _rmul_Time[W, T: UnitSystem](self, other: Time[W, T], /) -> Velocity[W, T]: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _VelocityConstant: ...
+    def _rmul_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> Force[float, T]: ...
+    def _rmul_Mass[W, T: UnitSystem](self, other: Mass[W, T], /) -> Force[W, T]: ...
+    def _cmul_Mass(self, other: _MassConstant, /) -> _ForceConstant: ...
+    def _rtruediv_Velocity_f[T: UnitSystem](
+        self, other: Velocity[float, T], /
+    ) -> Time[float, T]: ...
+    def _rtruediv_Velocity[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Time[W, T]: ...
+    def _ctruediv_Velocity(self, other: _VelocityConstant, /) -> _TimeConstant: ...
+    def _rtruediv_Force_f[T: UnitSystem](
+        self, other: Force[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rtruediv_Force[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> Mass[W, T]: ...
+    def _ctruediv_Force(self, other: _ForceConstant, /) -> _MassConstant: ...
+    def _rtruediv_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> Dimensionless[float, T]: ...
+    def _rtruediv_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _DimensionlessConstant: ...

@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.MassDensity import _MassDensityConstant
 from quantype._generated import Dimensionless, DipoleMoment, MassDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     DipoleMomentKind,
@@ -84,7 +86,9 @@ class MassDensityPerDipoleMoment(
     @overload
     def __truediv__(
         self,
-        other: MassDensityPerDipoleMoment[V, S] | MassDensityPerDipoleMoment[float, S],
+        other: MassDensityPerDipoleMoment[V, S]
+        | MassDensityPerDipoleMoment[float, S]
+        | _MassDensityPerDipoleMomentConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -243,3 +247,91 @@ class MassDensityPerDipoleMoment(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassDensityPerDipoleMoment[W, S]: ...
+
+class _MassDensityPerDipoleMomentConstant(
+    Constant[Div[MassDensityKind, DipoleMomentKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MassDensityPerDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MassDensityKind, DipoleMomentKind]]
+    ) -> MassDensityPerDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _DipoleMomentConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MassDensityKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerDipoleMomentConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MassDensityKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MassDensityPerDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MassDensityKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensityPerDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MassDensityKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityPerDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MassDensityKind, DipoleMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MassDensityKind, DipoleMomentKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MassDensityKind, DipoleMomentKind]], W, T]: ...
+    def _rmul_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> MassDensity[float, T]: ...
+    def _rmul_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> MassDensity[W, T]: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _MassDensityConstant: ...
+    def _rtruediv_MassDensity_f[T: UnitSystem](
+        self, other: MassDensity[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rtruediv_MassDensity[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _DipoleMomentConstant: ...

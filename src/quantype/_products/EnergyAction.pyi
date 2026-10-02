@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._generated import Action, Dimensionless, Energy
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, DimensionlessKind, Div, EnergyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,9 @@ class EnergyAction(Quantity[Mul[EnergyKind, ActionKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EnergyAction[V, S] | EnergyAction[float, S], /
+        self,
+        other: EnergyAction[V, S] | EnergyAction[float, S] | _EnergyActionConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EnergyAction[V, S]: ...
@@ -187,3 +190,69 @@ class EnergyAction(Quantity[Mul[EnergyKind, ActionKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyAction[W, S]: ...
+
+class _EnergyActionConstant(Constant[Mul[EnergyKind, ActionKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> EnergyAction[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[EnergyKind, ActionKind]]) -> EnergyAction[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyActionConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _EnergyConstant, /) -> _ActionConstant: ...
+    @overload
+    def __truediv__(self, other: _ActionConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Action[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[EnergyKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyKind, ActionKind]], W, T]: ...

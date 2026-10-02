@@ -13,6 +13,7 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Time import _TimeConstant
@@ -23,7 +24,7 @@ from quantype._generated import (
     InverseTime,
     Time,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AccelerationKind,
     DimensionlessKind,
@@ -109,7 +110,9 @@ class InverseTimeAcceleration(Quantity[Mul[InverseTimeKind, AccelerationKind], V
     @overload
     def __truediv__(
         self,
-        other: InverseTimeAcceleration[V, S] | InverseTimeAcceleration[float, S],
+        other: InverseTimeAcceleration[V, S]
+        | InverseTimeAcceleration[float, S]
+        | _InverseTimeAccelerationConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -256,3 +259,105 @@ class InverseTimeAcceleration(Quantity[Mul[InverseTimeKind, AccelerationKind], V
     @classmethod
     @override
     def from_value[W](cls, value: W) -> InverseTimeAcceleration[W, S]: ...
+
+class _InverseTimeAccelerationConstant(
+    Constant[Mul[InverseTimeKind, AccelerationKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> InverseTimeAcceleration[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[InverseTimeKind, AccelerationKind]]
+    ) -> InverseTimeAcceleration[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TimeConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[InverseTimeKind, AccelerationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeAccelerationConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Acceleration[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[InverseTimeKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _FrequencyConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __truediv__(self, other: _InverseTimeConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __truediv__(self, other: _AccelerationConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _InverseTimeAccelerationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[InverseTimeKind, AccelerationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeAccelerationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTimeAcceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[InverseTimeKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimeAccelerationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[InverseTimeKind, AccelerationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[InverseTimeKind, AccelerationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[InverseTimeKind, AccelerationKind]], W, T]: ...
+    def _rmul_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rmul_Time[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _AccelerationConstant: ...
+    def _rtruediv_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> Time[float, T]: ...
+    def _rtruediv_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Time[W, T]: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _TimeConstant: ...

@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
 from quantype._constants.Force import _ForceConstant
 from quantype._generated import Dimensionless, Entropy, Force
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EntropyKind, ForceKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,9 @@ class ForceEntropy(Quantity[Mul[ForceKind, EntropyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ForceEntropy[V, S] | ForceEntropy[float, S], /
+        self,
+        other: ForceEntropy[V, S] | ForceEntropy[float, S] | _ForceEntropyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ForceEntropy[V, S]: ...
@@ -187,3 +190,69 @@ class ForceEntropy(Quantity[Mul[ForceKind, EntropyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ForceEntropy[W, S]: ...
+
+class _ForceEntropyConstant(Constant[Mul[ForceKind, EntropyKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ForceEntropy[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[ForceKind, EntropyKind]]) -> ForceEntropy[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ForceKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceEntropyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ForceKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ForceConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __truediv__(self, other: _EntropyConstant, /) -> _ForceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ForceEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ForceKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ForceKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ForceKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ForceKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ForceKind, EntropyKind]], W, T]: ...

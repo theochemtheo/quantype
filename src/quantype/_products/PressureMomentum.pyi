@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Momentum import _MomentumConstant
 from quantype._constants.Pressure import _PressureConstant
 from quantype._generated import Dimensionless, Momentum, Pressure
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MomentumKind, Mul, PressureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,11 @@ class PressureMomentum(Quantity[Mul[PressureKind, MomentumKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PressureMomentum[V, S] | PressureMomentum[float, S], /
+        self,
+        other: PressureMomentum[V, S]
+        | PressureMomentum[float, S]
+        | _PressureMomentumConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PressureMomentum[V, S]: ...
@@ -189,3 +194,77 @@ class PressureMomentum(Quantity[Mul[PressureKind, MomentumKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PressureMomentum[W, S]: ...
+
+class _PressureMomentumConstant(Constant[Mul[PressureKind, MomentumKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PressureMomentum[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[PressureKind, MomentumKind]]
+    ) -> PressureMomentum[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[PressureKind, MomentumKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureMomentumConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[PressureKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _PressureConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __truediv__(self, other: _MomentumConstant, /) -> _PressureConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _PressureMomentumConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[PressureKind, MomentumKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureMomentumConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PressureMomentum[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[PressureKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureMomentumConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[PressureKind, MomentumKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[PressureKind, MomentumKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[PressureKind, MomentumKind]], W, T]: ...

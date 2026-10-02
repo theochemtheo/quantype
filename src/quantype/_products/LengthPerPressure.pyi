@@ -12,10 +12,13 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Force import _ForceConstant
+from quantype._constants.Length import _LengthConstant
 from quantype._constants.Pressure import _PressureConstant
+from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Dimensionless, Force, Length, Pressure, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, LengthKind, Mul, PressureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -83,7 +86,11 @@ class LengthPerPressure(Quantity[Div[LengthKind, PressureKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: LengthPerPressure[V, S] | LengthPerPressure[float, S], /
+        self,
+        other: LengthPerPressure[V, S]
+        | LengthPerPressure[float, S]
+        | _LengthPerPressureConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> LengthPerPressure[V, S]: ...
@@ -232,3 +239,99 @@ class LengthPerPressure(Quantity[Div[LengthKind, PressureKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> LengthPerPressure[W, S]: ...
+
+class _LengthPerPressureConstant(Constant[Div[LengthKind, PressureKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> LengthPerPressure[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[LengthKind, PressureKind]]
+    ) -> LengthPerPressure[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ForceConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __mul__(self, other: _PressureConstant, /) -> _LengthConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[LengthKind, PressureKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthPerPressureConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Force[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Pressure[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[LengthKind, PressureKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _LengthPerPressureConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[LengthKind, PressureKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthPerPressureConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: LengthPerPressure[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[LengthKind, PressureKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthPerPressureConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[LengthKind, PressureKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[LengthKind, PressureKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[LengthKind, PressureKind]], W, T]: ...
+    def _rmul_Force_f[T: UnitSystem](
+        self, other: Force[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rmul_Force[W, T: UnitSystem](self, other: Force[W, T], /) -> Volume[W, T]: ...
+    def _cmul_Force(self, other: _ForceConstant, /) -> _VolumeConstant: ...
+    def _rmul_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> Length[float, T]: ...
+    def _rmul_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Length[W, T]: ...
+    def _cmul_Pressure(self, other: _PressureConstant, /) -> _LengthConstant: ...
+    def _rtruediv_Length_f[T: UnitSystem](
+        self, other: Length[float, T], /
+    ) -> Pressure[float, T]: ...
+    def _rtruediv_Length[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Pressure[W, T]: ...
+    def _ctruediv_Length(self, other: _LengthConstant, /) -> _PressureConstant: ...
+    def _rtruediv_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Force[float, T]: ...
+    def _rtruediv_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Force[W, T]: ...
+    def _ctruediv_Volume(self, other: _VolumeConstant, /) -> _ForceConstant: ...

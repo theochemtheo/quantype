@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
+from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Dimensionless, EnergyPerVolume, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyPerVolumeKind, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -78,7 +80,9 @@ class VolumePerEnergyPerVolume(Quantity[Div[VolumeKind, EnergyPerVolumeKind], V,
     @overload
     def __truediv__(
         self,
-        other: VolumePerEnergyPerVolume[V, S] | VolumePerEnergyPerVolume[float, S],
+        other: VolumePerEnergyPerVolume[V, S]
+        | VolumePerEnergyPerVolume[float, S]
+        | _VolumePerEnergyPerVolumeConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -225,3 +229,89 @@ class VolumePerEnergyPerVolume(Quantity[Div[VolumeKind, EnergyPerVolumeKind], V,
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VolumePerEnergyPerVolume[W, S]: ...
+
+class _VolumePerEnergyPerVolumeConstant(Constant[Div[VolumeKind, EnergyPerVolumeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> VolumePerEnergyPerVolume[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[VolumeKind, EnergyPerVolumeKind]]
+    ) -> VolumePerEnergyPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyPerVolumeConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[VolumeKind, EnergyPerVolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumePerEnergyPerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[VolumeKind, EnergyPerVolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _VolumePerEnergyPerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[VolumeKind, EnergyPerVolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumePerEnergyPerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VolumePerEnergyPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[VolumeKind, EnergyPerVolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VolumePerEnergyPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[VolumeKind, EnergyPerVolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[VolumeKind, EnergyPerVolumeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[VolumeKind, EnergyPerVolumeKind]], W, T]: ...
+    def _rmul_EnergyPerVolume_f[T: UnitSystem](
+        self, other: EnergyPerVolume[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rmul_EnergyPerVolume[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> Volume[W, T]: ...
+    def _cmul_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _VolumeConstant: ...
+    def _rtruediv_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> EnergyPerVolume[float, T]: ...
+    def _rtruediv_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    def _ctruediv_Volume(
+        self, other: _VolumeConstant, /
+    ) -> _EnergyPerVolumeConstant: ...

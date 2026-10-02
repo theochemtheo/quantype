@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
 from quantype._generated import Dimensionless, ElectricPotential, EnergyPerVolume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -96,7 +97,8 @@ class EnergyPerVolumeElectricPotential(
     def __truediv__(
         self,
         other: EnergyPerVolumeElectricPotential[V, S]
-        | EnergyPerVolumeElectricPotential[float, S],
+        | EnergyPerVolumeElectricPotential[float, S]
+        | _EnergyPerVolumeElectricPotentialConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -246,3 +248,85 @@ class EnergyPerVolumeElectricPotential(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerVolumeElectricPotential[W, S]: ...
+
+class _EnergyPerVolumeElectricPotentialConstant(
+    Constant[Mul[EnergyPerVolumeKind, ElectricPotentialKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerVolumeElectricPotential[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyPerVolumeKind, ElectricPotentialKind]]
+    ) -> EnergyPerVolumeElectricPotential[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyPerVolumeKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumeElectricPotentialConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyPerVolumeKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _EnergyPerVolumeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyPerVolumeElectricPotentialConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyPerVolumeKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumeElectricPotentialConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolumeElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyPerVolumeKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumeElectricPotentialConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyPerVolumeKind, ElectricPotentialKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[EnergyPerVolumeKind, ElectricPotentialKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyPerVolumeKind, ElectricPotentialKind]], W, T]: ...

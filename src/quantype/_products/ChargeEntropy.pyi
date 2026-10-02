@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
 from quantype._generated import Charge, Dimensionless, Entropy
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, EntropyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,9 @@ class ChargeEntropy(Quantity[Mul[ChargeKind, EntropyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ChargeEntropy[V, S] | ChargeEntropy[float, S], /
+        self,
+        other: ChargeEntropy[V, S] | ChargeEntropy[float, S] | _ChargeEntropyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ChargeEntropy[V, S]: ...
@@ -187,3 +190,73 @@ class ChargeEntropy(Quantity[Mul[ChargeKind, EntropyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ChargeEntropy[W, S]: ...
+
+class _ChargeEntropyConstant(Constant[Mul[ChargeKind, EntropyKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ChargeEntropy[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[ChargeKind, EntropyKind]]) -> ChargeEntropy[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ChargeKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeEntropyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ChargeKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ChargeConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __truediv__(self, other: _EntropyConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ChargeEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ChargeKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ChargeEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ChargeKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ChargeKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ChargeKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ChargeKind, EntropyKind]], W, T]: ...

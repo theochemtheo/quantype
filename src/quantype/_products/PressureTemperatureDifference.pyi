@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Pressure import _PressureConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import Dimensionless, Pressure, TemperatureDifference
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -88,7 +89,8 @@ class PressureTemperatureDifference(
     def __truediv__(
         self,
         other: PressureTemperatureDifference[V, S]
-        | PressureTemperatureDifference[float, S],
+        | PressureTemperatureDifference[float, S]
+        | _PressureTemperatureDifferenceConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -234,3 +236,85 @@ class PressureTemperatureDifference(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PressureTemperatureDifference[W, S]: ...
+
+class _PressureTemperatureDifferenceConstant(
+    Constant[Mul[PressureKind, TemperatureDifferenceKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PressureTemperatureDifference[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[PressureKind, TemperatureDifferenceKind]]
+    ) -> PressureTemperatureDifference[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[PressureKind, TemperatureDifferenceKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureTemperatureDifferenceConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[PressureKind, TemperatureDifferenceKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PressureConstant, /
+    ) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _PressureConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _PressureTemperatureDifferenceConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[PressureKind, TemperatureDifferenceKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureTemperatureDifferenceConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PressureTemperatureDifference[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[PressureKind, TemperatureDifferenceKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressureTemperatureDifferenceConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[PressureKind, TemperatureDifferenceKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[PressureKind, TemperatureDifferenceKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[PressureKind, TemperatureDifferenceKind]], W, T]: ...

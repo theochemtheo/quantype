@@ -12,8 +12,9 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Angle, Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -59,7 +60,9 @@ class AngleSquared(Quantity[Pow[AngleKind, Literal[2]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AngleSquared[V, S] | AngleSquared[float, S], /
+        self,
+        other: AngleSquared[V, S] | AngleSquared[float, S] | _AngleSquaredConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AngleSquared[V, S]: ...
@@ -178,3 +181,65 @@ class AngleSquared(Quantity[Pow[AngleKind, Literal[2]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AngleSquared[W, S]: ...
+
+class _AngleSquaredConstant(Constant[Pow[AngleKind, Literal[2]]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AngleSquared[float, T]: ...
+    @override
+    def to(self, unit: Unit[Pow[AngleKind, Literal[2]]]) -> AngleSquared[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[AngleKind, Literal[2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleSquaredConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[AngleKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AngleConstant, /) -> _AngleConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AngleSquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[AngleKind, Literal[2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleSquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AngleSquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[AngleKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleSquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[AngleKind, Literal[2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[AngleKind, Literal[2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[AngleKind, Literal[2]]], W, T]: ...

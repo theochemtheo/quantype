@@ -11,6 +11,7 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.Energy import _EnergyConstant
@@ -22,7 +23,7 @@ from quantype._generated import (
     Energy,
     Length,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     DipoleMomentKind,
@@ -112,7 +113,8 @@ class ElectricPotentialDipoleMoment(
     def __truediv__(
         self,
         other: ElectricPotentialDipoleMoment[V, S]
-        | ElectricPotentialDipoleMoment[float, S],
+        | ElectricPotentialDipoleMoment[float, S]
+        | _ElectricPotentialDipoleMomentConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -258,3 +260,93 @@ class ElectricPotentialDipoleMoment(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectricPotentialDipoleMoment[W, S]: ...
+
+class _ElectricPotentialDipoleMomentConstant(
+    Constant[Mul[ElectricPotentialKind, DipoleMomentKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectricPotentialDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ElectricPotentialKind, DipoleMomentKind]]
+    ) -> ElectricPotentialDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ElectricPotentialKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialDipoleMomentConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ElectricPotentialKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _LengthConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(self, other: _EnergyConstant, /) -> _LengthConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _DipoleMomentConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricPotentialDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ElectricPotentialKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Length[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotentialDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ElectricPotentialKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ElectricPotentialKind, DipoleMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[ElectricPotentialKind, DipoleMomentKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ElectricPotentialKind, DipoleMomentKind]], W, T]: ...

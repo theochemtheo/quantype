@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._generated import Dimensionless, ElectricField, ParticleDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -89,7 +91,8 @@ class ParticleDensityPerElectricField(
     def __truediv__(
         self,
         other: ParticleDensityPerElectricField[V, S]
-        | ParticleDensityPerElectricField[float, S],
+        | ParticleDensityPerElectricField[float, S]
+        | _ParticleDensityPerElectricFieldConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -258,3 +261,93 @@ class ParticleDensityPerElectricField(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ParticleDensityPerElectricField[W, S]: ...
+
+class _ParticleDensityPerElectricFieldConstant(
+    Constant[Div[ParticleDensityKind, ElectricFieldKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ParticleDensityPerElectricField[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ParticleDensityKind, ElectricFieldKind]]
+    ) -> ParticleDensityPerElectricField[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ElectricFieldConstant, /) -> _ParticleDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ParticleDensityKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityPerElectricFieldConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ParticleDensityPerElectricFieldConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ParticleDensityKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityPerElectricFieldConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensityPerElectricField[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ParticleDensityKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityPerElectricFieldConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ParticleDensityKind, ElectricFieldKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[ParticleDensityKind, ElectricFieldKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ParticleDensityKind, ElectricFieldKind]], W, T]: ...
+    def _rmul_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> ParticleDensity[float, T]: ...
+    def _rmul_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    def _cmul_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _ParticleDensityConstant: ...
+    def _rtruediv_ParticleDensity_f[T: UnitSystem](
+        self, other: ParticleDensity[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rtruediv_ParticleDensity[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _ctruediv_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _ElectricFieldConstant: ...

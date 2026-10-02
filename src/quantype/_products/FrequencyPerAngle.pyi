@@ -13,8 +13,11 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._generated import Angle, Dimensionless, Frequency, InverseTime
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, FrequencyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +70,11 @@ class FrequencyPerAngle(Quantity[Div[FrequencyKind, AngleKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: FrequencyPerAngle[V, S] | FrequencyPerAngle[float, S], /
+        self,
+        other: FrequencyPerAngle[V, S]
+        | FrequencyPerAngle[float, S]
+        | _FrequencyPerAngleConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> FrequencyPerAngle[V, S]: ...
@@ -212,3 +219,92 @@ class FrequencyPerAngle(Quantity[Div[FrequencyKind, AngleKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> FrequencyPerAngle[W, S]: ...
+
+class _FrequencyPerAngleConstant(Constant[Div[FrequencyKind, AngleKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> FrequencyPerAngle[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[FrequencyKind, AngleKind]]
+    ) -> FrequencyPerAngle[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AngleConstant, /) -> _FrequencyConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[FrequencyKind, AngleKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyPerAngleConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Frequency[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[FrequencyKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _FrequencyPerAngleConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[FrequencyKind, AngleKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyPerAngleConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: FrequencyPerAngle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[FrequencyKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _FrequencyPerAngleConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[FrequencyKind, AngleKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[FrequencyKind, AngleKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[FrequencyKind, AngleKind]], W, T]: ...
+    def _rmul_Angle_f[T: UnitSystem](
+        self, other: Angle[float, T], /
+    ) -> Frequency[float, T]: ...
+    def _rmul_Angle[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> Frequency[W, T]: ...
+    def _cmul_Angle(self, other: _AngleConstant, /) -> _FrequencyConstant: ...
+    def _rtruediv_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rtruediv_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Angle[W, T]: ...
+    def _ctruediv_Frequency(self, other: _FrequencyConstant, /) -> _AngleConstant: ...
+    def _rtruediv_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rtruediv_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Angle[W, T]: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _AngleConstant: ...

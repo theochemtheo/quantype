@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.Time import _TimeConstant
 from quantype._generated import Dimensionless, Energy, Time
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyKind, Mul, TimeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,9 @@ class TimePerEnergy(Quantity[Div[TimeKind, EnergyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TimePerEnergy[V, S] | TimePerEnergy[float, S], /
+        self,
+        other: TimePerEnergy[V, S] | TimePerEnergy[float, S] | _TimePerEnergyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TimePerEnergy[V, S]: ...
@@ -199,3 +203,77 @@ class TimePerEnergy(Quantity[Div[TimeKind, EnergyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TimePerEnergy[W, S]: ...
+
+class _TimePerEnergyConstant(Constant[Div[TimeKind, EnergyKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> TimePerEnergy[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[TimeKind, EnergyKind]]) -> TimePerEnergy[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyConstant, /) -> _TimeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TimeKind, EnergyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerEnergyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TimeKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TimePerEnergyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TimeKind, EnergyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerEnergyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TimePerEnergy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TimeKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerEnergyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TimeKind, EnergyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[TimeKind, EnergyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TimeKind, EnergyKind]], W, T]: ...
+    def _rmul_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> Time[float, T]: ...
+    def _rmul_Energy[W, T: UnitSystem](self, other: Energy[W, T], /) -> Time[W, T]: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _TimeConstant: ...
+    def _rtruediv_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_Time[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_Time(self, other: _TimeConstant, /) -> _EnergyConstant: ...

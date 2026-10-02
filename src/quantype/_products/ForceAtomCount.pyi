@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Force import _ForceConstant
 from quantype._generated import AtomCount, Dimensionless, Force
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AtomCountKind, DimensionlessKind, Div, ForceKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,11 @@ class ForceAtomCount(Quantity[Mul[ForceKind, AtomCountKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ForceAtomCount[V, S] | ForceAtomCount[float, S], /
+        self,
+        other: ForceAtomCount[V, S]
+        | ForceAtomCount[float, S]
+        | _ForceAtomCountConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ForceAtomCount[V, S]: ...
@@ -189,3 +194,75 @@ class ForceAtomCount(Quantity[Mul[ForceKind, AtomCountKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ForceAtomCount[W, S]: ...
+
+class _ForceAtomCountConstant(Constant[Mul[ForceKind, AtomCountKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ForceAtomCount[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ForceKind, AtomCountKind]]
+    ) -> ForceAtomCount[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ForceKind, AtomCountKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceAtomCountConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ForceKind, AtomCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ForceConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __truediv__(self, other: _AtomCountConstant, /) -> _ForceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ForceAtomCountConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ForceKind, AtomCountKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceAtomCountConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceAtomCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ForceKind, AtomCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceAtomCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ForceKind, AtomCountKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ForceKind, AtomCountKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ForceKind, AtomCountKind]], W, T]: ...

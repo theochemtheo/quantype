@@ -12,7 +12,9 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Action import _ActionConstant
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
@@ -26,7 +28,7 @@ from quantype._generated import (
     InverseTime,
     Time,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ElectricPotentialKind, Mul, TimeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -135,7 +137,11 @@ class TimeElectricPotential(Quantity[Mul[TimeKind, ElectricPotentialKind], V, S]
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TimeElectricPotential[V, S] | TimeElectricPotential[float, S], /
+        self,
+        other: TimeElectricPotential[V, S]
+        | TimeElectricPotential[float, S]
+        | _TimeElectricPotentialConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TimeElectricPotential[V, S]: ...
@@ -304,3 +310,134 @@ class TimeElectricPotential(Quantity[Mul[TimeKind, ElectricPotentialKind], V, S]
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TimeElectricPotential[W, S]: ...
+
+class _TimeElectricPotentialConstant(Constant[Mul[TimeKind, ElectricPotentialKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TimeElectricPotential[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TimeKind, ElectricPotentialKind]]
+    ) -> TimeElectricPotential[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _FrequencyConstant, /) -> _ElectricPotentialConstant: ...
+    @overload
+    def __mul__(self, other: _InverseTimeConstant, /) -> _ElectricPotentialConstant: ...
+    @overload
+    def __mul__(self, other: _ChargeConstant, /) -> _ActionConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TimeKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeElectricPotentialConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TimeKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _TimeConstant, /) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(self, other: _ElectricPotentialConstant, /) -> _TimeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TimeElectricPotentialConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TimeKind, ElectricPotentialKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeElectricPotentialConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TimeElectricPotential[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TimeKind, ElectricPotentialKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimeElectricPotentialConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TimeKind, ElectricPotentialKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[TimeKind, ElectricPotentialKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TimeKind, ElectricPotentialKind]], W, T]: ...
+    def _rmul_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> ElectricPotential[float, T]: ...
+    def _rmul_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    def _cmul_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    def _rmul_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> ElectricPotential[float, T]: ...
+    def _rmul_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    def _cmul_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    def _rmul_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> Action[float, T]: ...
+    def _rmul_Charge[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> Action[W, T]: ...
+    def _cmul_Charge(self, other: _ChargeConstant, /) -> _ActionConstant: ...
+    def _rtruediv_ElectricPotential_f[T: UnitSystem](
+        self, other: ElectricPotential[float, T], /
+    ) -> InverseTime[float, T]: ...
+    def _rtruediv_ElectricPotential[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> InverseTime[W, T]: ...
+    def _ctruediv_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _InverseTimeConstant: ...
+    def _rtruediv_Action_f[T: UnitSystem](
+        self, other: Action[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rtruediv_Action[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Charge[W, T]: ...
+    def _ctruediv_Action(self, other: _ActionConstant, /) -> _ChargeConstant: ...

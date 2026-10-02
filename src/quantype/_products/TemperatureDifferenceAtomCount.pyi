@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import AtomCount, Dimensionless, TemperatureDifference
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AtomCountKind,
     DimensionlessKind,
@@ -88,7 +89,8 @@ class TemperatureDifferenceAtomCount(
     def __truediv__(
         self,
         other: TemperatureDifferenceAtomCount[V, S]
-        | TemperatureDifferenceAtomCount[float, S],
+        | TemperatureDifferenceAtomCount[float, S]
+        | _TemperatureDifferenceAtomCountConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -238,3 +240,85 @@ class TemperatureDifferenceAtomCount(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureDifferenceAtomCount[W, S]: ...
+
+class _TemperatureDifferenceAtomCountConstant(
+    Constant[Mul[TemperatureDifferenceKind, AtomCountKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureDifferenceAtomCount[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[TemperatureDifferenceKind, AtomCountKind]]
+    ) -> TemperatureDifferenceAtomCount[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[TemperatureDifferenceKind, AtomCountKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceAtomCountConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[TemperatureDifferenceKind, AtomCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _AtomCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AtomCountConstant, /
+    ) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureDifferenceAtomCountConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[TemperatureDifferenceKind, AtomCountKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceAtomCountConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifferenceAtomCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[TemperatureDifferenceKind, AtomCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferenceAtomCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[TemperatureDifferenceKind, AtomCountKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, AtomCountKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[TemperatureDifferenceKind, AtomCountKind]], W, T]: ...

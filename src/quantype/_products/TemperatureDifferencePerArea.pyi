@@ -13,7 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import (
     Area,
     Dimensionless,
@@ -21,7 +24,7 @@ from quantype._generated import (
     ForceConstant,
     TemperatureDifference,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AreaKind,
     DimensionlessKind,
@@ -103,7 +106,8 @@ class TemperatureDifferencePerArea(
     def __truediv__(
         self,
         other: TemperatureDifferencePerArea[V, S]
-        | TemperatureDifferencePerArea[float, S],
+        | TemperatureDifferencePerArea[float, S]
+        | _TemperatureDifferencePerAreaConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -289,3 +293,111 @@ class TemperatureDifferencePerArea(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TemperatureDifferencePerArea[W, S]: ...
+
+class _TemperatureDifferencePerAreaConstant(
+    Constant[Div[TemperatureDifferenceKind, AreaKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureDifferencePerArea[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[TemperatureDifferenceKind, AreaKind]]
+    ) -> TemperatureDifferencePerArea[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AreaConstant, /) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __mul__(self, other: _EntropyConstant, /) -> _ForceConstantConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TemperatureDifferenceKind, AreaKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferencePerAreaConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TemperatureDifferenceKind, AreaKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperatureDifferencePerAreaConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TemperatureDifferenceKind, AreaKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferencePerAreaConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifferencePerArea[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TemperatureDifferenceKind, AreaKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferencePerAreaConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TemperatureDifferenceKind, AreaKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[TemperatureDifferenceKind, AreaKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TemperatureDifferenceKind, AreaKind]], W, T]: ...
+    def _rmul_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> TemperatureDifference[float, T]: ...
+    def _rmul_Area[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    def _cmul_Area(self, other: _AreaConstant, /) -> _TemperatureDifferenceConstant: ...
+    def _rmul_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> ForceConstant[float, T]: ...
+    def _rmul_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    def _cmul_Entropy(self, other: _EntropyConstant, /) -> _ForceConstantConstant: ...
+    def _rtruediv_ForceConstant_f[T: UnitSystem](
+        self, other: ForceConstant[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rtruediv_ForceConstant[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _ctruediv_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _EntropyConstant: ...
+    def _rtruediv_TemperatureDifference_f[T: UnitSystem](
+        self, other: TemperatureDifference[float, T], /
+    ) -> Area[float, T]: ...
+    def _rtruediv_TemperatureDifference[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Area[W, T]: ...
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _AreaConstant: ...

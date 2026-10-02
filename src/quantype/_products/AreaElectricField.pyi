@@ -12,6 +12,7 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricField import _ElectricFieldConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.Length import _LengthConstant
@@ -22,7 +23,7 @@ from quantype._generated import (
     ElectricPotential,
     Length,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AreaKind, DimensionlessKind, Div, ElectricFieldKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -98,7 +99,11 @@ class AreaElectricField(Quantity[Mul[AreaKind, ElectricFieldKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AreaElectricField[V, S] | AreaElectricField[float, S], /
+        self,
+        other: AreaElectricField[V, S]
+        | AreaElectricField[float, S]
+        | _AreaElectricFieldConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AreaElectricField[V, S]: ...
@@ -219,3 +224,89 @@ class AreaElectricField(Quantity[Mul[AreaKind, ElectricFieldKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AreaElectricField[W, S]: ...
+
+class _AreaElectricFieldConstant(Constant[Mul[AreaKind, ElectricFieldKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AreaElectricField[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[AreaKind, ElectricFieldKind]]
+    ) -> AreaElectricField[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AreaKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaElectricFieldConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AreaKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _LengthConstant, /) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(self, other: _AreaConstant, /) -> _ElectricFieldConstant: ...
+    @overload
+    def __truediv__(self, other: _ElectricPotentialConstant, /) -> _LengthConstant: ...
+    @overload
+    def __truediv__(self, other: _ElectricFieldConstant, /) -> _AreaConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AreaElectricFieldConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AreaKind, ElectricFieldKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaElectricFieldConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AreaElectricField[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AreaKind, ElectricFieldKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaElectricFieldConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AreaKind, ElectricFieldKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AreaKind, ElectricFieldKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AreaKind, ElectricFieldKind]], W, T]: ...

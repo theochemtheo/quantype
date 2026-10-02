@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
+from quantype._constants.Entropy import _EntropyConstant
 from quantype._generated import Dimensionless, EnergyPerVolume, Entropy
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyPerVolumeKind, EntropyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -80,7 +82,9 @@ class EntropyPerEnergyPerVolume(Quantity[Div[EntropyKind, EnergyPerVolumeKind], 
     @overload
     def __truediv__(
         self,
-        other: EntropyPerEnergyPerVolume[V, S] | EntropyPerEnergyPerVolume[float, S],
+        other: EntropyPerEnergyPerVolume[V, S]
+        | EntropyPerEnergyPerVolume[float, S]
+        | _EntropyPerEnergyPerVolumeConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -237,3 +241,91 @@ class EntropyPerEnergyPerVolume(Quantity[Div[EntropyKind, EnergyPerVolumeKind], 
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EntropyPerEnergyPerVolume[W, S]: ...
+
+class _EntropyPerEnergyPerVolumeConstant(
+    Constant[Div[EntropyKind, EnergyPerVolumeKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EntropyPerEnergyPerVolume[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[EntropyKind, EnergyPerVolumeKind]]
+    ) -> EntropyPerEnergyPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyPerVolumeConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[EntropyKind, EnergyPerVolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyPerEnergyPerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[EntropyKind, EnergyPerVolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EntropyPerEnergyPerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[EntropyKind, EnergyPerVolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyPerEnergyPerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EntropyPerEnergyPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[EntropyKind, EnergyPerVolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropyPerEnergyPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[EntropyKind, EnergyPerVolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[EntropyKind, EnergyPerVolumeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[EntropyKind, EnergyPerVolumeKind]], W, T]: ...
+    def _rmul_EnergyPerVolume_f[T: UnitSystem](
+        self, other: EnergyPerVolume[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rmul_EnergyPerVolume[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _cmul_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _EntropyConstant: ...
+    def _rtruediv_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> EnergyPerVolume[float, T]: ...
+    def _rtruediv_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    def _ctruediv_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _EnergyPerVolumeConstant: ...

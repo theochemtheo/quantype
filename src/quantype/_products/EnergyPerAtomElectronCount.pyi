@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
 from quantype._generated import Dimensionless, ElectronCount, EnergyPerAtom
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -85,7 +86,9 @@ class EnergyPerAtomElectronCount(
     @overload
     def __truediv__(
         self,
-        other: EnergyPerAtomElectronCount[V, S] | EnergyPerAtomElectronCount[float, S],
+        other: EnergyPerAtomElectronCount[V, S]
+        | EnergyPerAtomElectronCount[float, S]
+        | _EnergyPerAtomElectronCountConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -225,3 +228,85 @@ class EnergyPerAtomElectronCount(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerAtomElectronCount[W, S]: ...
+
+class _EnergyPerAtomElectronCountConstant(
+    Constant[Mul[EnergyPerAtomKind, ElectronCountKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerAtomElectronCount[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyPerAtomKind, ElectronCountKind]]
+    ) -> EnergyPerAtomElectronCount[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyPerAtomKind, ElectronCountKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomElectronCountConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyPerAtomKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _ElectronCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectronCountConstant, /
+    ) -> _EnergyPerAtomConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyPerAtomElectronCountConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyPerAtomKind, ElectronCountKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomElectronCountConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtomElectronCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyPerAtomKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomElectronCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyPerAtomKind, ElectronCountKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[EnergyPerAtomKind, ElectronCountKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyPerAtomKind, ElectronCountKind]], W, T]: ...

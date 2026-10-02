@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronCount import _ElectronCountConstant
+from quantype._constants.Force import _ForceConstant
 from quantype._generated import Dimensionless, ElectronCount, Force
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ElectronCountKind, ForceKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -71,7 +73,11 @@ class ForcePerElectronCount(Quantity[Div[ForceKind, ElectronCountKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ForcePerElectronCount[V, S] | ForcePerElectronCount[float, S], /
+        self,
+        other: ForcePerElectronCount[V, S]
+        | ForcePerElectronCount[float, S]
+        | _ForcePerElectronCountConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ForcePerElectronCount[V, S]: ...
@@ -209,3 +215,87 @@ class ForcePerElectronCount(Quantity[Div[ForceKind, ElectronCountKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ForcePerElectronCount[W, S]: ...
+
+class _ForcePerElectronCountConstant(Constant[Div[ForceKind, ElectronCountKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ForcePerElectronCount[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ForceKind, ElectronCountKind]]
+    ) -> ForcePerElectronCount[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ElectronCountConstant, /) -> _ForceConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ForceKind, ElectronCountKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForcePerElectronCountConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ForceKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ForcePerElectronCountConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ForceKind, ElectronCountKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForcePerElectronCountConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForcePerElectronCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ForceKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForcePerElectronCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ForceKind, ElectronCountKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ForceKind, ElectronCountKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ForceKind, ElectronCountKind]], W, T]: ...
+    def _rmul_ElectronCount_f[T: UnitSystem](
+        self, other: ElectronCount[float, T], /
+    ) -> Force[float, T]: ...
+    def _rmul_ElectronCount[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Force[W, T]: ...
+    def _cmul_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _ForceConstant: ...
+    def _rtruediv_Force_f[T: UnitSystem](
+        self, other: Force[float, T], /
+    ) -> ElectronCount[float, T]: ...
+    def _rtruediv_Force[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    def _ctruediv_Force(self, other: _ForceConstant, /) -> _ElectronCountConstant: ...

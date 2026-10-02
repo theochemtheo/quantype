@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.Time import _TimeConstant
 from quantype._generated import Dimensionless, ForceConstant, Time
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ForceConstantKind, Mul, TimeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -71,7 +73,11 @@ class TimePerForceConstant(Quantity[Div[TimeKind, ForceConstantKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TimePerForceConstant[V, S] | TimePerForceConstant[float, S], /
+        self,
+        other: TimePerForceConstant[V, S]
+        | TimePerForceConstant[float, S]
+        | _TimePerForceConstantConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TimePerForceConstant[V, S]: ...
@@ -209,3 +215,87 @@ class TimePerForceConstant(Quantity[Div[TimeKind, ForceConstantKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TimePerForceConstant[W, S]: ...
+
+class _TimePerForceConstantConstant(Constant[Div[TimeKind, ForceConstantKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TimePerForceConstant[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[TimeKind, ForceConstantKind]]
+    ) -> TimePerForceConstant[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ForceConstantConstant, /) -> _TimeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TimeKind, ForceConstantKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerForceConstantConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TimeKind, ForceConstantKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TimePerForceConstantConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TimeKind, ForceConstantKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerForceConstantConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TimePerForceConstant[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TimeKind, ForceConstantKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerForceConstantConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TimeKind, ForceConstantKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[TimeKind, ForceConstantKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TimeKind, ForceConstantKind]], W, T]: ...
+    def _rmul_ForceConstant_f[T: UnitSystem](
+        self, other: ForceConstant[float, T], /
+    ) -> Time[float, T]: ...
+    def _rmul_ForceConstant[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Time[W, T]: ...
+    def _cmul_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _TimeConstant: ...
+    def _rtruediv_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> ForceConstant[float, T]: ...
+    def _rtruediv_Time[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    def _ctruediv_Time(self, other: _TimeConstant, /) -> _ForceConstantConstant: ...

@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import Dimensionless, EnergyPerAtom, TemperatureDifference
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -96,7 +97,8 @@ class EnergyPerAtomTemperatureDifference(
     def __truediv__(
         self,
         other: EnergyPerAtomTemperatureDifference[V, S]
-        | EnergyPerAtomTemperatureDifference[float, S],
+        | EnergyPerAtomTemperatureDifference[float, S]
+        | _EnergyPerAtomTemperatureDifferenceConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -248,3 +250,85 @@ class EnergyPerAtomTemperatureDifference(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerAtomTemperatureDifference[W, S]: ...
+
+class _EnergyPerAtomTemperatureDifferenceConstant(
+    Constant[Mul[EnergyPerAtomKind, TemperatureDifferenceKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerAtomTemperatureDifference[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyPerAtomKind, TemperatureDifferenceKind]]
+    ) -> EnergyPerAtomTemperatureDifference[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyPerAtomKind, TemperatureDifferenceKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomTemperatureDifferenceConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyPerAtomKind, TemperatureDifferenceKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _EnergyPerAtomConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyPerAtomTemperatureDifferenceConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyPerAtomKind, TemperatureDifferenceKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomTemperatureDifferenceConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtomTemperatureDifference[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyPerAtomKind, TemperatureDifferenceKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomTemperatureDifferenceConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyPerAtomKind, TemperatureDifferenceKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[EnergyPerAtomKind, TemperatureDifferenceKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyPerAtomKind, TemperatureDifferenceKind]], W, T]: ...

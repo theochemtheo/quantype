@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.ElectronDensity import _ElectronDensityConstant
 from quantype._generated import Dimensionless, DipoleMoment, ElectronDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     DipoleMomentKind,
@@ -88,7 +89,8 @@ class ElectronDensityDipoleMoment(
     def __truediv__(
         self,
         other: ElectronDensityDipoleMoment[V, S]
-        | ElectronDensityDipoleMoment[float, S],
+        | ElectronDensityDipoleMoment[float, S]
+        | _ElectronDensityDipoleMomentConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -232,3 +234,85 @@ class ElectronDensityDipoleMoment(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectronDensityDipoleMoment[W, S]: ...
+
+class _ElectronDensityDipoleMomentConstant(
+    Constant[Mul[ElectronDensityKind, DipoleMomentKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronDensityDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ElectronDensityKind, DipoleMomentKind]]
+    ) -> ElectronDensityDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ElectronDensityKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityDipoleMomentConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ElectronDensityKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectronDensityConstant, /
+    ) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _DipoleMomentConstant, /
+    ) -> _ElectronDensityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectronDensityDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ElectronDensityKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensityDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ElectronDensityKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ElectronDensityKind, DipoleMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[ElectronDensityKind, DipoleMomentKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ElectronDensityKind, DipoleMomentKind]], W, T]: ...

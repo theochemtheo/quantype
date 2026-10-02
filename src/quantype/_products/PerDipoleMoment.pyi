@@ -12,10 +12,12 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.ElectricField import _ElectricFieldConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._generated import Dimensionless, DipoleMoment, ElectricField, Energy
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, DipoleMomentKind, Div, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -89,7 +91,11 @@ class PerDipoleMoment(Quantity[Pow[DipoleMomentKind, Literal[-1]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PerDipoleMoment[V, S] | PerDipoleMoment[float, S], /
+        self,
+        other: PerDipoleMoment[V, S]
+        | PerDipoleMoment[float, S]
+        | _PerDipoleMomentConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PerDipoleMoment[V, S]: ...
@@ -237,3 +243,102 @@ class PerDipoleMoment(Quantity[Pow[DipoleMomentKind, Literal[-1]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PerDipoleMoment[W, S]: ...
+
+class _PerDipoleMomentConstant(Constant[Pow[DipoleMomentKind, Literal[-1]]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PerDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[DipoleMomentKind, Literal[-1]]]
+    ) -> PerDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyConstant, /) -> _ElectricFieldConstant: ...
+    @overload
+    def __mul__(self, other: _DipoleMomentConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[DipoleMomentKind, Literal[-1]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerDipoleMomentConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[DipoleMomentKind, Literal[-1]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PerDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[DipoleMomentKind, Literal[-1]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PerDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[DipoleMomentKind, Literal[-1]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[DipoleMomentKind, Literal[-1]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[DipoleMomentKind, Literal[-1]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[DipoleMomentKind, Literal[-1]]], W, T]: ...
+    def _rmul_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rmul_Energy[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _ElectricFieldConstant: ...
+    def _rmul_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> Dimensionless[float, T]: ...
+    def _rmul_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    def _rtruediv_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _EnergyConstant: ...

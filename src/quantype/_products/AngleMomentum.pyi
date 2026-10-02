@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Momentum import _MomentumConstant
 from quantype._generated import Angle, Dimensionless, Momentum
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, MomentumKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,9 @@ class AngleMomentum(Quantity[Mul[AngleKind, MomentumKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AngleMomentum[V, S] | AngleMomentum[float, S], /
+        self,
+        other: AngleMomentum[V, S] | AngleMomentum[float, S] | _AngleMomentumConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AngleMomentum[V, S]: ...
@@ -187,3 +190,73 @@ class AngleMomentum(Quantity[Mul[AngleKind, MomentumKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AngleMomentum[W, S]: ...
+
+class _AngleMomentumConstant(Constant[Mul[AngleKind, MomentumKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AngleMomentum[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[AngleKind, MomentumKind]]) -> AngleMomentum[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AngleKind, MomentumKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleMomentumConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AngleKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AngleConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __truediv__(self, other: _MomentumConstant, /) -> _AngleConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AngleMomentumConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AngleKind, MomentumKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleMomentumConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Angle[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AngleMomentum[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AngleKind, MomentumKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleMomentumConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AngleKind, MomentumKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AngleKind, MomentumKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AngleKind, MomentumKind]], W, T]: ...

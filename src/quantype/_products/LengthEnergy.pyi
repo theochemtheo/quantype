@@ -13,6 +13,7 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.Energy import _EnergyConstant
@@ -34,7 +35,7 @@ from quantype._generated import (
     Velocity,
     Volume,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyKind, LengthKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -160,7 +161,9 @@ class LengthEnergy(Quantity[Mul[LengthKind, EnergyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: LengthEnergy[V, S] | LengthEnergy[float, S], /
+        self,
+        other: LengthEnergy[V, S] | LengthEnergy[float, S] | _LengthEnergyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> LengthEnergy[V, S]: ...
@@ -279,3 +282,117 @@ class LengthEnergy(Quantity[Mul[LengthKind, EnergyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> LengthEnergy[W, S]: ...
+
+class _LengthEnergyConstant(Constant[Mul[LengthKind, EnergyKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> LengthEnergy[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[LengthKind, EnergyKind]]) -> LengthEnergy[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[LengthKind, EnergyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthEnergyConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[LengthKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _LengthConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(self, other: _AreaConstant, /) -> _ForceConstant: ...
+    @overload
+    def __truediv__(self, other: _VolumeConstant, /) -> _ForceConstantConstant: ...
+    @overload
+    def __truediv__(self, other: _VelocityConstant, /) -> _ActionConstant: ...
+    @overload
+    def __truediv__(self, other: _EnergyConstant, /) -> _LengthConstant: ...
+    @overload
+    def __truediv__(self, other: _ForceConstant, /) -> _AreaConstant: ...
+    @overload
+    def __truediv__(self, other: _ForceConstantConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _DipoleMomentConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __truediv__(self, other: _ActionConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _LengthEnergyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[LengthKind, EnergyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthEnergyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Length[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: LengthEnergy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[LengthKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthEnergyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[LengthKind, EnergyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[LengthKind, EnergyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[LengthKind, EnergyKind]], W, T]: ...

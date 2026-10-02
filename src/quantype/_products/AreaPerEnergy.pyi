@@ -12,9 +12,12 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.Force import _ForceConstant
 from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.Length import _LengthConstant
 from quantype._generated import (
     Area,
     Dimensionless,
@@ -23,7 +26,7 @@ from quantype._generated import (
     ForceConstant,
     Length,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AreaKind, DimensionlessKind, Div, EnergyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -112,7 +115,9 @@ class AreaPerEnergy(Quantity[Div[AreaKind, EnergyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AreaPerEnergy[V, S] | AreaPerEnergy[float, S], /
+        self,
+        other: AreaPerEnergy[V, S] | AreaPerEnergy[float, S] | _AreaPerEnergyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AreaPerEnergy[V, S]: ...
@@ -265,3 +270,108 @@ class AreaPerEnergy(Quantity[Div[AreaKind, EnergyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AreaPerEnergy[W, S]: ...
+
+class _AreaPerEnergyConstant(Constant[Div[AreaKind, EnergyKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AreaPerEnergy[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[AreaKind, EnergyKind]]) -> AreaPerEnergy[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyConstant, /) -> _AreaConstant: ...
+    @overload
+    def __mul__(self, other: _ForceConstant, /) -> _LengthConstant: ...
+    @overload
+    def __mul__(self, other: _ForceConstantConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AreaKind, EnergyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaPerEnergyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Force[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AreaKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AreaPerEnergyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AreaKind, EnergyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaPerEnergyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AreaPerEnergy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AreaKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaPerEnergyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AreaKind, EnergyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AreaKind, EnergyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AreaKind, EnergyKind]], W, T]: ...
+    def _rmul_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> Area[float, T]: ...
+    def _rmul_Energy[W, T: UnitSystem](self, other: Energy[W, T], /) -> Area[W, T]: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _AreaConstant: ...
+    def _rmul_Force_f[T: UnitSystem](
+        self, other: Force[float, T], /
+    ) -> Length[float, T]: ...
+    def _rmul_Force[W, T: UnitSystem](self, other: Force[W, T], /) -> Length[W, T]: ...
+    def _cmul_Force(self, other: _ForceConstant, /) -> _LengthConstant: ...
+    def _rmul_ForceConstant_f[T: UnitSystem](
+        self, other: ForceConstant[float, T], /
+    ) -> Dimensionless[float, T]: ...
+    def _rmul_ForceConstant[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    def _cmul_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _DimensionlessConstant: ...
+    def _rtruediv_Length_f[T: UnitSystem](
+        self, other: Length[float, T], /
+    ) -> Force[float, T]: ...
+    def _rtruediv_Length[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Force[W, T]: ...
+    def _ctruediv_Length(self, other: _LengthConstant, /) -> _ForceConstant: ...
+    def _rtruediv_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_Area[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_Area(self, other: _AreaConstant, /) -> _EnergyConstant: ...

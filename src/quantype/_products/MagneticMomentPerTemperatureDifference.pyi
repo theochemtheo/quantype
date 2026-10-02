@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import Dimensionless, MagneticMoment, TemperatureDifference
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -99,7 +101,8 @@ class MagneticMomentPerTemperatureDifference(
     def __truediv__(
         self,
         other: MagneticMomentPerTemperatureDifference[V, S]
-        | MagneticMomentPerTemperatureDifference[float, S],
+        | MagneticMomentPerTemperatureDifference[float, S]
+        | _MagneticMomentPerTemperatureDifferenceConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -280,3 +283,95 @@ class MagneticMomentPerTemperatureDifference(
     def from_value[W](
         cls, value: W
     ) -> MagneticMomentPerTemperatureDifference[W, S]: ...
+
+class _MagneticMomentPerTemperatureDifferenceConstant(
+    Constant[Div[MagneticMomentKind, TemperatureDifferenceKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagneticMomentPerTemperatureDifference[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[MagneticMomentKind, TemperatureDifferenceKind]]
+    ) -> MagneticMomentPerTemperatureDifference[float]: ...
+    @overload
+    @override
+    def __mul__(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _MagneticMomentConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MagneticMomentKind, TemperatureDifferenceKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentPerTemperatureDifferenceConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MagneticMomentKind, TemperatureDifferenceKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MagneticMomentPerTemperatureDifferenceConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MagneticMomentKind, TemperatureDifferenceKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentPerTemperatureDifferenceConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMomentPerTemperatureDifference[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MagneticMomentKind, TemperatureDifferenceKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagneticMomentPerTemperatureDifferenceConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MagneticMomentKind, TemperatureDifferenceKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[MagneticMomentKind, TemperatureDifferenceKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MagneticMomentKind, TemperatureDifferenceKind]], W, T]: ...
+    def _rmul_TemperatureDifference_f[T: UnitSystem](
+        self, other: TemperatureDifference[float, T], /
+    ) -> MagneticMoment[float, T]: ...
+    def _rmul_TemperatureDifference[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    def _cmul_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _MagneticMomentConstant: ...
+    def _rtruediv_MagneticMoment_f[T: UnitSystem](
+        self, other: MagneticMoment[float, T], /
+    ) -> TemperatureDifference[float, T]: ...
+    def _rtruediv_MagneticMoment[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    def _ctruediv_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _TemperatureDifferenceConstant: ...

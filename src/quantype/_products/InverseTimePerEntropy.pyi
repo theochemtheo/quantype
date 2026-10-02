@@ -13,7 +13,14 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
+from quantype._constants.Temperature import _TemperatureConstant
+from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
+from quantype._constants.TemperatureRate import _TemperatureRateConstant
 from quantype._generated import (
     Action,
     Dimensionless,
@@ -25,7 +32,7 @@ from quantype._generated import (
     TemperatureDifference,
     TemperatureRate,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EntropyKind, InverseTimeKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -93,7 +100,11 @@ class InverseTimePerEntropy(Quantity[Div[InverseTimeKind, EntropyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: InverseTimePerEntropy[V, S] | InverseTimePerEntropy[float, S], /
+        self,
+        other: InverseTimePerEntropy[V, S]
+        | InverseTimePerEntropy[float, S]
+        | _InverseTimePerEntropyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> InverseTimePerEntropy[V, S]: ...
@@ -279,3 +290,134 @@ class InverseTimePerEntropy(Quantity[Div[InverseTimeKind, EntropyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> InverseTimePerEntropy[W, S]: ...
+
+class _InverseTimePerEntropyConstant(Constant[Div[InverseTimeKind, EntropyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> InverseTimePerEntropy[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[InverseTimeKind, EntropyKind]]
+    ) -> InverseTimePerEntropy[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EntropyConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __mul__(self, other: _ActionConstant, /) -> _TemperatureConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[InverseTimeKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimePerEntropyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Temperature[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[InverseTimeKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _InverseTimePerEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[InverseTimeKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimePerEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTimePerEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[InverseTimeKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _InverseTimePerEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[InverseTimeKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[InverseTimeKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[InverseTimeKind, EntropyKind]], W, T]: ...
+    def _rmul_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> InverseTime[float, T]: ...
+    def _rmul_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> InverseTime[W, T]: ...
+    def _cmul_Entropy(self, other: _EntropyConstant, /) -> _InverseTimeConstant: ...
+    def _rmul_Action_f[T: UnitSystem](
+        self, other: Action[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rmul_Action[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _cmul_Action(self, other: _ActionConstant, /) -> _TemperatureConstant: ...
+    def _rtruediv_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> Action[float, T]: ...
+    def _rtruediv_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> Action[W, T]: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _ActionConstant: ...
+    def _rtruediv_TemperatureDifference_f[T: UnitSystem](
+        self, other: TemperatureDifference[float, T], /
+    ) -> Action[float, T]: ...
+    def _rtruediv_TemperatureDifference[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Action[W, T]: ...
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _ActionConstant: ...
+    def _rtruediv_TemperatureRate_f[T: UnitSystem](
+        self, other: TemperatureRate[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_TemperatureRate[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _EnergyConstant: ...
+    def _rtruediv_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rtruediv_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _ctruediv_Frequency(self, other: _FrequencyConstant, /) -> _EntropyConstant: ...
+    def _rtruediv_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rtruediv_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _EntropyConstant: ...

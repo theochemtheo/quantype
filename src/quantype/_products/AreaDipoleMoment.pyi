@@ -13,10 +13,11 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Area, Charge, Dimensionless, DipoleMoment, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AreaKind, DimensionlessKind, DipoleMomentKind, Div, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -88,7 +89,11 @@ class AreaDipoleMoment(Quantity[Mul[AreaKind, DipoleMomentKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AreaDipoleMoment[V, S] | AreaDipoleMoment[float, S], /
+        self,
+        other: AreaDipoleMoment[V, S]
+        | AreaDipoleMoment[float, S]
+        | _AreaDipoleMomentConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AreaDipoleMoment[V, S]: ...
@@ -209,3 +214,85 @@ class AreaDipoleMoment(Quantity[Mul[AreaKind, DipoleMomentKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AreaDipoleMoment[W, S]: ...
+
+class _AreaDipoleMomentConstant(Constant[Mul[AreaKind, DipoleMomentKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AreaDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[AreaKind, DipoleMomentKind]]
+    ) -> AreaDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AreaKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaDipoleMomentConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AreaKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AreaConstant, /) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__(self, other: _VolumeConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __truediv__(self, other: _ChargeConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __truediv__(self, other: _DipoleMomentConstant, /) -> _AreaConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AreaDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AreaKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AreaDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AreaKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AreaKind, DipoleMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AreaKind, DipoleMomentKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AreaKind, DipoleMomentKind]], W, T]: ...

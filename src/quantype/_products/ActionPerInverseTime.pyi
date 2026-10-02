@@ -13,11 +13,12 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Time import _TimeConstant
 from quantype._generated import Action, Dimensionless, Frequency, InverseTime, Time
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, DimensionlessKind, Div, InverseTimeKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -101,7 +102,11 @@ class ActionPerInverseTime(Quantity[Div[ActionKind, InverseTimeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ActionPerInverseTime[V, S] | ActionPerInverseTime[float, S], /
+        self,
+        other: ActionPerInverseTime[V, S]
+        | ActionPerInverseTime[float, S]
+        | _ActionPerInverseTimeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ActionPerInverseTime[V, S]: ...
@@ -247,3 +252,104 @@ class ActionPerInverseTime(Quantity[Div[ActionKind, InverseTimeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ActionPerInverseTime[W, S]: ...
+
+class _ActionPerInverseTimeConstant(Constant[Div[ActionKind, InverseTimeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ActionPerInverseTime[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ActionKind, InverseTimeKind]]
+    ) -> ActionPerInverseTime[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _FrequencyConstant, /) -> _ActionConstant: ...
+    @overload
+    def __mul__(self, other: _InverseTimeConstant, /) -> _ActionConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ActionKind, InverseTimeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ActionPerInverseTimeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Frequency[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Action[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ActionKind, InverseTimeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _TimeConstant, /) -> _ActionConstant: ...
+    @overload
+    def __truediv__(self, other: _ActionConstant, /) -> _TimeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ActionPerInverseTimeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ActionKind, InverseTimeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ActionPerInverseTimeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Time[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Action[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ActionPerInverseTime[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ActionKind, InverseTimeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ActionPerInverseTimeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ActionKind, InverseTimeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ActionKind, InverseTimeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ActionKind, InverseTimeKind]], W, T]: ...
+    def _rmul_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Action[float, T]: ...
+    def _rmul_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Action[W, T]: ...
+    def _cmul_Frequency(self, other: _FrequencyConstant, /) -> _ActionConstant: ...
+    def _rmul_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Action[float, T]: ...
+    def _rmul_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Action[W, T]: ...
+    def _cmul_InverseTime(self, other: _InverseTimeConstant, /) -> _ActionConstant: ...
+    def _rtruediv_Action_f[T: UnitSystem](
+        self, other: Action[float, T], /
+    ) -> InverseTime[float, T]: ...
+    def _rtruediv_Action[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> InverseTime[W, T]: ...
+    def _ctruediv_Action(self, other: _ActionConstant, /) -> _InverseTimeConstant: ...

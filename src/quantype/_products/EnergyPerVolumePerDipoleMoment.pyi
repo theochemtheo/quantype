@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
 from quantype._generated import Dimensionless, DipoleMoment, EnergyPerVolume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     DipoleMomentKind,
@@ -87,7 +89,8 @@ class EnergyPerVolumePerDipoleMoment(
     def __truediv__(
         self,
         other: EnergyPerVolumePerDipoleMoment[V, S]
-        | EnergyPerVolumePerDipoleMoment[float, S],
+        | EnergyPerVolumePerDipoleMoment[float, S]
+        | _EnergyPerVolumePerDipoleMomentConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -256,3 +259,93 @@ class EnergyPerVolumePerDipoleMoment(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerVolumePerDipoleMoment[W, S]: ...
+
+class _EnergyPerVolumePerDipoleMomentConstant(
+    Constant[Div[EnergyPerVolumeKind, DipoleMomentKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerVolumePerDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[EnergyPerVolumeKind, DipoleMomentKind]]
+    ) -> EnergyPerVolumePerDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _DipoleMomentConstant, /) -> _EnergyPerVolumeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[EnergyPerVolumeKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumePerDipoleMomentConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[EnergyPerVolumeKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EnergyPerVolumePerDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[EnergyPerVolumeKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumePerDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolumePerDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[EnergyPerVolumeKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumePerDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[EnergyPerVolumeKind, DipoleMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[EnergyPerVolumeKind, DipoleMomentKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[EnergyPerVolumeKind, DipoleMomentKind]], W, T]: ...
+    def _rmul_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> EnergyPerVolume[float, T]: ...
+    def _rmul_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _EnergyPerVolumeConstant: ...
+    def _rtruediv_EnergyPerVolume_f[T: UnitSystem](
+        self, other: EnergyPerVolume[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rtruediv_EnergyPerVolume[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _ctruediv_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _DipoleMomentConstant: ...

@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Angle, Dimensionless, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class AnglePerVolume(Quantity[Div[AngleKind, VolumeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AnglePerVolume[V, S] | AnglePerVolume[float, S], /
+        self,
+        other: AnglePerVolume[V, S]
+        | AnglePerVolume[float, S]
+        | _AnglePerVolumeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AnglePerVolume[V, S]: ...
@@ -199,3 +205,77 @@ class AnglePerVolume(Quantity[Div[AngleKind, VolumeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AnglePerVolume[W, S]: ...
+
+class _AnglePerVolumeConstant(Constant[Div[AngleKind, VolumeKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AnglePerVolume[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[AngleKind, VolumeKind]]) -> AnglePerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VolumeConstant, /) -> _AngleConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AngleKind, VolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AngleKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AnglePerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AngleKind, VolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AnglePerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AngleKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AngleKind, VolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AngleKind, VolumeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AngleKind, VolumeKind]], W, T]: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](self, other: Volume[W, T], /) -> Angle[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _AngleConstant: ...
+    def _rtruediv_Angle_f[T: UnitSystem](
+        self, other: Angle[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_Angle[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_Angle(self, other: _AngleConstant, /) -> _VolumeConstant: ...

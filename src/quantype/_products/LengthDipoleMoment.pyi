@@ -13,10 +13,11 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.Length import _LengthConstant
 from quantype._generated import Area, Charge, Dimensionless, DipoleMoment, Length
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, DipoleMomentKind, Div, LengthKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -88,7 +89,11 @@ class LengthDipoleMoment(Quantity[Mul[LengthKind, DipoleMomentKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: LengthDipoleMoment[V, S] | LengthDipoleMoment[float, S], /
+        self,
+        other: LengthDipoleMoment[V, S]
+        | LengthDipoleMoment[float, S]
+        | _LengthDipoleMomentConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> LengthDipoleMoment[V, S]: ...
@@ -209,3 +214,85 @@ class LengthDipoleMoment(Quantity[Mul[LengthKind, DipoleMomentKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> LengthDipoleMoment[W, S]: ...
+
+class _LengthDipoleMomentConstant(Constant[Mul[LengthKind, DipoleMomentKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> LengthDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[LengthKind, DipoleMomentKind]]
+    ) -> LengthDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[LengthKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthDipoleMomentConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[LengthKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _LengthConstant, /) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__(self, other: _AreaConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __truediv__(self, other: _ChargeConstant, /) -> _AreaConstant: ...
+    @overload
+    def __truediv__(self, other: _DipoleMomentConstant, /) -> _LengthConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _LengthDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[LengthKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Area[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: LengthDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[LengthKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[LengthKind, DipoleMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[LengthKind, DipoleMomentKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[LengthKind, DipoleMomentKind]], W, T]: ...

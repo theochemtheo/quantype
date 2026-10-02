@@ -9,7 +9,12 @@ import numpy as np
 import numpy.typing as npt
 
 from quantype import Energy, Entropy, Force, Mass, Momentum, Temperature, constants, u
-from quantype._generated import _EntropyConstant
+from quantype._generated import (
+    _DimensionlessConstant,
+    _EnergyConstant,
+    _EntropyConstant,
+)
+from quantype.products import EntropySquared, VelocityAction
 from quantype.systems import SI, Metal
 
 point = 300 * u.K
@@ -28,3 +33,12 @@ assert_type(2 * constants.k_B, _EntropyConstant)
 assert_type(constants.m_u.to_system(Metal), Mass[float, Metal])
 assert_type(constants.m_u * (1 * u.angstrom_per_fs), Momentum[float])
 assert_type(constants.e * (1 * u.volt_per_angstrom), Force[float])
+
+# Products of constants are named as products of quantities are.
+assert_type((constants.hbar * constants.c).to_system(SI), VelocityAction[float, SI])
+assert_type((constants.hbar * constants.c) / (1 * u.nm), Energy[float])
+assert_type((2 / constants.k_B) * (1 * u.eV), Temperature[float])
+assert_type((1 * u.eV) * (2 / constants.k_B), Temperature[float])
+assert_type((constants.k_B**2).to_system(SI), EntropySquared[float, SI])
+assert_type(constants.k_B / constants.k_B, _DimensionlessConstant)
+assert_type(constants.m_e * constants.c * constants.c, _EnergyConstant)

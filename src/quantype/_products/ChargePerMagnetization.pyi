@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Magnetization import _MagnetizationConstant
 from quantype._generated import Charge, Dimensionless, Magnetization
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, MagnetizationKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -71,7 +73,11 @@ class ChargePerMagnetization(Quantity[Div[ChargeKind, MagnetizationKind], V, S])
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ChargePerMagnetization[V, S] | ChargePerMagnetization[float, S], /
+        self,
+        other: ChargePerMagnetization[V, S]
+        | ChargePerMagnetization[float, S]
+        | _ChargePerMagnetizationConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ChargePerMagnetization[V, S]: ...
@@ -209,3 +215,87 @@ class ChargePerMagnetization(Quantity[Div[ChargeKind, MagnetizationKind], V, S])
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ChargePerMagnetization[W, S]: ...
+
+class _ChargePerMagnetizationConstant(Constant[Div[ChargeKind, MagnetizationKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ChargePerMagnetization[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ChargeKind, MagnetizationKind]]
+    ) -> ChargePerMagnetization[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _MagnetizationConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ChargeKind, MagnetizationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerMagnetizationConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ChargeKind, MagnetizationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ChargePerMagnetizationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ChargeKind, MagnetizationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerMagnetizationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ChargePerMagnetization[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ChargeKind, MagnetizationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargePerMagnetizationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ChargeKind, MagnetizationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ChargeKind, MagnetizationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ChargeKind, MagnetizationKind]], W, T]: ...
+    def _rmul_Magnetization_f[T: UnitSystem](
+        self, other: Magnetization[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rmul_Magnetization[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> Charge[W, T]: ...
+    def _cmul_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _ChargeConstant: ...
+    def _rtruediv_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> Magnetization[float, T]: ...
+    def _rtruediv_Charge[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> Magnetization[W, T]: ...
+    def _ctruediv_Charge(self, other: _ChargeConstant, /) -> _MagnetizationConstant: ...

@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._generated import Charge, Dimensionless, DipoleMoment
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, DipoleMomentKind, Div, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -70,7 +71,11 @@ class ChargeDipoleMoment(Quantity[Mul[ChargeKind, DipoleMomentKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ChargeDipoleMoment[V, S] | ChargeDipoleMoment[float, S], /
+        self,
+        other: ChargeDipoleMoment[V, S]
+        | ChargeDipoleMoment[float, S]
+        | _ChargeDipoleMomentConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ChargeDipoleMoment[V, S]: ...
@@ -191,3 +196,77 @@ class ChargeDipoleMoment(Quantity[Mul[ChargeKind, DipoleMomentKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ChargeDipoleMoment[W, S]: ...
+
+class _ChargeDipoleMomentConstant(Constant[Mul[ChargeKind, DipoleMomentKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ChargeDipoleMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ChargeKind, DipoleMomentKind]]
+    ) -> ChargeDipoleMoment[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ChargeKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeDipoleMomentConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ChargeKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ChargeConstant, /) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__(self, other: _DipoleMomentConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ChargeDipoleMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ChargeKind, DipoleMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeDipoleMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Charge[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ChargeDipoleMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ChargeKind, DipoleMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ChargeDipoleMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ChargeKind, DipoleMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ChargeKind, DipoleMomentKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ChargeKind, DipoleMomentKind]], W, T]: ...

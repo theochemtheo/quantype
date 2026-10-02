@@ -12,8 +12,9 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Action, Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, DimensionlessKind, Div, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -59,7 +60,9 @@ class ActionSquared(Quantity[Pow[ActionKind, Literal[2]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ActionSquared[V, S] | ActionSquared[float, S], /
+        self,
+        other: ActionSquared[V, S] | ActionSquared[float, S] | _ActionSquaredConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ActionSquared[V, S]: ...
@@ -178,3 +181,65 @@ class ActionSquared(Quantity[Pow[ActionKind, Literal[2]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ActionSquared[W, S]: ...
+
+class _ActionSquaredConstant(Constant[Pow[ActionKind, Literal[2]]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ActionSquared[float, T]: ...
+    @override
+    def to(self, unit: Unit[Pow[ActionKind, Literal[2]]]) -> ActionSquared[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[ActionKind, Literal[2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ActionSquaredConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[ActionKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ActionConstant, /) -> _ActionConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ActionSquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[ActionKind, Literal[2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ActionSquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Action[W, T], /) -> Action[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ActionSquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[ActionKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ActionSquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[ActionKind, Literal[2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[ActionKind, Literal[2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[ActionKind, Literal[2]]], W, T]: ...

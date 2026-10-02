@@ -12,15 +12,17 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._constants.TemperatureRate import _TemperatureRateConstant
+from quantype._constants.Time import _TimeConstant
 from quantype._generated import (
     Dimensionless,
     TemperatureDifference,
     TemperatureRate,
     Time,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, Mul, Pow, TemperatureRateKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -104,7 +106,11 @@ class PerTemperatureRate(Quantity[Pow[TemperatureRateKind, Literal[-1]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PerTemperatureRate[V, S] | PerTemperatureRate[float, S], /
+        self,
+        other: PerTemperatureRate[V, S]
+        | PerTemperatureRate[float, S]
+        | _PerTemperatureRateConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PerTemperatureRate[V, S]: ...
@@ -256,3 +262,104 @@ class PerTemperatureRate(Quantity[Pow[TemperatureRateKind, Literal[-1]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PerTemperatureRate[W, S]: ...
+
+class _PerTemperatureRateConstant(Constant[Pow[TemperatureRateKind, Literal[-1]]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PerTemperatureRate[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[TemperatureRateKind, Literal[-1]]]
+    ) -> PerTemperatureRate[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TemperatureDifferenceConstant, /) -> _TimeConstant: ...
+    @overload
+    def __mul__(self, other: _TemperatureRateConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[TemperatureRateKind, Literal[-1]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerTemperatureRateConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Time[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[TemperatureRateKind, Literal[-1]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PerTemperatureRateConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[TemperatureRateKind, Literal[-1]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerTemperatureRateConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PerTemperatureRate[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[TemperatureRateKind, Literal[-1]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerTemperatureRateConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[TemperatureRateKind, Literal[-1]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[TemperatureRateKind, Literal[-1]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[TemperatureRateKind, Literal[-1]]], W, T]: ...
+    def _rmul_TemperatureDifference_f[T: UnitSystem](
+        self, other: TemperatureDifference[float, T], /
+    ) -> Time[float, T]: ...
+    def _rmul_TemperatureDifference[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> Time[W, T]: ...
+    def _cmul_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _TimeConstant: ...
+    def _rmul_TemperatureRate_f[T: UnitSystem](
+        self, other: TemperatureRate[float, T], /
+    ) -> Dimensionless[float, T]: ...
+    def _rmul_TemperatureRate[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    def _cmul_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _DimensionlessConstant: ...
+    def _rtruediv_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> TemperatureDifference[float, T]: ...
+    def _rtruediv_Time[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    def _ctruediv_Time(
+        self, other: _TimeConstant, /
+    ) -> _TemperatureDifferenceConstant: ...

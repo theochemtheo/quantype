@@ -13,8 +13,9 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Acceleration, AtomCount, Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AccelerationKind, AtomCountKind, DimensionlessKind, Div, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -70,7 +71,11 @@ class AtomCountAcceleration(Quantity[Mul[AtomCountKind, AccelerationKind], V, S]
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AtomCountAcceleration[V, S] | AtomCountAcceleration[float, S], /
+        self,
+        other: AtomCountAcceleration[V, S]
+        | AtomCountAcceleration[float, S]
+        | _AtomCountAccelerationConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AtomCountAcceleration[V, S]: ...
@@ -199,3 +204,77 @@ class AtomCountAcceleration(Quantity[Mul[AtomCountKind, AccelerationKind], V, S]
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AtomCountAcceleration[W, S]: ...
+
+class _AtomCountAccelerationConstant(Constant[Mul[AtomCountKind, AccelerationKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AtomCountAcceleration[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[AtomCountKind, AccelerationKind]]
+    ) -> AtomCountAcceleration[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AtomCountKind, AccelerationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountAccelerationConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AtomCountKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AtomCountConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __truediv__(self, other: _AccelerationConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AtomCountAccelerationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AtomCountKind, AccelerationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountAccelerationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCountAcceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AtomCountKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountAccelerationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AtomCountKind, AccelerationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AtomCountKind, AccelerationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AtomCountKind, AccelerationKind]], W, T]: ...

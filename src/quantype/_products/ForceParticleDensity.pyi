@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Force import _ForceConstant
 from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._generated import Dimensionless, Force, ParticleDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ForceKind, Mul, ParticleDensityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -72,7 +73,11 @@ class ForceParticleDensity(Quantity[Mul[ForceKind, ParticleDensityKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ForceParticleDensity[V, S] | ForceParticleDensity[float, S], /
+        self,
+        other: ForceParticleDensity[V, S]
+        | ForceParticleDensity[float, S]
+        | _ForceParticleDensityConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ForceParticleDensity[V, S]: ...
@@ -201,3 +206,77 @@ class ForceParticleDensity(Quantity[Mul[ForceKind, ParticleDensityKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ForceParticleDensity[W, S]: ...
+
+class _ForceParticleDensityConstant(Constant[Mul[ForceKind, ParticleDensityKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ForceParticleDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[ForceKind, ParticleDensityKind]]
+    ) -> ForceParticleDensity[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ForceKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceParticleDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ForceKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ForceConstant, /) -> _ParticleDensityConstant: ...
+    @overload
+    def __truediv__(self, other: _ParticleDensityConstant, /) -> _ForceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ForceParticleDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ForceKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceParticleDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceParticleDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ForceKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceParticleDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ForceKind, ParticleDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ForceKind, ParticleDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ForceKind, ParticleDensityKind]], W, T]: ...

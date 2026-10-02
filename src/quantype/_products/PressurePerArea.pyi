@@ -13,9 +13,12 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.Pressure import _PressureConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Area, Dimensionless, ForceConstant, Pressure, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AreaKind, DimensionlessKind, Div, Mul, PressureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -83,7 +86,11 @@ class PressurePerArea(Quantity[Div[PressureKind, AreaKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PressurePerArea[V, S] | PressurePerArea[float, S], /
+        self,
+        other: PressurePerArea[V, S]
+        | PressurePerArea[float, S]
+        | _PressurePerAreaConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PressurePerArea[V, S]: ...
@@ -234,3 +241,101 @@ class PressurePerArea(Quantity[Div[PressureKind, AreaKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PressurePerArea[W, S]: ...
+
+class _PressurePerAreaConstant(Constant[Div[PressureKind, AreaKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PressurePerArea[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[PressureKind, AreaKind]]) -> PressurePerArea[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AreaConstant, /) -> _PressureConstant: ...
+    @overload
+    def __mul__(self, other: _VolumeConstant, /) -> _ForceConstantConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[PressureKind, AreaKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressurePerAreaConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Area[W, T], /) -> Pressure[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[PressureKind, AreaKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PressurePerAreaConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[PressureKind, AreaKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressurePerAreaConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PressurePerArea[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[PressureKind, AreaKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PressurePerAreaConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[PressureKind, AreaKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[PressureKind, AreaKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[PressureKind, AreaKind]], W, T]: ...
+    def _rmul_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> Pressure[float, T]: ...
+    def _rmul_Area[W, T: UnitSystem](self, other: Area[W, T], /) -> Pressure[W, T]: ...
+    def _cmul_Area(self, other: _AreaConstant, /) -> _PressureConstant: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> ForceConstant[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _ForceConstantConstant: ...
+    def _rtruediv_ForceConstant_f[T: UnitSystem](
+        self, other: ForceConstant[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_ForceConstant[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _VolumeConstant: ...
+    def _rtruediv_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> Area[float, T]: ...
+    def _rtruediv_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Area[W, T]: ...
+    def _ctruediv_Pressure(self, other: _PressureConstant, /) -> _AreaConstant: ...

@@ -342,7 +342,10 @@ assert constants.hbar.magnitude(u.joule_second) == pytest.approx(1.0545718e-34)
 assert constants.m_u.to_system(Metal).magnitude() == pytest.approx(1.0)  # g/mol
 ```
 
-`epsilon_0` and `k_e` have structural kinds, and so do their products:
+Products of constants are named as products of quantities are, so
+`(constants.hbar * constants.c) / (1 * u.nm)` is an `Energy` and
+`(1 * u.eV) * (2 / constants.k_B)` a `Temperature`, at runtime and in every type
+checker. `epsilon_0` and `k_e` have structural kinds, and so do their products:
 `constants.k_e * q1 * q2 / r` has an energy's dimensions but no declared name.
 Name it with `Energy.reinterpret(...)`.
 

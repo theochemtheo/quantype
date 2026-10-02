@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._generated import Angle, Dimensionless, ElectronCount
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, ElectronCountKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class ElectronCountPerAngle(Quantity[Div[ElectronCountKind, AngleKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ElectronCountPerAngle[V, S] | ElectronCountPerAngle[float, S], /
+        self,
+        other: ElectronCountPerAngle[V, S]
+        | ElectronCountPerAngle[float, S]
+        | _ElectronCountPerAngleConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ElectronCountPerAngle[V, S]: ...
@@ -207,3 +213,87 @@ class ElectronCountPerAngle(Quantity[Div[ElectronCountKind, AngleKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectronCountPerAngle[W, S]: ...
+
+class _ElectronCountPerAngleConstant(Constant[Div[ElectronCountKind, AngleKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronCountPerAngle[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ElectronCountKind, AngleKind]]
+    ) -> ElectronCountPerAngle[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AngleConstant, /) -> _ElectronCountConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ElectronCountKind, AngleKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountPerAngleConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ElectronCountKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectronCountPerAngleConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ElectronCountKind, AngleKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountPerAngleConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronCountPerAngle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ElectronCountKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronCountPerAngleConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ElectronCountKind, AngleKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ElectronCountKind, AngleKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ElectronCountKind, AngleKind]], W, T]: ...
+    def _rmul_Angle_f[T: UnitSystem](
+        self, other: Angle[float, T], /
+    ) -> ElectronCount[float, T]: ...
+    def _rmul_Angle[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    def _cmul_Angle(self, other: _AngleConstant, /) -> _ElectronCountConstant: ...
+    def _rtruediv_ElectronCount_f[T: UnitSystem](
+        self, other: ElectronCount[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rtruediv_ElectronCount[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Angle[W, T]: ...
+    def _ctruediv_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _AngleConstant: ...

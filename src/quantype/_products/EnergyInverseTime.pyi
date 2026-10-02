@@ -13,7 +13,9 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.Entropy import _EntropyConstant
 from quantype._constants.Force import _ForceConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
@@ -34,7 +36,7 @@ from quantype._generated import (
     Time,
     Velocity,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyKind, InverseTimeKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -157,7 +159,11 @@ class EnergyInverseTime(Quantity[Mul[EnergyKind, InverseTimeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EnergyInverseTime[V, S] | EnergyInverseTime[float, S], /
+        self,
+        other: EnergyInverseTime[V, S]
+        | EnergyInverseTime[float, S]
+        | _EnergyInverseTimeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EnergyInverseTime[V, S]: ...
@@ -291,3 +297,129 @@ class EnergyInverseTime(Quantity[Mul[EnergyKind, InverseTimeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyInverseTime[W, S]: ...
+
+class _EnergyInverseTimeConstant(Constant[Mul[EnergyKind, InverseTimeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyInverseTime[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[EnergyKind, InverseTimeKind]]
+    ) -> EnergyInverseTime[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _TimeConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[EnergyKind, InverseTimeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyInverseTimeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[EnergyKind, InverseTimeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _VelocityConstant, /) -> _ForceConstant: ...
+    @overload
+    def __truediv__(self, other: _EnergyConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __truediv__(self, other: _ForceConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __truediv__(self, other: _TemperatureRateConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __truediv__(self, other: _FrequencyConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(self, other: _InverseTimeConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(self, other: _MomentumConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __truediv__(self, other: _AccelerationConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyInverseTimeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[EnergyKind, InverseTimeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyInverseTimeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureRate[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyInverseTime[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[EnergyKind, InverseTimeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyInverseTimeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[EnergyKind, InverseTimeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[EnergyKind, InverseTimeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[EnergyKind, InverseTimeKind]], W, T]: ...
+    def _rmul_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rmul_Time[W, T: UnitSystem](self, other: Time[W, T], /) -> Energy[W, T]: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _EnergyConstant: ...
+    def _rtruediv_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> Time[float, T]: ...
+    def _rtruediv_Energy[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> Time[W, T]: ...
+    def _ctruediv_Energy(self, other: _EnergyConstant, /) -> _TimeConstant: ...

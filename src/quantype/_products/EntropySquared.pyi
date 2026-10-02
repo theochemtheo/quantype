@@ -11,9 +11,10 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
 from quantype._generated import Dimensionless, Entropy
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EntropyKind, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -59,7 +60,11 @@ class EntropySquared(Quantity[Pow[EntropyKind, Literal[2]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EntropySquared[V, S] | EntropySquared[float, S], /
+        self,
+        other: EntropySquared[V, S]
+        | EntropySquared[float, S]
+        | _EntropySquaredConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EntropySquared[V, S]: ...
@@ -178,3 +183,67 @@ class EntropySquared(Quantity[Pow[EntropyKind, Literal[2]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EntropySquared[W, S]: ...
+
+class _EntropySquaredConstant(Constant[Pow[EntropyKind, Literal[2]]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> EntropySquared[float, T]: ...
+    @override
+    def to(self, unit: Unit[Pow[EntropyKind, Literal[2]]]) -> EntropySquared[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[EntropyKind, Literal[2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropySquaredConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[EntropyKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _EntropyConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EntropySquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[EntropyKind, Literal[2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropySquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EntropySquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[EntropyKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EntropySquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[EntropyKind, Literal[2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[EntropyKind, Literal[2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[EntropyKind, Literal[2]]], W, T]: ...

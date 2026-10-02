@@ -12,7 +12,14 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.EnergyDensity import _EnergyDensityConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Momentum import _MomentumConstant
+from quantype._constants.Pressure import _PressureConstant
+from quantype._constants.Velocity import _VelocityConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
     Area,
@@ -25,7 +32,7 @@ from quantype._generated import (
     Velocity,
     Volume,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, Mul, VelocityKind, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -93,7 +100,11 @@ class VelocityPerVolume(Quantity[Div[VelocityKind, VolumeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: VelocityPerVolume[V, S] | VelocityPerVolume[float, S], /
+        self,
+        other: VelocityPerVolume[V, S]
+        | VelocityPerVolume[float, S]
+        | _VelocityPerVolumeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> VelocityPerVolume[V, S]: ...
@@ -260,3 +271,119 @@ class VelocityPerVolume(Quantity[Div[VelocityKind, VolumeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VelocityPerVolume[W, S]: ...
+
+class _VelocityPerVolumeConstant(Constant[Div[VelocityKind, VolumeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> VelocityPerVolume[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[VelocityKind, VolumeKind]]
+    ) -> VelocityPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VolumeConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __mul__(self, other: _MomentumConstant, /) -> _EnergyDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[VelocityKind, VolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityPerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Velocity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[VelocityKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _VelocityPerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[VelocityKind, VolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityPerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VelocityPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[VelocityKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[VelocityKind, VolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[VelocityKind, VolumeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[VelocityKind, VolumeKind]], W, T]: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Velocity[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> Velocity[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _VelocityConstant: ...
+    def _rmul_Momentum_f[T: UnitSystem](
+        self, other: Momentum[float, T], /
+    ) -> EnergyDensity[float, T]: ...
+    def _rmul_Momentum[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    def _cmul_Momentum(self, other: _MomentumConstant, /) -> _EnergyDensityConstant: ...
+    def _rtruediv_Velocity_f[T: UnitSystem](
+        self, other: Velocity[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_Velocity[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_Velocity(self, other: _VelocityConstant, /) -> _VolumeConstant: ...
+    def _rtruediv_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> Momentum[float, T]: ...
+    def _rtruediv_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> Momentum[W, T]: ...
+    def _ctruediv_Pressure(self, other: _PressureConstant, /) -> _MomentumConstant: ...
+    def _rtruediv_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Area[float, T]: ...
+    def _rtruediv_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Area[W, T]: ...
+    def _ctruediv_Frequency(self, other: _FrequencyConstant, /) -> _AreaConstant: ...
+    def _rtruediv_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Area[float, T]: ...
+    def _rtruediv_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Area[W, T]: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _AreaConstant: ...

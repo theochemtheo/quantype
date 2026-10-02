@@ -12,9 +12,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Length import _LengthConstant
 from quantype._generated import Angle, Dimensionless, Length
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, LengthKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,7 @@ class LengthAngle(Quantity[Mul[LengthKind, AngleKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: LengthAngle[V, S] | LengthAngle[float, S], /
+        self, other: LengthAngle[V, S] | LengthAngle[float, S] | _LengthAngleConstant, /
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> LengthAngle[V, S]: ...
@@ -187,3 +188,67 @@ class LengthAngle(Quantity[Mul[LengthKind, AngleKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> LengthAngle[W, S]: ...
+
+class _LengthAngleConstant(Constant[Mul[LengthKind, AngleKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> LengthAngle[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[LengthKind, AngleKind]]) -> LengthAngle[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[LengthKind, AngleKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthAngleConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[LengthKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _LengthConstant, /) -> _AngleConstant: ...
+    @overload
+    def __truediv__(self, other: _AngleConstant, /) -> _LengthConstant: ...
+    @overload
+    def __truediv__(self, other: _LengthAngleConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[LengthKind, AngleKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthAngleConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Length[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: LengthAngle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[LengthKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthAngleConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[LengthKind, AngleKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[LengthKind, AngleKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[LengthKind, AngleKind]], W, T]: ...

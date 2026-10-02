@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Mass import _MassConstant
+from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._generated import Dimensionless, Mass, ParticleDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MassKind, Mul, ParticleDensityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class ParticleDensityPerMass(Quantity[Div[ParticleDensityKind, MassKind], V, S])
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ParticleDensityPerMass[V, S] | ParticleDensityPerMass[float, S], /
+        self,
+        other: ParticleDensityPerMass[V, S]
+        | ParticleDensityPerMass[float, S]
+        | _ParticleDensityPerMassConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ParticleDensityPerMass[V, S]: ...
@@ -209,3 +215,87 @@ class ParticleDensityPerMass(Quantity[Div[ParticleDensityKind, MassKind], V, S])
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ParticleDensityPerMass[W, S]: ...
+
+class _ParticleDensityPerMassConstant(Constant[Div[ParticleDensityKind, MassKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ParticleDensityPerMass[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ParticleDensityKind, MassKind]]
+    ) -> ParticleDensityPerMass[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _MassConstant, /) -> _ParticleDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ParticleDensityKind, MassKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityPerMassConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ParticleDensityKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ParticleDensityPerMassConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ParticleDensityKind, MassKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityPerMassConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensityPerMass[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ParticleDensityKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ParticleDensityPerMassConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ParticleDensityKind, MassKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ParticleDensityKind, MassKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ParticleDensityKind, MassKind]], W, T]: ...
+    def _rmul_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> ParticleDensity[float, T]: ...
+    def _rmul_Mass[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    def _cmul_Mass(self, other: _MassConstant, /) -> _ParticleDensityConstant: ...
+    def _rtruediv_ParticleDensity_f[T: UnitSystem](
+        self, other: ParticleDensity[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rtruediv_ParticleDensity[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Mass[W, T]: ...
+    def _ctruediv_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _MassConstant: ...

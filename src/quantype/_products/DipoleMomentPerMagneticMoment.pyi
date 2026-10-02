@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._generated import Dimensionless, DipoleMoment, MagneticMoment
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     DipoleMomentKind,
@@ -89,7 +91,8 @@ class DipoleMomentPerMagneticMoment(
     def __truediv__(
         self,
         other: DipoleMomentPerMagneticMoment[V, S]
-        | DipoleMomentPerMagneticMoment[float, S],
+        | DipoleMomentPerMagneticMoment[float, S]
+        | _DipoleMomentPerMagneticMomentConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -254,3 +257,93 @@ class DipoleMomentPerMagneticMoment(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> DipoleMomentPerMagneticMoment[W, S]: ...
+
+class _DipoleMomentPerMagneticMomentConstant(
+    Constant[Div[DipoleMomentKind, MagneticMomentKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> DipoleMomentPerMagneticMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[DipoleMomentKind, MagneticMomentKind]]
+    ) -> DipoleMomentPerMagneticMoment[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _MagneticMomentConstant, /) -> _DipoleMomentConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[DipoleMomentKind, MagneticMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerMagneticMomentConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[DipoleMomentKind, MagneticMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _DipoleMomentPerMagneticMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[DipoleMomentKind, MagneticMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerMagneticMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMomentPerMagneticMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[DipoleMomentKind, MagneticMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _DipoleMomentPerMagneticMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[DipoleMomentKind, MagneticMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[DipoleMomentKind, MagneticMomentKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[DipoleMomentKind, MagneticMomentKind]], W, T]: ...
+    def _rmul_MagneticMoment_f[T: UnitSystem](
+        self, other: MagneticMoment[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rmul_MagneticMoment[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _cmul_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _DipoleMomentConstant: ...
+    def _rtruediv_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> MagneticMoment[float, T]: ...
+    def _rtruediv_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    def _ctruediv_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _MagneticMomentConstant: ...

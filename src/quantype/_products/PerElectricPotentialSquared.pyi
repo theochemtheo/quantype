@@ -11,8 +11,9 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ElectricPotentialKind, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -58,7 +59,8 @@ class PerElectricPotentialSquared(
     def __truediv__(
         self,
         other: PerElectricPotentialSquared[V, S]
-        | PerElectricPotentialSquared[float, S],
+        | PerElectricPotentialSquared[float, S]
+        | _PerElectricPotentialSquaredConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -202,3 +204,67 @@ class PerElectricPotentialSquared(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PerElectricPotentialSquared[W, S]: ...
+
+class _PerElectricPotentialSquaredConstant(
+    Constant[Pow[ElectricPotentialKind, Literal[-2]]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PerElectricPotentialSquared[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[ElectricPotentialKind, Literal[-2]]]
+    ) -> PerElectricPotentialSquared[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[ElectricPotentialKind, Literal[-2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerElectricPotentialSquaredConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[ElectricPotentialKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PerElectricPotentialSquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[ElectricPotentialKind, Literal[-2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerElectricPotentialSquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PerElectricPotentialSquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[ElectricPotentialKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerElectricPotentialSquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[ElectricPotentialKind, Literal[-2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[ElectricPotentialKind, Literal[-2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[ElectricPotentialKind, Literal[-2]]], W, T]: ...

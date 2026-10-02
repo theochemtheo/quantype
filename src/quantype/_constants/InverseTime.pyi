@@ -6,11 +6,44 @@
 # pyright: reportIncompatibleMethodOverride=false
 # pyright: reportPrivateUsage=false
 # ruff: noqa: N802
-from typing import Any, overload, override
+from typing import Any, Literal, overload, override
 
 import numpy as np
 
+from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Action import _ActionConstant
+from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Area import _AreaConstant
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.ElectricPotential import _ElectricPotentialConstant
+from quantype._constants.ElectronCount import _ElectronCountConstant
+from quantype._constants.ElectronDensity import _ElectronDensityConstant
+from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.EnergyDensity import _EnergyDensityConstant
+from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
+from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
+from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.Force import _ForceConstant
+from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.Length import _LengthConstant
+from quantype._constants.MagneticMoment import _MagneticMomentConstant
+from quantype._constants.Magnetization import _MagnetizationConstant
+from quantype._constants.Mass import _MassConstant
+from quantype._constants.MassDensity import _MassDensityConstant
+from quantype._constants.Momentum import _MomentumConstant
+from quantype._constants.ParticleDensity import _ParticleDensityConstant
+from quantype._constants.Pressure import _PressureConstant
+from quantype._constants.Temperature import _TemperatureConstant
+from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
+from quantype._constants.TemperatureRate import _TemperatureRateConstant
 from quantype._constants.Time import _TimeConstant
+from quantype._constants.Velocity import _VelocityConstant
+from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
     Acceleration,
     Action,
@@ -47,11 +80,139 @@ from quantype._generated import (
     Time,
     Velocity,
     Volume,
+    _CMulInverseTime,
+    _CTrueDivInverseTime,
     _RMulInverseTimeF,
     _RTrueDivInverseTimeF,
 )
+from quantype._products.AccelerationPerInverseTime import (
+    _AccelerationPerInverseTimeConstant,
+)
+from quantype._products.ActionPerInverseTime import _ActionPerInverseTimeConstant
+from quantype._products.AngleInverseTime import _AngleInverseTimeConstant
+from quantype._products.AnglePerInverseTime import _AnglePerInverseTimeConstant
+from quantype._products.AreaInverseTime import _AreaInverseTimeConstant
+from quantype._products.AreaPerInverseTime import _AreaPerInverseTimeConstant
+from quantype._products.AtomCountPerInverseTime import _AtomCountPerInverseTimeConstant
+from quantype._products.ChargePerInverseTime import _ChargePerInverseTimeConstant
+from quantype._products.DipoleMomentPerInverseTime import (
+    _DipoleMomentPerInverseTimeConstant,
+)
+from quantype._products.ElectricFieldPerInverseTime import (
+    _ElectricFieldPerInverseTimeConstant,
+)
+from quantype._products.ElectricPotentialPerInverseTime import (
+    _ElectricPotentialPerInverseTimeConstant,
+)
+from quantype._products.ElectronCountPerInverseTime import (
+    _ElectronCountPerInverseTimeConstant,
+)
+from quantype._products.ElectronDensityInverseTime import (
+    _ElectronDensityInverseTimeConstant,
+)
+from quantype._products.ElectronDensityPerInverseTime import (
+    _ElectronDensityPerInverseTimeConstant,
+)
+from quantype._products.EnergyDensityInverseTime import (
+    _EnergyDensityInverseTimeConstant,
+)
+from quantype._products.EnergyDensityPerInverseTime import (
+    _EnergyDensityPerInverseTimeConstant,
+)
+from quantype._products.EnergyInverseTime import _EnergyInverseTimeConstant
+from quantype._products.EnergyPerAtomInverseTime import (
+    _EnergyPerAtomInverseTimeConstant,
+)
+from quantype._products.EnergyPerAtomPerInverseTime import (
+    _EnergyPerAtomPerInverseTimeConstant,
+)
+from quantype._products.EnergyPerVolumeInverseTime import (
+    _EnergyPerVolumeInverseTimeConstant,
+)
+from quantype._products.EnergyPerVolumePerInverseTime import (
+    _EnergyPerVolumePerInverseTimeConstant,
+)
+from quantype._products.EntropyPerInverseTime import _EntropyPerInverseTimeConstant
+from quantype._products.ForceConstantInverseTime import (
+    _ForceConstantInverseTimeConstant,
+)
+from quantype._products.ForceConstantPerInverseTime import (
+    _ForceConstantPerInverseTimeConstant,
+)
+from quantype._products.ForceInverseTime import _ForceInverseTimeConstant
+from quantype._products.ForcePerInverseTime import _ForcePerInverseTimeConstant
+from quantype._products.FrequencyInverseTime import _FrequencyInverseTimeConstant
+from quantype._products.FrequencyPerInverseTime import _FrequencyPerInverseTimeConstant
+from quantype._products.InverseTimeAcceleration import _InverseTimeAccelerationConstant
+from quantype._products.InverseTimeAtomCount import _InverseTimeAtomCountConstant
+from quantype._products.InverseTimeCharge import _InverseTimeChargeConstant
+from quantype._products.InverseTimeCubed import _InverseTimeCubedConstant
+from quantype._products.InverseTimeDipoleMoment import _InverseTimeDipoleMomentConstant
+from quantype._products.InverseTimeElectricField import (
+    _InverseTimeElectricFieldConstant,
+)
+from quantype._products.InverseTimeElectricPotential import (
+    _InverseTimeElectricPotentialConstant,
+)
+from quantype._products.InverseTimeElectronCount import (
+    _InverseTimeElectronCountConstant,
+)
+from quantype._products.InverseTimeEntropy import _InverseTimeEntropyConstant
+from quantype._products.InverseTimeMass import _InverseTimeMassConstant
+from quantype._products.InverseTimeMassDensity import _InverseTimeMassDensityConstant
+from quantype._products.InverseTimeMomentum import _InverseTimeMomentumConstant
+from quantype._products.InverseTimeSquared import _InverseTimeSquaredConstant
+from quantype._products.LengthInverseTime import _LengthInverseTimeConstant
+from quantype._products.LengthPerInverseTime import _LengthPerInverseTimeConstant
+from quantype._products.MagneticMomentInverseTime import (
+    _MagneticMomentInverseTimeConstant,
+)
+from quantype._products.MagneticMomentPerInverseTime import (
+    _MagneticMomentPerInverseTimeConstant,
+)
+from quantype._products.MagnetizationInverseTime import (
+    _MagnetizationInverseTimeConstant,
+)
+from quantype._products.MagnetizationPerInverseTime import (
+    _MagnetizationPerInverseTimeConstant,
+)
+from quantype._products.MassDensityPerInverseTime import (
+    _MassDensityPerInverseTimeConstant,
+)
+from quantype._products.MassPerInverseTime import _MassPerInverseTimeConstant
+from quantype._products.MomentumPerInverseTime import _MomentumPerInverseTimeConstant
+from quantype._products.ParticleDensityInverseTime import (
+    _ParticleDensityInverseTimeConstant,
+)
+from quantype._products.ParticleDensityPerInverseTime import (
+    _ParticleDensityPerInverseTimeConstant,
+)
+from quantype._products.PerInverseTimeSquared import _PerInverseTimeSquaredConstant
+from quantype._products.PressureInverseTime import _PressureInverseTimeConstant
+from quantype._products.PressurePerInverseTime import _PressurePerInverseTimeConstant
+from quantype._products.TemperatureDifferenceInverseTime import (
+    _TemperatureDifferenceInverseTimeConstant,
+)
+from quantype._products.TemperatureDifferencePerInverseTime import (
+    _TemperatureDifferencePerInverseTimeConstant,
+)
+from quantype._products.TemperatureInverseTime import _TemperatureInverseTimeConstant
+from quantype._products.TemperaturePerInverseTime import (
+    _TemperaturePerInverseTimeConstant,
+)
+from quantype._products.TemperatureRateInverseTime import (
+    _TemperatureRateInverseTimeConstant,
+)
+from quantype._products.TemperatureRatePerInverseTime import (
+    _TemperatureRatePerInverseTimeConstant,
+)
+from quantype._products.TimePerInverseTime import _TimePerInverseTimeConstant
+from quantype._products.VelocityInverseTime import _VelocityInverseTimeConstant
+from quantype._products.VelocityPerInverseTime import _VelocityPerInverseTimeConstant
+from quantype._products.VolumeInverseTime import _VolumeInverseTimeConstant
+from quantype._products.VolumePerInverseTime import _VolumePerInverseTimeConstant
 from quantype.core import Constant, Quantity, Unit, _Operand
-from quantype.kinds import Div, InverseTimeKind, Mul
+from quantype.kinds import Div, InverseTimeKind, Mul, Pow
 from quantype.products import (
     AccelerationPerInverseTime,
     ActionPerInverseTime,
@@ -127,6 +288,8 @@ class _InverseTimeConstant(Constant[InverseTimeKind]):
     def to(self, unit: Unit[InverseTimeKind]) -> InverseTime[float]: ...
     @overload
     @override
+    def __mul__[R](self, other: _CMulInverseTime[R], /) -> R: ...
+    @overload
     def __mul__[L](
         self, other: Constant[L], /
     ) -> Constant[Mul[InverseTimeKind, L]]: ...
@@ -151,6 +314,8 @@ class _InverseTimeConstant(Constant[InverseTimeKind]):
     ) -> Quantity[Mul[L, InverseTimeKind], W, T]: ...
     @overload
     @override
+    def __truediv__[R](self, other: _CTrueDivInverseTime[R], /) -> R: ...
+    @overload
     def __truediv__[L](
         self, other: Constant[L], /
     ) -> Constant[Div[InverseTimeKind, L]]: ...
@@ -176,6 +341,17 @@ class _InverseTimeConstant(Constant[InverseTimeKind]):
     def __rtruediv__[L, W, T: UnitSystem](
         self, other: _Operand[L, W, T], /
     ) -> Quantity[Div[L, InverseTimeKind], W, T]: ...  # ty: ignore[invalid-method-override]
+    @overload
+    @override
+    def __pow__(self, exponent: Literal[-2], /) -> _PerInverseTimeSquaredConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[-1], /) -> _TimeConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[2], /) -> _InverseTimeSquaredConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[3], /) -> _InverseTimeCubedConstant: ...
+    @overload
+    def __pow__[N: int](self, exponent: N, /) -> Constant[Pow[InverseTimeKind, N]]: ...
     def _rmul_Dimensionless_f[T: UnitSystem](
         self, other: Dimensionless[float, T], /
     ) -> InverseTime[float, T]: ...
@@ -596,3 +772,191 @@ class _InverseTimeConstant(Constant[InverseTimeKind]):
     def _rtruediv_Action[W, T: UnitSystem](
         self, other: Action[W, T], /
     ) -> ActionPerInverseTime[W, T]: ...
+    def _cmul_Dimensionless(
+        self, other: _DimensionlessConstant, /
+    ) -> _InverseTimeConstant: ...
+    def _cmul_Length(self, other: _LengthConstant, /) -> _LengthInverseTimeConstant: ...
+    def _cmul_Area(self, other: _AreaConstant, /) -> _AreaInverseTimeConstant: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _VolumeInverseTimeConstant: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _DimensionlessConstant: ...
+    def _cmul_Velocity(
+        self, other: _VelocityConstant, /
+    ) -> _VelocityInverseTimeConstant: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _EnergyInverseTimeConstant: ...
+    def _cmul_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _EnergyPerAtomInverseTimeConstant: ...
+    def _cmul_Force(self, other: _ForceConstant, /) -> _ForceInverseTimeConstant: ...
+    def _cmul_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ForceConstantInverseTimeConstant: ...
+    def _cmul_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _PressureInverseTimeConstant: ...
+    def _cmul_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _EnergyDensityInverseTimeConstant: ...
+    def _cmul_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _EnergyPerVolumeInverseTimeConstant: ...
+    def _cmul_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _TemperatureInverseTimeConstant: ...
+    def _cmul_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _TemperatureDifferenceInverseTimeConstant: ...
+    def _cmul_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _TemperatureRateInverseTimeConstant: ...
+    def _cmul_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _MagneticMomentInverseTimeConstant: ...
+    def _cmul_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _MagnetizationInverseTimeConstant: ...
+    def _cmul_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _ParticleDensityInverseTimeConstant: ...
+    def _cmul_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ElectronDensityInverseTimeConstant: ...
+    def _cmul_Angle(self, other: _AngleConstant, /) -> _AngleInverseTimeConstant: ...
+    def _cmul_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _FrequencyInverseTimeConstant: ...
+    def _cmul_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _InverseTimeSquaredConstant: ...
+    def _cmul_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _InverseTimeAtomCountConstant: ...
+    def _cmul_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _InverseTimeElectronCountConstant: ...
+    def _cmul_Mass(self, other: _MassConstant, /) -> _InverseTimeMassConstant: ...
+    def _cmul_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _InverseTimeMassDensityConstant: ...
+    def _cmul_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _InverseTimeMomentumConstant: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _InverseTimeAccelerationConstant: ...
+    def _cmul_Charge(self, other: _ChargeConstant, /) -> _InverseTimeChargeConstant: ...
+    def _cmul_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _InverseTimeElectricPotentialConstant: ...
+    def _cmul_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _InverseTimeElectricFieldConstant: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _InverseTimeDipoleMomentConstant: ...
+    def _cmul_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _InverseTimeEntropyConstant: ...
+    def _cmul_Action(self, other: _ActionConstant, /) -> _EnergyConstant: ...
+    def _ctruediv_Dimensionless(
+        self, other: _DimensionlessConstant, /
+    ) -> _TimeConstant: ...
+    def _ctruediv_Length(
+        self, other: _LengthConstant, /
+    ) -> _LengthPerInverseTimeConstant: ...
+    def _ctruediv_Area(
+        self, other: _AreaConstant, /
+    ) -> _AreaPerInverseTimeConstant: ...
+    def _ctruediv_Volume(
+        self, other: _VolumeConstant, /
+    ) -> _VolumePerInverseTimeConstant: ...
+    def _ctruediv_Time(
+        self, other: _TimeConstant, /
+    ) -> _TimePerInverseTimeConstant: ...
+    def _ctruediv_Velocity(
+        self, other: _VelocityConstant, /
+    ) -> _VelocityPerInverseTimeConstant: ...
+    def _ctruediv_Energy(self, other: _EnergyConstant, /) -> _ActionConstant: ...
+    def _ctruediv_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _EnergyPerAtomPerInverseTimeConstant: ...
+    def _ctruediv_Force(
+        self, other: _ForceConstant, /
+    ) -> _ForcePerInverseTimeConstant: ...
+    def _ctruediv_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ForceConstantPerInverseTimeConstant: ...
+    def _ctruediv_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _PressurePerInverseTimeConstant: ...
+    def _ctruediv_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _EnergyDensityPerInverseTimeConstant: ...
+    def _ctruediv_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _EnergyPerVolumePerInverseTimeConstant: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _TemperaturePerInverseTimeConstant: ...
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _TemperatureDifferencePerInverseTimeConstant: ...
+    def _ctruediv_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _TemperatureRatePerInverseTimeConstant: ...
+    def _ctruediv_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _MagneticMomentPerInverseTimeConstant: ...
+    def _ctruediv_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _MagnetizationPerInverseTimeConstant: ...
+    def _ctruediv_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _ParticleDensityPerInverseTimeConstant: ...
+    def _ctruediv_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ElectronDensityPerInverseTimeConstant: ...
+    def _ctruediv_Angle(
+        self, other: _AngleConstant, /
+    ) -> _AnglePerInverseTimeConstant: ...
+    def _ctruediv_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _FrequencyPerInverseTimeConstant: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _DimensionlessConstant: ...
+    def _ctruediv_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _AtomCountPerInverseTimeConstant: ...
+    def _ctruediv_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _ElectronCountPerInverseTimeConstant: ...
+    def _ctruediv_Mass(
+        self, other: _MassConstant, /
+    ) -> _MassPerInverseTimeConstant: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _MassDensityPerInverseTimeConstant: ...
+    def _ctruediv_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _MomentumPerInverseTimeConstant: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _AccelerationPerInverseTimeConstant: ...
+    def _ctruediv_Charge(
+        self, other: _ChargeConstant, /
+    ) -> _ChargePerInverseTimeConstant: ...
+    def _ctruediv_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _ElectricPotentialPerInverseTimeConstant: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _ElectricFieldPerInverseTimeConstant: ...
+    def _ctruediv_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _DipoleMomentPerInverseTimeConstant: ...
+    def _ctruediv_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _EntropyPerInverseTimeConstant: ...
+    def _ctruediv_Action(
+        self, other: _ActionConstant, /
+    ) -> _ActionPerInverseTimeConstant: ...

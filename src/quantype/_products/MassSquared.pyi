@@ -11,9 +11,10 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Mass import _MassConstant
 from quantype._generated import Dimensionless, Mass
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MassKind, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -59,7 +60,7 @@ class MassSquared(Quantity[Pow[MassKind, Literal[2]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MassSquared[V, S] | MassSquared[float, S], /
+        self, other: MassSquared[V, S] | MassSquared[float, S] | _MassSquaredConstant, /
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MassSquared[V, S]: ...
@@ -174,3 +175,63 @@ class MassSquared(Quantity[Pow[MassKind, Literal[2]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassSquared[W, S]: ...
+
+class _MassSquaredConstant(Constant[Pow[MassKind, Literal[2]]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> MassSquared[float, T]: ...
+    @override
+    def to(self, unit: Unit[Pow[MassKind, Literal[2]]]) -> MassSquared[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[MassKind, Literal[2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassSquaredConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[MassKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _MassConstant, /) -> _MassConstant: ...
+    @overload
+    def __truediv__(self, other: _MassSquaredConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[MassKind, Literal[2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassSquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassSquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[MassKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassSquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[MassKind, Literal[2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[MassKind, Literal[2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[MassKind, Literal[2]]], W, T]: ...

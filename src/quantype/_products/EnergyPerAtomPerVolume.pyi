@@ -13,6 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.EnergyDensity import _EnergyDensityConstant
+from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
+from quantype._constants.Pressure import _PressureConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
     AtomCount,
@@ -22,7 +26,7 @@ from quantype._generated import (
     Pressure,
     Volume,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyPerAtomKind, Mul, VolumeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -92,7 +96,11 @@ class EnergyPerAtomPerVolume(Quantity[Div[EnergyPerAtomKind, VolumeKind], V, S])
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: EnergyPerAtomPerVolume[V, S] | EnergyPerAtomPerVolume[float, S], /
+        self,
+        other: EnergyPerAtomPerVolume[V, S]
+        | EnergyPerAtomPerVolume[float, S]
+        | _EnergyPerAtomPerVolumeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> EnergyPerAtomPerVolume[V, S]: ...
@@ -249,3 +257,109 @@ class EnergyPerAtomPerVolume(Quantity[Div[EnergyPerAtomKind, VolumeKind], V, S])
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerAtomPerVolume[W, S]: ...
+
+class _EnergyPerAtomPerVolumeConstant(Constant[Div[EnergyPerAtomKind, VolumeKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerAtomPerVolume[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[EnergyPerAtomKind, VolumeKind]]
+    ) -> EnergyPerAtomPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VolumeConstant, /) -> _EnergyPerAtomConstant: ...
+    @overload
+    def __mul__(self, other: _AtomCountConstant, /) -> _EnergyDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[EnergyPerAtomKind, VolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomPerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[EnergyPerAtomKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EnergyPerAtomPerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[EnergyPerAtomKind, VolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomPerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtomPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[EnergyPerAtomKind, VolumeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerAtomPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[EnergyPerAtomKind, VolumeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[EnergyPerAtomKind, VolumeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[EnergyPerAtomKind, VolumeKind]], W, T]: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> EnergyPerAtom[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _EnergyPerAtomConstant: ...
+    def _rmul_AtomCount_f[T: UnitSystem](
+        self, other: AtomCount[float, T], /
+    ) -> EnergyDensity[float, T]: ...
+    def _rmul_AtomCount[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    def _cmul_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _EnergyDensityConstant: ...
+    def _rtruediv_EnergyPerAtom_f[T: UnitSystem](
+        self, other: EnergyPerAtom[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_EnergyPerAtom[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _VolumeConstant: ...
+    def _rtruediv_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rtruediv_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> AtomCount[W, T]: ...
+    def _ctruediv_Pressure(self, other: _PressureConstant, /) -> _AtomCountConstant: ...

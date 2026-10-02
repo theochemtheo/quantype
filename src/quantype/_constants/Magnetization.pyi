@@ -6,10 +6,44 @@
 # pyright: reportIncompatibleMethodOverride=false
 # pyright: reportPrivateUsage=false
 # ruff: noqa: N802
-from typing import Any, overload, override
+from typing import Any, Literal, overload, override
 
 import numpy as np
 
+from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Action import _ActionConstant
+from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Area import _AreaConstant
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.ElectricPotential import _ElectricPotentialConstant
+from quantype._constants.ElectronCount import _ElectronCountConstant
+from quantype._constants.ElectronDensity import _ElectronDensityConstant
+from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.EnergyDensity import _EnergyDensityConstant
+from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
+from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
+from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.Force import _ForceConstant
+from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
+from quantype._constants.Length import _LengthConstant
+from quantype._constants.MagneticMoment import _MagneticMomentConstant
+from quantype._constants.Mass import _MassConstant
+from quantype._constants.MassDensity import _MassDensityConstant
+from quantype._constants.Momentum import _MomentumConstant
+from quantype._constants.ParticleDensity import _ParticleDensityConstant
+from quantype._constants.Pressure import _PressureConstant
+from quantype._constants.Temperature import _TemperatureConstant
+from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
+from quantype._constants.TemperatureRate import _TemperatureRateConstant
+from quantype._constants.Time import _TimeConstant
+from quantype._constants.Velocity import _VelocityConstant
+from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
     Acceleration,
     Action,
@@ -46,11 +80,157 @@ from quantype._generated import (
     Time,
     Velocity,
     Volume,
+    _CMulMagnetization,
+    _CTrueDivMagnetization,
     _RMulMagnetizationF,
     _RTrueDivMagnetizationF,
 )
+from quantype._products.AccelerationPerMagnetization import (
+    _AccelerationPerMagnetizationConstant,
+)
+from quantype._products.ActionPerMagnetization import _ActionPerMagnetizationConstant
+from quantype._products.AnglePerMagnetization import _AnglePerMagnetizationConstant
+from quantype._products.AreaMagnetization import _AreaMagnetizationConstant
+from quantype._products.AreaPerMagnetization import _AreaPerMagnetizationConstant
+from quantype._products.AtomCountPerMagnetization import (
+    _AtomCountPerMagnetizationConstant,
+)
+from quantype._products.ChargePerMagnetization import _ChargePerMagnetizationConstant
+from quantype._products.DipoleMomentPerMagnetization import (
+    _DipoleMomentPerMagnetizationConstant,
+)
+from quantype._products.ElectricFieldPerMagnetization import (
+    _ElectricFieldPerMagnetizationConstant,
+)
+from quantype._products.ElectricPotentialPerMagnetization import (
+    _ElectricPotentialPerMagnetizationConstant,
+)
+from quantype._products.ElectronCountPerMagnetization import (
+    _ElectronCountPerMagnetizationConstant,
+)
+from quantype._products.ElectronDensityPerMagnetization import (
+    _ElectronDensityPerMagnetizationConstant,
+)
+from quantype._products.EnergyDensityMagnetization import (
+    _EnergyDensityMagnetizationConstant,
+)
+from quantype._products.EnergyDensityPerMagnetization import (
+    _EnergyDensityPerMagnetizationConstant,
+)
+from quantype._products.EnergyMagnetization import _EnergyMagnetizationConstant
+from quantype._products.EnergyPerAtomMagnetization import (
+    _EnergyPerAtomMagnetizationConstant,
+)
+from quantype._products.EnergyPerAtomPerMagnetization import (
+    _EnergyPerAtomPerMagnetizationConstant,
+)
+from quantype._products.EnergyPerMagnetization import _EnergyPerMagnetizationConstant
+from quantype._products.EnergyPerVolumeMagnetization import (
+    _EnergyPerVolumeMagnetizationConstant,
+)
+from quantype._products.EnergyPerVolumePerMagnetization import (
+    _EnergyPerVolumePerMagnetizationConstant,
+)
+from quantype._products.EntropyPerMagnetization import _EntropyPerMagnetizationConstant
+from quantype._products.ForceConstantMagnetization import (
+    _ForceConstantMagnetizationConstant,
+)
+from quantype._products.ForceConstantPerMagnetization import (
+    _ForceConstantPerMagnetizationConstant,
+)
+from quantype._products.ForceMagnetization import _ForceMagnetizationConstant
+from quantype._products.ForcePerMagnetization import _ForcePerMagnetizationConstant
+from quantype._products.FrequencyPerMagnetization import (
+    _FrequencyPerMagnetizationConstant,
+)
+from quantype._products.InverseTimePerMagnetization import (
+    _InverseTimePerMagnetizationConstant,
+)
+from quantype._products.LengthMagnetization import _LengthMagnetizationConstant
+from quantype._products.LengthPerMagnetization import _LengthPerMagnetizationConstant
+from quantype._products.MagneticMomentMagnetization import (
+    _MagneticMomentMagnetizationConstant,
+)
+from quantype._products.MagnetizationAcceleration import (
+    _MagnetizationAccelerationConstant,
+)
+from quantype._products.MagnetizationAction import _MagnetizationActionConstant
+from quantype._products.MagnetizationAngle import _MagnetizationAngleConstant
+from quantype._products.MagnetizationAtomCount import _MagnetizationAtomCountConstant
+from quantype._products.MagnetizationCharge import _MagnetizationChargeConstant
+from quantype._products.MagnetizationCubed import _MagnetizationCubedConstant
+from quantype._products.MagnetizationDipoleMoment import (
+    _MagnetizationDipoleMomentConstant,
+)
+from quantype._products.MagnetizationElectricField import (
+    _MagnetizationElectricFieldConstant,
+)
+from quantype._products.MagnetizationElectricPotential import (
+    _MagnetizationElectricPotentialConstant,
+)
+from quantype._products.MagnetizationElectronCount import (
+    _MagnetizationElectronCountConstant,
+)
+from quantype._products.MagnetizationElectronDensity import (
+    _MagnetizationElectronDensityConstant,
+)
+from quantype._products.MagnetizationEntropy import _MagnetizationEntropyConstant
+from quantype._products.MagnetizationFrequency import _MagnetizationFrequencyConstant
+from quantype._products.MagnetizationInverseTime import (
+    _MagnetizationInverseTimeConstant,
+)
+from quantype._products.MagnetizationMass import _MagnetizationMassConstant
+from quantype._products.MagnetizationMassDensity import (
+    _MagnetizationMassDensityConstant,
+)
+from quantype._products.MagnetizationMomentum import _MagnetizationMomentumConstant
+from quantype._products.MagnetizationParticleDensity import (
+    _MagnetizationParticleDensityConstant,
+)
+from quantype._products.MagnetizationSquared import _MagnetizationSquaredConstant
+from quantype._products.MassDensityPerMagnetization import (
+    _MassDensityPerMagnetizationConstant,
+)
+from quantype._products.MassPerMagnetization import _MassPerMagnetizationConstant
+from quantype._products.MomentumPerMagnetization import (
+    _MomentumPerMagnetizationConstant,
+)
+from quantype._products.ParticleDensityPerMagnetization import (
+    _ParticleDensityPerMagnetizationConstant,
+)
+from quantype._products.PerMagnetization import _PerMagnetizationConstant
+from quantype._products.PerMagnetizationSquared import _PerMagnetizationSquaredConstant
+from quantype._products.PressureMagnetization import _PressureMagnetizationConstant
+from quantype._products.PressurePerMagnetization import (
+    _PressurePerMagnetizationConstant,
+)
+from quantype._products.TemperatureDifferenceMagnetization import (
+    _TemperatureDifferenceMagnetizationConstant,
+)
+from quantype._products.TemperatureDifferencePerMagnetization import (
+    _TemperatureDifferencePerMagnetizationConstant,
+)
+from quantype._products.TemperatureMagnetization import (
+    _TemperatureMagnetizationConstant,
+)
+from quantype._products.TemperaturePerMagnetization import (
+    _TemperaturePerMagnetizationConstant,
+)
+from quantype._products.TemperatureRateMagnetization import (
+    _TemperatureRateMagnetizationConstant,
+)
+from quantype._products.TemperatureRatePerMagnetization import (
+    _TemperatureRatePerMagnetizationConstant,
+)
+from quantype._products.TimeMagnetization import _TimeMagnetizationConstant
+from quantype._products.TimePerMagnetization import _TimePerMagnetizationConstant
+from quantype._products.VelocityMagnetization import _VelocityMagnetizationConstant
+from quantype._products.VelocityPerMagnetization import (
+    _VelocityPerMagnetizationConstant,
+)
+from quantype._products.VolumePerMagnetization import _VolumePerMagnetizationConstant
 from quantype.core import Constant, Quantity, Unit, _Operand
-from quantype.kinds import DimensionlessKind, Div, MagnetizationKind, Mul
+from quantype.kinds import Div, MagnetizationKind, Mul, Pow
 from quantype.products import (
     AccelerationPerMagnetization,
     ActionPerMagnetization,
@@ -128,6 +308,8 @@ class _MagnetizationConstant(Constant[MagnetizationKind]):
     def to(self, unit: Unit[MagnetizationKind]) -> Magnetization[float]: ...
     @overload
     @override
+    def __mul__[R](self, other: _CMulMagnetization[R], /) -> R: ...
+    @overload
     def __mul__[L](
         self, other: Constant[L], /
     ) -> Constant[Mul[MagnetizationKind, L]]: ...
@@ -152,6 +334,8 @@ class _MagnetizationConstant(Constant[MagnetizationKind]):
     ) -> Quantity[Mul[L, MagnetizationKind], W, T]: ...
     @overload
     @override
+    def __truediv__[R](self, other: _CTrueDivMagnetization[R], /) -> R: ...
+    @overload
     def __truediv__[L](
         self, other: Constant[L], /
     ) -> Constant[Div[MagnetizationKind, L]]: ...
@@ -169,13 +353,27 @@ class _MagnetizationConstant(Constant[MagnetizationKind]):
     ) -> Quantity[Div[MagnetizationKind, L], W, T]: ...
     @overload
     @override
+    # pyrefly: ignore[bad-override]
     def __rtruediv__(
         self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> Constant[Div[DimensionlessKind, MagnetizationKind]]: ...
+    ) -> _PerMagnetizationConstant: ...
     @overload
     def __rtruediv__[L, W, T: UnitSystem](
         self, other: _Operand[L, W, T], /
-    ) -> Quantity[Div[L, MagnetizationKind], W, T]: ...
+    ) -> Quantity[Div[L, MagnetizationKind], W, T]: ...  # ty: ignore[invalid-method-override]
+    @overload
+    @override
+    def __pow__(self, exponent: Literal[-2], /) -> _PerMagnetizationSquaredConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[-1], /) -> _PerMagnetizationConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[2], /) -> _MagnetizationSquaredConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[3], /) -> _MagnetizationCubedConstant: ...
+    @overload
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Constant[Pow[MagnetizationKind, N]]: ...
     def _rmul_Dimensionless_f[T: UnitSystem](
         self, other: Dimensionless[float, T], /
     ) -> Magnetization[float, T]: ...
@@ -596,3 +794,201 @@ class _MagnetizationConstant(Constant[MagnetizationKind]):
     def _rtruediv_Action[W, T: UnitSystem](
         self, other: Action[W, T], /
     ) -> ActionPerMagnetization[W, T]: ...
+    def _cmul_Dimensionless(
+        self, other: _DimensionlessConstant, /
+    ) -> _MagnetizationConstant: ...
+    def _cmul_Length(
+        self, other: _LengthConstant, /
+    ) -> _LengthMagnetizationConstant: ...
+    def _cmul_Area(self, other: _AreaConstant, /) -> _AreaMagnetizationConstant: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _MagneticMomentConstant: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _TimeMagnetizationConstant: ...
+    def _cmul_Velocity(
+        self, other: _VelocityConstant, /
+    ) -> _VelocityMagnetizationConstant: ...
+    def _cmul_Energy(
+        self, other: _EnergyConstant, /
+    ) -> _EnergyMagnetizationConstant: ...
+    def _cmul_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _EnergyPerAtomMagnetizationConstant: ...
+    def _cmul_Force(self, other: _ForceConstant, /) -> _ForceMagnetizationConstant: ...
+    def _cmul_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ForceConstantMagnetizationConstant: ...
+    def _cmul_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _PressureMagnetizationConstant: ...
+    def _cmul_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _EnergyDensityMagnetizationConstant: ...
+    def _cmul_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _EnergyPerVolumeMagnetizationConstant: ...
+    def _cmul_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _TemperatureMagnetizationConstant: ...
+    def _cmul_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _TemperatureDifferenceMagnetizationConstant: ...
+    def _cmul_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _TemperatureRateMagnetizationConstant: ...
+    def _cmul_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _MagneticMomentMagnetizationConstant: ...
+    def _cmul_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _MagnetizationSquaredConstant: ...
+    def _cmul_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _MagnetizationParticleDensityConstant: ...
+    def _cmul_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _MagnetizationElectronDensityConstant: ...
+    def _cmul_Angle(self, other: _AngleConstant, /) -> _MagnetizationAngleConstant: ...
+    def _cmul_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _MagnetizationFrequencyConstant: ...
+    def _cmul_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _MagnetizationInverseTimeConstant: ...
+    def _cmul_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _MagnetizationAtomCountConstant: ...
+    def _cmul_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _MagnetizationElectronCountConstant: ...
+    def _cmul_Mass(self, other: _MassConstant, /) -> _MagnetizationMassConstant: ...
+    def _cmul_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _MagnetizationMassDensityConstant: ...
+    def _cmul_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _MagnetizationMomentumConstant: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _MagnetizationAccelerationConstant: ...
+    def _cmul_Charge(
+        self, other: _ChargeConstant, /
+    ) -> _MagnetizationChargeConstant: ...
+    def _cmul_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _MagnetizationElectricPotentialConstant: ...
+    def _cmul_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _MagnetizationElectricFieldConstant: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _MagnetizationDipoleMomentConstant: ...
+    def _cmul_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _MagnetizationEntropyConstant: ...
+    def _cmul_Action(
+        self, other: _ActionConstant, /
+    ) -> _MagnetizationActionConstant: ...
+    def _ctruediv_Dimensionless(
+        self, other: _DimensionlessConstant, /
+    ) -> _PerMagnetizationConstant: ...
+    def _ctruediv_Length(
+        self, other: _LengthConstant, /
+    ) -> _LengthPerMagnetizationConstant: ...
+    def _ctruediv_Area(
+        self, other: _AreaConstant, /
+    ) -> _AreaPerMagnetizationConstant: ...
+    def _ctruediv_Volume(
+        self, other: _VolumeConstant, /
+    ) -> _VolumePerMagnetizationConstant: ...
+    def _ctruediv_Time(
+        self, other: _TimeConstant, /
+    ) -> _TimePerMagnetizationConstant: ...
+    def _ctruediv_Velocity(
+        self, other: _VelocityConstant, /
+    ) -> _VelocityPerMagnetizationConstant: ...
+    def _ctruediv_Energy(
+        self, other: _EnergyConstant, /
+    ) -> _EnergyPerMagnetizationConstant: ...
+    def _ctruediv_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _EnergyPerAtomPerMagnetizationConstant: ...
+    def _ctruediv_Force(
+        self, other: _ForceConstant, /
+    ) -> _ForcePerMagnetizationConstant: ...
+    def _ctruediv_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ForceConstantPerMagnetizationConstant: ...
+    def _ctruediv_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _PressurePerMagnetizationConstant: ...
+    def _ctruediv_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _EnergyDensityPerMagnetizationConstant: ...
+    def _ctruediv_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _EnergyPerVolumePerMagnetizationConstant: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _TemperaturePerMagnetizationConstant: ...
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _TemperatureDifferencePerMagnetizationConstant: ...
+    def _ctruediv_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _TemperatureRatePerMagnetizationConstant: ...
+    def _ctruediv_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _VolumeConstant: ...
+    def _ctruediv_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _DimensionlessConstant: ...
+    def _ctruediv_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _ParticleDensityPerMagnetizationConstant: ...
+    def _ctruediv_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ElectronDensityPerMagnetizationConstant: ...
+    def _ctruediv_Angle(
+        self, other: _AngleConstant, /
+    ) -> _AnglePerMagnetizationConstant: ...
+    def _ctruediv_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _FrequencyPerMagnetizationConstant: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _InverseTimePerMagnetizationConstant: ...
+    def _ctruediv_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _AtomCountPerMagnetizationConstant: ...
+    def _ctruediv_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _ElectronCountPerMagnetizationConstant: ...
+    def _ctruediv_Mass(
+        self, other: _MassConstant, /
+    ) -> _MassPerMagnetizationConstant: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _MassDensityPerMagnetizationConstant: ...
+    def _ctruediv_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _MomentumPerMagnetizationConstant: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _AccelerationPerMagnetizationConstant: ...
+    def _ctruediv_Charge(
+        self, other: _ChargeConstant, /
+    ) -> _ChargePerMagnetizationConstant: ...
+    def _ctruediv_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _ElectricPotentialPerMagnetizationConstant: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _ElectricFieldPerMagnetizationConstant: ...
+    def _ctruediv_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _DipoleMomentPerMagnetizationConstant: ...
+    def _ctruediv_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _EntropyPerMagnetizationConstant: ...
+    def _ctruediv_Action(
+        self, other: _ActionConstant, /
+    ) -> _ActionPerMagnetizationConstant: ...

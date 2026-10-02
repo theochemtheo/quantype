@@ -21,6 +21,7 @@ from quantype._internal._products import class_for
 from quantype._internal._semantics import (
     DIMENSIONLESS_KINDS,
     KINDS,
+    Expression,
     Kind,
     Semantic,
     addition,
@@ -1042,8 +1043,13 @@ _CONSTANT_CLASSES: dict[Semantic, type[Constant[Any]]] = {}
 
 
 def _constant(name: str, semantic: Semantic, reference: float) -> Constant[Any]:
-    """A constant of its kind's generated class, or the structural base class."""
-    return _CONSTANT_CLASSES.get(semantic, Constant)(name, semantic, reference)
+    """A constant of its kind's or product's class, or the structural base class."""
+    cls = _CONSTANT_CLASSES.get(semantic)
+    if cls is None and isinstance(semantic, Expression):
+        from quantype._internal._products import constant_class_for
+
+        cls = cast("type[Constant[Any]] | None", constant_class_for(semantic))
+    return (cls or Constant)(name, semantic, reference)
 
 
 def _parse(

@@ -11,8 +11,9 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, Mul, ParticleDensityKind, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -55,7 +56,9 @@ class PerParticleDensitySquared(Quantity[Pow[ParticleDensityKind, Literal[-2]], 
     @overload
     def __truediv__(
         self,
-        other: PerParticleDensitySquared[V, S] | PerParticleDensitySquared[float, S],
+        other: PerParticleDensitySquared[V, S]
+        | PerParticleDensitySquared[float, S]
+        | _PerParticleDensitySquaredConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -195,3 +198,67 @@ class PerParticleDensitySquared(Quantity[Pow[ParticleDensityKind, Literal[-2]], 
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PerParticleDensitySquared[W, S]: ...
+
+class _PerParticleDensitySquaredConstant(
+    Constant[Pow[ParticleDensityKind, Literal[-2]]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PerParticleDensitySquared[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[ParticleDensityKind, Literal[-2]]]
+    ) -> PerParticleDensitySquared[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[ParticleDensityKind, Literal[-2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerParticleDensitySquaredConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[ParticleDensityKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PerParticleDensitySquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[ParticleDensityKind, Literal[-2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerParticleDensitySquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PerParticleDensitySquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[ParticleDensityKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerParticleDensitySquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[ParticleDensityKind, Literal[-2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[ParticleDensityKind, Literal[-2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[ParticleDensityKind, Literal[-2]]], W, T]: ...

@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.MassDensity import _MassDensityConstant
 from quantype._generated import Dimensionless, ElectricPotential, MassDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -87,7 +89,8 @@ class ElectricPotentialPerMassDensity(
     def __truediv__(
         self,
         other: ElectricPotentialPerMassDensity[V, S]
-        | ElectricPotentialPerMassDensity[float, S],
+        | ElectricPotentialPerMassDensity[float, S]
+        | _ElectricPotentialPerMassDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -258,3 +261,93 @@ class ElectricPotentialPerMassDensity(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectricPotentialPerMassDensity[W, S]: ...
+
+class _ElectricPotentialPerMassDensityConstant(
+    Constant[Div[ElectricPotentialKind, MassDensityKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectricPotentialPerMassDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ElectricPotentialKind, MassDensityKind]]
+    ) -> ElectricPotentialPerMassDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _MassDensityConstant, /) -> _ElectricPotentialConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ElectricPotentialKind, MassDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialPerMassDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, MassDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectricPotentialPerMassDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ElectricPotentialKind, MassDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialPerMassDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotentialPerMassDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ElectricPotentialKind, MassDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialPerMassDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ElectricPotentialKind, MassDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[ElectricPotentialKind, MassDensityKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ElectricPotentialKind, MassDensityKind]], W, T]: ...
+    def _rmul_MassDensity_f[T: UnitSystem](
+        self, other: MassDensity[float, T], /
+    ) -> ElectricPotential[float, T]: ...
+    def _rmul_MassDensity[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    def _cmul_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    def _rtruediv_ElectricPotential_f[T: UnitSystem](
+        self, other: ElectricPotential[float, T], /
+    ) -> MassDensity[float, T]: ...
+    def _rtruediv_ElectricPotential[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> MassDensity[W, T]: ...
+    def _ctruediv_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _MassDensityConstant: ...

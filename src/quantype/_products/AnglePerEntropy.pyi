@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Entropy import _EntropyConstant
 from quantype._generated import Angle, Dimensionless, Entropy
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, EntropyKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class AnglePerEntropy(Quantity[Div[AngleKind, EntropyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AnglePerEntropy[V, S] | AnglePerEntropy[float, S], /
+        self,
+        other: AnglePerEntropy[V, S]
+        | AnglePerEntropy[float, S]
+        | _AnglePerEntropyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AnglePerEntropy[V, S]: ...
@@ -201,3 +207,81 @@ class AnglePerEntropy(Quantity[Div[AngleKind, EntropyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AnglePerEntropy[W, S]: ...
+
+class _AnglePerEntropyConstant(Constant[Div[AngleKind, EntropyKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AnglePerEntropy[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[AngleKind, EntropyKind]]) -> AnglePerEntropy[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EntropyConstant, /) -> _AngleConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AngleKind, EntropyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerEntropyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Entropy[W, T], /) -> Angle[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AngleKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AnglePerEntropyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AngleKind, EntropyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerEntropyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AnglePerEntropy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AngleKind, EntropyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerEntropyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AngleKind, EntropyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AngleKind, EntropyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AngleKind, EntropyKind]], W, T]: ...
+    def _rmul_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rmul_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> Angle[W, T]: ...
+    def _cmul_Entropy(self, other: _EntropyConstant, /) -> _AngleConstant: ...
+    def _rtruediv_Angle_f[T: UnitSystem](
+        self, other: Angle[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rtruediv_Angle[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _ctruediv_Angle(self, other: _AngleConstant, /) -> _EntropyConstant: ...

@@ -2456,6 +2456,12 @@ class _RTrueDivDimensionlessF[T: UnitSystem, R](Protocol):
 class _RTrueDivDimensionless[L, R](Protocol):
     def _rtruediv_Dimensionless(self, other: L, /) -> R: ...
 
+class _CMulDimensionless[R](Protocol):  # noqa: PYI046
+    def _cmul_Dimensionless(self, other: _DimensionlessConstant, /) -> R: ...
+
+class _CTrueDivDimensionless[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Dimensionless(self, other: _DimensionlessConstant, /) -> R: ...
+
 class _RMulLengthF[T: UnitSystem, R](Protocol):
     def _rmul_Length_f(self, other: Length[float, T], /) -> R: ...
 
@@ -2467,6 +2473,12 @@ class _RTrueDivLengthF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivLength[L, R](Protocol):
     def _rtruediv_Length(self, other: L, /) -> R: ...
+
+class _CMulLength[R](Protocol):  # noqa: PYI046
+    def _cmul_Length(self, other: _LengthConstant, /) -> R: ...
+
+class _CTrueDivLength[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Length(self, other: _LengthConstant, /) -> R: ...
 
 class _RMulAreaF[T: UnitSystem, R](Protocol):
     def _rmul_Area_f(self, other: Area[float, T], /) -> R: ...
@@ -2480,6 +2492,12 @@ class _RTrueDivAreaF[T: UnitSystem, R](Protocol):
 class _RTrueDivArea[L, R](Protocol):
     def _rtruediv_Area(self, other: L, /) -> R: ...
 
+class _CMulArea[R](Protocol):  # noqa: PYI046
+    def _cmul_Area(self, other: _AreaConstant, /) -> R: ...
+
+class _CTrueDivArea[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Area(self, other: _AreaConstant, /) -> R: ...
+
 class _RMulVolumeF[T: UnitSystem, R](Protocol):
     def _rmul_Volume_f(self, other: Volume[float, T], /) -> R: ...
 
@@ -2491,6 +2509,12 @@ class _RTrueDivVolumeF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivVolume[L, R](Protocol):
     def _rtruediv_Volume(self, other: L, /) -> R: ...
+
+class _CMulVolume[R](Protocol):  # noqa: PYI046
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> R: ...
+
+class _CTrueDivVolume[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Volume(self, other: _VolumeConstant, /) -> R: ...
 
 class _RMulTimeF[T: UnitSystem, R](Protocol):
     def _rmul_Time_f(self, other: Time[float, T], /) -> R: ...
@@ -2504,6 +2528,12 @@ class _RTrueDivTimeF[T: UnitSystem, R](Protocol):
 class _RTrueDivTime[L, R](Protocol):
     def _rtruediv_Time(self, other: L, /) -> R: ...
 
+class _CMulTime[R](Protocol):  # noqa: PYI046
+    def _cmul_Time(self, other: _TimeConstant, /) -> R: ...
+
+class _CTrueDivTime[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Time(self, other: _TimeConstant, /) -> R: ...
+
 class _RMulVelocityF[T: UnitSystem, R](Protocol):
     def _rmul_Velocity_f(self, other: Velocity[float, T], /) -> R: ...
 
@@ -2515,6 +2545,12 @@ class _RTrueDivVelocityF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivVelocity[L, R](Protocol):
     def _rtruediv_Velocity(self, other: L, /) -> R: ...
+
+class _CMulVelocity[R](Protocol):  # noqa: PYI046
+    def _cmul_Velocity(self, other: _VelocityConstant, /) -> R: ...
+
+class _CTrueDivVelocity[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Velocity(self, other: _VelocityConstant, /) -> R: ...
 
 class _RMulEnergyF[T: UnitSystem, R](Protocol):
     def _rmul_Energy_f(self, other: Energy[float, T], /) -> R: ...
@@ -2528,6 +2564,12 @@ class _RTrueDivEnergyF[T: UnitSystem, R](Protocol):
 class _RTrueDivEnergy[L, R](Protocol):
     def _rtruediv_Energy(self, other: L, /) -> R: ...
 
+class _CMulEnergy[R](Protocol):  # noqa: PYI046
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> R: ...
+
+class _CTrueDivEnergy[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Energy(self, other: _EnergyConstant, /) -> R: ...
+
 class _RMulEnergyPerAtomF[T: UnitSystem, R](Protocol):
     def _rmul_EnergyPerAtom_f(self, other: EnergyPerAtom[float, T], /) -> R: ...
 
@@ -2539,6 +2581,12 @@ class _RTrueDivEnergyPerAtomF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivEnergyPerAtom[L, R](Protocol):
     def _rtruediv_EnergyPerAtom(self, other: L, /) -> R: ...
+
+class _CMulEnergyPerAtom[R](Protocol):  # noqa: PYI046
+    def _cmul_EnergyPerAtom(self, other: _EnergyPerAtomConstant, /) -> R: ...
+
+class _CTrueDivEnergyPerAtom[R](Protocol):  # noqa: PYI046
+    def _ctruediv_EnergyPerAtom(self, other: _EnergyPerAtomConstant, /) -> R: ...
 
 class _RMulForceF[T: UnitSystem, R](Protocol):
     def _rmul_Force_f(self, other: Force[float, T], /) -> R: ...
@@ -2552,6 +2600,12 @@ class _RTrueDivForceF[T: UnitSystem, R](Protocol):
 class _RTrueDivForce[L, R](Protocol):
     def _rtruediv_Force(self, other: L, /) -> R: ...
 
+class _CMulForce[R](Protocol):  # noqa: PYI046
+    def _cmul_Force(self, other: _ForceConstant, /) -> R: ...
+
+class _CTrueDivForce[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Force(self, other: _ForceConstant, /) -> R: ...
+
 class _RMulForceConstantF[T: UnitSystem, R](Protocol):
     def _rmul_ForceConstant_f(self, other: ForceConstant[float, T], /) -> R: ...
 
@@ -2563,6 +2617,12 @@ class _RTrueDivForceConstantF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivForceConstant[L, R](Protocol):
     def _rtruediv_ForceConstant(self, other: L, /) -> R: ...
+
+class _CMulForceConstant[R](Protocol):  # noqa: PYI046
+    def _cmul_ForceConstant(self, other: _ForceConstantConstant, /) -> R: ...
+
+class _CTrueDivForceConstant[R](Protocol):  # noqa: PYI046
+    def _ctruediv_ForceConstant(self, other: _ForceConstantConstant, /) -> R: ...
 
 class _RMulPressureF[T: UnitSystem, R](Protocol):
     def _rmul_Pressure_f(self, other: Pressure[float, T], /) -> R: ...
@@ -2576,6 +2636,12 @@ class _RTrueDivPressureF[T: UnitSystem, R](Protocol):
 class _RTrueDivPressure[L, R](Protocol):
     def _rtruediv_Pressure(self, other: L, /) -> R: ...
 
+class _CMulPressure[R](Protocol):  # noqa: PYI046
+    def _cmul_Pressure(self, other: _PressureConstant, /) -> R: ...
+
+class _CTrueDivPressure[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Pressure(self, other: _PressureConstant, /) -> R: ...
+
 class _RMulEnergyDensityF[T: UnitSystem, R](Protocol):
     def _rmul_EnergyDensity_f(self, other: EnergyDensity[float, T], /) -> R: ...
 
@@ -2587,6 +2653,12 @@ class _RTrueDivEnergyDensityF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivEnergyDensity[L, R](Protocol):
     def _rtruediv_EnergyDensity(self, other: L, /) -> R: ...
+
+class _CMulEnergyDensity[R](Protocol):  # noqa: PYI046
+    def _cmul_EnergyDensity(self, other: _EnergyDensityConstant, /) -> R: ...
+
+class _CTrueDivEnergyDensity[R](Protocol):  # noqa: PYI046
+    def _ctruediv_EnergyDensity(self, other: _EnergyDensityConstant, /) -> R: ...
 
 class _RMulEnergyPerVolumeF[T: UnitSystem, R](Protocol):
     def _rmul_EnergyPerVolume_f(self, other: EnergyPerVolume[float, T], /) -> R: ...
@@ -2600,6 +2672,12 @@ class _RTrueDivEnergyPerVolumeF[T: UnitSystem, R](Protocol):
 class _RTrueDivEnergyPerVolume[L, R](Protocol):
     def _rtruediv_EnergyPerVolume(self, other: L, /) -> R: ...
 
+class _CMulEnergyPerVolume[R](Protocol):  # noqa: PYI046
+    def _cmul_EnergyPerVolume(self, other: _EnergyPerVolumeConstant, /) -> R: ...
+
+class _CTrueDivEnergyPerVolume[R](Protocol):  # noqa: PYI046
+    def _ctruediv_EnergyPerVolume(self, other: _EnergyPerVolumeConstant, /) -> R: ...
+
 class _RMulTemperatureF[T: UnitSystem, R](Protocol):
     def _rmul_Temperature_f(self, other: Temperature[float, T], /) -> R: ...
 
@@ -2611,6 +2689,12 @@ class _RTrueDivTemperatureF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivTemperature[L, R](Protocol):
     def _rtruediv_Temperature(self, other: L, /) -> R: ...
+
+class _CMulTemperature[R](Protocol):  # noqa: PYI046
+    def _cmul_Temperature(self, other: _TemperatureConstant, /) -> R: ...
+
+class _CTrueDivTemperature[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Temperature(self, other: _TemperatureConstant, /) -> R: ...
 
 class _RMulTemperatureDifferenceF[T: UnitSystem, R](Protocol):
     def _rmul_TemperatureDifference_f(
@@ -2628,6 +2712,16 @@ class _RTrueDivTemperatureDifferenceF[T: UnitSystem, R](Protocol):
 class _RTrueDivTemperatureDifference[L, R](Protocol):
     def _rtruediv_TemperatureDifference(self, other: L, /) -> R: ...
 
+class _CMulTemperatureDifference[R](Protocol):  # noqa: PYI046
+    def _cmul_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> R: ...
+
+class _CTrueDivTemperatureDifference[R](Protocol):  # noqa: PYI046
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> R: ...
+
 class _RMulTemperatureRateF[T: UnitSystem, R](Protocol):
     def _rmul_TemperatureRate_f(self, other: TemperatureRate[float, T], /) -> R: ...
 
@@ -2639,6 +2733,12 @@ class _RTrueDivTemperatureRateF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivTemperatureRate[L, R](Protocol):
     def _rtruediv_TemperatureRate(self, other: L, /) -> R: ...
+
+class _CMulTemperatureRate[R](Protocol):  # noqa: PYI046
+    def _cmul_TemperatureRate(self, other: _TemperatureRateConstant, /) -> R: ...
+
+class _CTrueDivTemperatureRate[R](Protocol):  # noqa: PYI046
+    def _ctruediv_TemperatureRate(self, other: _TemperatureRateConstant, /) -> R: ...
 
 class _RMulMagneticMomentF[T: UnitSystem, R](Protocol):
     def _rmul_MagneticMoment_f(self, other: MagneticMoment[float, T], /) -> R: ...
@@ -2652,6 +2752,12 @@ class _RTrueDivMagneticMomentF[T: UnitSystem, R](Protocol):
 class _RTrueDivMagneticMoment[L, R](Protocol):
     def _rtruediv_MagneticMoment(self, other: L, /) -> R: ...
 
+class _CMulMagneticMoment[R](Protocol):  # noqa: PYI046
+    def _cmul_MagneticMoment(self, other: _MagneticMomentConstant, /) -> R: ...
+
+class _CTrueDivMagneticMoment[R](Protocol):  # noqa: PYI046
+    def _ctruediv_MagneticMoment(self, other: _MagneticMomentConstant, /) -> R: ...
+
 class _RMulMagnetizationF[T: UnitSystem, R](Protocol):
     def _rmul_Magnetization_f(self, other: Magnetization[float, T], /) -> R: ...
 
@@ -2663,6 +2769,12 @@ class _RTrueDivMagnetizationF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivMagnetization[L, R](Protocol):
     def _rtruediv_Magnetization(self, other: L, /) -> R: ...
+
+class _CMulMagnetization[R](Protocol):  # noqa: PYI046
+    def _cmul_Magnetization(self, other: _MagnetizationConstant, /) -> R: ...
+
+class _CTrueDivMagnetization[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Magnetization(self, other: _MagnetizationConstant, /) -> R: ...
 
 class _RMulParticleDensityF[T: UnitSystem, R](Protocol):
     def _rmul_ParticleDensity_f(self, other: ParticleDensity[float, T], /) -> R: ...
@@ -2676,6 +2788,12 @@ class _RTrueDivParticleDensityF[T: UnitSystem, R](Protocol):
 class _RTrueDivParticleDensity[L, R](Protocol):
     def _rtruediv_ParticleDensity(self, other: L, /) -> R: ...
 
+class _CMulParticleDensity[R](Protocol):  # noqa: PYI046
+    def _cmul_ParticleDensity(self, other: _ParticleDensityConstant, /) -> R: ...
+
+class _CTrueDivParticleDensity[R](Protocol):  # noqa: PYI046
+    def _ctruediv_ParticleDensity(self, other: _ParticleDensityConstant, /) -> R: ...
+
 class _RMulElectronDensityF[T: UnitSystem, R](Protocol):
     def _rmul_ElectronDensity_f(self, other: ElectronDensity[float, T], /) -> R: ...
 
@@ -2687,6 +2805,12 @@ class _RTrueDivElectronDensityF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivElectronDensity[L, R](Protocol):
     def _rtruediv_ElectronDensity(self, other: L, /) -> R: ...
+
+class _CMulElectronDensity[R](Protocol):  # noqa: PYI046
+    def _cmul_ElectronDensity(self, other: _ElectronDensityConstant, /) -> R: ...
+
+class _CTrueDivElectronDensity[R](Protocol):  # noqa: PYI046
+    def _ctruediv_ElectronDensity(self, other: _ElectronDensityConstant, /) -> R: ...
 
 class _RMulAngleF[T: UnitSystem, R](Protocol):
     def _rmul_Angle_f(self, other: Angle[float, T], /) -> R: ...
@@ -2700,6 +2824,12 @@ class _RTrueDivAngleF[T: UnitSystem, R](Protocol):
 class _RTrueDivAngle[L, R](Protocol):
     def _rtruediv_Angle(self, other: L, /) -> R: ...
 
+class _CMulAngle[R](Protocol):  # noqa: PYI046
+    def _cmul_Angle(self, other: _AngleConstant, /) -> R: ...
+
+class _CTrueDivAngle[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Angle(self, other: _AngleConstant, /) -> R: ...
+
 class _RMulFrequencyF[T: UnitSystem, R](Protocol):
     def _rmul_Frequency_f(self, other: Frequency[float, T], /) -> R: ...
 
@@ -2711,6 +2841,12 @@ class _RTrueDivFrequencyF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivFrequency[L, R](Protocol):
     def _rtruediv_Frequency(self, other: L, /) -> R: ...
+
+class _CMulFrequency[R](Protocol):  # noqa: PYI046
+    def _cmul_Frequency(self, other: _FrequencyConstant, /) -> R: ...
+
+class _CTrueDivFrequency[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Frequency(self, other: _FrequencyConstant, /) -> R: ...
 
 class _RMulInverseTimeF[T: UnitSystem, R](Protocol):
     def _rmul_InverseTime_f(self, other: InverseTime[float, T], /) -> R: ...
@@ -2724,6 +2860,12 @@ class _RTrueDivInverseTimeF[T: UnitSystem, R](Protocol):
 class _RTrueDivInverseTime[L, R](Protocol):
     def _rtruediv_InverseTime(self, other: L, /) -> R: ...
 
+class _CMulInverseTime[R](Protocol):  # noqa: PYI046
+    def _cmul_InverseTime(self, other: _InverseTimeConstant, /) -> R: ...
+
+class _CTrueDivInverseTime[R](Protocol):  # noqa: PYI046
+    def _ctruediv_InverseTime(self, other: _InverseTimeConstant, /) -> R: ...
+
 class _RMulAtomCountF[T: UnitSystem, R](Protocol):
     def _rmul_AtomCount_f(self, other: AtomCount[float, T], /) -> R: ...
 
@@ -2735,6 +2877,12 @@ class _RTrueDivAtomCountF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivAtomCount[L, R](Protocol):
     def _rtruediv_AtomCount(self, other: L, /) -> R: ...
+
+class _CMulAtomCount[R](Protocol):  # noqa: PYI046
+    def _cmul_AtomCount(self, other: _AtomCountConstant, /) -> R: ...
+
+class _CTrueDivAtomCount[R](Protocol):  # noqa: PYI046
+    def _ctruediv_AtomCount(self, other: _AtomCountConstant, /) -> R: ...
 
 class _RMulElectronCountF[T: UnitSystem, R](Protocol):
     def _rmul_ElectronCount_f(self, other: ElectronCount[float, T], /) -> R: ...
@@ -2748,6 +2896,12 @@ class _RTrueDivElectronCountF[T: UnitSystem, R](Protocol):
 class _RTrueDivElectronCount[L, R](Protocol):
     def _rtruediv_ElectronCount(self, other: L, /) -> R: ...
 
+class _CMulElectronCount[R](Protocol):  # noqa: PYI046
+    def _cmul_ElectronCount(self, other: _ElectronCountConstant, /) -> R: ...
+
+class _CTrueDivElectronCount[R](Protocol):  # noqa: PYI046
+    def _ctruediv_ElectronCount(self, other: _ElectronCountConstant, /) -> R: ...
+
 class _RMulMassF[T: UnitSystem, R](Protocol):
     def _rmul_Mass_f(self, other: Mass[float, T], /) -> R: ...
 
@@ -2759,6 +2913,12 @@ class _RTrueDivMassF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivMass[L, R](Protocol):
     def _rtruediv_Mass(self, other: L, /) -> R: ...
+
+class _CMulMass[R](Protocol):  # noqa: PYI046
+    def _cmul_Mass(self, other: _MassConstant, /) -> R: ...
+
+class _CTrueDivMass[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Mass(self, other: _MassConstant, /) -> R: ...
 
 class _RMulMassDensityF[T: UnitSystem, R](Protocol):
     def _rmul_MassDensity_f(self, other: MassDensity[float, T], /) -> R: ...
@@ -2772,6 +2932,12 @@ class _RTrueDivMassDensityF[T: UnitSystem, R](Protocol):
 class _RTrueDivMassDensity[L, R](Protocol):
     def _rtruediv_MassDensity(self, other: L, /) -> R: ...
 
+class _CMulMassDensity[R](Protocol):  # noqa: PYI046
+    def _cmul_MassDensity(self, other: _MassDensityConstant, /) -> R: ...
+
+class _CTrueDivMassDensity[R](Protocol):  # noqa: PYI046
+    def _ctruediv_MassDensity(self, other: _MassDensityConstant, /) -> R: ...
+
 class _RMulMomentumF[T: UnitSystem, R](Protocol):
     def _rmul_Momentum_f(self, other: Momentum[float, T], /) -> R: ...
 
@@ -2783,6 +2949,12 @@ class _RTrueDivMomentumF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivMomentum[L, R](Protocol):
     def _rtruediv_Momentum(self, other: L, /) -> R: ...
+
+class _CMulMomentum[R](Protocol):  # noqa: PYI046
+    def _cmul_Momentum(self, other: _MomentumConstant, /) -> R: ...
+
+class _CTrueDivMomentum[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Momentum(self, other: _MomentumConstant, /) -> R: ...
 
 class _RMulAccelerationF[T: UnitSystem, R](Protocol):
     def _rmul_Acceleration_f(self, other: Acceleration[float, T], /) -> R: ...
@@ -2796,6 +2968,12 @@ class _RTrueDivAccelerationF[T: UnitSystem, R](Protocol):
 class _RTrueDivAcceleration[L, R](Protocol):
     def _rtruediv_Acceleration(self, other: L, /) -> R: ...
 
+class _CMulAcceleration[R](Protocol):  # noqa: PYI046
+    def _cmul_Acceleration(self, other: _AccelerationConstant, /) -> R: ...
+
+class _CTrueDivAcceleration[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Acceleration(self, other: _AccelerationConstant, /) -> R: ...
+
 class _RMulChargeF[T: UnitSystem, R](Protocol):
     def _rmul_Charge_f(self, other: Charge[float, T], /) -> R: ...
 
@@ -2807,6 +2985,12 @@ class _RTrueDivChargeF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivCharge[L, R](Protocol):
     def _rtruediv_Charge(self, other: L, /) -> R: ...
+
+class _CMulCharge[R](Protocol):  # noqa: PYI046
+    def _cmul_Charge(self, other: _ChargeConstant, /) -> R: ...
+
+class _CTrueDivCharge[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Charge(self, other: _ChargeConstant, /) -> R: ...
 
 class _RMulElectricPotentialF[T: UnitSystem, R](Protocol):
     def _rmul_ElectricPotential_f(self, other: ElectricPotential[float, T], /) -> R: ...
@@ -2822,6 +3006,14 @@ class _RTrueDivElectricPotentialF[T: UnitSystem, R](Protocol):
 class _RTrueDivElectricPotential[L, R](Protocol):
     def _rtruediv_ElectricPotential(self, other: L, /) -> R: ...
 
+class _CMulElectricPotential[R](Protocol):  # noqa: PYI046
+    def _cmul_ElectricPotential(self, other: _ElectricPotentialConstant, /) -> R: ...
+
+class _CTrueDivElectricPotential[R](Protocol):  # noqa: PYI046
+    def _ctruediv_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> R: ...
+
 class _RMulElectricFieldF[T: UnitSystem, R](Protocol):
     def _rmul_ElectricField_f(self, other: ElectricField[float, T], /) -> R: ...
 
@@ -2833,6 +3025,12 @@ class _RTrueDivElectricFieldF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivElectricField[L, R](Protocol):
     def _rtruediv_ElectricField(self, other: L, /) -> R: ...
+
+class _CMulElectricField[R](Protocol):  # noqa: PYI046
+    def _cmul_ElectricField(self, other: _ElectricFieldConstant, /) -> R: ...
+
+class _CTrueDivElectricField[R](Protocol):  # noqa: PYI046
+    def _ctruediv_ElectricField(self, other: _ElectricFieldConstant, /) -> R: ...
 
 class _RMulDipoleMomentF[T: UnitSystem, R](Protocol):
     def _rmul_DipoleMoment_f(self, other: DipoleMoment[float, T], /) -> R: ...
@@ -2846,6 +3044,12 @@ class _RTrueDivDipoleMomentF[T: UnitSystem, R](Protocol):
 class _RTrueDivDipoleMoment[L, R](Protocol):
     def _rtruediv_DipoleMoment(self, other: L, /) -> R: ...
 
+class _CMulDipoleMoment[R](Protocol):  # noqa: PYI046
+    def _cmul_DipoleMoment(self, other: _DipoleMomentConstant, /) -> R: ...
+
+class _CTrueDivDipoleMoment[R](Protocol):  # noqa: PYI046
+    def _ctruediv_DipoleMoment(self, other: _DipoleMomentConstant, /) -> R: ...
+
 class _RMulEntropyF[T: UnitSystem, R](Protocol):
     def _rmul_Entropy_f(self, other: Entropy[float, T], /) -> R: ...
 
@@ -2858,6 +3062,12 @@ class _RTrueDivEntropyF[T: UnitSystem, R](Protocol):
 class _RTrueDivEntropy[L, R](Protocol):
     def _rtruediv_Entropy(self, other: L, /) -> R: ...
 
+class _CMulEntropy[R](Protocol):  # noqa: PYI046
+    def _cmul_Entropy(self, other: _EntropyConstant, /) -> R: ...
+
+class _CTrueDivEntropy[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Entropy(self, other: _EntropyConstant, /) -> R: ...
+
 class _RMulActionF[T: UnitSystem, R](Protocol):
     def _rmul_Action_f(self, other: Action[float, T], /) -> R: ...
 
@@ -2869,6 +3079,12 @@ class _RTrueDivActionF[T: UnitSystem, R](Protocol):
 
 class _RTrueDivAction[L, R](Protocol):
     def _rtruediv_Action(self, other: L, /) -> R: ...
+
+class _CMulAction[R](Protocol):  # noqa: PYI046
+    def _cmul_Action(self, other: _ActionConstant, /) -> R: ...
+
+class _CTrueDivAction[R](Protocol):  # noqa: PYI046
+    def _ctruediv_Action(self, other: _ActionConstant, /) -> R: ...
 
 class Dimensionless(Quantity[DimensionlessKind, V, S]):
     @classmethod

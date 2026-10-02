@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Magnetization import _MagnetizationConstant
 from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._generated import Dimensionless, Magnetization, ParticleDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -88,7 +89,8 @@ class MagnetizationParticleDensity(
     def __truediv__(
         self,
         other: MagnetizationParticleDensity[V, S]
-        | MagnetizationParticleDensity[float, S],
+        | MagnetizationParticleDensity[float, S]
+        | _MagnetizationParticleDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -234,3 +236,85 @@ class MagnetizationParticleDensity(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MagnetizationParticleDensity[W, S]: ...
+
+class _MagnetizationParticleDensityConstant(
+    Constant[Mul[MagnetizationKind, ParticleDensityKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagnetizationParticleDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[MagnetizationKind, ParticleDensityKind]]
+    ) -> MagnetizationParticleDensity[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[MagnetizationKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationParticleDensityConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MagnetizationConstant, /
+    ) -> _ParticleDensityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ParticleDensityConstant, /
+    ) -> _MagnetizationConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MagnetizationParticleDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[MagnetizationKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationParticleDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagnetizationParticleDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[MagnetizationKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationParticleDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[MagnetizationKind, ParticleDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Mul[MagnetizationKind, ParticleDensityKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[MagnetizationKind, ParticleDensityKind]], W, T]: ...

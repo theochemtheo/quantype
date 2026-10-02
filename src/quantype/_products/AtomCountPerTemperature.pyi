@@ -12,7 +12,10 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
+from quantype._constants.Entropy import _EntropyConstant
 from quantype._constants.Temperature import _TemperatureConstant
 from quantype._generated import (
     AtomCount,
@@ -21,7 +24,7 @@ from quantype._generated import (
     Entropy,
     Temperature,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AtomCountKind, DimensionlessKind, Div, Mul, TemperatureKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -96,7 +99,9 @@ class AtomCountPerTemperature(Quantity[Div[AtomCountKind, TemperatureKind], V, S
     @overload
     def __truediv__(
         self,
-        other: AtomCountPerTemperature[V, S] | AtomCountPerTemperature[float, S],
+        other: AtomCountPerTemperature[V, S]
+        | AtomCountPerTemperature[float, S]
+        | _AtomCountPerTemperatureConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -260,3 +265,113 @@ class AtomCountPerTemperature(Quantity[Div[AtomCountKind, TemperatureKind], V, S
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AtomCountPerTemperature[W, S]: ...
+
+class _AtomCountPerTemperatureConstant(Constant[Div[AtomCountKind, TemperatureKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AtomCountPerTemperature[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[AtomCountKind, TemperatureKind]]
+    ) -> AtomCountPerTemperature[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyPerAtomConstant, /) -> _EntropyConstant: ...
+    @overload
+    def __mul__(self, other: _TemperatureConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AtomCountKind, TemperatureKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerTemperatureConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Entropy[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AtomCountKind, TemperatureKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AtomCountPerTemperatureConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AtomCountKind, TemperatureKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerTemperatureConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCountPerTemperature[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AtomCountKind, TemperatureKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerTemperatureConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AtomCountKind, TemperatureKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AtomCountKind, TemperatureKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AtomCountKind, TemperatureKind]], W, T]: ...
+    def _rmul_EnergyPerAtom_f[T: UnitSystem](
+        self, other: EnergyPerAtom[float, T], /
+    ) -> Entropy[float, T]: ...
+    def _rmul_EnergyPerAtom[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Entropy[W, T]: ...
+    def _cmul_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _EntropyConstant: ...
+    def _rmul_Temperature_f[T: UnitSystem](
+        self, other: Temperature[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rmul_Temperature[W, T: UnitSystem](
+        self, other: Temperature[W, T], /
+    ) -> AtomCount[W, T]: ...
+    def _cmul_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _AtomCountConstant: ...
+    def _rtruediv_AtomCount_f[T: UnitSystem](
+        self, other: AtomCount[float, T], /
+    ) -> Temperature[float, T]: ...
+    def _rtruediv_AtomCount[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Temperature[W, T]: ...
+    def _ctruediv_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _TemperatureConstant: ...
+    def _rtruediv_Entropy_f[T: UnitSystem](
+        self, other: Entropy[float, T], /
+    ) -> EnergyPerAtom[float, T]: ...
+    def _rtruediv_Entropy[W, T: UnitSystem](
+        self, other: Entropy[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    def _ctruediv_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _EnergyPerAtomConstant: ...

@@ -11,10 +11,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._constants.Velocity import _VelocityConstant
 from quantype._generated import Dimensionless, MagneticMoment, Velocity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MagneticMomentKind, Mul, VelocityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -72,7 +73,11 @@ class VelocityMagneticMoment(Quantity[Mul[VelocityKind, MagneticMomentKind], V, 
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: VelocityMagneticMoment[V, S] | VelocityMagneticMoment[float, S], /
+        self,
+        other: VelocityMagneticMoment[V, S]
+        | VelocityMagneticMoment[float, S]
+        | _VelocityMagneticMomentConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> VelocityMagneticMoment[V, S]: ...
@@ -201,3 +206,77 @@ class VelocityMagneticMoment(Quantity[Mul[VelocityKind, MagneticMomentKind], V, 
     @classmethod
     @override
     def from_value[W](cls, value: W) -> VelocityMagneticMoment[W, S]: ...
+
+class _VelocityMagneticMomentConstant(Constant[Mul[VelocityKind, MagneticMomentKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> VelocityMagneticMoment[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[VelocityKind, MagneticMomentKind]]
+    ) -> VelocityMagneticMoment[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[VelocityKind, MagneticMomentKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityMagneticMomentConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[VelocityKind, MagneticMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _VelocityConstant, /) -> _MagneticMomentConstant: ...
+    @overload
+    def __truediv__(self, other: _MagneticMomentConstant, /) -> _VelocityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _VelocityMagneticMomentConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[VelocityKind, MagneticMomentKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityMagneticMomentConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> Velocity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: VelocityMagneticMoment[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[VelocityKind, MagneticMomentKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _VelocityMagneticMomentConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[VelocityKind, MagneticMomentKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[VelocityKind, MagneticMomentKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[VelocityKind, MagneticMomentKind]], W, T]: ...

@@ -12,7 +12,10 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.Momentum import _MomentumConstant
 from quantype._constants.Velocity import _VelocityConstant
 from quantype._generated import (
     Dimensionless,
@@ -21,7 +24,7 @@ from quantype._generated import (
     Momentum,
     Velocity,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ElectricFieldKind, Mul, VelocityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -96,7 +99,9 @@ class ElectricFieldPerVelocity(Quantity[Div[ElectricFieldKind, VelocityKind], V,
     @overload
     def __truediv__(
         self,
-        other: ElectricFieldPerVelocity[V, S] | ElectricFieldPerVelocity[float, S],
+        other: ElectricFieldPerVelocity[V, S]
+        | ElectricFieldPerVelocity[float, S]
+        | _ElectricFieldPerVelocityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -262,3 +267,111 @@ class ElectricFieldPerVelocity(Quantity[Div[ElectricFieldKind, VelocityKind], V,
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectricFieldPerVelocity[W, S]: ...
+
+class _ElectricFieldPerVelocityConstant(Constant[Div[ElectricFieldKind, VelocityKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectricFieldPerVelocity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ElectricFieldKind, VelocityKind]]
+    ) -> ElectricFieldPerVelocity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VelocityConstant, /) -> _ElectricFieldConstant: ...
+    @overload
+    def __mul__(self, other: _DipoleMomentConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ElectricFieldKind, VelocityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldPerVelocityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> ElectricField[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ElectricFieldKind, VelocityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectricFieldPerVelocityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ElectricFieldKind, VelocityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldPerVelocityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricFieldPerVelocity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ElectricFieldKind, VelocityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricFieldPerVelocityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ElectricFieldKind, VelocityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ElectricFieldKind, VelocityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ElectricFieldKind, VelocityKind]], W, T]: ...
+    def _rmul_Velocity_f[T: UnitSystem](
+        self, other: Velocity[float, T], /
+    ) -> ElectricField[float, T]: ...
+    def _rmul_Velocity[W, T: UnitSystem](
+        self, other: Velocity[W, T], /
+    ) -> ElectricField[W, T]: ...
+    def _cmul_Velocity(self, other: _VelocityConstant, /) -> _ElectricFieldConstant: ...
+    def _rmul_DipoleMoment_f[T: UnitSystem](
+        self, other: DipoleMoment[float, T], /
+    ) -> Momentum[float, T]: ...
+    def _rmul_DipoleMoment[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> Momentum[W, T]: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _MomentumConstant: ...
+    def _rtruediv_Momentum_f[T: UnitSystem](
+        self, other: Momentum[float, T], /
+    ) -> DipoleMoment[float, T]: ...
+    def _rtruediv_Momentum[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    def _ctruediv_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _DipoleMomentConstant: ...
+    def _rtruediv_ElectricField_f[T: UnitSystem](
+        self, other: ElectricField[float, T], /
+    ) -> Velocity[float, T]: ...
+    def _rtruediv_ElectricField[W, T: UnitSystem](
+        self, other: ElectricField[W, T], /
+    ) -> Velocity[W, T]: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _VelocityConstant: ...

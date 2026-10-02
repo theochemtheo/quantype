@@ -12,8 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._constants.ElectronDensity import _ElectronDensityConstant
+from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._generated import (
     AtomCount,
     Dimensionless,
@@ -21,7 +24,7 @@ from quantype._generated import (
     ElectronDensity,
     ParticleDensity,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AtomCountKind, DimensionlessKind, Div, ElectronCountKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -106,7 +109,9 @@ class AtomCountPerElectronCount(Quantity[Div[AtomCountKind, ElectronCountKind], 
     @overload
     def __truediv__(
         self,
-        other: AtomCountPerElectronCount[V, S] | AtomCountPerElectronCount[float, S],
+        other: AtomCountPerElectronCount[V, S]
+        | AtomCountPerElectronCount[float, S]
+        | _AtomCountPerElectronCountConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -282,3 +287,117 @@ class AtomCountPerElectronCount(Quantity[Div[AtomCountKind, ElectronCountKind], 
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AtomCountPerElectronCount[W, S]: ...
+
+class _AtomCountPerElectronCountConstant(
+    Constant[Div[AtomCountKind, ElectronCountKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AtomCountPerElectronCount[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[AtomCountKind, ElectronCountKind]]
+    ) -> AtomCountPerElectronCount[float]: ...
+    @overload
+    @override
+    def __mul__(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ParticleDensityConstant: ...
+    @overload
+    def __mul__(self, other: _ElectronCountConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AtomCountKind, ElectronCountKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerElectronCountConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AtomCountKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AtomCountPerElectronCountConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AtomCountKind, ElectronCountKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerElectronCountConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCountPerElectronCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AtomCountKind, ElectronCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AtomCountPerElectronCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AtomCountKind, ElectronCountKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AtomCountKind, ElectronCountKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AtomCountKind, ElectronCountKind]], W, T]: ...
+    def _rmul_ElectronDensity_f[T: UnitSystem](
+        self, other: ElectronDensity[float, T], /
+    ) -> ParticleDensity[float, T]: ...
+    def _rmul_ElectronDensity[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    def _cmul_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ParticleDensityConstant: ...
+    def _rmul_ElectronCount_f[T: UnitSystem](
+        self, other: ElectronCount[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rmul_ElectronCount[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> AtomCount[W, T]: ...
+    def _cmul_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _AtomCountConstant: ...
+    def _rtruediv_ParticleDensity_f[T: UnitSystem](
+        self, other: ParticleDensity[float, T], /
+    ) -> ElectronDensity[float, T]: ...
+    def _rtruediv_ParticleDensity[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    def _ctruediv_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _ElectronDensityConstant: ...
+    def _rtruediv_AtomCount_f[T: UnitSystem](
+        self, other: AtomCount[float, T], /
+    ) -> ElectronCount[float, T]: ...
+    def _rtruediv_AtomCount[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    def _ctruediv_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _ElectronCountConstant: ...

@@ -12,6 +12,8 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
 from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._constants.Volume import _VolumeConstant
@@ -22,7 +24,7 @@ from quantype._generated import (
     ParticleDensity,
     Volume,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyKind, Mul, ParticleDensityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -104,7 +106,9 @@ class EnergyPerParticleDensity(Quantity[Div[EnergyKind, ParticleDensityKind], V,
     @overload
     def __truediv__(
         self,
-        other: EnergyPerParticleDensity[V, S] | EnergyPerParticleDensity[float, S],
+        other: EnergyPerParticleDensity[V, S]
+        | EnergyPerParticleDensity[float, S]
+        | _EnergyPerParticleDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -251,3 +255,101 @@ class EnergyPerParticleDensity(Quantity[Div[EnergyKind, ParticleDensityKind], V,
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerParticleDensity[W, S]: ...
+
+class _EnergyPerParticleDensityConstant(Constant[Div[EnergyKind, ParticleDensityKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerParticleDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[EnergyKind, ParticleDensityKind]]
+    ) -> EnergyPerParticleDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ParticleDensityConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[EnergyKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerParticleDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Energy[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[EnergyKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _VolumeConstant, /) -> _EnergyPerAtomConstant: ...
+    @overload
+    def __truediv__(self, other: _EnergyPerAtomConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _EnergyPerParticleDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[EnergyKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerParticleDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> EnergyPerAtom[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerAtom[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerParticleDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[EnergyKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerParticleDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[EnergyKind, ParticleDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[EnergyKind, ParticleDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[EnergyKind, ParticleDensityKind]], W, T]: ...
+    def _rmul_ParticleDensity_f[T: UnitSystem](
+        self, other: ParticleDensity[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rmul_ParticleDensity[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Energy[W, T]: ...
+    def _cmul_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _EnergyConstant: ...
+    def _rtruediv_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> ParticleDensity[float, T]: ...
+    def _rtruediv_Energy[W, T: UnitSystem](
+        self, other: Energy[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    def _ctruediv_Energy(
+        self, other: _EnergyConstant, /
+    ) -> _ParticleDensityConstant: ...

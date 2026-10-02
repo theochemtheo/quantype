@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._generated import Angle, Dimensionless, ParticleDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, Mul, ParticleDensityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -74,7 +76,9 @@ class AnglePerParticleDensity(Quantity[Div[AngleKind, ParticleDensityKind], V, S
     @overload
     def __truediv__(
         self,
-        other: AnglePerParticleDensity[V, S] | AnglePerParticleDensity[float, S],
+        other: AnglePerParticleDensity[V, S]
+        | AnglePerParticleDensity[float, S]
+        | _AnglePerParticleDensityConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -219,3 +223,87 @@ class AnglePerParticleDensity(Quantity[Div[AngleKind, ParticleDensityKind], V, S
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AnglePerParticleDensity[W, S]: ...
+
+class _AnglePerParticleDensityConstant(Constant[Div[AngleKind, ParticleDensityKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> AnglePerParticleDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[AngleKind, ParticleDensityKind]]
+    ) -> AnglePerParticleDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ParticleDensityConstant, /) -> _AngleConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[AngleKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerParticleDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Angle[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[AngleKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _AnglePerParticleDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[AngleKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerParticleDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AnglePerParticleDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[AngleKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AnglePerParticleDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[AngleKind, ParticleDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[AngleKind, ParticleDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[AngleKind, ParticleDensityKind]], W, T]: ...
+    def _rmul_ParticleDensity_f[T: UnitSystem](
+        self, other: ParticleDensity[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rmul_ParticleDensity[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Angle[W, T]: ...
+    def _cmul_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _AngleConstant: ...
+    def _rtruediv_Angle_f[T: UnitSystem](
+        self, other: Angle[float, T], /
+    ) -> ParticleDensity[float, T]: ...
+    def _rtruediv_Angle[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    def _ctruediv_Angle(self, other: _AngleConstant, /) -> _ParticleDensityConstant: ...

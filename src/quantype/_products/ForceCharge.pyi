@@ -12,6 +12,7 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.DipoleMoment import _DipoleMomentConstant
 from quantype._constants.Force import _ForceConstant
 from quantype._constants.ForceConstant import _ForceConstantConstant
@@ -22,7 +23,7 @@ from quantype._generated import (
     Force,
     ForceConstant,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, ForceKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -96,7 +97,7 @@ class ForceCharge(Quantity[Mul[ForceKind, ChargeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ForceCharge[V, S] | ForceCharge[float, S], /
+        self, other: ForceCharge[V, S] | ForceCharge[float, S] | _ForceChargeConstant, /
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ForceCharge[V, S]: ...
@@ -215,3 +216,83 @@ class ForceCharge(Quantity[Mul[ForceKind, ChargeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ForceCharge[W, S]: ...
+
+class _ForceChargeConstant(Constant[Mul[ForceKind, ChargeKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> ForceCharge[float, T]: ...
+    @override
+    def to(self, unit: Unit[Mul[ForceKind, ChargeKind]]) -> ForceCharge[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[ForceKind, ChargeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceChargeConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[ForceKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _ForceConstant, /) -> _ChargeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ForceConstantConstant, /
+    ) -> _DipoleMomentConstant: ...
+    @overload
+    def __truediv__(self, other: _ChargeConstant, /) -> _ForceConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _DipoleMomentConstant, /
+    ) -> _ForceConstantConstant: ...
+    @overload
+    def __truediv__(self, other: _ForceChargeConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[ForceKind, ChargeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceChargeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Force[W, T], /) -> Charge[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> DipoleMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: DipoleMoment[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceCharge[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[ForceKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceChargeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[ForceKind, ChargeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[ForceKind, ChargeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[ForceKind, ChargeKind]], W, T]: ...

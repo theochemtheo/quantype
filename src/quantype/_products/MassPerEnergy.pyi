@@ -12,7 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.EnergyDensity import _EnergyDensityConstant
+from quantype._constants.Mass import _MassConstant
+from quantype._constants.MassDensity import _MassDensityConstant
 from quantype._constants.Pressure import _PressureConstant
 from quantype._generated import (
     Dimensionless,
@@ -22,7 +26,7 @@ from quantype._generated import (
     MassDensity,
     Pressure,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, EnergyKind, MassKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -90,7 +94,9 @@ class MassPerEnergy(Quantity[Div[MassKind, EnergyKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MassPerEnergy[V, S] | MassPerEnergy[float, S], /
+        self,
+        other: MassPerEnergy[V, S] | MassPerEnergy[float, S] | _MassPerEnergyConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MassPerEnergy[V, S]: ...
@@ -241,3 +247,99 @@ class MassPerEnergy(Quantity[Div[MassKind, EnergyKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassPerEnergy[W, S]: ...
+
+class _MassPerEnergyConstant(Constant[Div[MassKind, EnergyKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> MassPerEnergy[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[MassKind, EnergyKind]]) -> MassPerEnergy[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyConstant, /) -> _MassConstant: ...
+    @overload
+    def __mul__(self, other: _PressureConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MassKind, EnergyKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerEnergyConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MassKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MassPerEnergyConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MassKind, EnergyKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerEnergyConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassPerEnergy[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MassKind, EnergyKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerEnergyConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MassKind, EnergyKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MassKind, EnergyKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MassKind, EnergyKind]], W, T]: ...
+    def _rmul_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rmul_Energy[W, T: UnitSystem](self, other: Energy[W, T], /) -> Mass[W, T]: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _MassConstant: ...
+    def _rmul_Pressure_f[T: UnitSystem](
+        self, other: Pressure[float, T], /
+    ) -> MassDensity[float, T]: ...
+    def _rmul_Pressure[W, T: UnitSystem](
+        self, other: Pressure[W, T], /
+    ) -> MassDensity[W, T]: ...
+    def _cmul_Pressure(self, other: _PressureConstant, /) -> _MassDensityConstant: ...
+    def _rtruediv_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_Mass[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_Mass(self, other: _MassConstant, /) -> _EnergyConstant: ...
+    def _rtruediv_MassDensity_f[T: UnitSystem](
+        self, other: MassDensity[float, T], /
+    ) -> EnergyDensity[float, T]: ...
+    def _rtruediv_MassDensity[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> EnergyDensity[W, T]: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _EnergyDensityConstant: ...

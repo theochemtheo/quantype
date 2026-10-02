@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.ElectronDensity import _ElectronDensityConstant
 from quantype._constants.Length import _LengthConstant
 from quantype._generated import Dimensionless, ElectronDensity, Length
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ElectronDensityKind, LengthKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -70,7 +72,9 @@ class ElectronDensityPerLength(Quantity[Div[ElectronDensityKind, LengthKind], V,
     @overload
     def __truediv__(
         self,
-        other: ElectronDensityPerLength[V, S] | ElectronDensityPerLength[float, S],
+        other: ElectronDensityPerLength[V, S]
+        | ElectronDensityPerLength[float, S]
+        | _ElectronDensityPerLengthConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -219,3 +223,87 @@ class ElectronDensityPerLength(Quantity[Div[ElectronDensityKind, LengthKind], V,
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectronDensityPerLength[W, S]: ...
+
+class _ElectronDensityPerLengthConstant(Constant[Div[ElectronDensityKind, LengthKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronDensityPerLength[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ElectronDensityKind, LengthKind]]
+    ) -> ElectronDensityPerLength[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _LengthConstant, /) -> _ElectronDensityConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ElectronDensityKind, LengthKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityPerLengthConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ElectronDensityKind, LengthKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectronDensityPerLengthConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ElectronDensityKind, LengthKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityPerLengthConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensityPerLength[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ElectronDensityKind, LengthKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityPerLengthConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ElectronDensityKind, LengthKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ElectronDensityKind, LengthKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ElectronDensityKind, LengthKind]], W, T]: ...
+    def _rmul_Length_f[T: UnitSystem](
+        self, other: Length[float, T], /
+    ) -> ElectronDensity[float, T]: ...
+    def _rmul_Length[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> ElectronDensity[W, T]: ...
+    def _cmul_Length(self, other: _LengthConstant, /) -> _ElectronDensityConstant: ...
+    def _rtruediv_ElectronDensity_f[T: UnitSystem](
+        self, other: ElectronDensity[float, T], /
+    ) -> Length[float, T]: ...
+    def _rtruediv_ElectronDensity[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> Length[W, T]: ...
+    def _ctruediv_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _LengthConstant: ...

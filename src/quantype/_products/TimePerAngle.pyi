@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Time import _TimeConstant
 from quantype._generated import Angle, Dimensionless, Time
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, DimensionlessKind, Div, Mul, TimeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,9 @@ class TimePerAngle(Quantity[Div[TimeKind, AngleKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TimePerAngle[V, S] | TimePerAngle[float, S], /
+        self,
+        other: TimePerAngle[V, S] | TimePerAngle[float, S] | _TimePerAngleConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TimePerAngle[V, S]: ...
@@ -195,3 +199,75 @@ class TimePerAngle(Quantity[Div[TimeKind, AngleKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TimePerAngle[W, S]: ...
+
+class _TimePerAngleConstant(Constant[Div[TimeKind, AngleKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> TimePerAngle[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[TimeKind, AngleKind]]) -> TimePerAngle[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AngleConstant, /) -> _TimeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TimeKind, AngleKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerAngleConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Angle[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TimeKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TimePerAngleConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TimeKind, AngleKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerAngleConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TimePerAngle[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TimeKind, AngleKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerAngleConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TimeKind, AngleKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[TimeKind, AngleKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TimeKind, AngleKind]], W, T]: ...
+    def _rmul_Angle_f[T: UnitSystem](
+        self, other: Angle[float, T], /
+    ) -> Time[float, T]: ...
+    def _rmul_Angle[W, T: UnitSystem](self, other: Angle[W, T], /) -> Time[W, T]: ...
+    def _cmul_Angle(self, other: _AngleConstant, /) -> _TimeConstant: ...
+    def _rtruediv_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> Angle[float, T]: ...
+    def _rtruediv_Time[W, T: UnitSystem](self, other: Time[W, T], /) -> Angle[W, T]: ...
+    def _ctruediv_Time(self, other: _TimeConstant, /) -> _AngleConstant: ...

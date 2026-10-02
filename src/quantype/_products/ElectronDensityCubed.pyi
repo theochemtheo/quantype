@@ -11,8 +11,9 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ElectronDensityKind, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -50,7 +51,11 @@ class ElectronDensityCubed(Quantity[Pow[ElectronDensityKind, Literal[3]], V, S])
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ElectronDensityCubed[V, S] | ElectronDensityCubed[float, S], /
+        self,
+        other: ElectronDensityCubed[V, S]
+        | ElectronDensityCubed[float, S]
+        | _ElectronDensityCubedConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ElectronDensityCubed[V, S]: ...
@@ -179,3 +184,65 @@ class ElectronDensityCubed(Quantity[Pow[ElectronDensityKind, Literal[3]], V, S])
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectronDensityCubed[W, S]: ...
+
+class _ElectronDensityCubedConstant(Constant[Pow[ElectronDensityKind, Literal[3]]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectronDensityCubed[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[ElectronDensityKind, Literal[3]]]
+    ) -> ElectronDensityCubed[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[ElectronDensityKind, Literal[3]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityCubedConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[ElectronDensityKind, Literal[3]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectronDensityCubedConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[ElectronDensityKind, Literal[3]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityCubedConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectronDensityCubed[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[ElectronDensityKind, Literal[3]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectronDensityCubedConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[ElectronDensityKind, Literal[3]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[ElectronDensityKind, Literal[3]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[ElectronDensityKind, Literal[3]]], W, T]: ...

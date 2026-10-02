@@ -11,11 +11,12 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
 from quantype._constants.Mass import _MassConstant
 from quantype._constants.Momentum import _MomentumConstant
 from quantype._generated import Dimensionless, Energy, Mass, Momentum
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MomentumKind, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -77,7 +78,11 @@ class MomentumSquared(Quantity[Pow[MomentumKind, Literal[2]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MomentumSquared[V, S] | MomentumSquared[float, S], /
+        self,
+        other: MomentumSquared[V, S]
+        | MomentumSquared[float, S]
+        | _MomentumSquaredConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MomentumSquared[V, S]: ...
@@ -198,3 +203,79 @@ class MomentumSquared(Quantity[Pow[MomentumKind, Literal[2]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MomentumSquared[W, S]: ...
+
+class _MomentumSquaredConstant(Constant[Pow[MomentumKind, Literal[2]]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MomentumSquared[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[MomentumKind, Literal[2]]]
+    ) -> MomentumSquared[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[MomentumKind, Literal[2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumSquaredConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[MomentumKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _EnergyConstant, /) -> _MassConstant: ...
+    @overload
+    def __truediv__(self, other: _MassConstant, /) -> _EnergyConstant: ...
+    @overload
+    def __truediv__(self, other: _MomentumConstant, /) -> _MomentumConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MomentumSquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[MomentumKind, Literal[2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumSquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Mass[W, T], /) -> Energy[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Momentum[W, T], /
+    ) -> Momentum[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MomentumSquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[MomentumKind, Literal[2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MomentumSquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[MomentumKind, Literal[2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[MomentumKind, Literal[2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[MomentumKind, Literal[2]]], W, T]: ...

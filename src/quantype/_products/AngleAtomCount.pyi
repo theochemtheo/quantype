@@ -13,8 +13,9 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Angle import _AngleConstant
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Angle, AtomCount, Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AngleKind, AtomCountKind, DimensionlessKind, Div, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -68,7 +69,11 @@ class AngleAtomCount(Quantity[Mul[AngleKind, AtomCountKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AngleAtomCount[V, S] | AngleAtomCount[float, S], /
+        self,
+        other: AngleAtomCount[V, S]
+        | AngleAtomCount[float, S]
+        | _AngleAtomCountConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AngleAtomCount[V, S]: ...
@@ -189,3 +194,75 @@ class AngleAtomCount(Quantity[Mul[AngleKind, AtomCountKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AngleAtomCount[W, S]: ...
+
+class _AngleAtomCountConstant(Constant[Mul[AngleKind, AtomCountKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AngleAtomCount[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[AngleKind, AtomCountKind]]
+    ) -> AngleAtomCount[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[AngleKind, AtomCountKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleAtomCountConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[AngleKind, AtomCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _AngleConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __truediv__(self, other: _AtomCountConstant, /) -> _AngleConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _AngleAtomCountConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[AngleKind, AtomCountKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleAtomCountConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Angle[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Angle[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AngleAtomCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[AngleKind, AtomCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AngleAtomCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[AngleKind, AtomCountKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[AngleKind, AtomCountKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[AngleKind, AtomCountKind]], W, T]: ...

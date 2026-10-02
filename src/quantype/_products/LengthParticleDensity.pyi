@@ -13,10 +13,12 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Length import _LengthConstant
 from quantype._constants.ParticleDensity import _ParticleDensityConstant
 from quantype._generated import Area, AtomCount, Dimensionless, Length, ParticleDensity
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, LengthKind, Mul, ParticleDensityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -89,7 +91,11 @@ class LengthParticleDensity(Quantity[Mul[LengthKind, ParticleDensityKind], V, S]
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: LengthParticleDensity[V, S] | LengthParticleDensity[float, S], /
+        self,
+        other: LengthParticleDensity[V, S]
+        | LengthParticleDensity[float, S]
+        | _LengthParticleDensityConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> LengthParticleDensity[V, S]: ...
@@ -231,3 +237,93 @@ class LengthParticleDensity(Quantity[Mul[LengthKind, ParticleDensityKind], V, S]
     @classmethod
     @override
     def from_value[W](cls, value: W) -> LengthParticleDensity[W, S]: ...
+
+class _LengthParticleDensityConstant(Constant[Mul[LengthKind, ParticleDensityKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> LengthParticleDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[LengthKind, ParticleDensityKind]]
+    ) -> LengthParticleDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AreaConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[LengthKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthParticleDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Area[W, T], /) -> AtomCount[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[LengthKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _LengthConstant, /) -> _ParticleDensityConstant: ...
+    @overload
+    def __truediv__(self, other: _ParticleDensityConstant, /) -> _LengthConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _LengthParticleDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[LengthKind, ParticleDensityKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthParticleDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: LengthParticleDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[LengthKind, ParticleDensityKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _LengthParticleDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[LengthKind, ParticleDensityKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[LengthKind, ParticleDensityKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[LengthKind, ParticleDensityKind]], W, T]: ...
+    def _rmul_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> AtomCount[float, T]: ...
+    def _rmul_Area[W, T: UnitSystem](self, other: Area[W, T], /) -> AtomCount[W, T]: ...
+    def _cmul_Area(self, other: _AreaConstant, /) -> _AtomCountConstant: ...
+    def _rtruediv_AtomCount_f[T: UnitSystem](
+        self, other: AtomCount[float, T], /
+    ) -> Area[float, T]: ...
+    def _rtruediv_AtomCount[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Area[W, T]: ...
+    def _ctruediv_AtomCount(self, other: _AtomCountConstant, /) -> _AreaConstant: ...

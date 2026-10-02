@@ -11,9 +11,10 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Dimensionless, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AreaKind, DimensionlessKind, Div, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -59,7 +60,7 @@ class AreaCubed(Quantity[Pow[AreaKind, Literal[3]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: AreaCubed[V, S] | AreaCubed[float, S], /
+        self, other: AreaCubed[V, S] | AreaCubed[float, S] | _AreaCubedConstant, /
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> AreaCubed[V, S]: ...
@@ -174,3 +175,63 @@ class AreaCubed(Quantity[Pow[AreaKind, Literal[3]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> AreaCubed[W, S]: ...
+
+class _AreaCubedConstant(Constant[Pow[AreaKind, Literal[3]]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> AreaCubed[float, T]: ...
+    @override
+    def to(self, unit: Unit[Pow[AreaKind, Literal[3]]]) -> AreaCubed[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[AreaKind, Literal[3]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaCubedConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[AreaKind, Literal[3]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _VolumeConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __truediv__(self, other: _AreaCubedConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[AreaKind, Literal[3]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaCubedConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Volume[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AreaCubed[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[AreaKind, Literal[3]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _AreaCubedConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[AreaKind, Literal[3]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[AreaKind, Literal[3]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[AreaKind, Literal[3]]], W, T]: ...

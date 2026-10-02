@@ -12,7 +12,10 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Area import _AreaConstant
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.ForceConstant import _ForceConstantConstant
 from quantype._generated import (
     Area,
@@ -21,7 +24,7 @@ from quantype._generated import (
     ElectricPotential,
     ForceConstant,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -111,7 +114,8 @@ class ElectricPotentialPerForceConstant(
     def __truediv__(
         self,
         other: ElectricPotentialPerForceConstant[V, S]
-        | ElectricPotentialPerForceConstant[float, S],
+        | ElectricPotentialPerForceConstant[float, S]
+        | _ElectricPotentialPerForceConstantConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -297,3 +301,111 @@ class ElectricPotentialPerForceConstant(
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ElectricPotentialPerForceConstant[W, S]: ...
+
+class _ElectricPotentialPerForceConstantConstant(
+    Constant[Div[ElectricPotentialKind, ForceConstantKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ElectricPotentialPerForceConstant[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ElectricPotentialKind, ForceConstantKind]]
+    ) -> ElectricPotentialPerForceConstant[float]: ...
+    @overload
+    @override
+    def __mul__(
+        self, other: _ForceConstantConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    @overload
+    def __mul__(self, other: _ChargeConstant, /) -> _AreaConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ElectricPotentialKind, ForceConstantKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialPerForceConstantConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Area[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ElectricPotentialKind, ForceConstantKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ElectricPotentialPerForceConstantConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ElectricPotentialKind, ForceConstantKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialPerForceConstantConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ElectricPotentialPerForceConstant[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ElectricPotentialKind, ForceConstantKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ElectricPotentialPerForceConstantConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ElectricPotentialKind, ForceConstantKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[ElectricPotentialKind, ForceConstantKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ElectricPotentialKind, ForceConstantKind]], W, T]: ...
+    def _rmul_ForceConstant_f[T: UnitSystem](
+        self, other: ForceConstant[float, T], /
+    ) -> ElectricPotential[float, T]: ...
+    def _rmul_ForceConstant[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> ElectricPotential[W, T]: ...
+    def _cmul_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ElectricPotentialConstant: ...
+    def _rmul_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> Area[float, T]: ...
+    def _rmul_Charge[W, T: UnitSystem](self, other: Charge[W, T], /) -> Area[W, T]: ...
+    def _cmul_Charge(self, other: _ChargeConstant, /) -> _AreaConstant: ...
+    def _rtruediv_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rtruediv_Area[W, T: UnitSystem](
+        self, other: Area[W, T], /
+    ) -> Charge[W, T]: ...
+    def _ctruediv_Area(self, other: _AreaConstant, /) -> _ChargeConstant: ...
+    def _rtruediv_ElectricPotential_f[T: UnitSystem](
+        self, other: ElectricPotential[float, T], /
+    ) -> ForceConstant[float, T]: ...
+    def _rtruediv_ElectricPotential[W, T: UnitSystem](
+        self, other: ElectricPotential[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    def _ctruediv_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _ForceConstantConstant: ...

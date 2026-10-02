@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
 from quantype._generated import Action, Dimensionless, EnergyPerVolume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, DimensionlessKind, Div, EnergyPerVolumeKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -70,7 +72,9 @@ class EnergyPerVolumePerAction(Quantity[Div[EnergyPerVolumeKind, ActionKind], V,
     @overload
     def __truediv__(
         self,
-        other: EnergyPerVolumePerAction[V, S] | EnergyPerVolumePerAction[float, S],
+        other: EnergyPerVolumePerAction[V, S]
+        | EnergyPerVolumePerAction[float, S]
+        | _EnergyPerVolumePerActionConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -219,3 +223,87 @@ class EnergyPerVolumePerAction(Quantity[Div[EnergyPerVolumeKind, ActionKind], V,
     @classmethod
     @override
     def from_value[W](cls, value: W) -> EnergyPerVolumePerAction[W, S]: ...
+
+class _EnergyPerVolumePerActionConstant(Constant[Div[EnergyPerVolumeKind, ActionKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> EnergyPerVolumePerAction[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[EnergyPerVolumeKind, ActionKind]]
+    ) -> EnergyPerVolumePerAction[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ActionConstant, /) -> _EnergyPerVolumeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[EnergyPerVolumeKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumePerActionConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[EnergyPerVolumeKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _EnergyPerVolumePerActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[EnergyPerVolumeKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumePerActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: EnergyPerVolumePerAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[EnergyPerVolumeKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _EnergyPerVolumePerActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[EnergyPerVolumeKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[EnergyPerVolumeKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[EnergyPerVolumeKind, ActionKind]], W, T]: ...
+    def _rmul_Action_f[T: UnitSystem](
+        self, other: Action[float, T], /
+    ) -> EnergyPerVolume[float, T]: ...
+    def _rmul_Action[W, T: UnitSystem](
+        self, other: Action[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    def _cmul_Action(self, other: _ActionConstant, /) -> _EnergyPerVolumeConstant: ...
+    def _rtruediv_EnergyPerVolume_f[T: UnitSystem](
+        self, other: EnergyPerVolume[float, T], /
+    ) -> Action[float, T]: ...
+    def _rtruediv_EnergyPerVolume[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> Action[W, T]: ...
+    def _ctruediv_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _ActionConstant: ...

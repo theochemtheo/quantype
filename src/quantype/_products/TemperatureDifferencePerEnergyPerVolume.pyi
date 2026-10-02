@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
+from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import Dimensionless, EnergyPerVolume, TemperatureDifference
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     DimensionlessKind,
     Div,
@@ -103,7 +105,8 @@ class TemperatureDifferencePerEnergyPerVolume(
     def __truediv__(
         self,
         other: TemperatureDifferencePerEnergyPerVolume[V, S]
-        | TemperatureDifferencePerEnergyPerVolume[float, S],
+        | TemperatureDifferencePerEnergyPerVolume[float, S]
+        | _TemperatureDifferencePerEnergyPerVolumeConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -298,3 +301,103 @@ class TemperatureDifferencePerEnergyPerVolume(
     def from_value[W](
         cls, value: W
     ) -> TemperatureDifferencePerEnergyPerVolume[W, S]: ...
+
+class _TemperatureDifferencePerEnergyPerVolumeConstant(
+    Constant[Div[TemperatureDifferenceKind, EnergyPerVolumeKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> TemperatureDifferencePerEnergyPerVolume[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[TemperatureDifferenceKind, EnergyPerVolumeKind]]
+    ) -> TemperatureDifferencePerEnergyPerVolume[float]: ...
+    @overload
+    @override
+    def __mul__(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _TemperatureDifferenceConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TemperatureDifferenceKind, EnergyPerVolumeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferencePerEnergyPerVolumeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[
+        Mul[Div[TemperatureDifferenceKind, EnergyPerVolumeKind], L], W, T
+    ]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TemperatureDifferencePerEnergyPerVolumeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TemperatureDifferenceKind, EnergyPerVolumeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferencePerEnergyPerVolumeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TemperatureDifferencePerEnergyPerVolume[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[
+        Div[Div[TemperatureDifferenceKind, EnergyPerVolumeKind], L], W, T
+    ]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TemperatureDifferencePerEnergyPerVolumeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[
+        Mul[L, Div[TemperatureDifferenceKind, EnergyPerVolumeKind]], W, T
+    ]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[
+        Div[DimensionlessKind, Div[TemperatureDifferenceKind, EnergyPerVolumeKind]]
+    ]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[
+        Div[L, Div[TemperatureDifferenceKind, EnergyPerVolumeKind]], W, T
+    ]: ...
+    def _rmul_EnergyPerVolume_f[T: UnitSystem](
+        self, other: EnergyPerVolume[float, T], /
+    ) -> TemperatureDifference[float, T]: ...
+    def _rmul_EnergyPerVolume[W, T: UnitSystem](
+        self, other: EnergyPerVolume[W, T], /
+    ) -> TemperatureDifference[W, T]: ...
+    def _cmul_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _TemperatureDifferenceConstant: ...
+    def _rtruediv_TemperatureDifference_f[T: UnitSystem](
+        self, other: TemperatureDifference[float, T], /
+    ) -> EnergyPerVolume[float, T]: ...
+    def _rtruediv_TemperatureDifference[W, T: UnitSystem](
+        self, other: TemperatureDifference[W, T], /
+    ) -> EnergyPerVolume[W, T]: ...
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _EnergyPerVolumeConstant: ...

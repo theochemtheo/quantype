@@ -12,10 +12,13 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.ForceConstant import _ForceConstantConstant
 from quantype._constants.Length import _LengthConstant
 from quantype._constants.Mass import _MassConstant
 from quantype._generated import Acceleration, Dimensionless, ForceConstant, Length, Mass
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ForceConstantKind, MassKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -83,7 +86,11 @@ class ForceConstantPerMass(Quantity[Div[ForceConstantKind, MassKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: ForceConstantPerMass[V, S] | ForceConstantPerMass[float, S], /
+        self,
+        other: ForceConstantPerMass[V, S]
+        | ForceConstantPerMass[float, S]
+        | _ForceConstantPerMassConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> ForceConstantPerMass[V, S]: ...
@@ -240,3 +247,109 @@ class ForceConstantPerMass(Quantity[Div[ForceConstantKind, MassKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> ForceConstantPerMass[W, S]: ...
+
+class _ForceConstantPerMassConstant(Constant[Div[ForceConstantKind, MassKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> ForceConstantPerMass[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Div[ForceConstantKind, MassKind]]
+    ) -> ForceConstantPerMass[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _LengthConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __mul__(self, other: _MassConstant, /) -> _ForceConstantConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[ForceConstantKind, MassKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstantPerMassConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[ForceConstantKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _ForceConstantPerMassConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[ForceConstantKind, MassKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstantPerMassConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ForceConstantPerMass[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[ForceConstantKind, MassKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _ForceConstantPerMassConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[ForceConstantKind, MassKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[ForceConstantKind, MassKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[ForceConstantKind, MassKind]], W, T]: ...
+    def _rmul_Length_f[T: UnitSystem](
+        self, other: Length[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rmul_Length[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _cmul_Length(self, other: _LengthConstant, /) -> _AccelerationConstant: ...
+    def _rmul_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> ForceConstant[float, T]: ...
+    def _rmul_Mass[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> ForceConstant[W, T]: ...
+    def _cmul_Mass(self, other: _MassConstant, /) -> _ForceConstantConstant: ...
+    def _rtruediv_ForceConstant_f[T: UnitSystem](
+        self, other: ForceConstant[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rtruediv_ForceConstant[W, T: UnitSystem](
+        self, other: ForceConstant[W, T], /
+    ) -> Mass[W, T]: ...
+    def _ctruediv_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _MassConstant: ...
+    def _rtruediv_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> Length[float, T]: ...
+    def _rtruediv_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Length[W, T]: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _LengthConstant: ...

@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Action import _ActionConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Mass import _MassConstant
 from quantype._generated import Action, Dimensionless, Mass
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ActionKind, DimensionlessKind, Div, MassKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,9 @@ class MassPerAction(Quantity[Div[MassKind, ActionKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MassPerAction[V, S] | MassPerAction[float, S], /
+        self,
+        other: MassPerAction[V, S] | MassPerAction[float, S] | _MassPerActionConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MassPerAction[V, S]: ...
@@ -199,3 +203,77 @@ class MassPerAction(Quantity[Div[MassKind, ActionKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassPerAction[W, S]: ...
+
+class _MassPerActionConstant(Constant[Div[MassKind, ActionKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> MassPerAction[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[MassKind, ActionKind]]) -> MassPerAction[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ActionConstant, /) -> _MassConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MassKind, ActionKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerActionConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Action[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MassKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MassPerActionConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MassKind, ActionKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerActionConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassPerAction[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MassKind, ActionKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerActionConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MassKind, ActionKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MassKind, ActionKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MassKind, ActionKind]], W, T]: ...
+    def _rmul_Action_f[T: UnitSystem](
+        self, other: Action[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rmul_Action[W, T: UnitSystem](self, other: Action[W, T], /) -> Mass[W, T]: ...
+    def _cmul_Action(self, other: _ActionConstant, /) -> _MassConstant: ...
+    def _rtruediv_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> Action[float, T]: ...
+    def _rtruediv_Mass[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> Action[W, T]: ...
+    def _ctruediv_Mass(self, other: _MassConstant, /) -> _ActionConstant: ...

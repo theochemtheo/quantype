@@ -12,6 +12,7 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.MagneticMoment import _MagneticMomentConstant
 from quantype._constants.Magnetization import _MagnetizationConstant
 from quantype._constants.ParticleDensity import _ParticleDensityConstant
@@ -22,7 +23,7 @@ from quantype._generated import (
     Magnetization,
     ParticleDensity,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AtomCountKind, DimensionlessKind, Div, MagnetizationKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -102,7 +103,11 @@ class MagnetizationAtomCount(Quantity[Mul[MagnetizationKind, AtomCountKind], V, 
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MagnetizationAtomCount[V, S] | MagnetizationAtomCount[float, S], /
+        self,
+        other: MagnetizationAtomCount[V, S]
+        | MagnetizationAtomCount[float, S]
+        | _MagnetizationAtomCountConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MagnetizationAtomCount[V, S]: ...
@@ -231,3 +236,93 @@ class MagnetizationAtomCount(Quantity[Mul[MagnetizationKind, AtomCountKind], V, 
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MagnetizationAtomCount[W, S]: ...
+
+class _MagnetizationAtomCountConstant(Constant[Mul[MagnetizationKind, AtomCountKind]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MagnetizationAtomCount[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[MagnetizationKind, AtomCountKind]]
+    ) -> MagnetizationAtomCount[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[MagnetizationKind, AtomCountKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationAtomCountConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[MagnetizationKind, AtomCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MagneticMomentConstant, /
+    ) -> _ParticleDensityConstant: ...
+    @overload
+    def __truediv__(self, other: _MagnetizationConstant, /) -> _AtomCountConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _ParticleDensityConstant, /
+    ) -> _MagneticMomentConstant: ...
+    @overload
+    def __truediv__(self, other: _AtomCountConstant, /) -> _MagnetizationConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MagnetizationAtomCountConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[MagnetizationKind, AtomCountKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationAtomCountConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagneticMoment[W, T], /
+    ) -> ParticleDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Magnetization[W, T], /
+    ) -> AtomCount[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: ParticleDensity[W, T], /
+    ) -> MagneticMoment[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: AtomCount[W, T], /
+    ) -> Magnetization[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MagnetizationAtomCount[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[MagnetizationKind, AtomCountKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MagnetizationAtomCountConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[MagnetizationKind, AtomCountKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[MagnetizationKind, AtomCountKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[MagnetizationKind, AtomCountKind]], W, T]: ...

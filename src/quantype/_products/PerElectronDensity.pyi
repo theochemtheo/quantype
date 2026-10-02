@@ -12,10 +12,12 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectronCount import _ElectronCountConstant
 from quantype._constants.ElectronDensity import _ElectronDensityConstant
+from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Dimensionless, ElectronCount, ElectronDensity, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ElectronDensityKind, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -95,7 +97,11 @@ class PerElectronDensity(Quantity[Pow[ElectronDensityKind, Literal[-1]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PerElectronDensity[V, S] | PerElectronDensity[float, S], /
+        self,
+        other: PerElectronDensity[V, S]
+        | PerElectronDensity[float, S]
+        | _PerElectronDensityConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PerElectronDensity[V, S]: ...
@@ -245,3 +251,102 @@ class PerElectronDensity(Quantity[Pow[ElectronDensityKind, Literal[-1]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PerElectronDensity[W, S]: ...
+
+class _PerElectronDensityConstant(Constant[Pow[ElectronDensityKind, Literal[-1]]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PerElectronDensity[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[ElectronDensityKind, Literal[-1]]]
+    ) -> PerElectronDensity[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ElectronDensityConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __mul__(self, other: _ElectronCountConstant, /) -> _VolumeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[ElectronDensityKind, Literal[-1]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerElectronDensityConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Volume[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[ElectronDensityKind, Literal[-1]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PerElectronDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[ElectronDensityKind, Literal[-1]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerElectronDensityConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PerElectronDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[ElectronDensityKind, Literal[-1]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerElectronDensityConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[ElectronDensityKind, Literal[-1]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[ElectronDensityKind, Literal[-1]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[ElectronDensityKind, Literal[-1]]], W, T]: ...
+    def _rmul_ElectronDensity_f[T: UnitSystem](
+        self, other: ElectronDensity[float, T], /
+    ) -> Dimensionless[float, T]: ...
+    def _rmul_ElectronDensity[W, T: UnitSystem](
+        self, other: ElectronDensity[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    def _cmul_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    def _rmul_ElectronCount_f[T: UnitSystem](
+        self, other: ElectronCount[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rmul_ElectronCount[W, T: UnitSystem](
+        self, other: ElectronCount[W, T], /
+    ) -> Volume[W, T]: ...
+    def _cmul_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _VolumeConstant: ...
+    def _rtruediv_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> ElectronCount[float, T]: ...
+    def _rtruediv_Volume[W, T: UnitSystem](
+        self, other: Volume[W, T], /
+    ) -> ElectronCount[W, T]: ...
+    def _ctruediv_Volume(self, other: _VolumeConstant, /) -> _ElectronCountConstant: ...

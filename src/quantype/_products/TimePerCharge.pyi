@@ -13,8 +13,10 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Time import _TimeConstant
 from quantype._generated import Charge, Dimensionless, Time
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import ChargeKind, DimensionlessKind, Div, Mul, TimeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,9 @@ class TimePerCharge(Quantity[Div[TimeKind, ChargeKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: TimePerCharge[V, S] | TimePerCharge[float, S], /
+        self,
+        other: TimePerCharge[V, S] | TimePerCharge[float, S] | _TimePerChargeConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> TimePerCharge[V, S]: ...
@@ -199,3 +203,77 @@ class TimePerCharge(Quantity[Div[TimeKind, ChargeKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> TimePerCharge[W, S]: ...
+
+class _TimePerChargeConstant(Constant[Div[TimeKind, ChargeKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> TimePerCharge[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[TimeKind, ChargeKind]]) -> TimePerCharge[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _ChargeConstant, /) -> _TimeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[TimeKind, ChargeKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerChargeConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Charge[W, T], /) -> Time[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[TimeKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _TimePerChargeConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[TimeKind, ChargeKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerChargeConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: TimePerCharge[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[TimeKind, ChargeKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _TimePerChargeConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[TimeKind, ChargeKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[TimeKind, ChargeKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[TimeKind, ChargeKind]], W, T]: ...
+    def _rmul_Charge_f[T: UnitSystem](
+        self, other: Charge[float, T], /
+    ) -> Time[float, T]: ...
+    def _rmul_Charge[W, T: UnitSystem](self, other: Charge[W, T], /) -> Time[W, T]: ...
+    def _cmul_Charge(self, other: _ChargeConstant, /) -> _TimeConstant: ...
+    def _rtruediv_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> Charge[float, T]: ...
+    def _rtruediv_Time[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> Charge[W, T]: ...
+    def _ctruediv_Time(self, other: _TimeConstant, /) -> _ChargeConstant: ...

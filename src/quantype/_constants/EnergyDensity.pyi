@@ -6,10 +6,44 @@
 # pyright: reportIncompatibleMethodOverride=false
 # pyright: reportPrivateUsage=false
 # ruff: noqa: N802
-from typing import Any, overload, override
+from typing import Any, Literal, overload, override
 
 import numpy as np
 
+from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Action import _ActionConstant
+from quantype._constants.Angle import _AngleConstant
+from quantype._constants.Area import _AreaConstant
+from quantype._constants.AtomCount import _AtomCountConstant
+from quantype._constants.Charge import _ChargeConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.DipoleMoment import _DipoleMomentConstant
+from quantype._constants.ElectricField import _ElectricFieldConstant
+from quantype._constants.ElectricPotential import _ElectricPotentialConstant
+from quantype._constants.ElectronCount import _ElectronCountConstant
+from quantype._constants.ElectronDensity import _ElectronDensityConstant
+from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.EnergyPerAtom import _EnergyPerAtomConstant
+from quantype._constants.EnergyPerVolume import _EnergyPerVolumeConstant
+from quantype._constants.Entropy import _EntropyConstant
+from quantype._constants.Force import _ForceConstant
+from quantype._constants.ForceConstant import _ForceConstantConstant
+from quantype._constants.Frequency import _FrequencyConstant
+from quantype._constants.InverseTime import _InverseTimeConstant
+from quantype._constants.Length import _LengthConstant
+from quantype._constants.MagneticMoment import _MagneticMomentConstant
+from quantype._constants.Magnetization import _MagnetizationConstant
+from quantype._constants.Mass import _MassConstant
+from quantype._constants.MassDensity import _MassDensityConstant
+from quantype._constants.Momentum import _MomentumConstant
+from quantype._constants.ParticleDensity import _ParticleDensityConstant
+from quantype._constants.Pressure import _PressureConstant
+from quantype._constants.Temperature import _TemperatureConstant
+from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
+from quantype._constants.TemperatureRate import _TemperatureRateConstant
+from quantype._constants.Time import _TimeConstant
+from quantype._constants.Velocity import _VelocityConstant
+from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import (
     Acceleration,
     Action,
@@ -46,11 +80,161 @@ from quantype._generated import (
     Time,
     Velocity,
     Volume,
+    _CMulEnergyDensity,
+    _CTrueDivEnergyDensity,
     _RMulEnergyDensityF,
     _RTrueDivEnergyDensityF,
 )
+from quantype._products.AccelerationPerEnergyDensity import (
+    _AccelerationPerEnergyDensityConstant,
+)
+from quantype._products.ActionPerEnergyDensity import _ActionPerEnergyDensityConstant
+from quantype._products.AnglePerEnergyDensity import _AnglePerEnergyDensityConstant
+from quantype._products.AreaEnergyDensity import _AreaEnergyDensityConstant
+from quantype._products.AreaPerEnergyDensity import _AreaPerEnergyDensityConstant
+from quantype._products.AtomCountPerEnergyDensity import (
+    _AtomCountPerEnergyDensityConstant,
+)
+from quantype._products.ChargePerEnergyDensity import _ChargePerEnergyDensityConstant
+from quantype._products.DipoleMomentPerEnergyDensity import (
+    _DipoleMomentPerEnergyDensityConstant,
+)
+from quantype._products.ElectricFieldPerEnergyDensity import (
+    _ElectricFieldPerEnergyDensityConstant,
+)
+from quantype._products.ElectricPotentialPerEnergyDensity import (
+    _ElectricPotentialPerEnergyDensityConstant,
+)
+from quantype._products.ElectronCountPerEnergyDensity import (
+    _ElectronCountPerEnergyDensityConstant,
+)
+from quantype._products.ElectronDensityPerEnergyDensity import (
+    _ElectronDensityPerEnergyDensityConstant,
+)
+from quantype._products.EnergyDensityAcceleration import (
+    _EnergyDensityAccelerationConstant,
+)
+from quantype._products.EnergyDensityAction import _EnergyDensityActionConstant
+from quantype._products.EnergyDensityAngle import _EnergyDensityAngleConstant
+from quantype._products.EnergyDensityAtomCount import _EnergyDensityAtomCountConstant
+from quantype._products.EnergyDensityCharge import _EnergyDensityChargeConstant
+from quantype._products.EnergyDensityCubed import _EnergyDensityCubedConstant
+from quantype._products.EnergyDensityDipoleMoment import (
+    _EnergyDensityDipoleMomentConstant,
+)
+from quantype._products.EnergyDensityElectricField import (
+    _EnergyDensityElectricFieldConstant,
+)
+from quantype._products.EnergyDensityElectricPotential import (
+    _EnergyDensityElectricPotentialConstant,
+)
+from quantype._products.EnergyDensityElectronCount import (
+    _EnergyDensityElectronCountConstant,
+)
+from quantype._products.EnergyDensityElectronDensity import (
+    _EnergyDensityElectronDensityConstant,
+)
+from quantype._products.EnergyDensityEnergyPerVolume import (
+    _EnergyDensityEnergyPerVolumeConstant,
+)
+from quantype._products.EnergyDensityEntropy import _EnergyDensityEntropyConstant
+from quantype._products.EnergyDensityFrequency import _EnergyDensityFrequencyConstant
+from quantype._products.EnergyDensityInverseTime import (
+    _EnergyDensityInverseTimeConstant,
+)
+from quantype._products.EnergyDensityMagneticMoment import (
+    _EnergyDensityMagneticMomentConstant,
+)
+from quantype._products.EnergyDensityMagnetization import (
+    _EnergyDensityMagnetizationConstant,
+)
+from quantype._products.EnergyDensityMass import _EnergyDensityMassConstant
+from quantype._products.EnergyDensityMassDensity import (
+    _EnergyDensityMassDensityConstant,
+)
+from quantype._products.EnergyDensityMomentum import _EnergyDensityMomentumConstant
+from quantype._products.EnergyDensityParticleDensity import (
+    _EnergyDensityParticleDensityConstant,
+)
+from quantype._products.EnergyDensitySquared import _EnergyDensitySquaredConstant
+from quantype._products.EnergyDensityTemperature import (
+    _EnergyDensityTemperatureConstant,
+)
+from quantype._products.EnergyDensityTemperatureDifference import (
+    _EnergyDensityTemperatureDifferenceConstant,
+)
+from quantype._products.EnergyDensityTemperatureRate import (
+    _EnergyDensityTemperatureRateConstant,
+)
+from quantype._products.EnergyEnergyDensity import _EnergyEnergyDensityConstant
+from quantype._products.EnergyPerAtomEnergyDensity import (
+    _EnergyPerAtomEnergyDensityConstant,
+)
+from quantype._products.EnergyPerAtomPerEnergyDensity import (
+    _EnergyPerAtomPerEnergyDensityConstant,
+)
+from quantype._products.EnergyPerEnergyDensity import _EnergyPerEnergyDensityConstant
+from quantype._products.EnergyPerVolumePerEnergyDensity import (
+    _EnergyPerVolumePerEnergyDensityConstant,
+)
+from quantype._products.EntropyPerEnergyDensity import _EntropyPerEnergyDensityConstant
+from quantype._products.ForceConstantEnergyDensity import (
+    _ForceConstantEnergyDensityConstant,
+)
+from quantype._products.ForceConstantPerEnergyDensity import (
+    _ForceConstantPerEnergyDensityConstant,
+)
+from quantype._products.ForceEnergyDensity import _ForceEnergyDensityConstant
+from quantype._products.ForcePerEnergyDensity import _ForcePerEnergyDensityConstant
+from quantype._products.FrequencyPerEnergyDensity import (
+    _FrequencyPerEnergyDensityConstant,
+)
+from quantype._products.InverseTimePerEnergyDensity import (
+    _InverseTimePerEnergyDensityConstant,
+)
+from quantype._products.LengthEnergyDensity import _LengthEnergyDensityConstant
+from quantype._products.LengthPerEnergyDensity import _LengthPerEnergyDensityConstant
+from quantype._products.MagneticMomentPerEnergyDensity import (
+    _MagneticMomentPerEnergyDensityConstant,
+)
+from quantype._products.MagnetizationPerEnergyDensity import (
+    _MagnetizationPerEnergyDensityConstant,
+)
+from quantype._products.MassDensityPerEnergyDensity import (
+    _MassDensityPerEnergyDensityConstant,
+)
+from quantype._products.MassPerEnergyDensity import _MassPerEnergyDensityConstant
+from quantype._products.MomentumPerEnergyDensity import (
+    _MomentumPerEnergyDensityConstant,
+)
+from quantype._products.ParticleDensityPerEnergyDensity import (
+    _ParticleDensityPerEnergyDensityConstant,
+)
+from quantype._products.PerEnergyDensity import _PerEnergyDensityConstant
+from quantype._products.PerEnergyDensitySquared import _PerEnergyDensitySquaredConstant
+from quantype._products.PressureEnergyDensity import _PressureEnergyDensityConstant
+from quantype._products.PressurePerEnergyDensity import (
+    _PressurePerEnergyDensityConstant,
+)
+from quantype._products.TemperatureDifferencePerEnergyDensity import (
+    _TemperatureDifferencePerEnergyDensityConstant,
+)
+from quantype._products.TemperaturePerEnergyDensity import (
+    _TemperaturePerEnergyDensityConstant,
+)
+from quantype._products.TemperatureRatePerEnergyDensity import (
+    _TemperatureRatePerEnergyDensityConstant,
+)
+from quantype._products.TimeEnergyDensity import _TimeEnergyDensityConstant
+from quantype._products.TimePerEnergyDensity import _TimePerEnergyDensityConstant
+from quantype._products.VelocityEnergyDensity import _VelocityEnergyDensityConstant
+from quantype._products.VelocityPerEnergyDensity import (
+    _VelocityPerEnergyDensityConstant,
+)
+from quantype._products.VolumeEnergyDensity import _VolumeEnergyDensityConstant
+from quantype._products.VolumePerEnergyDensity import _VolumePerEnergyDensityConstant
 from quantype.core import Constant, Quantity, Unit, _Operand
-from quantype.kinds import DimensionlessKind, Div, EnergyDensityKind, Mul
+from quantype.kinds import Div, EnergyDensityKind, Mul, Pow
 from quantype.products import (
     AccelerationPerEnergyDensity,
     ActionPerEnergyDensity,
@@ -130,6 +314,8 @@ class _EnergyDensityConstant(Constant[EnergyDensityKind]):
     def to(self, unit: Unit[EnergyDensityKind]) -> EnergyDensity[float]: ...
     @overload
     @override
+    def __mul__[R](self, other: _CMulEnergyDensity[R], /) -> R: ...
+    @overload
     def __mul__[L](
         self, other: Constant[L], /
     ) -> Constant[Mul[EnergyDensityKind, L]]: ...
@@ -154,6 +340,8 @@ class _EnergyDensityConstant(Constant[EnergyDensityKind]):
     ) -> Quantity[Mul[L, EnergyDensityKind], W, T]: ...
     @overload
     @override
+    def __truediv__[R](self, other: _CTrueDivEnergyDensity[R], /) -> R: ...
+    @overload
     def __truediv__[L](
         self, other: Constant[L], /
     ) -> Constant[Div[EnergyDensityKind, L]]: ...
@@ -171,13 +359,27 @@ class _EnergyDensityConstant(Constant[EnergyDensityKind]):
     ) -> Quantity[Div[EnergyDensityKind, L], W, T]: ...
     @overload
     @override
+    # pyrefly: ignore[bad-override]
     def __rtruediv__(
         self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> Constant[Div[DimensionlessKind, EnergyDensityKind]]: ...
+    ) -> _PerEnergyDensityConstant: ...
     @overload
     def __rtruediv__[L, W, T: UnitSystem](
         self, other: _Operand[L, W, T], /
-    ) -> Quantity[Div[L, EnergyDensityKind], W, T]: ...
+    ) -> Quantity[Div[L, EnergyDensityKind], W, T]: ...  # ty: ignore[invalid-method-override]
+    @overload
+    @override
+    def __pow__(self, exponent: Literal[-2], /) -> _PerEnergyDensitySquaredConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[-1], /) -> _PerEnergyDensityConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[2], /) -> _EnergyDensitySquaredConstant: ...
+    @overload
+    def __pow__(self, exponent: Literal[3], /) -> _EnergyDensityCubedConstant: ...
+    @overload
+    def __pow__[N: int](
+        self, exponent: N, /
+    ) -> Constant[Pow[EnergyDensityKind, N]]: ...
     def _rmul_Dimensionless_f[T: UnitSystem](
         self, other: Dimensionless[float, T], /
     ) -> EnergyDensity[float, T]: ...
@@ -598,3 +800,203 @@ class _EnergyDensityConstant(Constant[EnergyDensityKind]):
     def _rtruediv_Action[W, T: UnitSystem](
         self, other: Action[W, T], /
     ) -> ActionPerEnergyDensity[W, T]: ...
+    def _cmul_Dimensionless(
+        self, other: _DimensionlessConstant, /
+    ) -> _EnergyDensityConstant: ...
+    def _cmul_Length(
+        self, other: _LengthConstant, /
+    ) -> _LengthEnergyDensityConstant: ...
+    def _cmul_Area(self, other: _AreaConstant, /) -> _AreaEnergyDensityConstant: ...
+    def _cmul_Volume(
+        self, other: _VolumeConstant, /
+    ) -> _VolumeEnergyDensityConstant: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _TimeEnergyDensityConstant: ...
+    def _cmul_Velocity(
+        self, other: _VelocityConstant, /
+    ) -> _VelocityEnergyDensityConstant: ...
+    def _cmul_Energy(
+        self, other: _EnergyConstant, /
+    ) -> _EnergyEnergyDensityConstant: ...
+    def _cmul_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _EnergyPerAtomEnergyDensityConstant: ...
+    def _cmul_Force(self, other: _ForceConstant, /) -> _ForceEnergyDensityConstant: ...
+    def _cmul_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ForceConstantEnergyDensityConstant: ...
+    def _cmul_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _PressureEnergyDensityConstant: ...
+    def _cmul_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _EnergyDensitySquaredConstant: ...
+    def _cmul_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _EnergyDensityEnergyPerVolumeConstant: ...
+    def _cmul_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _EnergyDensityTemperatureConstant: ...
+    def _cmul_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _EnergyDensityTemperatureDifferenceConstant: ...
+    def _cmul_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _EnergyDensityTemperatureRateConstant: ...
+    def _cmul_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _EnergyDensityMagneticMomentConstant: ...
+    def _cmul_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _EnergyDensityMagnetizationConstant: ...
+    def _cmul_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _EnergyDensityParticleDensityConstant: ...
+    def _cmul_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _EnergyDensityElectronDensityConstant: ...
+    def _cmul_Angle(self, other: _AngleConstant, /) -> _EnergyDensityAngleConstant: ...
+    def _cmul_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _EnergyDensityFrequencyConstant: ...
+    def _cmul_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _EnergyDensityInverseTimeConstant: ...
+    def _cmul_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _EnergyDensityAtomCountConstant: ...
+    def _cmul_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _EnergyDensityElectronCountConstant: ...
+    def _cmul_Mass(self, other: _MassConstant, /) -> _EnergyDensityMassConstant: ...
+    def _cmul_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _EnergyDensityMassDensityConstant: ...
+    def _cmul_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _EnergyDensityMomentumConstant: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _EnergyDensityAccelerationConstant: ...
+    def _cmul_Charge(
+        self, other: _ChargeConstant, /
+    ) -> _EnergyDensityChargeConstant: ...
+    def _cmul_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _EnergyDensityElectricPotentialConstant: ...
+    def _cmul_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _EnergyDensityElectricFieldConstant: ...
+    def _cmul_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _EnergyDensityDipoleMomentConstant: ...
+    def _cmul_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _EnergyDensityEntropyConstant: ...
+    def _cmul_Action(
+        self, other: _ActionConstant, /
+    ) -> _EnergyDensityActionConstant: ...
+    def _ctruediv_Dimensionless(
+        self, other: _DimensionlessConstant, /
+    ) -> _PerEnergyDensityConstant: ...
+    def _ctruediv_Length(
+        self, other: _LengthConstant, /
+    ) -> _LengthPerEnergyDensityConstant: ...
+    def _ctruediv_Area(
+        self, other: _AreaConstant, /
+    ) -> _AreaPerEnergyDensityConstant: ...
+    def _ctruediv_Volume(
+        self, other: _VolumeConstant, /
+    ) -> _VolumePerEnergyDensityConstant: ...
+    def _ctruediv_Time(
+        self, other: _TimeConstant, /
+    ) -> _TimePerEnergyDensityConstant: ...
+    def _ctruediv_Velocity(
+        self, other: _VelocityConstant, /
+    ) -> _VelocityPerEnergyDensityConstant: ...
+    def _ctruediv_Energy(
+        self, other: _EnergyConstant, /
+    ) -> _EnergyPerEnergyDensityConstant: ...
+    def _ctruediv_EnergyPerAtom(
+        self, other: _EnergyPerAtomConstant, /
+    ) -> _EnergyPerAtomPerEnergyDensityConstant: ...
+    def _ctruediv_Force(
+        self, other: _ForceConstant, /
+    ) -> _ForcePerEnergyDensityConstant: ...
+    def _ctruediv_ForceConstant(
+        self, other: _ForceConstantConstant, /
+    ) -> _ForceConstantPerEnergyDensityConstant: ...
+    def _ctruediv_Pressure(
+        self, other: _PressureConstant, /
+    ) -> _PressurePerEnergyDensityConstant: ...
+    def _ctruediv_EnergyDensity(
+        self, other: _EnergyDensityConstant, /
+    ) -> _DimensionlessConstant: ...
+    def _ctruediv_EnergyPerVolume(
+        self, other: _EnergyPerVolumeConstant, /
+    ) -> _EnergyPerVolumePerEnergyDensityConstant: ...
+    def _ctruediv_Temperature(
+        self, other: _TemperatureConstant, /
+    ) -> _TemperaturePerEnergyDensityConstant: ...
+    def _ctruediv_TemperatureDifference(
+        self, other: _TemperatureDifferenceConstant, /
+    ) -> _TemperatureDifferencePerEnergyDensityConstant: ...
+    def _ctruediv_TemperatureRate(
+        self, other: _TemperatureRateConstant, /
+    ) -> _TemperatureRatePerEnergyDensityConstant: ...
+    def _ctruediv_MagneticMoment(
+        self, other: _MagneticMomentConstant, /
+    ) -> _MagneticMomentPerEnergyDensityConstant: ...
+    def _ctruediv_Magnetization(
+        self, other: _MagnetizationConstant, /
+    ) -> _MagnetizationPerEnergyDensityConstant: ...
+    def _ctruediv_ParticleDensity(
+        self, other: _ParticleDensityConstant, /
+    ) -> _ParticleDensityPerEnergyDensityConstant: ...
+    def _ctruediv_ElectronDensity(
+        self, other: _ElectronDensityConstant, /
+    ) -> _ElectronDensityPerEnergyDensityConstant: ...
+    def _ctruediv_Angle(
+        self, other: _AngleConstant, /
+    ) -> _AnglePerEnergyDensityConstant: ...
+    def _ctruediv_Frequency(
+        self, other: _FrequencyConstant, /
+    ) -> _FrequencyPerEnergyDensityConstant: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _InverseTimePerEnergyDensityConstant: ...
+    def _ctruediv_AtomCount(
+        self, other: _AtomCountConstant, /
+    ) -> _AtomCountPerEnergyDensityConstant: ...
+    def _ctruediv_ElectronCount(
+        self, other: _ElectronCountConstant, /
+    ) -> _ElectronCountPerEnergyDensityConstant: ...
+    def _ctruediv_Mass(
+        self, other: _MassConstant, /
+    ) -> _MassPerEnergyDensityConstant: ...
+    def _ctruediv_MassDensity(
+        self, other: _MassDensityConstant, /
+    ) -> _MassDensityPerEnergyDensityConstant: ...
+    def _ctruediv_Momentum(
+        self, other: _MomentumConstant, /
+    ) -> _MomentumPerEnergyDensityConstant: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _AccelerationPerEnergyDensityConstant: ...
+    def _ctruediv_Charge(
+        self, other: _ChargeConstant, /
+    ) -> _ChargePerEnergyDensityConstant: ...
+    def _ctruediv_ElectricPotential(
+        self, other: _ElectricPotentialConstant, /
+    ) -> _ElectricPotentialPerEnergyDensityConstant: ...
+    def _ctruediv_ElectricField(
+        self, other: _ElectricFieldConstant, /
+    ) -> _ElectricFieldPerEnergyDensityConstant: ...
+    def _ctruediv_DipoleMoment(
+        self, other: _DipoleMomentConstant, /
+    ) -> _DipoleMomentPerEnergyDensityConstant: ...
+    def _ctruediv_Entropy(
+        self, other: _EntropyConstant, /
+    ) -> _EntropyPerEnergyDensityConstant: ...
+    def _ctruediv_Action(
+        self, other: _ActionConstant, /
+    ) -> _ActionPerEnergyDensityConstant: ...

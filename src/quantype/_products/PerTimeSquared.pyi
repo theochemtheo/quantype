@@ -12,6 +12,8 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Frequency import _FrequencyConstant
 from quantype._constants.InverseTime import _InverseTimeConstant
 from quantype._constants.Length import _LengthConstant
@@ -24,7 +26,7 @@ from quantype._generated import (
     Length,
     Time,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, Mul, Pow, TimeKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -108,7 +110,11 @@ class PerTimeSquared(Quantity[Pow[TimeKind, Literal[-2]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PerTimeSquared[V, S] | PerTimeSquared[float, S], /
+        self,
+        other: PerTimeSquared[V, S]
+        | PerTimeSquared[float, S]
+        | _PerTimeSquaredConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PerTimeSquared[V, S]: ...
@@ -268,3 +274,122 @@ class PerTimeSquared(Quantity[Pow[TimeKind, Literal[-2]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PerTimeSquared[W, S]: ...
+
+class _PerTimeSquaredConstant(Constant[Pow[TimeKind, Literal[-2]]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> PerTimeSquared[float, T]: ...
+    @override
+    def to(self, unit: Unit[Pow[TimeKind, Literal[-2]]]) -> PerTimeSquared[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _LengthConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __mul__(self, other: _TimeConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[TimeKind, Literal[-2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerTimeSquaredConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Time[W, T], /) -> InverseTime[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[TimeKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _FrequencyConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __truediv__(self, other: _InverseTimeConstant, /) -> _InverseTimeConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _PerTimeSquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[TimeKind, Literal[-2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerTimeSquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> InverseTime[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PerTimeSquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[TimeKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerTimeSquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[TimeKind, Literal[-2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[TimeKind, Literal[-2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[TimeKind, Literal[-2]]], W, T]: ...
+    def _rmul_Length_f[T: UnitSystem](
+        self, other: Length[float, T], /
+    ) -> Acceleration[float, T]: ...
+    def _rmul_Length[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> Acceleration[W, T]: ...
+    def _cmul_Length(self, other: _LengthConstant, /) -> _AccelerationConstant: ...
+    def _rmul_Time_f[T: UnitSystem](
+        self, other: Time[float, T], /
+    ) -> InverseTime[float, T]: ...
+    def _rmul_Time[W, T: UnitSystem](
+        self, other: Time[W, T], /
+    ) -> InverseTime[W, T]: ...
+    def _cmul_Time(self, other: _TimeConstant, /) -> _InverseTimeConstant: ...
+    def _rtruediv_Frequency_f[T: UnitSystem](
+        self, other: Frequency[float, T], /
+    ) -> Time[float, T]: ...
+    def _rtruediv_Frequency[W, T: UnitSystem](
+        self, other: Frequency[W, T], /
+    ) -> Time[W, T]: ...
+    def _ctruediv_Frequency(self, other: _FrequencyConstant, /) -> _TimeConstant: ...
+    def _rtruediv_InverseTime_f[T: UnitSystem](
+        self, other: InverseTime[float, T], /
+    ) -> Time[float, T]: ...
+    def _rtruediv_InverseTime[W, T: UnitSystem](
+        self, other: InverseTime[W, T], /
+    ) -> Time[W, T]: ...
+    def _ctruediv_InverseTime(
+        self, other: _InverseTimeConstant, /
+    ) -> _TimeConstant: ...
+    def _rtruediv_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> Length[float, T]: ...
+    def _rtruediv_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Length[W, T]: ...
+    def _ctruediv_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _LengthConstant: ...

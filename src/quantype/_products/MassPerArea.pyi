@@ -14,8 +14,11 @@ from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
 from quantype._constants.Area import _AreaConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Length import _LengthConstant
+from quantype._constants.Mass import _MassConstant
 from quantype._constants.MassDensity import _MassDensityConstant
+from quantype._constants.Pressure import _PressureConstant
 from quantype._generated import (
     Acceleration,
     Area,
@@ -25,7 +28,7 @@ from quantype._generated import (
     MassDensity,
     Pressure,
 )
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import AreaKind, DimensionlessKind, Div, MassKind, Mul
 from quantype.systems import Atomistic, UnitSystem
 
@@ -111,7 +114,7 @@ class MassPerArea(Quantity[Div[MassKind, AreaKind], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MassPerArea[V, S] | MassPerArea[float, S], /
+        self, other: MassPerArea[V, S] | MassPerArea[float, S] | _MassPerAreaConstant, /
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MassPerArea[V, S]: ...
@@ -247,3 +250,100 @@ class MassPerArea(Quantity[Div[MassKind, AreaKind], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassPerArea[W, S]: ...
+
+class _MassPerAreaConstant(Constant[Div[MassKind, AreaKind]]):
+    @override
+    def to_system[T: UnitSystem](self, system: type[T]) -> MassPerArea[float, T]: ...
+    @override
+    def to(self, unit: Unit[Div[MassKind, AreaKind]]) -> MassPerArea[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _AreaConstant, /) -> _MassConstant: ...
+    @overload
+    def __mul__(self, other: _AccelerationConstant, /) -> _PressureConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Div[MassKind, AreaKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerAreaConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Area[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Pressure[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Div[MassKind, AreaKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _LengthConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __truediv__(self, other: _MassDensityConstant, /) -> _LengthConstant: ...
+    @overload
+    def __truediv__(self, other: _MassPerAreaConstant, /) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Div[MassKind, AreaKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerAreaConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Length[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> Length[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassPerArea[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Div[MassKind, AreaKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassPerAreaConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Div[MassKind, AreaKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Div[MassKind, AreaKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Div[MassKind, AreaKind]], W, T]: ...
+    def _rmul_Area_f[T: UnitSystem](
+        self, other: Area[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rmul_Area[W, T: UnitSystem](self, other: Area[W, T], /) -> Mass[W, T]: ...
+    def _cmul_Area(self, other: _AreaConstant, /) -> _MassConstant: ...
+    def _rmul_Acceleration_f[T: UnitSystem](
+        self, other: Acceleration[float, T], /
+    ) -> Pressure[float, T]: ...
+    def _rmul_Acceleration[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> Pressure[W, T]: ...
+    def _cmul_Acceleration(
+        self, other: _AccelerationConstant, /
+    ) -> _PressureConstant: ...
+    def _rtruediv_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> Area[float, T]: ...
+    def _rtruediv_Mass[W, T: UnitSystem](self, other: Mass[W, T], /) -> Area[W, T]: ...
+    def _ctruediv_Mass(self, other: _MassConstant, /) -> _AreaConstant: ...

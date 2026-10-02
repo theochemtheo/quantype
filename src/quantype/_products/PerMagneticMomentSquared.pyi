@@ -11,8 +11,9 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MagneticMomentKind, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -53,7 +54,9 @@ class PerMagneticMomentSquared(Quantity[Pow[MagneticMomentKind, Literal[-2]], V,
     @overload
     def __truediv__(
         self,
-        other: PerMagneticMomentSquared[V, S] | PerMagneticMomentSquared[float, S],
+        other: PerMagneticMomentSquared[V, S]
+        | PerMagneticMomentSquared[float, S]
+        | _PerMagneticMomentSquaredConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -183,3 +186,65 @@ class PerMagneticMomentSquared(Quantity[Pow[MagneticMomentKind, Literal[-2]], V,
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PerMagneticMomentSquared[W, S]: ...
+
+class _PerMagneticMomentSquaredConstant(Constant[Pow[MagneticMomentKind, Literal[-2]]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PerMagneticMomentSquared[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[MagneticMomentKind, Literal[-2]]]
+    ) -> PerMagneticMomentSquared[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[MagneticMomentKind, Literal[-2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerMagneticMomentSquaredConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[MagneticMomentKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PerMagneticMomentSquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[MagneticMomentKind, Literal[-2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerMagneticMomentSquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PerMagneticMomentSquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[MagneticMomentKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerMagneticMomentSquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[MagneticMomentKind, Literal[-2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[MagneticMomentKind, Literal[-2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[MagneticMomentKind, Literal[-2]]], W, T]: ...

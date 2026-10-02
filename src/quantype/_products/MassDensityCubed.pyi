@@ -11,8 +11,9 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, MassDensityKind, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -50,7 +51,11 @@ class MassDensityCubed(Quantity[Pow[MassDensityKind, Literal[3]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: MassDensityCubed[V, S] | MassDensityCubed[float, S], /
+        self,
+        other: MassDensityCubed[V, S]
+        | MassDensityCubed[float, S]
+        | _MassDensityCubedConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> MassDensityCubed[V, S]: ...
@@ -171,3 +176,65 @@ class MassDensityCubed(Quantity[Pow[MassDensityKind, Literal[3]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassDensityCubed[W, S]: ...
+
+class _MassDensityCubedConstant(Constant[Pow[MassDensityKind, Literal[3]]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MassDensityCubed[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[MassDensityKind, Literal[3]]]
+    ) -> MassDensityCubed[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[MassDensityKind, Literal[3]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityCubedConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[MassDensityKind, Literal[3]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _MassDensityCubedConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[MassDensityKind, Literal[3]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityCubedConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensityCubed[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[MassDensityKind, Literal[3]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityCubedConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[MassDensityKind, Literal[3]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[MassDensityKind, Literal[3]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[MassDensityKind, Literal[3]]], W, T]: ...

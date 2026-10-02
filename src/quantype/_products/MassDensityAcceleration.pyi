@@ -13,10 +13,12 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._constants.Acceleration import _AccelerationConstant
+from quantype._constants.Dimensionless import _DimensionlessConstant
+from quantype._constants.Force import _ForceConstant
 from quantype._constants.MassDensity import _MassDensityConstant
 from quantype._constants.Volume import _VolumeConstant
 from quantype._generated import Acceleration, Dimensionless, Force, MassDensity, Volume
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import (
     AccelerationKind,
     DimensionlessKind,
@@ -94,7 +96,9 @@ class MassDensityAcceleration(Quantity[Mul[MassDensityKind, AccelerationKind], V
     @overload
     def __truediv__(
         self,
-        other: MassDensityAcceleration[V, S] | MassDensityAcceleration[float, S],
+        other: MassDensityAcceleration[V, S]
+        | MassDensityAcceleration[float, S]
+        | _MassDensityAccelerationConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -237,3 +241,95 @@ class MassDensityAcceleration(Quantity[Mul[MassDensityKind, AccelerationKind], V
     @classmethod
     @override
     def from_value[W](cls, value: W) -> MassDensityAcceleration[W, S]: ...
+
+class _MassDensityAccelerationConstant(
+    Constant[Mul[MassDensityKind, AccelerationKind]]
+):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> MassDensityAcceleration[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Mul[MassDensityKind, AccelerationKind]]
+    ) -> MassDensityAcceleration[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _VolumeConstant, /) -> _ForceConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Mul[MassDensityKind, AccelerationKind], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityAccelerationConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Volume[W, T], /) -> Force[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Mul[MassDensityKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(self, other: _MassDensityConstant, /) -> _AccelerationConstant: ...
+    @overload
+    def __truediv__(self, other: _AccelerationConstant, /) -> _MassDensityConstant: ...
+    @overload
+    def __truediv__(
+        self, other: _MassDensityAccelerationConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Mul[MassDensityKind, AccelerationKind], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityAccelerationConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensity[W, T], /
+    ) -> Acceleration[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: Acceleration[W, T], /
+    ) -> MassDensity[W, T]: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: MassDensityAcceleration[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Mul[MassDensityKind, AccelerationKind], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _MassDensityAccelerationConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Mul[MassDensityKind, AccelerationKind]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Mul[MassDensityKind, AccelerationKind]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Mul[MassDensityKind, AccelerationKind]], W, T]: ...
+    def _rmul_Volume_f[T: UnitSystem](
+        self, other: Volume[float, T], /
+    ) -> Force[float, T]: ...
+    def _rmul_Volume[W, T: UnitSystem](self, other: Volume[W, T], /) -> Force[W, T]: ...
+    def _cmul_Volume(self, other: _VolumeConstant, /) -> _ForceConstant: ...
+    def _rtruediv_Force_f[T: UnitSystem](
+        self, other: Force[float, T], /
+    ) -> Volume[float, T]: ...
+    def _rtruediv_Force[W, T: UnitSystem](
+        self, other: Force[W, T], /
+    ) -> Volume[W, T]: ...
+    def _ctruediv_Force(self, other: _ForceConstant, /) -> _VolumeConstant: ...

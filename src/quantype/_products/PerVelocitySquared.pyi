@@ -12,9 +12,11 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.Energy import _EnergyConstant
+from quantype._constants.Mass import _MassConstant
 from quantype._generated import Dimensionless, Energy, Mass
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, Mul, Pow, VelocityKind
 from quantype.systems import Atomistic, UnitSystem
 
@@ -67,7 +69,11 @@ class PerVelocitySquared(Quantity[Pow[VelocityKind, Literal[-2]], V, S]):
     ) -> Dimensionless[W, S]: ...
     @overload
     def __truediv__(
-        self, other: PerVelocitySquared[V, S] | PerVelocitySquared[float, S], /
+        self,
+        other: PerVelocitySquared[V, S]
+        | PerVelocitySquared[float, S]
+        | _PerVelocitySquaredConstant,
+        /,
     ) -> Dimensionless[V, S]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> PerVelocitySquared[V, S]: ...
@@ -201,3 +207,81 @@ class PerVelocitySquared(Quantity[Pow[VelocityKind, Literal[-2]], V, S]):
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PerVelocitySquared[W, S]: ...
+
+class _PerVelocitySquaredConstant(Constant[Pow[VelocityKind, Literal[-2]]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PerVelocitySquared[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[VelocityKind, Literal[-2]]]
+    ) -> PerVelocitySquared[float]: ...
+    @overload
+    @override
+    def __mul__(self, other: _EnergyConstant, /) -> _MassConstant: ...
+    @overload
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[VelocityKind, Literal[-2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerVelocitySquaredConstant: ...
+    @overload
+    def __mul__[W, T: UnitSystem](self, other: Energy[W, T], /) -> Mass[W, T]: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[VelocityKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PerVelocitySquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[VelocityKind, Literal[-2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerVelocitySquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PerVelocitySquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[VelocityKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerVelocitySquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[VelocityKind, Literal[-2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[VelocityKind, Literal[-2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[VelocityKind, Literal[-2]]], W, T]: ...
+    def _rmul_Energy_f[T: UnitSystem](
+        self, other: Energy[float, T], /
+    ) -> Mass[float, T]: ...
+    def _rmul_Energy[W, T: UnitSystem](self, other: Energy[W, T], /) -> Mass[W, T]: ...
+    def _cmul_Energy(self, other: _EnergyConstant, /) -> _MassConstant: ...
+    def _rtruediv_Mass_f[T: UnitSystem](
+        self, other: Mass[float, T], /
+    ) -> Energy[float, T]: ...
+    def _rtruediv_Mass[W, T: UnitSystem](
+        self, other: Mass[W, T], /
+    ) -> Energy[W, T]: ...
+    def _ctruediv_Mass(self, other: _MassConstant, /) -> _EnergyConstant: ...

@@ -11,8 +11,9 @@ import numpy as np
 import numpy.typing as npt
 from typing_extensions import TypeVar
 
+from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._generated import Dimensionless
-from quantype.core import Quantity, _Numerical, _Scalar
+from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
 from quantype.kinds import DimensionlessKind, Div, ForceConstantKind, Mul, Pow
 from quantype.systems import Atomistic, UnitSystem
 
@@ -51,7 +52,9 @@ class PerForceConstantSquared(Quantity[Pow[ForceConstantKind, Literal[-2]], V, S
     @overload
     def __truediv__(
         self,
-        other: PerForceConstantSquared[V, S] | PerForceConstantSquared[float, S],
+        other: PerForceConstantSquared[V, S]
+        | PerForceConstantSquared[float, S]
+        | _PerForceConstantSquaredConstant,
         /,
     ) -> Dimensionless[V, S]: ...
     @overload
@@ -181,3 +184,65 @@ class PerForceConstantSquared(Quantity[Pow[ForceConstantKind, Literal[-2]], V, S
     @classmethod
     @override
     def from_value[W](cls, value: W) -> PerForceConstantSquared[W, S]: ...
+
+class _PerForceConstantSquaredConstant(Constant[Pow[ForceConstantKind, Literal[-2]]]):
+    @override
+    def to_system[T: UnitSystem](
+        self, system: type[T]
+    ) -> PerForceConstantSquared[float, T]: ...
+    @override
+    def to(
+        self, unit: Unit[Pow[ForceConstantKind, Literal[-2]]]
+    ) -> PerForceConstantSquared[float]: ...
+    @overload
+    @override
+    def __mul__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Mul[Pow[ForceConstantKind, Literal[-2]], L]]: ...
+    @overload
+    def __mul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerForceConstantSquaredConstant: ...
+    @overload
+    def __mul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[Pow[ForceConstantKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __truediv__(
+        self, other: _PerForceConstantSquaredConstant, /
+    ) -> _DimensionlessConstant: ...
+    @overload
+    def __truediv__[L](
+        self, other: Constant[L], /
+    ) -> Constant[Div[Pow[ForceConstantKind, Literal[-2]], L]]: ...
+    @overload
+    def __truediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerForceConstantSquaredConstant: ...
+    @overload
+    def __truediv__[W, T: UnitSystem](
+        self, other: PerForceConstantSquared[W, T], /
+    ) -> Dimensionless[W, T]: ...
+    @overload
+    def __truediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[Pow[ForceConstantKind, Literal[-2]], L], W, T]: ...
+    @overload
+    @override
+    def __rmul__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> _PerForceConstantSquaredConstant: ...
+    @overload
+    def __rmul__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Mul[L, Pow[ForceConstantKind, Literal[-2]]], W, T]: ...
+    @overload
+    @override
+    def __rtruediv__(
+        self, other: float | np.floating[Any] | np.integer[Any], /
+    ) -> Constant[Div[DimensionlessKind, Pow[ForceConstantKind, Literal[-2]]]]: ...
+    @overload
+    def __rtruediv__[L, W, T: UnitSystem](
+        self, other: _Operand[L, W, T], /
+    ) -> Quantity[Div[L, Pow[ForceConstantKind, Literal[-2]]], W, T]: ...

@@ -80,6 +80,14 @@ PROTOCOLS = (
 )
 
 
+# A product of constants dispatches the same way: `k_B * e` finds its result
+# in e's `_cmul_Entropy` member.
+CONSTANT_PROTOCOLS = (
+    ("mul", "__mul__", "Mul", "_CMul", "_cmul_"),
+    ("div", "__truediv__", "Div", "_CTrueDiv", "_ctruediv_"),
+)
+
+
 def protocol_stubs(catalogue: Catalogue) -> str:
     text = ""
     for name in catalogue.quantities:
@@ -90,19 +98,33 @@ def protocol_stubs(catalogue: Catalogue) -> str:
                 f"\nclass {protocol}{name}[L, R](Protocol):\n"
                 f"    def {member}{name}(self, other: L, /) -> R: ...\n"
             )
+        for _, _, _, protocol, member in CONSTANT_PROTOCOLS:
+            # Used by the constant and product modules, not this one.
+            text += (
+                f"\nclass {protocol}{name}[R](Protocol):  # noqa: PYI046\n"
+                f"    def {member}{name}(self, other: _{name}Constant, /) -> R: ...\n"
+            )
     return text
+
+
+def product_name(
+    operation: str, left: str, right: str, catalogue: Catalogue, table: Table
+) -> str | None:
+    """The named kind or product class of named ``left`` times or over ``right``."""
+    named = catalogue.algebra.get((operation, left, right))
+    if named is not None:
+        return named
+    pair = table.pair("mul" if operation == "mul" else "div", left, right)
+    return pair.name if pair is not None else None
 
 
 def product_type(
     operation: str, left: str, right: str, catalogue: Catalogue, table: Table
 ) -> Callable[[str, str], str]:
     """The type of named ``left`` times or over named ``right``, by storage and system."""
-    named = catalogue.algebra.get((operation, left, right))
-    if named is not None:
-        return lambda storage, system: f"{named}[{storage}, {system}]"
-    pair = table.pair("mul" if operation == "mul" else "div", left, right)
-    if pair is not None:
-        return lambda storage, system: f"{pair.name}[{storage}, {system}]"
+    result = product_name(operation, left, right, catalogue, table)
+    if result is not None:
+        return lambda storage, system: f"{result}[{storage}, {system}]"
     expression = "Mul" if operation == "mul" else "Div"
     return lambda storage, system: (
         f"Quantity[{expression}[{left}Kind, {right}Kind], {storage}, {system}]"
@@ -241,14 +263,29 @@ def structural_fallback(method: str, name: str, result: str) -> list[str]:
     ]
 
 
-def power_type(name: str, exponent: int, catalogue: Catalogue, table: Table) -> str:
+def power_name(
+    name: str, exponent: int, catalogue: Catalogue, table: Table
+) -> str | None:
+    """The named kind or product class of a named kind's literal power."""
     named = named_power(catalogue.algebra, catalogue.powers, name, exponent)
     if named is not None:
-        return f"{named}[V, S]"
+        return named
     pair = table.pair("pow", name, exponent)
-    if pair is not None:
-        return f"{pair.name}[V, S]"
+    return pair.name if pair is not None else None
+
+
+def power_type(name: str, exponent: int, catalogue: Catalogue, table: Table) -> str:
+    result = power_name(name, exponent, catalogue, table)
+    if result is not None:
+        return f"{result}[V, S]"
     return f"Quantity[Pow[{name}Kind, Literal[{exponent}]], V, S]"
+
+
+def literal_exponents(name: str, catalogue: Catalogue) -> list[int]:
+    """The exponents named or given a product class for ``name``."""
+    return sorted(
+        {*POWERS, *(power for kind, power in catalogue.powers if kind == name)}
+    )
 
 
 def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
@@ -290,9 +327,7 @@ def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
         overrides=True,
     )
     # x ** 2 is x * x and x ** -1 is 1 / x, so literal powers are named or pairs.
-    exponents = sorted(
-        {*POWERS, *(power for kind, power in catalogue.powers if kind == name)}
-    )
+    exponents = literal_exponents(name, catalogue)
     powers = [
         f"def __pow__(self, exponent: Literal[{exponent}], /) -> {power_type(name, exponent, catalogue, table)}: ..."
         for exponent in exponents
@@ -303,40 +338,40 @@ def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
     return text + overloads(powers, overrides=True)
 
 
+SCALARS = "float | np.floating[Any] | np.integer[Any]"
+
+
 def constant_stub(name: str, catalogue: Catalogue, table: Table) -> str:
     """A kind's constant: system-free, adopting each quantity operand's system.
 
     A constant is float-like: ``k_B * T`` finds its result in ``T``'s float
     protocol member, and ``T * k_B`` in this class's members, which are generic
-    in the quantity's storage and system. A reflected structural operand is
-    typed structurally (see ``_Operand`` in core.pyi), and a constant on the left
-    handles products of constants.
+    in the quantity's storage and system. A product of two constants finds its
+    result in the right constant's ``_cmul_`` member, a named kind's constant or
+    a product class's (``ADR-006``). A reflected structural operand is typed
+    structurally (see ``_Operand`` in core.pyi).
     """
     own = f"_{name}Constant"
-    scalar_types = "float | np.floating[Any] | np.integer[Any]"
     text = f"\nclass {own}(Constant[{name}Kind]):\n"
     text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[float, T]: ...\n"
     text += f"    @override\n    def to(self, unit: Unit[{name}Kind]) -> {name}[float]: ...\n"
-    algebra = catalogue.algebra
+    reciprocal = product_name("div", "Dimensionless", name, catalogue, table)
     for method, protocol, expression, reflected in (
-        ("__mul__", "_RMul", "Mul", False),
+        ("__mul__", "Mul", "Mul", False),
         ("__rmul__", "", "Mul", True),
-        ("__truediv__", "_RTrueDiv", "Div", False),
+        ("__truediv__", "TrueDiv", "Div", False),
         ("__rtruediv__", "", "Div", True),
     ):
         signatures: list[str] = []
         if not reflected:
-            # Constants carry protocol members too, so a product of constants
-            # must match first.
+            # A constant on the right carries both kinds of member; the product
+            # of constants must match first.
             signatures += [
+                f"def {method}[R](self, other: _C{protocol}{name}[R], /) -> R: ...",
                 f"def {method}[L](self, other: Constant[L], /) -> Constant[{expression}[{name}Kind, L]]: ...",
-                f"def {method}[R, T: UnitSystem](self, other: {protocol}{name}F[T, R], /) -> R: ...",
+                f"def {method}[R, T: UnitSystem](self, other: _R{protocol}{name}F[T, R], /) -> R: ...",
             ]
-        # A named reciprocal refines the base's structural return type, which
-        # checkers compare as an override.
-        reciprocal = None
         if method == "__rtruediv__":
-            reciprocal = algebra.get(("div", "Dimensionless", name))
             scalar = (
                 f"_{reciprocal}Constant"
                 if reciprocal is not None
@@ -346,16 +381,36 @@ def constant_stub(name: str, catalogue: Catalogue, table: Table) -> str:
             scalar = own
         pair = f"L, {name}Kind" if reflected else f"{name}Kind, L"
         signatures += [
-            f"def {method}(self, other: {scalar_types}, /) -> {scalar}: ...",
+            f"def {method}(self, other: {SCALARS}, /) -> {scalar}: ...",
             f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{pair}], W, T]: ...",
         ]
         block = overloads(signatures, overrides=True)
-        text += block if reciprocal is None else suppressed_override(block)
+        # A named reciprocal refines the base's structural return type, which
+        # checkers compare as an override.
+        text += block if method != "__rtruediv__" else suppressed_override(block)
+    powers = [
+        f"def __pow__(self, exponent: Literal[{exponent}], /) -> _{powered}Constant: ..."
+        for exponent in literal_exponents(name, catalogue)
+        if (powered := power_name(name, exponent, catalogue, table)) is not None
+    ]
+    powers.append(
+        f"def __pow__[N: int](self, exponent: N, /) -> Constant[Pow[{name}Kind, N]]: ..."
+    )
+    text += overloads(powers, overrides=True)
     for operation, _, _, _, member in PROTOCOLS:
         for left in catalogue.quantities:
             result = product_type(operation, left, name, catalogue, table)
             text += f"    def {member}{left}_f[T: UnitSystem](self, other: {left}[float, T], /) -> {result('float', 'T')}: ...\n"
             text += f"    def {member}{left}[W, T: UnitSystem](self, other: {left}[W, T], /) -> {result('W', 'T')}: ...\n"
+    for operation, _, expression, _, member in CONSTANT_PROTOCOLS:
+        for left in catalogue.quantities:
+            named = product_name(operation, left, name, catalogue, table)
+            returned = (
+                f"_{named}Constant"
+                if named is not None
+                else f"Constant[{expression}[{left}Kind, {name}Kind]]"
+            )
+            text += f"    def {member}{left}(self, other: _{left}Constant, /) -> {returned}: ...\n"
     return text
 
 
@@ -563,7 +618,7 @@ def constant_module(name: str, catalogue: Catalogue, package: str, table: Table)
         + "# pyright: reportPrivateUsage=false\n"
         + PROTOCOL_MEMBERS
     )
-    text += "from typing import Any, overload, override\nimport numpy as np\n"
+    text += "from typing import Any, Literal, overload, override\nimport numpy as np\n"
     text += "from quantype.core import Constant, Unit, _Operand\n"
     text += (
         "from quantype.core import Quantity\n"
@@ -578,7 +633,13 @@ def constant_module(name: str, catalogue: Catalogue, package: str, table: Table)
     generated = [
         word
         for kind in catalogue.quantities
-        for word in (kind, f"_RMul{kind}F", f"_RTrueDiv{kind}F")
+        for word in (
+            kind,
+            f"_RMul{kind}F",
+            f"_RTrueDiv{kind}F",
+            f"_CMul{kind}",
+            f"_CTrueDiv{kind}",
+        )
         if word in used
     ]
     text += f"from {package}._generated import " + ", ".join(generated) + "\n"
@@ -588,6 +649,9 @@ def constant_module(name: str, catalogue: Catalogue, package: str, table: Table)
     pairs = sorted(word for word in used if word in table.pairs)
     if pairs:
         text += f"from {package}.products import " + ", ".join(pairs) + "\n"
+    for pair in sorted(table.pairs):
+        if f"_{pair}Constant" in used:
+            text += f"from {package}._products.{pair} import _{pair}Constant\n"
     return text + body
 
 
