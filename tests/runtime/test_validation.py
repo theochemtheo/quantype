@@ -301,3 +301,9 @@ def test_parse_restores_float64_array_storage() -> None:
     restored = Length.parse(narrow).value
     assert isinstance(restored, np.ndarray)
     assert restored.dtype == np.float64
+
+
+def test_parse_keeps_float64_arrays_as_they_are() -> None:
+    restored = Length.parse({"magnitude": [1.0, 2.0], "unit": "nm"}).value
+    assert isinstance(restored, np.ndarray)
+    assert restored.dtype == np.float64

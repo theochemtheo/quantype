@@ -994,9 +994,6 @@ _TORCH_DIFFERENT = frozenset({"sort", "median", "nanmedian"})
 def torch_function(func: Any, args: Sequence[Any], kwargs: dict[str, Any]) -> Any:
     """Torch's dispatch protocol, onto the same unit rules as NumPy's."""
     name = str(getattr(func, "__name__", ""))
-    if name.startswith("__"):
-        # Tensor operators: Python then tries the quantity's reflected operator.
-        return NotImplemented
     name = _TORCH_NAMES.get(name, name)
     function = UFUNCS.get(name) or FUNCTIONS.get(name) or LINALG.get(name)
     if function is None or name in _TORCH_DIFFERENT:
@@ -1006,6 +1003,16 @@ def torch_function(func: Any, args: Sequence[Any], kwargs: dict[str, Any]) -> An
         )
     keywords = {_TORCH_KEYWORDS.get(key, key): value for key, value in kwargs.items()}
     arguments = list(args)
+    reflected = REFLECTED.get(name)
+    if (
+        reflected is not None
+        and len(arguments) == 2  # noqa: PLR2004 -- a binary operator
+        and not _is_quantity(arguments[0])
+        and _is_quantity(arguments[1])
+    ):
+        # A plain tensor on the left: as for NumPy, the quantity's reflected
+        # operator decides, instead of handing the operator back to Torch.
+        return getattr(arguments[1], reflected)(arguments[0])
     if name == "clip":
         arguments += [keywords.pop("min", None), keywords.pop("max", None)]
         arguments = arguments[:3]

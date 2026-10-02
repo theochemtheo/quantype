@@ -51,8 +51,6 @@ def overloads(
     signatures: list[str], indent: str = "    ", *, overrides: bool = False
 ) -> str:
     decorator = indent + "@override\n" if overrides else ""
-    if len(signatures) == 1:
-        return decorator + indent + signatures[0] + "\n"
     return "".join(
         indent
         + "@overload\n"
@@ -419,7 +417,13 @@ def structural_quantity_stub() -> str:
         ),
         overrides=True,
     )
-    text += "    @override\n    def __pow__[A, B, N: int](self: _StructuralQuantity[A, B, V, S], exponent: N, /) -> Quantity[Pow[K, N], V, S]: ...\n"
+    text += overloads(
+        [
+            "def __pow__[A, B](self: _StructuralQuantity[A, B, V, S], exponent: Literal[2], /) -> Quantity[Pow[K, Literal[2]], V, S]: ...",
+            "def __pow__[A, B, N: int](self: _StructuralQuantity[A, B, V, S], exponent: N, /) -> Quantity[Pow[K, N], V, S]: ...",
+        ],
+        overrides=True,
+    )
     for method in ("__neg__", "__abs__"):
         text += f"    @override\n    def {method}[{structural}](self: Q) -> Q: ...\n"
     text += f"    @override\n    def sum[{structural}](self: Q, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False) -> Q: ...\n"
@@ -870,12 +874,11 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         for name, pair in table.pairs.items()
         if pair.operation == "pow" and pair.right == 2  # noqa: PLR2004
     )
-    if squares:
-        text += (
-            f"from {package}.products import ("
-            + ", ".join(name for name, _ in squares)
-            + ")\n"
-        )
+    text += (
+        f"from {package}.products import ("
+        + ", ".join(name for name, _ in squares)
+        + ")\n"
+    )
     text += (
         f"from {package}._generated import ("
         + ", ".join(f"_RMul{name}F, _RMul{name}" for name in catalogue.quantities)
@@ -903,6 +906,12 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     roots.append(
         "def sqrt[V, S: UnitSystem](x: Dimensionless[V, S], /) -> Dimensionless[V, S]: ..."
     )
+    # Squares of unnamed kinds, written x ** 2 or x * x; named ones are above.
+    roots += [
+        f"def sqrt[A, B, V, S: UnitSystem](x: _BaseQuantity[{square}, V, S], /) -> Quantity[{e}[A, B], V, S]: ..."
+        for e in STRUCTURES
+        for square in (f"Pow[{e}[A, B], Literal[2]]", f"Mul[{e}[A, B], {e}[A, B]]")
+    ]
     text += overloads([*roots, *(raw.format("sqrt") for raw in RAW_UNARY)], indent="")
     for name in ("absolute", "abs", "fabs"):
         text += overloads(

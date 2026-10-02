@@ -21,7 +21,6 @@ from quantype._internal._products import class_for
 from quantype._internal._semantics import (
     DIMENSIONLESS_KINDS,
     KINDS,
-    TEMPERATURE_DIFFERENCES,
     Kind,
     Semantic,
     addition,
@@ -160,10 +159,19 @@ def _wrap(
     return cast("Quantity[Any, Any, Any]", result)
 
 
-def _delta_unit(point: Unit[Any], kind: Semantic) -> Unit[Any] | None:
+def _is_scalar(raw: object) -> bool:
+    """Python numbers and NumPy scalars, as opposed to arrays and tensors."""
+    if isinstance(raw, (int, float)):
+        return True
+    if not type(raw).__module__.startswith("numpy"):
+        return False
+    import numpy as np
+
+    return isinstance(raw, np.generic)
+
+
+def _delta_unit(point: Unit[Any], kind: Kind) -> Unit[Any] | None:
     """The temperature-difference unit matching a point unit (°C → Δ°C)."""
-    if not isinstance(kind, Kind):
-        return None
     try:
         unit = get_unit(f"delta_{point.name}", kind=kind)
     except ValueError:
@@ -178,13 +186,10 @@ def _sum_display(
     for display in (left._display, right._display):
         if display is not None and display.semantic is kind:
             return display
-    if (
-        left._display is not None
-        and isinstance(left._semantic, Kind)
-        and TEMPERATURE_DIFFERENCES.get(left._semantic) is kind
-    ):
-        return _delta_unit(left._display, kind)
-    return None
+    if left._display is None:
+        return None
+    # Only a point minus a point gets here; its difference kind is the result.
+    return _delta_unit(left._display, cast("Kind", kind))
 
 
 class Quantity[K, V, S: UnitSystem]:
@@ -204,8 +209,7 @@ class Quantity[K, V, S: UnitSystem]:
         if cls.__dict__.get("_kind"):
             if "_semantic" not in cls.__dict__:
                 cls._semantic = KINDS[cls._kind]
-            if isinstance(cls._semantic, Kind):
-                _CLASSES[cls._semantic] = cls
+            _CLASSES[cast("Kind", cls._semantic)] = cls
 
     @classmethod
     def __class_getitem__(cls, parameters: Any) -> GenericAlias:
@@ -644,13 +648,8 @@ class Quantity[K, V, S: UnitSystem]:
         unit and exact echo are deliberately excluded: ``1 nm`` and ``10 Å`` agree.
         """
         raw: Any = self._value
-        if not isinstance(raw, (int, float)):
-            if not type(raw).__module__.startswith("numpy"):
-                raise TypeError(f"unhashable array storage: {type(raw).__name__}")
-            import numpy as np
-
-            if not isinstance(raw, np.generic):
-                raise TypeError(f"unhashable array storage: {type(raw).__name__}")
+        if not _is_scalar(raw):
+            raise TypeError(f"unhashable array storage: {type(raw).__name__}")
         return hash((self._semantic, self._system, cast("object", raw)))
 
     def __lt__(self, other: object) -> Any:
@@ -667,20 +666,19 @@ class Quantity[K, V, S: UnitSystem]:
 
     def __getitem__(self, key: Any) -> Self:
         raw: Any = self._value
-        if isinstance(raw, (int, float)):
+        if _is_scalar(raw):
             raise TypeError("Scalar quantities cannot be indexed")
         selected = raw[key]
         if type(raw).__module__.startswith("numpy"):
             import numpy as np
 
             # Preserve ndarray storage when indexing selects a single element.
-            if isinstance(raw, np.ndarray):
-                selected = np.asarray(selected)
+            selected = np.asarray(selected)
         return self._with(selected)
 
     def __len__(self) -> int:
         raw: Any = self._value
-        if isinstance(raw, (int, float)):
+        if _is_scalar(raw):
             raise TypeError("Scalar quantities have no length")
         return len(raw)
 

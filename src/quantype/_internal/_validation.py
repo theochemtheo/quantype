@@ -104,10 +104,10 @@ def pydantic_schema(
 
     # Dimensionless values print as a bare number, so the schema accepts one.
     pattern = DIMENSIONLESS_STRING if cls._kind == "Dimensionless" else QUANTITY_STRING
-    wrapper = getattr(core_schema, "with_info_wrap_validator_function", None)
-    if wrapper is None:
-        # Pydantic 2.0 used this name for the same context-aware boundary.
-        wrapper = getattr(core_schema, "general_wrap_validator_function")  # noqa: B009
+    # Pydantic 2.0 calls the same context-aware boundary by its older name.
+    wrapper = getattr(
+        core_schema, "with_info_wrap_validator_function", None
+    ) or getattr(core_schema, "general_wrap_validator_function")  # noqa: B009
     return cast(
         "core_schema.CoreSchema",
         wrapper(

@@ -26,7 +26,7 @@ from quantype import (
     ujax,
     utorch,
 )
-from quantype.kinds import ForceKind, LengthKind, Mul
+from quantype.kinds import EnergyKind, ForceKind, LengthKind, Mul, TimeKind
 from quantype.products import TemperatureDifferenceSquared
 from quantype.systems import SI
 
@@ -63,6 +63,10 @@ assert_type(qnp.var(positions), Area[Array])
 assert_type(qnp.var(temperatures), TemperatureDifferenceSquared[Array])
 assert_type(qnp.nanstd(temperatures), TemperatureDifference[Array])
 assert_type(qnp.square(positions), Area[Array])
+product = (1 * u.nm) * (1 * u.fs) * u.eV(1)
+structural = Quantity[Mul[Mul[LengthKind, TimeKind], EnergyKind], float]
+assert_type(qnp.sqrt(product * product), structural)
+assert_type(qnp.sqrt(product**2), structural)
 assert_type(qnp.hypot(positions, positions), Length[Array])
 assert_type(qnp.linspace(0 * u.nm, 1 * u.nm, 5), Length[Array])
 # Products are named as for `*`; a plain array keeps the kind.

@@ -117,3 +117,16 @@ def test_runtime_arithmetic_finds_the_product_class_of_every_spelling(
         if type(outcome).__name__ != name:
             wrong.append(((operation, left, right), name, type(outcome).__name__))
     assert wrong == []
+
+
+def test_two_products_with_the_same_name_are_rejected() -> None:
+    names = ["Ab", "AbCd", "CdEf", "Ef"]
+    catalogue = builtin_catalogue().extend(
+        quantities={
+            name: QuantitySpec((0, 0, 0, 0, 0, index + 1, 0, 0), name.lower())
+            for index, name in enumerate(names)
+        },
+        units={name.lower(): UnitSpec(name) for name in names},
+    )
+    with pytest.raises(ValueError, match="would both be named AbCdEf"):
+        naming_table(catalogue)

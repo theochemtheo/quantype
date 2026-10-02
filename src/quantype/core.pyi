@@ -323,6 +323,12 @@ class Quantity(Generic[K, V, S]):
     def __rsub__[Q: _StructuralQuantity[Any, Any, Any, Any]](
         self: Q, other: int, /
     ) -> Q: ...
+    # A literal square keeps its exponent in every checker, so qnp.sqrt undoes it.
+    @overload
+    def __pow__[A, B](
+        self: _StructuralQuantity[A, B, V, S], exponent: Literal[2], /
+    ) -> Quantity[Pow[K, Literal[2]], V, S]: ...
+    @overload
     def __pow__[A, B, N: int](
         self: _StructuralQuantity[A, B, V, S], exponent: N, /
     ) -> Quantity[Pow[K, N], V, S]: ...

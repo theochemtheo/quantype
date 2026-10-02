@@ -27,7 +27,7 @@ from quantype import (
 )
 from quantype import units as u
 from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS, UNITS
-from quantype._internal._semantics import KINDS
+from quantype._internal._semantics import KINDS, Kind, dimensionless_kind, named_kind
 from quantype.core import _wrap, dimensions, get_unit, result_kind
 from quantype.systems import SI
 
@@ -252,6 +252,10 @@ def test_operations_without_physical_meaning_raise() -> None:
     length = 2 * u.nm
     with pytest.raises(TypeError, match="absolute Temperature from 0"):
         _ = 0 - cast("Any", 300 * u.K)
+    with pytest.raises(
+        TypeError, match="Cannot subtract TemperatureDifference and Temperature"
+    ):
+        _ = cast("Any", 5 * u.delta_K) - 300 * u.K
     with pytest.raises(TypeError, match="Cannot subtract Temperature and Length"):
         _ = cast("Any", 300 * u.K) - length
     with pytest.raises(TypeError, match="Only integer quantity powers"):
@@ -292,3 +296,25 @@ def test_internal_entry_points_reject_unsupported_requests() -> None:
 
 def test_product_classes_are_listed_for_completion() -> None:
     assert "LengthTime" in dir(quantype.products)
+
+
+def test_numpy_scalar_storage_behaves_as_a_scalar() -> None:
+    narrow = Length[np.float32](2, u.nm)
+    assert hash(narrow) == hash(Length[np.float32](20, u.angstrom))
+    with pytest.raises(TypeError, match="Scalar quantities cannot be indexed"):
+        _ = narrow[0]
+    with pytest.raises(TypeError, match="Scalar quantities have no length"):
+        len(narrow)
+
+
+def test_numpy_ufuncs_without_a_reflected_rule_name_the_operands() -> None:
+    with pytest.raises(TypeError, match=r"np\.maximum of a plain array and Length"):
+        np.maximum(np.ones(2), cast("Any", 2 * u.nm))
+
+
+def test_kinds_outside_every_catalogue_are_rejected_clearly() -> None:
+    with pytest.raises(TypeError, match="catalogue has no NoSuchKind kind"):
+        named_kind(KINDS["Length"], "NoSuchKind")
+    stray = Kind("Stray", (1, 0, 0, 0, 0, 0, 0, 0), "angstrom")
+    with pytest.raises(TypeError, match="requires a catalogue dimensionless kind"):
+        dimensionless_kind(stray)

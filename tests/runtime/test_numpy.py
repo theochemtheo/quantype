@@ -363,11 +363,14 @@ def test_quantities_and_plain_numbers_do_not_mix_in_functions() -> None:
 
 def test_square_roots_of_squared_products_and_ratios() -> None:
     product = (2 * u.nm) * (3 * u.fs) * u.eV(1)
-    untyped: Any = qnp
-    root = untyped.sqrt(product * product)
+    root = qnp.sqrt(product * product)
+    assert qnp.sqrt(product**2).kind == product.kind
     assert root.kind == product.kind
     assert root.value == pytest.approx(product.value)
     assert qnp.sqrt(u.one(4.0)) == u.one(2.0)
+    untyped: Any = qnp
+    with pytest.raises(TypeError, match="sqrt needs a squared kind"):
+        untyped.sqrt(product)
 
 
 def test_shape_helpers_keep_the_kind() -> None:

@@ -22,6 +22,7 @@ from quantype import (
     u,
     utorch,
 )
+from quantype.products import PerLength
 from quantype.systems import SI
 from quantype.testing import assert_allclose
 
@@ -226,3 +227,17 @@ def test_tensor_storage_rejects_complex_and_integer_dtypes() -> None:
 def test_assert_allclose_accepts_tensors_that_require_gradients() -> None:
     tracked = torch.tensor([1.0, 2.0], requires_grad=True)
     assert_allclose(Length[torch.Tensor](tracked, u.nm), u.nm(torch.tensor([1.0, 2.0])))
+
+
+def test_plain_tensors_need_units_to_meet_quantities() -> None:
+    lengths = Length[torch.Tensor](torch.tensor([1.0]), u.nm)
+    plain: Any = torch.ones(1)
+    with pytest.raises(TypeError, match="Cannot add Tensor and Length; give it a unit"):
+        _ = plain + lengths
+    with pytest.raises(TypeError, match="Cannot add Tensor and Length"):
+        torch.add(plain, cast("Any", lengths))
+    with pytest.raises(TypeError, match="Cannot subtract Tensor and Length"):
+        _ = plain - lengths
+    assert isinstance(plain / lengths, PerLength)
+    with pytest.raises(TypeError, match=r"torch\.__setitem__ does not know the units"):
+        plain[0] = lengths
