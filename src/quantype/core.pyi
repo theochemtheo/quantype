@@ -1,7 +1,16 @@
 # mypy: disable-error-code=overload-overlap
 # pyright: reportOverlappingOverload=false
 from collections.abc import Iterator, Sequence
-from typing import Any, ClassVar, Generic, Literal, Protocol, Self, overload, override
+from typing import (
+    Any,
+    ClassVar,
+    Generic,
+    Literal,
+    Protocol,
+    Self,
+    overload,
+    override,
+)
 
 import numpy as np
 import numpy.typing as npt
@@ -341,6 +350,10 @@ class Quantity(Generic[K, V, S]):
 def require_unit(unit: object, kind: str, hint: str = ...) -> None: ...
 
 type _Scalar = float | np.floating[Any] | np.integer[Any]
+
+# An operand the generated stubs repeat in thousands of signatures. Pyright
+# prints an alias's name in diagnostics, so aliases stand only for parameters.
+type _IntArray = npt.NDArray[np.integer[Any]]  # noqa: PYI047
 
 # A NumPy, JAX or Torch array scaling a quantity: each exports through DLPack,
 # which quantities do not, so a quantity never matches it.

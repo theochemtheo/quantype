@@ -62,6 +62,13 @@ def overloads(
     )
 
 
+def numpy_imports(used: set[str]) -> str:
+    """NumPy's imports for a generated module whose body uses the words ``used``."""
+    return ("import numpy as np\n" if "np" in used else "") + (
+        "import numpy.typing as npt\n" if "npt" in used else ""
+    )
+
+
 def binary(method: str, name: str, right: str, result: str) -> list[str]:
     """Float storage takes the other operand's; otherwise the storage is kept."""
     return [
@@ -155,7 +162,7 @@ def scaling(method: str, name: str, result: Callable[[str], str]) -> list[str]:
     """
     return [
         f"def {method}(self, other: _Scalar, /) -> {result('V')}: ...",
-        f"def {method}(self: {name}[float, S], other: npt.NDArray[np.integer[Any]], /) -> {result('npt.NDArray[np.float64]')}: ...",
+        f"def {method}(self: {name}[float, S], other: _IntArray, /) -> {result('npt.NDArray[np.float64]')}: ...",
         f"def {method}[W: _Numerical](self: {name}[float, S], other: W, /) -> {result('W')}: ...",
         f"def {method}(self, other: _Numerical, /) -> {result('V')}: ...",
     ]
@@ -338,9 +345,6 @@ def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
     return text + overloads(powers, overrides=True)
 
 
-SCALARS = "float | np.floating[Any] | np.integer[Any]"
-
-
 def constant_stub(name: str, catalogue: Catalogue, table: Table) -> str:
     """A kind's constant: system-free, adopting each quantity operand's system.
 
@@ -381,7 +385,7 @@ def constant_stub(name: str, catalogue: Catalogue, table: Table) -> str:
             scalar = own
         pair = f"L, {name}Kind" if reflected else f"{name}Kind, L"
         signatures += [
-            f"def {method}(self, other: {SCALARS}, /) -> {scalar}: ...",
+            f"def {method}(self, other: _Scalar, /) -> {scalar}: ...",
             f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{pair}], W, T]: ...",
         ]
         block = overloads(signatures, overrides=True)
@@ -557,7 +561,7 @@ def quantity_outputs(
         + "# pyright: reportPrivateUsage=false\n"
         + PROTOCOL_MEMBERS
     )
-    stub += "from typing import Any, Literal, Never, Protocol, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Unit, _Numerical, _Scalar\n"
+    stub += "from typing import Any, Literal, Never, Protocol, overload, override\nimport numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Unit, _IntArray, _Numerical, _Scalar\n"
     stub += (
         "from quantype.core import Quantity\n"
         if package == "quantype"
@@ -618,8 +622,13 @@ def constant_module(name: str, catalogue: Catalogue, package: str, table: Table)
         + "# pyright: reportPrivateUsage=false\n"
         + PROTOCOL_MEMBERS
     )
-    text += "from typing import Any, Literal, overload, override\nimport numpy as np\n"
-    text += "from quantype.core import Constant, Unit, _Operand\n"
+    text += (
+        "from typing import "
+        + ", ".join(n for n in ("Any", "Literal", "overload", "override") if n in used)
+        + "\n"
+    )
+    text += numpy_imports(used)
+    text += "from quantype.core import Constant, Unit, _Operand, _Scalar\n"
     text += (
         "from quantype.core import Quantity\n"
         if package == "quantype"

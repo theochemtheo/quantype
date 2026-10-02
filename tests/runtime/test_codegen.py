@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
+import ast
 import importlib.util
+import io
 import re
 import shlex
 import shutil
 import subprocess
 import sys
+import tokenize
 from pathlib import Path
 
 import numpy as np
@@ -15,6 +18,7 @@ import pytest
 
 from quantype.catalogue import Catalogue, QuantitySpec, UnitSpec, builtin_catalogue
 from quantype.codegen import generate, render
+from quantype.codegen._compact import minify
 
 PROJECT_FIXTURE = Path(__file__).parents[1] / "fixtures" / "generated_catalogue"
 
@@ -209,6 +213,44 @@ def test_rendering_is_deterministic(catalogue: Catalogue) -> None:
     assert render(catalogue, package="labquantities") == render(
         catalogue, package="labquantities"
     )
+
+
+def _checker_comments(source: str) -> list[str]:
+    return [
+        token.string
+        for token in tokenize.generate_tokens(io.StringIO(source).readline)
+        if token.type == tokenize.COMMENT
+        and token.string.startswith(("# mypy:", "# pyright:", "# pyrefly:", "# ty:"))
+    ]
+
+
+def _unminified(tree: ast.Module) -> ast.Module:
+    """Undo minification's short names for ``overload`` and ``override``."""
+    names = {"_o": "overload", "_v": "override"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Name):
+            node.id = names.get(node.id, node.id)
+        elif isinstance(node, ast.alias) and node.asname in names:
+            node.asname = None
+    return tree
+
+
+def test_minifying_keeps_each_private_stub_module() -> None:
+    sources = render(builtin_catalogue())
+    private = [
+        name
+        for name in sources
+        if name.startswith(("_products/", "_constants/")) or name == "_generated.pyi"
+    ]
+    assert len(private) > 1700
+    for name in private:
+        source = sources[name]
+        minified = minify(source)
+        assert len(minified) <= len(source)
+        assert ast.dump(_unminified(ast.parse(minified))) == ast.dump(
+            ast.parse(source)
+        ), name
+        assert _checker_comments(minified) == _checker_comments(source), name
 
 
 def test_generated_files_are_current(

@@ -18,9 +18,9 @@ from quantype.codegen._render import (
     PROTOCOL_MEMBERS,
     PROTOCOLS,
     QUANTITY_OVERRIDES,
-    SCALARS,
     binary,
     method_overloads,
+    numpy_imports,
     overloads,
     scaling,
     structural_fallback,
@@ -34,7 +34,14 @@ if TYPE_CHECKING:
 # ruff: noqa: E501
 
 _TYPING = ("Any", "Literal", "overload", "override")
-_CORE = ("Constant", "Unit", "_Numerical", "_Operand", "_Scalar")
+_CORE = (
+    "Constant",
+    "Unit",
+    "_IntArray",
+    "_Numerical",
+    "_Operand",
+    "_Scalar",
+)
 
 
 def _entry_signatures(method: str, pair: str, right: str, result: str) -> list[str]:
@@ -151,7 +158,7 @@ def constant_class(pair: Pair, table: Table) -> str:
         ]
         signatures += [
             f"def {method}[L](self, other: Constant[L], /) -> Constant[{expression}[{marker}, L]]: ...",
-            f"def {method}(self, other: {SCALARS}, /) -> {own}: ...",
+            f"def {method}(self, other: _Scalar, /) -> {own}: ...",
         ]
         signatures += [
             f"def {method}[W, T: UnitSystem](self, other: {right}[W, T], /) -> {result}[W, T]: ..."
@@ -167,7 +174,7 @@ def constant_class(pair: Pair, table: Table) -> str:
     ):
         text += overloads(
             [
-                f"def {method}(self, other: {SCALARS}, /) -> {scalar}: ...",
+                f"def {method}(self, other: _Scalar, /) -> {scalar}: ...",
                 f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[L, {marker}], W, T]: ...",
             ],
             overrides=True,
@@ -183,8 +190,20 @@ def constant_class(pair: Pair, table: Table) -> str:
     return text
 
 
+def _abbreviated(body: str, pair: Pair) -> str:
+    """Spell the module's own class by a short name, ``_C``.
+
+    It recurs in almost every signature of a product module, and the product
+    modules are most of the installed package.
+    """
+    return "".join(
+        line if line.startswith("class ") else re.sub(rf"\b{pair.name}\[", "_C[", line)
+        for line in body.splitlines(keepends=True)
+    )
+
+
 def _pair_module(pair: Pair, catalogue: Catalogue, package: str, table: Table) -> str:
-    body = pair_class(pair, table) + constant_class(pair, table)
+    body = _abbreviated(pair_class(pair, table) + constant_class(pair, table), pair)
     used: set[str] = set(re.findall(r"\b\w+\b", body))
     text = (
         HEADER
@@ -194,7 +213,7 @@ def _pair_module(pair: Pair, catalogue: Catalogue, package: str, table: Table) -
         + (PROTOCOL_MEMBERS if "    def _r" in body else "")
     )
     text += "from typing import " + ", ".join(n for n in _TYPING if n in used) + "\n"
-    text += "import numpy as np\nimport numpy.typing as npt\n"
+    text += numpy_imports(used)
     text += "from typing_extensions import TypeVar\n"
     text += "from quantype.systems import Atomistic, UnitSystem\n"
     text += (
@@ -214,6 +233,10 @@ def _pair_module(pair: Pair, catalogue: Catalogue, package: str, table: Table) -
     for kind in catalogue.quantities:
         if f"_{kind}Constant" in used:
             text += f"from {package}._constants.{kind} import _{kind}Constant\n"
+    # An import, not an alias: Pyright prints an alias's name in diagnostics.
+    # Pyrefly and ty cannot resolve a module importing itself, so it comes
+    # through the public re-export.
+    text += f"from {package}.products import {pair.name} as _C\n"
     text += "# Public parameter names read better in diagnostics than private ones.\n"
     text += "# ruff: noqa: PYI001\n"
     text += (

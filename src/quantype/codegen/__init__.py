@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 from quantype.catalogue import (
     _QUANTITY_BINDINGS,  # pyright: ignore[reportPrivateUsage]
 )
+from quantype.codegen._compact import minify
 from quantype.codegen._package import package_outputs
 from quantype.codegen._products import product_outputs
 from quantype.codegen._render import outputs
@@ -59,8 +60,15 @@ def render(catalogue: Catalogue, *, package: str = "quantype") -> dict[str, str]
 _BATCH = 200
 
 
+def _private_stub(name: str) -> bool:
+    """A module that is minified (see ``quantype.codegen._compact``)."""
+    return name.startswith(("_products/", "_constants/")) or name == "_generated.pyi"
+
+
 def _formatted(formatter: str, package: str, sources: dict[str, str]) -> dict[str, str]:
     """Sort imports and format the Python sources, many files per Ruff run.
+
+    The private stub modules are then minified.
 
     Starting Ruff once per file dominated generation. The files are written
     under the working directory, so Ruff reads the configuration it would read
@@ -97,7 +105,8 @@ def _formatted(formatter: str, package: str, sources: dict[str, str]) -> dict[st
                     check=True,
                 )
         for name in python:
-            formatted[name] = (root / name).read_text(encoding="utf-8")
+            text = (root / name).read_text(encoding="utf-8")
+            formatted[name] = minify(text) if _private_stub(name) else text
     return formatted
 
 
