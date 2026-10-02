@@ -17,7 +17,7 @@ Scope: scalar quantity outputs. `ujax.grad`/`value_and_grad` differentiate the q
 
 ## JAX
 
-`src/quantype/_internal/_jax.py` (re-exported by `ujax.py`) registers the base quantity and generated quantity classes as single-leaf pytrees on adapter import. The leaf is the raw `.value`; metadata holds semantic identity and unit system, never the display unit (it would make presentation part of tree structure and break `lax.cond`/`scan`). Unflattening must restore both without coercing leaves, including sentinels JAX supplies while manipulating trees.
+`src/quantype/_internal/_jax.py` (re-exported by `ujax.py`) registers the base quantity and generated quantity classes as single-leaf pytrees on adapter import. The leaf is the raw `.value`; metadata holds semantic identity and unit system, never the display unit ([ADR-004](../../../docs/decisions/ADR-004-display-unit-is-presentation.md)). Unflattening must restore both without coercing leaves, including sentinels JAX supplies while manipulating trees.
 
 `_raw_function` carries output metadata through `has_aux=True` so kind discovery does not evaluate the user's function separately. Preserve that behavior under `grad`, `hessian`, `jit` and `vmap`. Reuse physical algebra rather than deriving kinds from raw dimensions.
 

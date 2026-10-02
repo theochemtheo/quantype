@@ -19,9 +19,13 @@ Parent: read [core physical semantics](../quantype-core/SKILL.md), including its
 
 `src/quantype/codegen/_render.py` produces quantity, kind, unit and autodiff contracts. `_package.py` adds application-package scaffolding. `render(...)` returns source strings without running tools. `generate(...)` formats with Ruff and writes changed files; `check=True` returns stale names without writing. Check mode still requires Ruff on PATH.
 
-For built-ins, change definitions or renderers, run `uv run scripts/generate.py`, then `uv run scripts/generate.py --check`. Review the generated diff. See the [ownership map](../quantype/references/architecture.md) for generated files and handwritten exports; adding a built-in class may require updating `src/quantype/__init__.py` as well.
+For built-ins, change definitions or renderers, run `uv run scripts/generate.py`, then `uv run scripts/generate.py --check`. Review the generated diff. See the [ownership map](../../../docs/architecture.md) for generated files and handwritten exports; adding a built-in class may require updating `src/quantype/__init__.py` as well.
 
-Application generation currently requires a combined catalogue containing the core kinds required by its helpers. Use `builtin_catalogue().extend(...)` and a distinct package name. A generated `labquantities.Length` is a different nominal type from `quantype.Length`; use imports consistently from one API. Generation does not update the installed built-in overloads. Refer to `docs/custom-catalogues.md` for application-facing examples.
+Application generation ([ADR-010](../../../docs/decisions/ADR-010-application-catalogues-are-separate-packages.md)) currently requires a combined catalogue containing the core kinds required by its helpers. Use `builtin_catalogue().extend(...)` and a distinct package name. A generated `labquantities.Length` is a different nominal type from `quantype.Length`; use imports consistently from one API. Generation does not update the installed built-in overloads. Refer to `docs/custom-catalogues.md` for application-facing examples.
+
+## Product classes
+
+`codegen/_table.py` builds the naming table from `Catalogue.algebra`: which products of up to three named factors are named, and a product class for every unnamed product of two kinds and the literal powers 2, 3, -1 and -2 ([ADR-005](../../../docs/decisions/ADR-005-products-named-by-factors.md)). `codegen/_products.py` renders each product class's stub module under `_products/`, plus `products.py` (the table as text rows, parsed lazily) and `products.pyi`; `_internal/_products.py` creates the runtime classes on demand. Named classes find product results through `_rmul_*`/`_rtruediv_*` protocol members on the right operand, never through per-partner overloads ([ADR-006](../../../docs/decisions/ADR-006-protocol-dispatch-for-product-stubs.md)). A new kind or relation can add or rename many product classes: review the generated diff, `test_naming_table.py`, and the stubtest allowlist's `_products`/`_constants` entries. Measure checker time with the stubs installed in site-packages, not as local code.
 
 ## Validate actual consumers
 

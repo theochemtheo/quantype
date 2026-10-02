@@ -9,7 +9,7 @@ Parent: read [core physical semantics](../quantype-core/SKILL.md), including its
 
 ## Find the owner of the signature
 
-The API uses Python 3.12 generic syntax and `py.typed`, without a checker plugin. Quantity stubs are generic over storage `V` and unit system `S`; `S` is a module-level `typing_extensions.TypeVar` with `default=Atomistic` (PEP 695 cannot express defaults before 3.13) and is invariant, so operands from different systems match no overload. Method-level parameters keep PEP 695 syntax. `core.py` is a dynamic runtime dispatch boundary; adjacent `core.pyi` is its precise public contract. `_internal/_unit.pyi` and `_internal/_math.pyi` are also handwritten. Quantity, namespace and autodiff stubs are generated; see [catalogue](../quantype-catalogue/SKILL.md) before changing those signatures.
+The API uses Python 3.12 generic syntax and `py.typed`, without a checker plugin ([ADR-002](../../../docs/decisions/ADR-002-generated-stubs-for-four-checkers.md)). Quantity stubs are generic over storage `V` and unit system `S`; `S` is a module-level `typing_extensions.TypeVar` with `default=Atomistic` (PEP 695 cannot express defaults before 3.13) and is invariant, so operands from different systems match no overload. Method-level parameters keep PEP 695 syntax. `core.py` is a dynamic runtime dispatch boundary; adjacent `core.pyi` is its precise public contract. `_internal/_unit.pyi` and `_internal/_math.pyi` are also handwritten. Quantity, namespace and autodiff stubs are generated; see [catalogue](../quantype-catalogue/SKILL.md) before changing those signatures.
 
 Trace failures from the consumer expression to the selected overload and its generating relation or template. Preserve:
 
