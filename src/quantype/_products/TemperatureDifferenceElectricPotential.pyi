@@ -5,7 +5,7 @@
 # mypy: disable-error-code=override
 # pyright: reportIncompatibleMethodOverride=false
 # pyright: reportPrivateUsage=false
-from typing import Any, overload, override
+from typing import overload, override
 
 import numpy as np
 import numpy.typing as npt
@@ -15,14 +15,9 @@ from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.ElectricPotential import _ElectricPotentialConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._generated import Dimensionless, ElectricPotential, TemperatureDifference
-from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
-from quantype.kinds import (
-    DimensionlessKind,
-    Div,
-    ElectricPotentialKind,
-    Mul,
-    TemperatureDifferenceKind,
-)
+from quantype.core import Constant, Quantity, Unit, _IntArray, _Numerical, _Operand, _Scalar
+from quantype.kinds import DimensionlessKind, Div, ElectricPotentialKind, Mul, TemperatureDifferenceKind
+from quantype.products import TemperatureDifferenceElectricPotential as _C
 from quantype.systems import Atomistic, UnitSystem
 
 # Public parameter names read better in diagnostics than private ones.
@@ -30,341 +25,137 @@ from quantype.systems import Atomistic, UnitSystem
 V = TypeVar("V")
 S = TypeVar("S", bound=UnitSystem, default=Atomistic)
 
-class TemperatureDifferenceElectricPotential(
-    Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], V, S]
-):
+class TemperatureDifferenceElectricPotential(Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], V, S]):
     @overload
     @override
-    def __mul__(
-        self, other: _Scalar, /
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> _C[V, S]: ...
     @overload
-    def __mul__(
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceElectricPotential[npt.NDArray[np.float64], S]: ...
+    def __mul__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __mul__[W: _Numerical](
-        self: TemperatureDifferenceElectricPotential[float, S], other: W, /
-    ) -> TemperatureDifferenceElectricPotential[W, S]: ...
+    def __mul__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __mul__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __mul__(self, other: _Numerical, /) -> _C[V, S]: ...
     @overload
-    def __mul__[K, W](
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: Quantity[K, W, S],
-        /,
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], W, S
-    ]: ...
+    def __mul__[K, W](self: _C[float, S], other: Quantity[K, W, S], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], W, S]: ...
     @overload
-    def __mul__[K](
-        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], V, S
-    ]: ...
+    def __mul__[K](self, other: Quantity[K, V, S] | Quantity[K, float, S], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
-    def __truediv__[W](
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: TemperatureDifference[W, S],
-        /,
-    ) -> ElectricPotential[W, S]: ...
+    def __truediv__[W](self: _C[float, S], other: TemperatureDifference[W, S], /) -> ElectricPotential[W, S]: ...
     @overload
-    def __truediv__(
-        self,
-        other: TemperatureDifference[V, S]
-        | TemperatureDifference[float, S]
-        | _TemperatureDifferenceConstant,
-        /,
-    ) -> ElectricPotential[V, S]: ...
+    def __truediv__(self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S] | _TemperatureDifferenceConstant, /) -> ElectricPotential[V, S]: ...
     @overload
-    def __truediv__[W](
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: ElectricPotential[W, S],
-        /,
-    ) -> TemperatureDifference[W, S]: ...
+    def __truediv__[W](self: _C[float, S], other: ElectricPotential[W, S], /) -> TemperatureDifference[W, S]: ...
     @overload
-    def __truediv__(
-        self,
-        other: ElectricPotential[V, S]
-        | ElectricPotential[float, S]
-        | _ElectricPotentialConstant,
-        /,
-    ) -> TemperatureDifference[V, S]: ...
+    def __truediv__(self, other: ElectricPotential[V, S] | ElectricPotential[float, S] | _ElectricPotentialConstant, /) -> TemperatureDifference[V, S]: ...
     @overload
-    def __truediv__[W](
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: TemperatureDifferenceElectricPotential[W, S],
-        /,
-    ) -> Dimensionless[W, S]: ...
+    def __truediv__[W](self: _C[float, S], other: _C[W, S], /) -> Dimensionless[W, S]: ...
     @overload
-    def __truediv__(
-        self,
-        other: TemperatureDifferenceElectricPotential[V, S]
-        | TemperatureDifferenceElectricPotential[float, S]
-        | _TemperatureDifferenceElectricPotentialConstant,
-        /,
-    ) -> Dimensionless[V, S]: ...
+    def __truediv__(self, other: _C[V, S] | _C[float, S] | _TemperatureDifferenceElectricPotentialConstant, /) -> Dimensionless[V, S]: ...
     @overload
-    def __truediv__(
-        self, other: _Scalar, /
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> _C[V, S]: ...
     @overload
-    def __truediv__(
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceElectricPotential[npt.NDArray[np.float64], S]: ...
+    def __truediv__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __truediv__[W: _Numerical](
-        self: TemperatureDifferenceElectricPotential[float, S], other: W, /
-    ) -> TemperatureDifferenceElectricPotential[W, S]: ...
+    def __truediv__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __truediv__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __truediv__(self, other: _Numerical, /) -> _C[V, S]: ...
     @overload
-    def __truediv__[K, W](
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: Quantity[K, W, S],
-        /,
-    ) -> Quantity[
-        Div[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], W, S
-    ]: ...
+    def __truediv__[K, W](self: _C[float, S], other: Quantity[K, W, S], /) -> Quantity[Div[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], W, S]: ...
     @overload
-    def __truediv__[K](
-        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
-    ) -> Quantity[
-        Div[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], V, S
-    ]: ...
+    def __truediv__[K](self, other: Quantity[K, V, S] | Quantity[K, float, S], /) -> Quantity[Div[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
-    def __matmul__(
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceElectricPotential[npt.NDArray[np.float64], S]: ...
+    def __matmul__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __matmul__[W: _Numerical](
-        self: TemperatureDifferenceElectricPotential[float, S], other: W, /
-    ) -> TemperatureDifferenceElectricPotential[W, S]: ...
+    def __matmul__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __matmul__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __matmul__(self, other: _Numerical, /) -> _C[V, S]: ...
     @overload
-    def __matmul__[K, W](
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: Quantity[K, W, S],
-        /,
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], W, S
-    ]: ...
+    def __matmul__[K, W](self: _C[float, S], other: Quantity[K, W, S], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], W, S]: ...
     @overload
-    def __matmul__[K](
-        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], V, S
-    ]: ...
+    def __matmul__[K](self, other: Quantity[K, V, S] | Quantity[K, float, S], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], K], V, S]: ...
     @overload
     @override
-    def __rmul__(
-        self, other: _Scalar, /
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> _C[V, S]: ...
     @overload
-    def __rmul__(
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceElectricPotential[npt.NDArray[np.float64], S]: ...
+    def __rmul__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __rmul__[W: _Numerical](
-        self: TemperatureDifferenceElectricPotential[float, S], other: W, /
-    ) -> TemperatureDifferenceElectricPotential[W, S]: ...
+    def __rmul__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __rmul__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __rmul__(self, other: _Numerical, /) -> _C[V, S]: ...
     @overload
     @override
-    def __rmatmul__(
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceElectricPotential[npt.NDArray[np.float64], S]: ...
+    def __rmatmul__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __rmatmul__[W: _Numerical](
-        self: TemperatureDifferenceElectricPotential[float, S], other: W, /
-    ) -> TemperatureDifferenceElectricPotential[W, S]: ...
+    def __rmatmul__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __rmatmul__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __rmatmul__(self, other: _Numerical, /) -> _C[V, S]: ...
     @override
-    def item(self) -> TemperatureDifferenceElectricPotential[float, S]: ...
+    def item(self) -> _C[float, S]: ...
     @overload
     @override
-    def __rtruediv__(
-        self, other: _Scalar, /
-    ) -> Quantity[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]],
-        V,
-        S,
-    ]: ...
+    def __rtruediv__(self, other: _Scalar, /) -> Quantity[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]], V, S]: ...
     @overload
-    def __rtruediv__(
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> Quantity[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]],
-        npt.NDArray[np.float64],
-        S,
-    ]: ...
+    def __rtruediv__(self: _C[float, S], other: _IntArray, /) -> Quantity[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]], npt.NDArray[np.float64], S]: ...
     @overload
-    def __rtruediv__[W: _Numerical](
-        self: TemperatureDifferenceElectricPotential[float, S], other: W, /
-    ) -> Quantity[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]],
-        W,
-        S,
-    ]: ...
+    def __rtruediv__[W: _Numerical](self: _C[float, S], other: W, /) -> Quantity[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]], W, S]: ...
     @overload
-    def __rtruediv__(
-        self, other: _Numerical, /
-    ) -> Quantity[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]],
-        V,
-        S,
-    ]: ...
+    def __rtruediv__(self, other: _Numerical, /) -> Quantity[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]], V, S]: ...
     @overload
     @override
-    def __add__[W](
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], W, S],
-        /,
-    ) -> TemperatureDifferenceElectricPotential[W, S]: ...
+    def __add__[W](self: _C[float, S], other: Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], W, S], /) -> _C[W, S]: ...
     @overload
-    def __add__(
-        self,
-        other: Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], V, S]
-        | Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], float, S],
-        /,
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __add__(self, other: Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], V, S] | Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], float, S], /) -> _C[V, S]: ...
     @overload
     @override
-    def __sub__[W](
-        self: TemperatureDifferenceElectricPotential[float, S],
-        other: Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], W, S],
-        /,
-    ) -> TemperatureDifferenceElectricPotential[W, S]: ...
+    def __sub__[W](self: _C[float, S], other: Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], W, S], /) -> _C[W, S]: ...
     @overload
-    def __sub__(
-        self,
-        other: Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], V, S]
-        | Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], float, S],
-        /,
-    ) -> TemperatureDifferenceElectricPotential[V, S]: ...
+    def __sub__(self, other: Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], V, S] | Quantity[Mul[TemperatureDifferenceKind, ElectricPotentialKind], float, S], /) -> _C[V, S]: ...
     @override
-    def to_system[T: UnitSystem](
-        self, system: type[T]
-    ) -> TemperatureDifferenceElectricPotential[V, T]: ...
+    def to_system[T: UnitSystem](self, system: type[T]) -> _C[V, T]: ...
     @classmethod
     @override
-    def from_value[W](
-        cls, value: W
-    ) -> TemperatureDifferenceElectricPotential[W, S]: ...
+    def from_value[W](cls, value: W) -> _C[W, S]: ...
 
-class _TemperatureDifferenceElectricPotentialConstant(
-    Constant[Mul[TemperatureDifferenceKind, ElectricPotentialKind]]
-):
+class _TemperatureDifferenceElectricPotentialConstant(Constant[Mul[TemperatureDifferenceKind, ElectricPotentialKind]]):
     @override
-    def to_system[T: UnitSystem](
-        self, system: type[T]
-    ) -> TemperatureDifferenceElectricPotential[float, T]: ...
+    def to_system[T: UnitSystem](self, system: type[T]) -> _C[float, T]: ...
     @override
-    def to(
-        self, unit: Unit[Mul[TemperatureDifferenceKind, ElectricPotentialKind]]
-    ) -> TemperatureDifferenceElectricPotential[float]: ...
+    def to(self, unit: Unit[Mul[TemperatureDifferenceKind, ElectricPotentialKind]]) -> _C[float]: ...
     @overload
     @override
-    def __mul__[L](
-        self, other: Constant[L], /
-    ) -> Constant[Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], L]]: ...
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], L]]: ...
     @overload
-    def __mul__(
-        self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> _TemperatureDifferenceElectricPotentialConstant: ...
+    def __mul__(self, other: _Scalar, /) -> _TemperatureDifferenceElectricPotentialConstant: ...
     @overload
-    def __mul__[L, W, T: UnitSystem](
-        self, other: _Operand[L, W, T], /
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], L], W, T
-    ]: ...
+    def __mul__[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, ElectricPotentialKind], L], W, T]: ...
     @overload
     @override
-    def __truediv__(
-        self, other: _TemperatureDifferenceConstant, /
-    ) -> _ElectricPotentialConstant: ...
+    def __truediv__(self, other: _TemperatureDifferenceConstant, /) -> _ElectricPotentialConstant: ...
     @overload
-    def __truediv__(
-        self, other: _ElectricPotentialConstant, /
-    ) -> _TemperatureDifferenceConstant: ...
+    def __truediv__(self, other: _ElectricPotentialConstant, /) -> _TemperatureDifferenceConstant: ...
     @overload
-    def __truediv__(
-        self, other: _TemperatureDifferenceElectricPotentialConstant, /
-    ) -> _DimensionlessConstant: ...
+    def __truediv__(self, other: _TemperatureDifferenceElectricPotentialConstant, /) -> _DimensionlessConstant: ...
     @overload
-    def __truediv__[L](
-        self, other: Constant[L], /
-    ) -> Constant[Div[Mul[TemperatureDifferenceKind, ElectricPotentialKind], L]]: ...
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[Mul[TemperatureDifferenceKind, ElectricPotentialKind], L]]: ...
     @overload
-    def __truediv__(
-        self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> _TemperatureDifferenceElectricPotentialConstant: ...
+    def __truediv__(self, other: _Scalar, /) -> _TemperatureDifferenceElectricPotentialConstant: ...
     @overload
-    def __truediv__[W, T: UnitSystem](
-        self, other: TemperatureDifference[W, T], /
-    ) -> ElectricPotential[W, T]: ...
+    def __truediv__[W, T: UnitSystem](self, other: TemperatureDifference[W, T], /) -> ElectricPotential[W, T]: ...
     @overload
-    def __truediv__[W, T: UnitSystem](
-        self, other: ElectricPotential[W, T], /
-    ) -> TemperatureDifference[W, T]: ...
+    def __truediv__[W, T: UnitSystem](self, other: ElectricPotential[W, T], /) -> TemperatureDifference[W, T]: ...
     @overload
-    def __truediv__[W, T: UnitSystem](
-        self, other: TemperatureDifferenceElectricPotential[W, T], /
-    ) -> Dimensionless[W, T]: ...
+    def __truediv__[W, T: UnitSystem](self, other: _C[W, T], /) -> Dimensionless[W, T]: ...
     @overload
-    def __truediv__[L, W, T: UnitSystem](
-        self, other: _Operand[L, W, T], /
-    ) -> Quantity[
-        Div[Mul[TemperatureDifferenceKind, ElectricPotentialKind], L], W, T
-    ]: ...
+    def __truediv__[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[Div[Mul[TemperatureDifferenceKind, ElectricPotentialKind], L], W, T]: ...
     @overload
     @override
-    def __rmul__(
-        self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> _TemperatureDifferenceElectricPotentialConstant: ...
+    def __rmul__(self, other: _Scalar, /) -> _TemperatureDifferenceElectricPotentialConstant: ...
     @overload
-    def __rmul__[L, W, T: UnitSystem](
-        self, other: _Operand[L, W, T], /
-    ) -> Quantity[
-        Mul[L, Mul[TemperatureDifferenceKind, ElectricPotentialKind]], W, T
-    ]: ...
+    def __rmul__[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[Mul[L, Mul[TemperatureDifferenceKind, ElectricPotentialKind]], W, T]: ...
     @overload
     @override
-    def __rtruediv__(
-        self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> Constant[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]]
-    ]: ...
+    def __rtruediv__(self, other: _Scalar, /) -> Constant[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, ElectricPotentialKind]]]: ...
     @overload
-    def __rtruediv__[L, W, T: UnitSystem](
-        self, other: _Operand[L, W, T], /
-    ) -> Quantity[
-        Div[L, Mul[TemperatureDifferenceKind, ElectricPotentialKind]], W, T
-    ]: ...
+    def __rtruediv__[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[Div[L, Mul[TemperatureDifferenceKind, ElectricPotentialKind]], W, T]: ...

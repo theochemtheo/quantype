@@ -57,6 +57,14 @@ def render(catalogue: Catalogue, *, package: str = "quantype") -> dict[str, str]
 
 # Paths per Ruff run: every platform caps the length of a command line.
 _BATCH = 200
+# The private stub modules are read by type checkers, not people, and they are
+# most of the installed package. Ruff's widest line keeps each signature on one
+# line instead of wrapping it over several indented ones.
+_COMPACT_LINE_LENGTH = 320
+
+
+def _compact(name: str) -> bool:
+    return name.startswith(("_products/", "_constants/")) or name == "_generated.pyi"
 
 
 def _formatted(formatter: str, package: str, sources: dict[str, str]) -> dict[str, str]:
@@ -77,25 +85,32 @@ def _formatted(formatter: str, package: str, sources: dict[str, str]) -> dict[st
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(sources[name], encoding="utf-8")
-        paths = [str(root / name) for name in python]
-        for start in range(0, len(paths), _BATCH):
-            batch = paths[start : start + _BATCH]
-            for command in (
-                [
-                    "check",
-                    "--fix",
-                    "--select",
-                    "I,RUF022",
-                    "--config",
-                    f"lint.isort.known-first-party = [{first_party!r}]",
-                ],
-                ["format"],
-            ):
-                subprocess.run(  # noqa: S603 -- resolved formatter, no shell
-                    [formatter, *command, "--quiet", *batch],
-                    capture_output=True,
-                    check=True,
-                )
+        groups: tuple[tuple[list[str], list[str]], ...] = (
+            ([str(root / name) for name in python if not _compact(name)], []),
+            (
+                [str(root / name) for name in python if _compact(name)],
+                ["--line-length", str(_COMPACT_LINE_LENGTH)],
+            ),
+        )
+        for paths, options in groups:
+            for start in range(0, len(paths), _BATCH):
+                batch = paths[start : start + _BATCH]
+                for command in (
+                    [
+                        "check",
+                        "--fix",
+                        "--select",
+                        "I,RUF022",
+                        "--config",
+                        f"lint.isort.known-first-party = [{first_party!r}]",
+                    ],
+                    ["format"],
+                ):
+                    subprocess.run(  # noqa: S603 -- resolved formatter, no shell
+                        [formatter, *command, *options, "--quiet", *batch],
+                        capture_output=True,
+                        check=True,
+                    )
         for name in python:
             formatted[name] = (root / name).read_text(encoding="utf-8")
     return formatted

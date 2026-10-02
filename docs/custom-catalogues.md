@@ -26,6 +26,9 @@ generate(catalogue, "src/labquantities", package="labquantities")
 
 Generation formats its output with Ruff, so install Ruff where you run it
 (`uv add --dev ruff` in an application project, or `python -m pip install ruff`).
+The private stubs, `_products/`, `_constants/`, and `_generated.pyi`, are
+written for type checkers in long lines, so exclude them from your own Ruff
+formatting and line-length checks.
 
 A `QuantitySpec`'s dimensions are exponents over quantype's eight base axes, in
 order: length, energy, time, temperature, magnetic moment, atom, electron, and

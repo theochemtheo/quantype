@@ -5,7 +5,7 @@
 # mypy: disable-error-code=override
 # pyright: reportIncompatibleMethodOverride=false
 # pyright: reportPrivateUsage=false
-from typing import Any, overload, override
+from typing import overload, override
 
 import numpy as np
 import numpy.typing as npt
@@ -15,14 +15,9 @@ from quantype._constants.Dimensionless import _DimensionlessConstant
 from quantype._constants.TemperatureDifference import _TemperatureDifferenceConstant
 from quantype._constants.TemperatureRate import _TemperatureRateConstant
 from quantype._generated import Dimensionless, TemperatureDifference, TemperatureRate
-from quantype.core import Constant, Quantity, Unit, _Numerical, _Operand, _Scalar
-from quantype.kinds import (
-    DimensionlessKind,
-    Div,
-    Mul,
-    TemperatureDifferenceKind,
-    TemperatureRateKind,
-)
+from quantype.core import Constant, Quantity, Unit, _IntArray, _Numerical, _Operand, _Scalar
+from quantype.kinds import DimensionlessKind, Div, Mul, TemperatureDifferenceKind, TemperatureRateKind
+from quantype.products import TemperatureDifferenceTemperatureRate as _C
 from quantype.systems import Atomistic, UnitSystem
 
 # Public parameter names read better in diagnostics than private ones.
@@ -30,339 +25,137 @@ from quantype.systems import Atomistic, UnitSystem
 V = TypeVar("V")
 S = TypeVar("S", bound=UnitSystem, default=Atomistic)
 
-class TemperatureDifferenceTemperatureRate(
-    Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], V, S]
-):
+class TemperatureDifferenceTemperatureRate(Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], V, S]):
     @overload
     @override
-    def __mul__(
-        self, other: _Scalar, /
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __mul__(self, other: _Scalar, /) -> _C[V, S]: ...
     @overload
-    def __mul__(
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceTemperatureRate[npt.NDArray[np.float64], S]: ...
+    def __mul__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __mul__[W: _Numerical](
-        self: TemperatureDifferenceTemperatureRate[float, S], other: W, /
-    ) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    def __mul__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __mul__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __mul__(self, other: _Numerical, /) -> _C[V, S]: ...
     @overload
-    def __mul__[K, W](
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: Quantity[K, W, S],
-        /,
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], W, S
-    ]: ...
+    def __mul__[K, W](self: _C[float, S], other: Quantity[K, W, S], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], W, S]: ...
     @overload
-    def __mul__[K](
-        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], V, S
-    ]: ...
+    def __mul__[K](self, other: Quantity[K, V, S] | Quantity[K, float, S], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], V, S]: ...
     @overload
     @override
-    def __truediv__[W](
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: TemperatureDifference[W, S],
-        /,
-    ) -> TemperatureRate[W, S]: ...
+    def __truediv__[W](self: _C[float, S], other: TemperatureDifference[W, S], /) -> TemperatureRate[W, S]: ...
     @overload
-    def __truediv__(
-        self,
-        other: TemperatureDifference[V, S]
-        | TemperatureDifference[float, S]
-        | _TemperatureDifferenceConstant,
-        /,
-    ) -> TemperatureRate[V, S]: ...
+    def __truediv__(self, other: TemperatureDifference[V, S] | TemperatureDifference[float, S] | _TemperatureDifferenceConstant, /) -> TemperatureRate[V, S]: ...
     @overload
-    def __truediv__[W](
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: TemperatureRate[W, S],
-        /,
-    ) -> TemperatureDifference[W, S]: ...
+    def __truediv__[W](self: _C[float, S], other: TemperatureRate[W, S], /) -> TemperatureDifference[W, S]: ...
     @overload
-    def __truediv__(
-        self,
-        other: TemperatureRate[V, S]
-        | TemperatureRate[float, S]
-        | _TemperatureRateConstant,
-        /,
-    ) -> TemperatureDifference[V, S]: ...
+    def __truediv__(self, other: TemperatureRate[V, S] | TemperatureRate[float, S] | _TemperatureRateConstant, /) -> TemperatureDifference[V, S]: ...
     @overload
-    def __truediv__[W](
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: TemperatureDifferenceTemperatureRate[W, S],
-        /,
-    ) -> Dimensionless[W, S]: ...
+    def __truediv__[W](self: _C[float, S], other: _C[W, S], /) -> Dimensionless[W, S]: ...
     @overload
-    def __truediv__(
-        self,
-        other: TemperatureDifferenceTemperatureRate[V, S]
-        | TemperatureDifferenceTemperatureRate[float, S]
-        | _TemperatureDifferenceTemperatureRateConstant,
-        /,
-    ) -> Dimensionless[V, S]: ...
+    def __truediv__(self, other: _C[V, S] | _C[float, S] | _TemperatureDifferenceTemperatureRateConstant, /) -> Dimensionless[V, S]: ...
     @overload
-    def __truediv__(
-        self, other: _Scalar, /
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __truediv__(self, other: _Scalar, /) -> _C[V, S]: ...
     @overload
-    def __truediv__(
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceTemperatureRate[npt.NDArray[np.float64], S]: ...
+    def __truediv__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __truediv__[W: _Numerical](
-        self: TemperatureDifferenceTemperatureRate[float, S], other: W, /
-    ) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    def __truediv__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __truediv__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __truediv__(self, other: _Numerical, /) -> _C[V, S]: ...
     @overload
-    def __truediv__[K, W](
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: Quantity[K, W, S],
-        /,
-    ) -> Quantity[
-        Div[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], W, S
-    ]: ...
+    def __truediv__[K, W](self: _C[float, S], other: Quantity[K, W, S], /) -> Quantity[Div[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], W, S]: ...
     @overload
-    def __truediv__[K](
-        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
-    ) -> Quantity[
-        Div[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], V, S
-    ]: ...
+    def __truediv__[K](self, other: Quantity[K, V, S] | Quantity[K, float, S], /) -> Quantity[Div[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], V, S]: ...
     @overload
     @override
-    def __matmul__(
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceTemperatureRate[npt.NDArray[np.float64], S]: ...
+    def __matmul__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __matmul__[W: _Numerical](
-        self: TemperatureDifferenceTemperatureRate[float, S], other: W, /
-    ) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    def __matmul__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __matmul__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __matmul__(self, other: _Numerical, /) -> _C[V, S]: ...
     @overload
-    def __matmul__[K, W](
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: Quantity[K, W, S],
-        /,
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], W, S
-    ]: ...
+    def __matmul__[K, W](self: _C[float, S], other: Quantity[K, W, S], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], W, S]: ...
     @overload
-    def __matmul__[K](
-        self, other: Quantity[K, V, S] | Quantity[K, float, S], /
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], V, S
-    ]: ...
+    def __matmul__[K](self, other: Quantity[K, V, S] | Quantity[K, float, S], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], K], V, S]: ...
     @overload
     @override
-    def __rmul__(
-        self, other: _Scalar, /
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __rmul__(self, other: _Scalar, /) -> _C[V, S]: ...
     @overload
-    def __rmul__(
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceTemperatureRate[npt.NDArray[np.float64], S]: ...
+    def __rmul__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __rmul__[W: _Numerical](
-        self: TemperatureDifferenceTemperatureRate[float, S], other: W, /
-    ) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    def __rmul__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __rmul__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __rmul__(self, other: _Numerical, /) -> _C[V, S]: ...
     @overload
     @override
-    def __rmatmul__(
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> TemperatureDifferenceTemperatureRate[npt.NDArray[np.float64], S]: ...
+    def __rmatmul__(self: _C[float, S], other: _IntArray, /) -> _C[npt.NDArray[np.float64], S]: ...
     @overload
-    def __rmatmul__[W: _Numerical](
-        self: TemperatureDifferenceTemperatureRate[float, S], other: W, /
-    ) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    def __rmatmul__[W: _Numerical](self: _C[float, S], other: W, /) -> _C[W, S]: ...
     @overload
-    def __rmatmul__(
-        self, other: _Numerical, /
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __rmatmul__(self, other: _Numerical, /) -> _C[V, S]: ...
     @override
-    def item(self) -> TemperatureDifferenceTemperatureRate[float, S]: ...
+    def item(self) -> _C[float, S]: ...
     @overload
     @override
-    def __rtruediv__(
-        self, other: _Scalar, /
-    ) -> Quantity[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]],
-        V,
-        S,
-    ]: ...
+    def __rtruediv__(self, other: _Scalar, /) -> Quantity[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]], V, S]: ...
     @overload
-    def __rtruediv__(
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: npt.NDArray[np.integer[Any]],
-        /,
-    ) -> Quantity[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]],
-        npt.NDArray[np.float64],
-        S,
-    ]: ...
+    def __rtruediv__(self: _C[float, S], other: _IntArray, /) -> Quantity[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]], npt.NDArray[np.float64], S]: ...
     @overload
-    def __rtruediv__[W: _Numerical](
-        self: TemperatureDifferenceTemperatureRate[float, S], other: W, /
-    ) -> Quantity[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]],
-        W,
-        S,
-    ]: ...
+    def __rtruediv__[W: _Numerical](self: _C[float, S], other: W, /) -> Quantity[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]], W, S]: ...
     @overload
-    def __rtruediv__(
-        self, other: _Numerical, /
-    ) -> Quantity[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]],
-        V,
-        S,
-    ]: ...
+    def __rtruediv__(self, other: _Numerical, /) -> Quantity[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]], V, S]: ...
     @overload
     @override
-    def __add__[W](
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], W, S],
-        /,
-    ) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    def __add__[W](self: _C[float, S], other: Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], W, S], /) -> _C[W, S]: ...
     @overload
-    def __add__(
-        self,
-        other: Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], V, S]
-        | Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], float, S],
-        /,
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __add__(self, other: Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], V, S] | Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], float, S], /) -> _C[V, S]: ...
     @overload
     @override
-    def __sub__[W](
-        self: TemperatureDifferenceTemperatureRate[float, S],
-        other: Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], W, S],
-        /,
-    ) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    def __sub__[W](self: _C[float, S], other: Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], W, S], /) -> _C[W, S]: ...
     @overload
-    def __sub__(
-        self,
-        other: Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], V, S]
-        | Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], float, S],
-        /,
-    ) -> TemperatureDifferenceTemperatureRate[V, S]: ...
+    def __sub__(self, other: Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], V, S] | Quantity[Mul[TemperatureDifferenceKind, TemperatureRateKind], float, S], /) -> _C[V, S]: ...
     @override
-    def to_system[T: UnitSystem](
-        self, system: type[T]
-    ) -> TemperatureDifferenceTemperatureRate[V, T]: ...
+    def to_system[T: UnitSystem](self, system: type[T]) -> _C[V, T]: ...
     @classmethod
     @override
-    def from_value[W](cls, value: W) -> TemperatureDifferenceTemperatureRate[W, S]: ...
+    def from_value[W](cls, value: W) -> _C[W, S]: ...
 
-class _TemperatureDifferenceTemperatureRateConstant(
-    Constant[Mul[TemperatureDifferenceKind, TemperatureRateKind]]
-):
+class _TemperatureDifferenceTemperatureRateConstant(Constant[Mul[TemperatureDifferenceKind, TemperatureRateKind]]):
     @override
-    def to_system[T: UnitSystem](
-        self, system: type[T]
-    ) -> TemperatureDifferenceTemperatureRate[float, T]: ...
+    def to_system[T: UnitSystem](self, system: type[T]) -> _C[float, T]: ...
     @override
-    def to(
-        self, unit: Unit[Mul[TemperatureDifferenceKind, TemperatureRateKind]]
-    ) -> TemperatureDifferenceTemperatureRate[float]: ...
+    def to(self, unit: Unit[Mul[TemperatureDifferenceKind, TemperatureRateKind]]) -> _C[float]: ...
     @overload
     @override
-    def __mul__[L](
-        self, other: Constant[L], /
-    ) -> Constant[Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], L]]: ...
+    def __mul__[L](self, other: Constant[L], /) -> Constant[Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], L]]: ...
     @overload
-    def __mul__(
-        self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> _TemperatureDifferenceTemperatureRateConstant: ...
+    def __mul__(self, other: _Scalar, /) -> _TemperatureDifferenceTemperatureRateConstant: ...
     @overload
-    def __mul__[L, W, T: UnitSystem](
-        self, other: _Operand[L, W, T], /
-    ) -> Quantity[
-        Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], L], W, T
-    ]: ...
+    def __mul__[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[Mul[Mul[TemperatureDifferenceKind, TemperatureRateKind], L], W, T]: ...
     @overload
     @override
-    def __truediv__(
-        self, other: _TemperatureDifferenceConstant, /
-    ) -> _TemperatureRateConstant: ...
+    def __truediv__(self, other: _TemperatureDifferenceConstant, /) -> _TemperatureRateConstant: ...
     @overload
-    def __truediv__(
-        self, other: _TemperatureRateConstant, /
-    ) -> _TemperatureDifferenceConstant: ...
+    def __truediv__(self, other: _TemperatureRateConstant, /) -> _TemperatureDifferenceConstant: ...
     @overload
-    def __truediv__(
-        self, other: _TemperatureDifferenceTemperatureRateConstant, /
-    ) -> _DimensionlessConstant: ...
+    def __truediv__(self, other: _TemperatureDifferenceTemperatureRateConstant, /) -> _DimensionlessConstant: ...
     @overload
-    def __truediv__[L](
-        self, other: Constant[L], /
-    ) -> Constant[Div[Mul[TemperatureDifferenceKind, TemperatureRateKind], L]]: ...
+    def __truediv__[L](self, other: Constant[L], /) -> Constant[Div[Mul[TemperatureDifferenceKind, TemperatureRateKind], L]]: ...
     @overload
-    def __truediv__(
-        self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> _TemperatureDifferenceTemperatureRateConstant: ...
+    def __truediv__(self, other: _Scalar, /) -> _TemperatureDifferenceTemperatureRateConstant: ...
     @overload
-    def __truediv__[W, T: UnitSystem](
-        self, other: TemperatureDifference[W, T], /
-    ) -> TemperatureRate[W, T]: ...
+    def __truediv__[W, T: UnitSystem](self, other: TemperatureDifference[W, T], /) -> TemperatureRate[W, T]: ...
     @overload
-    def __truediv__[W, T: UnitSystem](
-        self, other: TemperatureRate[W, T], /
-    ) -> TemperatureDifference[W, T]: ...
+    def __truediv__[W, T: UnitSystem](self, other: TemperatureRate[W, T], /) -> TemperatureDifference[W, T]: ...
     @overload
-    def __truediv__[W, T: UnitSystem](
-        self, other: TemperatureDifferenceTemperatureRate[W, T], /
-    ) -> Dimensionless[W, T]: ...
+    def __truediv__[W, T: UnitSystem](self, other: _C[W, T], /) -> Dimensionless[W, T]: ...
     @overload
-    def __truediv__[L, W, T: UnitSystem](
-        self, other: _Operand[L, W, T], /
-    ) -> Quantity[
-        Div[Mul[TemperatureDifferenceKind, TemperatureRateKind], L], W, T
-    ]: ...
+    def __truediv__[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[Div[Mul[TemperatureDifferenceKind, TemperatureRateKind], L], W, T]: ...
     @overload
     @override
-    def __rmul__(
-        self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> _TemperatureDifferenceTemperatureRateConstant: ...
+    def __rmul__(self, other: _Scalar, /) -> _TemperatureDifferenceTemperatureRateConstant: ...
     @overload
-    def __rmul__[L, W, T: UnitSystem](
-        self, other: _Operand[L, W, T], /
-    ) -> Quantity[
-        Mul[L, Mul[TemperatureDifferenceKind, TemperatureRateKind]], W, T
-    ]: ...
+    def __rmul__[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[Mul[L, Mul[TemperatureDifferenceKind, TemperatureRateKind]], W, T]: ...
     @overload
     @override
-    def __rtruediv__(
-        self, other: float | np.floating[Any] | np.integer[Any], /
-    ) -> Constant[
-        Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]]
-    ]: ...
+    def __rtruediv__(self, other: _Scalar, /) -> Constant[Div[DimensionlessKind, Mul[TemperatureDifferenceKind, TemperatureRateKind]]]: ...
     @overload
-    def __rtruediv__[L, W, T: UnitSystem](
-        self, other: _Operand[L, W, T], /
-    ) -> Quantity[
-        Div[L, Mul[TemperatureDifferenceKind, TemperatureRateKind]], W, T
-    ]: ...
+    def __rtruediv__[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[Div[L, Mul[TemperatureDifferenceKind, TemperatureRateKind]], W, T]: ...
