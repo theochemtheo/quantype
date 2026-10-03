@@ -8,6 +8,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
+import quantype
 import quantype.numpy as qnp
 from quantype import (
     Area,
@@ -18,14 +19,30 @@ from quantype import (
     Quantity,
     Temperature,
     TemperatureDifference,
+    Time,
     u,
 )
+from quantype.catalogue import builtin_catalogue
 from quantype.systems import SI, Atomistic, Metal
 
 
 def _dynamic(cls: object) -> Any:  # noqa: ANN401 -- deliberately invalid calls
     """Hide deliberately invalid parameters from the type checkers."""
     return cls
+
+
+def test_a_kind_class_names_its_kind() -> None:
+    for name in builtin_catalogue().quantities:
+        cls: Any = getattr(quantype, name)
+        assert cls.kind == name
+        assert cls[float].kind == name
+        assert cls.from_value(1.0).kind == name
+    product = Length[float](2, u.nm) * Time[float](1, u.fs)
+    assert type(product).kind == product.kind == "Mul[Length,Time]"
+    with pytest.raises(AttributeError, match="named quantity classes"):
+        getattr(Quantity, "kind")  # noqa: B009 -- the access is the test
+    with pytest.raises(AttributeError, match="kind is fixed"):
+        _dynamic(product).kind = "Energy"
 
 
 def test_construction_remembers_the_input_unit() -> None:

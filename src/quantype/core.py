@@ -194,10 +194,24 @@ def _sum_display(
     return _delta_unit(left._display, cast("Kind", kind))
 
 
+class _KindName:
+    """``kind`` on a named quantity class as on its instances: ``Force.kind``."""
+
+    def __get__(self, instance: object, owner: type | None = None) -> str:
+        semantic = getattr(owner if instance is None else instance, "_semantic", None)
+        if semantic is None:
+            raise AttributeError("Only named quantity classes have a kind")
+        return str(semantic)
+
+    def __set__(self, instance: object, value: object) -> None:
+        raise AttributeError("A quantity's kind is fixed")
+
+
 class Quantity[K, V, S: UnitSystem]:
     """A semantic quantity: raw numbers in a unit system, and a display unit."""
 
     _kind: str = ""
+    kind: ClassVar[str] = cast("str", _KindName())
     _semantic: Semantic
     _system: type[UnitSystem]
     _display: Unit[K] | None
@@ -265,10 +279,6 @@ class Quantity[K, V, S: UnitSystem]:
     def value(self) -> V:
         """Raw numbers in the unit system's units; explicitly bypasses units."""
         return self._value
-
-    @property
-    def kind(self) -> str:
-        return str(self._semantic)
 
     @property
     def dimensions(self) -> tuple[int, ...]:

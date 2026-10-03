@@ -79,6 +79,13 @@ def test_unit_systems_cover_new_kinds() -> None:
     assert qnp.sqrt(Length[float, SI](2, u.nm) ** 2).system is SI
 
 
+def test_kind_names_on_classes() -> None:
+    assert SurfaceTension.kind == "SurfaceTension"
+    assert (2 * u.angstrom * Pressure[float](1, u.pascal)).kind == "SurfaceTension"
+    product = (2 * u.angstrom) * (3 * u.fs)
+    assert type(product).kind == product.kind == "Mul[Length,Time]"
+
+
 def test_portable_unit_factors() -> None:
     assert u.lab_sqrt2(2).value == 2 * 2**0.5
     assert u.lab_point(1).value == 2.5

@@ -307,6 +307,7 @@ def test_unrendered_product_modules_are_stale_and_removed(
         "portable_unit_factors",
         "unit_systems_cover_new_kinds",
         "unit_lookup",
+        "kind_names_on_classes",
     ],
 )
 def test_generated_runtime(generated_project: Path, case: str) -> None:

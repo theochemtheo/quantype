@@ -49,6 +49,7 @@ class Quantity(Generic[K, V, S]):
     _system: type[UnitSystem]
     _display: Unit[K] | None
     _echo: float | None
+    kind: ClassVar[str]
     # Without a storage parameter, a float, NumPy float, or array is the
     # storage. Calling the unit converts integers and lists to float storage,
     # which an __init__ can't express in every checker, so they leave V open.
@@ -78,8 +79,6 @@ class Quantity(Generic[K, V, S]):
     ) -> Unit[K]: ...
     @property
     def value(self) -> V: ...
-    @property
-    def kind(self) -> str: ...
     @property
     def dimensions(self) -> tuple[int, ...]: ...
     @property

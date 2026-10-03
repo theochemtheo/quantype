@@ -15,7 +15,6 @@ from typing import TYPE_CHECKING, Any, TypeGuard, cast, get_args, get_origin
 import numpy as np
 
 from quantype import codata
-
 from quantype._internal._lookup import resolve_unit as resolve_unit  # noqa: PLC0414
 from quantype._internal._lookup import unit_of_kind
 from quantype._internal._semantics import Kind

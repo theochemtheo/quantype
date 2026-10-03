@@ -28,7 +28,9 @@ written back as `0.5 nanometer` in every system, and `"20.1 degC"` as exactly
 A quantity object has `magnitude` and `unit`, and `kind` if it names its kind,
 which must then match: written objects always include it, and hand-written ones
 can leave it out where the target kind is known, as in a Pydantic field or
-`Length.parse`. A string such as `"5 angstrom"` is accepted there too.
+`Length.parse`. A string such as `"5 angstrom"` is accepted there too. The
+name is the class's `kind`: `Length.kind` and a length's `.kind` are both
+`"Length"`, so data that names its kind can be checked against a class.
 `model_dump()` keeps quantities, as it keeps datetimes, and
 `model_dump(mode="json")` and `model_dump_json()` write the objects.
 
