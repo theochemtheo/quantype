@@ -11,6 +11,17 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 - ASE's units: `u.ase_time` (Å √(amu/eV), about 10.18 fs), and
   `u.ase_velocity` and `u.ase_momentum`, the units of `atoms.get_velocities()`
   and `atoms.get_momenta()`.
+- `Kind.unit_named(name)` finds a unit of that kind by catalogue name, alias,
+  or display symbol, as `parse` reads them: `Force.unit_named("Ha/a0") is
+  u.hartree_per_bohr`. `units=` adds custom units, and `Force[V, S].unit_named`
+  also finds the units only `S` defines.
+- `quantype.typing.quantity_type(annotation)` reads the kind class, storage
+  type, and unit system from an annotation such as `Force[float, SI]`, and
+  returns `None` for anything else.
+- `Force.kind` gives the kind's name on the class, as `.kind` does on a
+  quantity.
+- Typed construction takes `display=False` to convert without remembering the
+  input unit, so the value shows in the system's unit, as with `from_value`.
 
 ### Changed
 
@@ -19,6 +30,11 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   is now `12.0`, and `Mass.from_value` takes daltons. Products that involve a
   mass or a density rescale, as they do in `Metal` and `Real`. See
   [ADR-013](docs/decisions/ADR-013-atomistic-stores-mass-in-daltons.md).
+- Unknown unit names in `parse`, Pydantic validation, and `load_npz` list the
+  kind's units, and a display symbol of the requested kind takes precedence
+  over a name that belongs to another kind.
+- A third type argument, as in `Length[float, SI, int]`, raises `TypeError`
+  when the alias is called or read.
 
 ## [0.1.0] - 2026-10-03
 
