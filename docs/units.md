@@ -90,12 +90,12 @@ default, and you can choose another built-in system or
 A system names one unit per base axis, and each kind's unit follows from its
 dimensions: `Atomistic` stores forces in eV/Å because it stores energies in eV
 and lengths in Å. A system can also store a few kinds in units of their own, as
-LAMMPS does for pressure. Arithmetic that produces or consumes those kinds
+`Atomistic` does for mass and LAMMPS does for pressure. Arithmetic that produces or consumes those kinds
 rescales by a constant factor. The built-in systems are in `quantype.systems`:
 
 | System | Length | Energy | Time | Charge | Magnetic moment | Own units |
 | --- | --- | --- | --- | --- | --- | --- |
-| `Atomistic` (default) | Å | eV | fs | e | μB | |
+| `Atomistic` (default) | Å | eV | fs | e | μB | mass Da, density g/cm³ |
 | `Metal` (LAMMPS) | Å | eV | ps | e | μB | mass g/mol, pressure bar, density g/cm³ |
 | `Real` (LAMMPS) | Å | kcal/mol | fs | e | μB | mass g/mol, pressure atm, electric field V/Å, density g/cm³ |
 | `SI` | m | J | s | C | A·m² | |
@@ -106,6 +106,42 @@ Temperature is in kelvin in every built-in system, and atom and electron counts
 are 1. `System.unit_for(Kind)` gives the unit a system stores a kind in. For
 the built-in systems it is always a named catalogue unit, as in
 `SI.unit_for(Pressure) is u.pascal`.
+
+Å, eV, and fs make the coherent mass unit eV fs²/Å², about 0.00965 Da, which
+no one quotes. `Atomistic` stores masses in daltons instead, the unit ASE uses,
+and densities in g/cm³:
+
+```python
+import pytest
+
+from quantype import Mass, Velocity, u
+
+m = Mass[float](12, u.Da)
+assert m.value == 12.0  # daltons
+v = Velocity[float](0.01, u.angstrom_per_fs)
+kinetic = 0.5 * m * v**2  # rescaled into eV: 1 Da Å²/fs² ≈ 103.6 eV
+assert kinetic.value == pytest.approx(0.0621856)
+```
+
+ASE keeps its units coherent by deriving time instead. Its time unit,
+`u.ase_time` (Å √(amu/eV)), is about 10.18 fs. `atoms.get_velocities()` returns
+`u.ase_velocity` (√(eV/amu)), and `atoms.get_momenta()` returns `u.ase_momentum`
+(√(amu eV)), so those arrays wrap as they are:
+
+```python
+import numpy as np
+import numpy.typing as npt
+import pytest
+
+from quantype import Mass, Momentum, Velocity, u
+
+raw_velocities = np.array([[0.5, 0.0, 0.0]])  # from atoms.get_velocities()
+v = Velocity[npt.NDArray[np.float64]](raw_velocities, u.ase_velocity)
+assert v.magnitude(u.angstrom_per_fs)[0, 0] == pytest.approx(0.0491135)
+p = Mass[float](12, u.Da) * v
+assert isinstance(p, Momentum)
+np.testing.assert_allclose(p.magnitude(u.ase_momentum), [[6.0, 0.0, 0.0]])
+```
 
 ```python
 import pytest
@@ -210,9 +246,11 @@ the system if it isn't the default. `str` shows only the magnitude and unit.
   convert it. `Length.from_value(raw)` uses the default system.
 - `np.asarray(q)` and other implicit conversions to arrays raise `TypeError`.
 
-Every conversion goes through `Atomistic`'s units: ångström, eV, fs, kelvin,
-Bohr magneton, atom, electron, and elementary charge. Atom, electron, and charge
-are dimensions of their own. Mass is derived, as energy time² / length².
+Every conversion goes through the reference units, which are `Atomistic`'s
+base units: ångström, eV, fs, kelvin, Bohr magneton, atom, electron, and
+elementary charge. Atom, electron, and charge are dimensions of their own. Mass
+is derived, as energy time² / length², so its reference unit is eV fs²/Å², not
+the dalton that `Atomistic` stores it in.
 Importing `quantype` doesn't import NumPy, Pydantic, Torch, or JAX.
 
 ## CODATA edition

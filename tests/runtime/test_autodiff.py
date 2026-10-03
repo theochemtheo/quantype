@@ -15,7 +15,10 @@ from quantype import (
     Force,
     ForceConstant,
     Length,
+    Mass,
+    Momentum,
     Quantity,
+    Velocity,
     _generated,
     u,
     ujax,
@@ -207,6 +210,21 @@ def test_jax_transformations_in_each_system(system: type[UnitSystem]) -> None:
         lambda: length(_jnp.array(5.0), u.angstrom),
     )
     np.testing.assert_allclose(chosen.magnitude(u.angstrom), 5.0, rtol=1e-5)
+
+
+def test_jax_grad_rescales_atomistic_masses() -> None:
+    mass = Mass[float](12, u.Da)
+
+    def kinetic(v: Velocity[jax.Array]) -> Energy[jax.Array]:
+        return 0.5 * mass * (v * v).sum()
+
+    v = Velocity[jax.Array](_jnp.array([0.01, 0.02]), u.angstrom_per_fs)
+    momentum = _jax.jit(ujax.grad(kinetic))(v)
+    assert type(momentum) is Momentum
+    assert_allclose(momentum, (mass * v).to(u.eV_fs_per_angstrom), rtol=1e-6)
+    np.testing.assert_allclose(
+        momentum.value, [0.12 * 103.6426966, 0.24 * 103.6426966], rtol=1e-6
+    )
 
 
 def test_jax_grad_requires_one_system() -> None:

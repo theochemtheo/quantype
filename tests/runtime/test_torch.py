@@ -17,6 +17,8 @@ from quantype import (
     Force,
     ForceConstant,
     Length,
+    Mass,
+    Momentum,
     Time,
     Velocity,
     u,
@@ -86,6 +88,18 @@ def test_torch_grad_in_another_system() -> None:
         TypeError, match="output in Atomistic with respect to an input in SI"
     ):
         untyped(Energy.from_value(x.value.sum()) * 1.0, x)
+
+
+def test_torch_grad_rescales_atomistic_masses() -> None:
+    raw = torch.tensor([0.01, 0.02], dtype=torch.float64, requires_grad=True)
+    v = Velocity[torch.Tensor](raw, u.angstrom_per_fs)
+    mass = Mass[float](12, u.Da)
+    momentum = utorch.grad(0.5 * mass * (v * v).sum(), v)
+    assert type(momentum) is Momentum
+    torch.testing.assert_close(
+        momentum.value,
+        torch.tensor([0.12, 0.24], dtype=torch.float64) * 103.64269667160805,
+    )
 
 
 def test_torch_tensors_scale_quantities() -> None:

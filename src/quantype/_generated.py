@@ -299,9 +299,9 @@ class ElectronCount[V, S: UnitSystem](Quantity[ElectronCountKind, V, S]):
 
 
 class Mass[V, S: UnitSystem](Quantity[MassKind, V, S]):
-    """A mass, stored in eV fs^2/Å^2 in the default Atomistic system.
+    """A mass, stored in Da in the default Atomistic system.
 
-    Build one with ``Mass[float](2, u.eV_fs2_per_angstrom2)``.
+    Build one with ``Mass[float](2, u.dalton)``.
     Its units are in ``u.mass``.
     """
 
@@ -309,9 +309,9 @@ class Mass[V, S: UnitSystem](Quantity[MassKind, V, S]):
 
 
 class MassDensity[V, S: UnitSystem](Quantity[MassDensityKind, V, S]):
-    """A mass density, stored in eV fs^2/Å^5 in the default Atomistic system.
+    """A mass density, stored in g/cm^3 in the default Atomistic system.
 
-    Build one with ``MassDensity[float](2, u.eV_fs2_per_angstrom5)``.
+    Build one with ``MassDensity[float](2, u.gram_per_cubic_centimeter)``.
     Its units are in ``u.mass_density``.
     """
 

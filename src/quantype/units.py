@@ -184,6 +184,9 @@ _NAMES = {
     "us": "microsecond",
     "millisecond": "millisecond",
     "ms": "millisecond",
+    "ase_time": "ase_time",
+    "ase_velocity": "ase_velocity",
+    "ase_momentum": "ase_momentum",
     "kilojoule": "kilojoule",
     "kJ": "kilojoule",
     "kilocalorie": "kilocalorie",
@@ -388,6 +391,10 @@ class _TimeNamespace:
     def millisecond(self) -> "Unit[TimeKind]":
         return _typing.cast("Unit[TimeKind]", _get_unit("millisecond"))
 
+    @property
+    def ase_time(self) -> "Unit[TimeKind]":
+        return _typing.cast("Unit[TimeKind]", _get_unit("ase_time"))
+
 
 time = _TimeNamespace()
 
@@ -412,6 +419,10 @@ class _VelocityNamespace:
     @property
     def atomic_velocity(self) -> "Unit[VelocityKind]":
         return _typing.cast("Unit[VelocityKind]", _get_unit("atomic_velocity"))
+
+    @property
+    def ase_velocity(self) -> "Unit[VelocityKind]":
+        return _typing.cast("Unit[VelocityKind]", _get_unit("ase_velocity"))
 
 
 velocity = _VelocityNamespace()
@@ -969,6 +980,10 @@ mass_density = _MassDensityNamespace()
 
 class _MomentumNamespace:
     @property
+    def ase_momentum(self) -> "Unit[MomentumKind]":
+        return _typing.cast("Unit[MomentumKind]", _get_unit("ase_momentum"))
+
+    @property
     def eV_fs_per_angstrom(self) -> "Unit[MomentumKind]":
         return _typing.cast("Unit[MomentumKind]", _get_unit("eV_fs_per_angstrom"))
 
@@ -1210,6 +1225,9 @@ __all__ = [
     "angstrom_per_ps2",
     "angstrom_squared",
     "area",
+    "ase_momentum",
+    "ase_time",
+    "ase_velocity",
     "atm",
     "atmosphere",
     "atom",

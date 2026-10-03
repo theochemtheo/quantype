@@ -922,6 +922,9 @@ microsecond: _TimeUnit
 us: _TimeUnit
 millisecond: _TimeUnit
 ms: _TimeUnit
+ase_time: _TimeUnit
+ase_velocity: _VelocityUnit
+ase_momentum: _MomentumUnit
 kilojoule: _EnergyUnit
 kJ: _EnergyUnit
 kilocalorie: _EnergyUnit
@@ -1060,6 +1063,8 @@ class _TimeNamespace:
     def microsecond(self) -> _TimeUnit: ...
     @property
     def millisecond(self) -> _TimeUnit: ...
+    @property
+    def ase_time(self) -> _TimeUnit: ...
 
 time: _TimeNamespace
 
@@ -1074,6 +1079,8 @@ class _VelocityNamespace:
     def centimeter_per_second(self) -> _VelocityUnit: ...
     @property
     def atomic_velocity(self) -> _VelocityUnit: ...
+    @property
+    def ase_velocity(self) -> _VelocityUnit: ...
 
 velocity: _VelocityNamespace
 
@@ -1349,6 +1356,8 @@ mass_density: _MassDensityNamespace
 
 class _MomentumNamespace:
     @property
+    def ase_momentum(self) -> _MomentumUnit: ...
+    @property
     def eV_fs_per_angstrom(self) -> _MomentumUnit: ...
     @property
     def eV_ps_per_angstrom(self) -> _MomentumUnit: ...
@@ -1489,6 +1498,9 @@ __all__ = [
     "angstrom_per_ps2",
     "angstrom_squared",
     "area",
+    "ase_momentum",
+    "ase_time",
+    "ase_velocity",
     "atm",
     "atmosphere",
     "atom",
