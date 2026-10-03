@@ -31,3 +31,7 @@ Use `scripts/check_mypy.py` for the configured dual-parser run: it separates par
 `uv run just lint` checks Just formatting, Ruff lint/format, TOML formatting/validation, hook configuration and offline workflow lint. `uv run just setup` also installs Git hooks; use it when hook installation is requested, not merely to validate a change.
 
 CI additionally tests core-only, JAX-only, Torch-only and minimum core dependency environments. A successful all-extras run alone does not establish optional dependency isolation or compatibility with minimum versions. Use the relevant existing isolation tests and describe coverage limits instead of claiming those environments were tested locally.
+
+## Review added comments
+
+Before committing, list the comment lines the branch adds with `git diff origin/main -- '*.py' '*.pyi' | grep -E '^\+.*#'`. Keep each only if it meets the comment rule in [AGENTS.md](../../../../AGENTS.md); no linter checks this.

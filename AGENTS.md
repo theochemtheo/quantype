@@ -24,6 +24,12 @@ Each kind of information has one home. Link to it rather than restating it.
 - Runtime behavior and static types agree. A change to either needs a runtime
   test and a typing test
   ([ADR-002](docs/decisions/ADR-002-generated-stubs-for-four-checkers.md)).
+- Comment only what the code can't say: a non-obvious reason, constraint, or
+  workaround. Don't restate the code or the assertion beside it, record
+  history or provenance ("public since 0.1.0", ticket ids), or add banner
+  labels; rename or split the code instead. Suppressions such as
+  `# noqa: S603` and the `# error` markers in negative typing tests are fine
+  ([design principles](docs/DESIGN_PRINCIPLES.md)).
 - Prose uses American spelling, except "catalogue", which follows the API
   ([ADR-012](docs/decisions/ADR-012-american-spelling-except-catalogue.md)).
 - A change that contradicts an accepted decision starts as a proposal in

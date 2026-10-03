@@ -151,9 +151,6 @@ def test_temperatures_never_gain_an_offset() -> None:
         assert point.to_system(system).magnitude(u.celsius) == 20.0
 
 
-# --- Validation at class definition ------------------------------------------
-
-
 def test_system_requires_a_name() -> None:
     body = {"length": u.nm, "energy": u.eV, "time": u.fs}
     with pytest.raises(TypeError, match=re.escape("requires name=...")):
@@ -204,9 +201,6 @@ def test_derived_scales_must_fit_float64() -> None:
             length = huge
             energy = u.eV
             time = u.fs
-
-
-# --- A custom system end to end ---------------------------------------------
 
 
 def test_gromacs_storage_and_bridge() -> None:
@@ -284,9 +278,6 @@ def test_custom_units_resolve_by_kind() -> None:
     assert parsed.magnitude(Gromacs.unit_for(Force)) == pytest.approx(1.0)
 
 
-# --- Numerical range -----------------------------------------------------------
-
-
 def test_documented_range_table_is_current() -> None:
     table = range_table(BUILTIN, ("float32", "float64"))
     assert table in DOCS.read_text()
@@ -337,9 +328,6 @@ def test_narrow_numpy_construction_warns_on_underflow() -> None:
         warnings.simplefilter("error")
         Energy[npt.NDArray[np.float32], SI]([1.0], u.eV)
         Energy[npt.NDArray[np.float64], SI]([1e-22], u.eV)
-
-
-# --- Pydantic ------------------------------------------------------------------
 
 
 class SIConfig(BaseModel):

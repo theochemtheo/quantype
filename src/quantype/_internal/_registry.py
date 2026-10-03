@@ -371,7 +371,6 @@ def _electromechanical_units(c: _Constants) -> dict[str, UnitSpec]:
     statvolt = 1e-7 / statcoulomb  # V, which is eV per e
     pascal = c.angstrom**3 / ev
     return {
-        # Everyday units of existing kinds.
         "millimeter": UnitSpec("Length", 1e7, symbol="mm", aliases=("mm",)),
         "micrometer": UnitSpec("Length", 1e4, symbol="µm", aliases=("um", "µm", "μm")),
         "picometer": UnitSpec("Length", 1e-2, symbol="pm", aliases=("pm",)),

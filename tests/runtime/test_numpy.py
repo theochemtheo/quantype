@@ -312,7 +312,7 @@ def test_matrix_products_and_integrals_follow_the_algebra(
     assert_allclose(rotated, _lengths([4.0, 3.0]))
     assert isinstance(namespace.outer(displacement, displacement), Area)
     total = namespace.dot(displacement, displacement)
-    assert isinstance(total.value, np.ndarray)  # array storage stays an array
+    assert isinstance(total.value, np.ndarray)
     times = Time[Array]([0.0, 1.0, 2.0], u.fs)
     speeds = Velocity[Array]([1.0, 1.0, 1.0], u.angstrom_per_fs)
     distance = cast("Length[Array]", namespace.trapezoid(speeds, times))
