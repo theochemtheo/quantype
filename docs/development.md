@@ -58,6 +58,10 @@ failing below 98% line-and-branch coverage (`COVERAGE_MIN` overrides it). CI
 posts the summary to the job and to pull requests, and on `main` writes the
 README badge's figure to the `badges` branch.
 
+CI measures coverage on Python 3.14, where coverage traces branches through
+`sys.monitoring`; on 3.12 it falls back to `sys.settrace`, and the suite takes
+more than twice as long. `UV_PYTHON=3.14 uv run just coverage` matches CI.
+
 ## Dependency tiers
 
 CI runs the suite in the full environment and in deliberately incomplete ones:

@@ -59,6 +59,11 @@ jobs:
     permissions:
       contents: read
       pull-requests: write
+    env:
+      # Coverage measures branches through sys.monitoring only from Python
+      # 3.14; on 3.12 it falls back to sys.settrace, which more than doubles
+      # the suite's time. Nothing in src branches on the Python version.
+      UV_PYTHON: "3.14"
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -66,7 +71,7 @@ jobs:
       - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
           version: "0.12.17"
-          cache-suffix: all-extras
+          cache-suffix: all-extras-3.14
           save-cache: ${{ github.ref == 'refs/heads/main' }}
       - run: uv sync --locked --all-extras
       - run: bash scripts/coverage.sh
@@ -116,12 +121,23 @@ jobs:
           git push -fq "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" badges
 
   python-versions:
+    name: python-versions (${{ matrix.python }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.13", "3.14"]
+        # The coverage job runs the full suite on 3.14.
+        include:
+          # lint and typecheck restore this job's cache on 3.12.
+          - python: "3.12"
+            cache-suffix: all-extras
+          - python: "3.13"
+            cache-suffix: all-extras-3.13
+    env:
+      # An environment variable, unlike --python, reaches the `uv run` inside
+      # `just test`; otherwise .python-version's 3.12 replaces the environment.
+      UV_PYTHON: ${{ matrix.python }}
     steps:
       - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
         with:
@@ -129,10 +145,10 @@ jobs:
       - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78 # v7.6.0
         with:
           version: "0.12.17"
-          cache-suffix: all-extras-${{ matrix.python }}
+          cache-suffix: ${{ matrix.cache-suffix }}
           save-cache: ${{ github.ref == 'refs/heads/main' }}
-      - run: uv sync --locked --all-extras --python ${{ matrix.python }}
-      - run: uv run --python ${{ matrix.python }} just test
+      - run: uv sync --locked --all-extras
+      - run: uv run just test
         env:
           QUANTYPE_TEST_TIER: full
 
