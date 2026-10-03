@@ -922,6 +922,7 @@ microsecond: _TimeUnit
 us: _TimeUnit
 millisecond: _TimeUnit
 ms: _TimeUnit
+ase_time: _TimeUnit
 kilojoule: _EnergyUnit
 kJ: _EnergyUnit
 kilocalorie: _EnergyUnit
@@ -1060,6 +1061,8 @@ class _TimeNamespace:
     def microsecond(self) -> _TimeUnit: ...
     @property
     def millisecond(self) -> _TimeUnit: ...
+    @property
+    def ase_time(self) -> _TimeUnit: ...
 
 time: _TimeNamespace
 
@@ -1489,6 +1492,7 @@ __all__ = [
     "angstrom_per_ps2",
     "angstrom_squared",
     "area",
+    "ase_time",
     "atm",
     "atmosphere",
     "atom",

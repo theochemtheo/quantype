@@ -109,7 +109,8 @@ the built-in systems it is always a named catalogue unit, as in
 
 Å, eV, and fs make the coherent mass unit eV fs²/Å², about 0.00965 Da, which
 no one quotes. `Atomistic` stores masses in daltons instead, the unit ASE uses,
-and densities in g/cm³:
+and densities in g/cm³. ASE keeps its units coherent by deriving time instead:
+`u.ase_time`, Å √(amu/eV), is about 10.18 fs.
 
 ```python
 import pytest
@@ -121,6 +122,10 @@ assert m.value == 12.0  # daltons
 v = Velocity[float](0.01, u.angstrom_per_fs)
 kinetic = 0.5 * m * v**2  # rescaled into eV: 1 Da Å²/fs² ≈ 103.6 eV
 assert kinetic.value == pytest.approx(0.0621856)
+
+ase_velocity = u.angstrom(0.5) / u.ase_time(1.0)  # 0.5 in ASE's units
+assert isinstance(ase_velocity, Velocity)
+assert ase_velocity.magnitude(u.angstrom_per_fs) == pytest.approx(0.0491135)
 ```
 
 ```python

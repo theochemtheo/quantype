@@ -184,6 +184,7 @@ _NAMES = {
     "us": "microsecond",
     "millisecond": "millisecond",
     "ms": "millisecond",
+    "ase_time": "ase_time",
     "kilojoule": "kilojoule",
     "kJ": "kilojoule",
     "kilocalorie": "kilocalorie",
@@ -387,6 +388,10 @@ class _TimeNamespace:
     @property
     def millisecond(self) -> "Unit[TimeKind]":
         return _typing.cast("Unit[TimeKind]", _get_unit("millisecond"))
+
+    @property
+    def ase_time(self) -> "Unit[TimeKind]":
+        return _typing.cast("Unit[TimeKind]", _get_unit("ase_time"))
 
 
 time = _TimeNamespace()
@@ -1210,6 +1215,7 @@ __all__ = [
     "angstrom_per_ps2",
     "angstrom_squared",
     "area",
+    "ase_time",
     "atm",
     "atmosphere",
     "atom",

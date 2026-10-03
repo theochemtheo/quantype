@@ -360,6 +360,7 @@ def _electromechanical_units(c: _Constants) -> dict[str, UnitSpec]:
     """
     ev = c.electron_volt  # J per eV, and C per elementary charge
     mass = ev * 1e-10  # kg per eV fs²/Å²
+    dalton = c.codata.atomic_mass_constant / mass
     per_atom_mole = 1 / c.N_A
     kcal_mol = c.kilo * c.calorie * per_atom_mole / ev
     bohr = c.codata.bohr_radius / c.angstrom
@@ -377,6 +378,8 @@ def _electromechanical_units(c: _Constants) -> dict[str, UnitSpec]:
         "nanosecond": UnitSpec("Time", 1e6, symbol="ns", aliases=("ns",)),
         "microsecond": UnitSpec("Time", 1e9, symbol="µs", aliases=("us", "µs", "μs")),
         "millisecond": UnitSpec("Time", 1e12, symbol="ms", aliases=("ms",)),
+        # ASE's time unit, about 10.18 fs: with Å and eV, it makes masses daltons.
+        "ase_time": UnitSpec("Time", math.sqrt(dalton), symbol="Å √(amu/eV)"),
         "kilojoule": UnitSpec("Energy", c.kilo / ev, symbol="kJ", aliases=("kJ",)),
         "kilocalorie": UnitSpec(
             "Energy", c.kilo * c.calorie / ev, symbol="kcal", aliases=("kcal",)
@@ -401,12 +404,7 @@ def _electromechanical_units(c: _Constants) -> dict[str, UnitSpec]:
         ),
         # Mass. LAMMPS writes per-particle masses in g/mol.
         "eV_fs2_per_angstrom2": UnitSpec("Mass", symbol="eV fs^2/Å^2"),
-        "dalton": UnitSpec(
-            "Mass",
-            c.codata.atomic_mass_constant / mass,
-            symbol="Da",
-            aliases=("Da", "amu"),
-        ),
+        "dalton": UnitSpec("Mass", dalton, symbol="Da", aliases=("Da", "amu")),
         "gram_per_mole": UnitSpec(
             "Mass", 1e-3 * per_atom_mole / mass, symbol="g/mol", aliases=("g/mol",)
         ),

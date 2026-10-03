@@ -14,7 +14,7 @@ declared name, and the unit each built-in system stores it in. Each unit is on
 | `Length` | length | `angstrom` (Å), `Angstrom`, `Ang`; `meter` (m), `m`, `metre`; `centimeter` (cm), `cm`; `nanometer` (nm), `nm`; `bohr` (a0); `millimeter` (mm), `mm`; `micrometer` (µm), `um`; `picometer` (pm), `pm` |
 | `Area` | length² | `angstrom_squared` (Å^2), `angstrom2`; `square_meter` (m^2); `square_centimeter` (cm^2); `bohr_squared` (a0^2) |
 | `Volume` | length³ | `angstrom_cubed` (Å^3), `angstrom3`; `cubic_meter` (m^3); `cubic_centimeter` (cm^3); `bohr_cubed` (a0^3) |
-| `Time` | time | `femtosecond` (fs), `fs`; `picosecond` (ps), `ps`; `second` (s), `s`; `atomic_time` (ħ/Eh); `nanosecond` (ns), `ns`; `microsecond` (µs), `us`; `millisecond` (ms), `ms` |
+| `Time` | time | `femtosecond` (fs), `fs`; `picosecond` (ps), `ps`; `second` (s), `s`; `atomic_time` (ħ/Eh); `nanosecond` (ns), `ns`; `microsecond` (µs), `us`; `millisecond` (ms), `ms`; `ase_time` (Å √(amu/eV)) |
 | `Velocity` | length / time | `angstrom_per_fs` (Å/fs); `angstrom_per_ps` (Å/ps); `meter_per_second` (m/s); `centimeter_per_second` (cm/s); `atomic_velocity` (a0 Eh/ħ) |
 | `Energy` | energy | `electron_volt` (eV), `eV`; `millielectron_volt` (meV), `meV`; `joule` (J), `J`; `hartree` (Ha), `Ha`; `rydberg` (Ry), `Ry`; `kcal_per_mol` (kcal/mol); `erg` (erg); `kilojoule` (kJ), `kJ`; `kilocalorie` (kcal), `kcal`; `kJ_per_mol` (kJ/mol) |
 | `EnergyPerAtom` | energy / atom | `eV_per_atom` (eV/atom); `hartree_per_atom` (Ha/atom); `J_per_atom` (J/atom); `kcal_per_mol_per_atom` (kcal/mol/atom); `erg_per_atom` (erg/atom) |

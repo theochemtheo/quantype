@@ -6,6 +6,10 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `u.ase_time`, ASE's time unit Å √(amu/eV), about 10.18 fs.
+
 ### Changed
 
 - `Atomistic`, the default system, stores masses in daltons and mass densities

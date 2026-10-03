@@ -23,11 +23,12 @@ from quantype import (
     Momentum,
     Pressure,
     Quantity,
+    Time,
     Velocity,
     Volume,
     u,
 )
-from quantype._internal._registry import close_relations
+from quantype._internal._registry import close_relations, unit_specs
 from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
 from quantype.products import LengthMass
 from quantype.serialization import load_npz, save_npz
@@ -54,6 +55,19 @@ def test_atomistic_stores_mass_in_daltons() -> None:
     assert Mass.from_value(12.0).magnitude(u.Da) == 12
     assert (1 * u.m_e).value == pytest.approx(5.485799090441e-4, rel=1e-9)
     assert repr(Mass.from_value(1.0)) == "Mass(1.0 Da)"
+
+
+def test_ase_time_makes_daltons_coherent() -> None:
+    fs = 1e5 * math.sqrt(1.66053906892e-27 / 1.602176634e-19)
+    assert (1 * u.ase_time).magnitude(u.fs) == pytest.approx(fs, rel=1e-12)
+    speed = Length[float](1, u.angstrom) / Time[float](1, u.ase_time)
+    assert isinstance(speed, Velocity)
+    kinetic = Mass[float](1, u.Da) * speed * speed
+    assert kinetic.magnitude(u.eV) == pytest.approx(1, rel=1e-12)
+    # ase.units.fs, from ASE's default CODATA 2014.
+    assert 1 / unit_specs("2014")["ase_time"].scale == pytest.approx(
+        0.09822694788464063, rel=1e-14
+    )
 
 
 def test_atomistic_mass_arithmetic_rescales() -> None:
