@@ -72,6 +72,10 @@ class Quantity(Generic[K, V, S]):
         offset: float = ...,
         symbol: str | None = ...,
     ) -> Unit[K]: ...
+    @classmethod
+    def unit_named(
+        cls, name: str, *, units: tuple[Unit[Any], ...] = ...
+    ) -> Unit[K]: ...
     @property
     def value(self) -> V: ...
     @property
@@ -429,6 +433,12 @@ def _wrap(
     display: Unit[Any] | None = ...,
     echo: float | None = ...,
 ) -> Quantity[Any, Any, Any]: ...
+def _unit_named(
+    cls: type[Quantity[Any, Any, Any]],
+    name: str,
+    units: tuple[Unit[Any], ...],
+    system: type[UnitSystem],
+) -> Unit[Any]: ...
 def _parse(
     cls: type[Quantity[Any, Any, Any]],
     data: object,

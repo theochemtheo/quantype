@@ -84,6 +84,17 @@ def test_portable_unit_factors() -> None:
     assert u.lab_point(1).value == 2.5
 
 
+def test_unit_lookup() -> None:
+    assert Length.unit_named("lab_sqrt2") is u.lab_sqrt2
+    assert Length.unit_named("Å") is u.angstrom
+    tension = u.surface_tension.surface_tension
+    assert SurfaceTension.unit_named("surface_tension") is tension
+    with pytest.raises(ValueError, match="Expected Length; received Pressure"):
+        Length.unit_named("pascal")
+    with pytest.raises(ValueError, match="Unknown unit 'furlong' for Length"):
+        Length.unit_named("furlong")
+
+
 def test_serialization_roundtrip() -> None:
     length = Length[float](2, u.length.nanometer)
 

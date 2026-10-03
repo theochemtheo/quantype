@@ -19,7 +19,9 @@ if TYPE_CHECKING:
 # pyright: reportPrivateUsage=false
 
 # GenericAlias forwards every other attribute to the unparameterized class.
-_OWN_ATTRIBUTES = frozenset({"from_value", "parse", "storage", "unit_system"})
+_OWN_ATTRIBUTES = frozenset(
+    {"from_value", "parse", "storage", "unit_named", "unit_system"}
+)
 
 
 class StorageAlias(GenericAlias):
@@ -89,3 +91,9 @@ class StorageAlias(GenericAlias):
         from quantype.core import _parse
 
         return _parse(cast("Any", self.__origin__), data, units, self.unit_system)
+
+    def unit_named(self, name: str, *, units: tuple[Unit[Any], ...] = ()) -> Unit[Any]:
+        """Also finds the units of this alias's system, as ``parse`` does."""
+        from quantype.core import _unit_named
+
+        return _unit_named(cast("Any", self.__origin__), name, units, self.unit_system)

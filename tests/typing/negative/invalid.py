@@ -30,6 +30,8 @@ bad_root = qnp.sqrt(1.0 * u.eV)  # error
 bad_constructor = Length[float](2, u.energy.hartree)  # error
 bad_definition = Temperature.define_unit("bleb", reference=u.nm)  # error
 missing_unit = Length[float](2)  # error
+wrong_named_unit = Length[float](2, Force.unit_named("newton"))  # error
+unit_name_not_string = Length.unit_named(u.nm)  # error
 
 point = 300 * u.K
 bad_point_sum = point.sum()  # error

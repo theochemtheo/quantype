@@ -252,6 +252,15 @@ class Quantity[K, V, S: UnitSystem]:
             symbol,
         )
 
+    @classmethod
+    def unit_named(cls, name: str, *, units: tuple[Unit[Any], ...] = ()) -> Unit[K]:
+        """The unit of this kind that ``name`` names, as ``parse`` reads it.
+
+        A catalogue name or alias comes first, then a display symbol such as
+        ``"Ha/a0"``. ``units`` adds definitions the catalogue doesn't have.
+        """
+        return cast("Unit[K]", _unit_named(cls, name, units, Atomistic))
+
     @property
     def value(self) -> V:
         """Raw numbers in the unit system's units; explicitly bypasses units."""
@@ -1051,6 +1060,21 @@ def _constant(name: str, semantic: Semantic, reference: float) -> Constant[Any]:
 
         cls = cast("type[Constant[Any]] | None", constant_class_for(semantic))
     return (cls or Constant)(name, semantic, reference)
+
+
+def _unit_named(
+    cls: type[Quantity[Any, Any, Any]],
+    name: str,
+    units: tuple[Unit[Any], ...],
+    system: type[UnitSystem],
+) -> Unit[Any]:
+    from quantype._internal._lookup import unit_of_kind
+
+    if getattr(cls, "_semantic", None) is None:
+        raise TypeError("unit_named requires a named quantity class")
+    if not isinstance(name, str):  # pyright: ignore[reportUnnecessaryIsInstance]
+        raise TypeError(f"Unit names are strings; received {type(name).__name__}")
+    return unit_of_kind(name, cast("Kind", cls._semantic), units, system)
 
 
 def _parse(

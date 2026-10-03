@@ -14,6 +14,7 @@ in [decisions](decisions/).
 | CODATA editions ([ADR-009](decisions/ADR-009-vendored-codata-one-edition-per-process.md)) | `src/quantype/codata.py`; generated `_internal/_codata.py` | `test_codata.py` |
 | Quantity wrapping, operators and reductions | `src/quantype/core.py`; handwritten `core.pyi` | `test_core.py`, `test_refactor.py`, typing fixtures |
 | Unit definitions and catalogue lookup | `src/quantype/_internal/_unit.py`; handwritten `_unit.pyi` | `test_core.py`, `test_validation.py` |
+| Unit lookup by name, alias, or symbol (`unit_named`, `parse`) | `src/quantype/_internal/_lookup.py` | `test_unit_lookup.py`, `test_validation.py` |
 | Unit systems, derived units, range checks | `src/quantype/_internal/_systems.py`; public `systems.py` | `test_systems.py`, `test_scenarios.py`, typing fixtures |
 | Typed constructors and backend conversion | `src/quantype/_internal/_construction.py`, `_storage.py` | `test_refactor.py`, `test_binary_failures.py` |
 | NumPy functions and dispatch | `src/quantype/_internal/_numpy.py` (unit rules, backend namespaces, `UFUNCS`/`FUNCTIONS`/Torch names); generated `numpy.py`/`numpy.pyi` per catalogue; `Quantity.__array_ufunc__`/`__array_function__`/`__torch_function__` | `test_numpy.py`, `test_scenarios_jax.py`, `test_torch.py` |

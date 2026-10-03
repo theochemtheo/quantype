@@ -298,6 +298,7 @@ def literal_exponents(name: str, catalogue: Catalogue) -> list[int]:
 
 def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
     text = f"    @classmethod\n    @override\n    def define_unit(cls, name: str, *, reference: Unit[{name}Kind], scale: float = 1.0, offset: float = 0.0, symbol: str | None = None) -> _units._{name}Unit: ...\n"
+    text += f"    @classmethod\n    @override\n    def unit_named(cls, name: str, *, units: tuple[Unit[Any], ...] = ()) -> _units._{name}Unit: ...\n"
     text += f"    @classmethod\n    @override\n    def from_value[W](cls, value: W) -> {name}[W, S]: ...\n"
     text += f"    @classmethod\n    @override\n    def reinterpret[W, T: UnitSystem](cls, quantity: Quantity[Any, W, T]) -> {name}[W, T]: ...\n"
     # A string holds one number; other inputs may hold arrays.

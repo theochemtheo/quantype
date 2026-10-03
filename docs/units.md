@@ -78,6 +78,27 @@ wins: use
 `u.dimensionless.one`, `u.energy_density.energy_density`, or
 `u.energy_per_volume.energy_per_volume`.
 
+To find a unit from a name held as a string, such as one in a configuration
+file, ask its kind:
+
+```python
+import pytest
+
+from quantype import Force, Length, u
+
+assert Force.unit_named("hartree_per_bohr") is u.hartree_per_bohr
+assert Length.unit_named("nm") is u.nanometer
+assert Force.unit_named("Ha/a0") is u.hartree_per_bohr  # its symbol
+with pytest.raises(ValueError, match="Expected Force; received Length"):
+    Force.unit_named("nm")
+```
+
+`unit_named` reads names as `parse` does. It tries catalogue names and aliases
+first, then the display symbols of the kind's units, and raises `ValueError` for
+a unit of another kind or a name it doesn't know, listing the kind's units in
+that case. `units=` adds [custom units](#define-a-unit-without-global-registration),
+and `Force[V, S].unit_named` also finds the units that only system `S` defines.
+
 ## Unit systems
 
 A unit system is the set of units quantities store their numbers in. Storing

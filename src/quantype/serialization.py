@@ -15,6 +15,9 @@ from typing import TYPE_CHECKING, Any, TypeGuard, cast, get_args, get_origin
 import numpy as np
 
 from quantype import codata
+
+from quantype._internal._lookup import resolve_unit as resolve_unit  # noqa: PLC0414
+from quantype._internal._lookup import unit_of_kind
 from quantype._internal._semantics import Kind
 from quantype._internal._storage import (
     backend_name,
@@ -29,8 +32,7 @@ from quantype._internal._systems import (
     into_system,
     require_system,
 )
-from quantype._internal._unit import known_kinds, units_of
-from quantype.core import Quantity, Unit, _wrap, get_unit
+from quantype.core import Quantity, Unit, _wrap
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -39,76 +41,6 @@ if TYPE_CHECKING:
 # Pydantic consumes these validation failures as ValueErrors.
 # ruff: noqa: SLF001, TRY004
 # pyright: reportPrivateUsage=false
-
-
-def resolve_unit(
-    name: str,
-    units: Iterable[Unit[Any]] = (),
-    *,
-    kind: Kind | None = None,
-    system: type[UnitSystem] = Atomistic,
-) -> Unit[Any]:
-    """Resolve explicit definitions without mutating the builtin catalogue.
-
-    The target system's own units (custom bases and derived identifiers such as
-    ``gromacs:Force``) are found automatically after explicit definitions.
-    """
-    definitions = _definitions(units, kind)
-    named = [unit for (key, _), unit in definitions.items() if key == name]
-    # Different kinds may share an identifier: prefer the requested kind.
-    for unit in named:
-        if unit.semantic is kind:
-            return unit
-    if kind is not None and system is not Atomistic:
-        for unit in (system.unit_for(kind), *system.units):
-            if unit.name == name and unit.semantic is kind:
-                return unit
-    if named:
-        return named[0]
-    try:
-        return get_unit(name, kind=kind)
-    except ValueError:
-        if kind is None:
-            raise
-        return _by_symbol(name, kind, [*definitions.values(), *_system_units(system)])
-
-
-def _system_units(system: type[UnitSystem]) -> list[Unit[Any]]:
-    return [*system.units, *(system.unit_for(kind) for kind in known_kinds())]
-
-
-def _by_symbol(name: str, kind: Kind, extra: Iterable[Unit[Any]]) -> Unit[Any]:
-    """A unit of ``kind`` whose display symbol is ``name``, so printed values parse."""
-    found = list(
-        dict.fromkeys(
-            unit
-            for unit in (*extra, *units_of(kind))
-            if unit.semantic is kind and unit.symbol == name
-        )
-    )
-    if len(found) > 1:
-        names = ", ".join(unit.name for unit in found)
-        raise ValueError(f"Unit symbol {name!r} is ambiguous; use one of {names}")
-    if not found:
-        raise ValueError(f"Unknown unit {name!r}")
-    return found[0]
-
-
-def _definitions(
-    units: Iterable[Unit[Any]], kind: Kind | None
-) -> dict[tuple[str, Kind], Unit[Any]]:
-    definitions: dict[tuple[str, Kind], Unit[Any]] = {}
-    for unit in units:
-        if (unit.name, unit.semantic) in definitions:
-            raise ValueError(f"Duplicate unit definition {unit.name!r}")
-        try:
-            builtin = get_unit(unit.name, kind=kind)
-        except ValueError:
-            builtin = None
-        if builtin is not None and builtin is not unit:
-            raise ValueError(f"Custom unit shadows builtin {unit.name!r}")
-        definitions[unit.name, unit.semantic] = unit
-    return definitions
 
 
 def selected_unit(
@@ -219,10 +151,7 @@ def parse_quantity(
             )
         return data
     value, name = _wire_fields(data, cls._kind)
-    kind = cast("Kind", cls._semantic)
-    unit = resolve_unit(name, units, kind=kind, system=system)
-    if unit.semantic is not cls._semantic:
-        raise ValueError(f"Expected {cls._kind}; received {unit.kind} (unit {name!r})")
+    unit = unit_of_kind(name, cast("Kind", cls._semantic), units, system)
     reject_booleans(value)
     array = np.asarray(value)
     if array.dtype.kind not in "iuf":
@@ -313,9 +242,7 @@ def load_npz[Q](
         entry = _archive_entry(json.loads(str(archive["metadata"])), name)
         if entry["kind"] != cls._kind:
             raise ValueError(f"Expected {cls._kind}; received {entry['kind']}")
-        unit = resolve_unit(entry["unit"], units, kind=kind, system=system)
-        if unit.semantic is not cls._semantic:
-            raise ValueError(f"Expected {cls._kind}; received {unit.kind}")
+        unit = unit_of_kind(entry["unit"], kind, units, system)
         if entry["array"] not in archive:
             raise ValueError("Archive is missing the quantity array")
         array = archive[entry["array"]]

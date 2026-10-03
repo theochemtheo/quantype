@@ -6,8 +6,11 @@ import numpy as np
 import numpy.typing as npt
 import torch
 
-from quantype import Area, Length, Temperature, u
+from quantype import Area, Force, Length, Temperature, u
+from quantype.core import Unit
+from quantype.kinds import ForceKind
 from quantype.serialization import load_npz
+from quantype.systems import SI
 
 assert_type(Length[np.float64](2, u.length.nanometer), Length[np.float64])
 assert_type(
@@ -31,3 +34,9 @@ values: npt.NDArray[np.float64] = np.zeros(3)
 assert_type(Length(values, u.nm), Length[npt.NDArray[np.float64]])
 assert_type(Length(torch.zeros(3), u.nm), Length[torch.Tensor])
 assert_type(Length(2.0, u.nm) * Length(3.0, u.nm), Area[float])
+
+hartree_per_bohr = Force.unit_named("hartree_per_bohr")
+assert_type(hartree_per_bohr(2.0), Force[float])
+assert_type(Force[np.float64](2, Force.unit_named("Ha/a0")), Force[np.float64])
+assert_type(Force[float, SI].unit_named("newton")(2.0), Force[float])
+newton: Unit[ForceKind] = Force.unit_named("newton", units=(bleb,))
