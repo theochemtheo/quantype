@@ -15,6 +15,7 @@ import pytest
 import quantype
 from quantype import Energy, Length, Temperature, u
 from quantype.serialization import load_npz, save_npz
+from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -71,7 +72,7 @@ def test_npz_custom_units_and_zero_dimensional_storage(tmp_path: Path) -> None:
         path, "point", Temperature[npt.NDArray[np.float64]], units=(bleb,)
     )
     assert restored.value.shape == ()
-    np.testing.assert_allclose(restored.value, point.value)
+    assert_allclose(restored, point)
 
 
 def test_torch_constructor_and_archive(tmp_path: Path) -> None:

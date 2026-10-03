@@ -22,6 +22,7 @@ from quantype import (
 )
 from quantype.products import LengthEnergy
 from quantype.systems import CGS, SI, Atomic, Atomistic, Metal, Real, UnitSystem
+from quantype.testing import assert_allclose
 
 
 def _dynamic(cls: object) -> Any:  # noqa: ANN401 -- runtime-chosen parameters
@@ -71,10 +72,10 @@ def test_jax_jit_and_vmap() -> None:
     x = u.angstrom(_jnp.array([[1.0, 2.0], [3.0, 4.0]]))
     energies = ujax.jit(ujax.vmap(_jax_harmonic))(x)
     assert type(energies) is Energy
-    np.testing.assert_allclose(energies.value, [5.0, 25.0])
+    assert_allclose(energies, u.eV(np.array([5.0, 25.0])))
     gradients = ujax.jit(ujax.vmap(ujax.grad(_jax_harmonic)))(x)
     assert type(gradients) is Force
-    np.testing.assert_allclose(gradients.value, 2.0 * x.value)
+    assert_allclose(gradients, 2.0 * u.eV_per_angstrom_squared * x)
 
 
 def test_jax_every_quantity_class_is_a_single_leaf_pytree() -> None:
@@ -97,7 +98,7 @@ def test_jax_every_quantity_class_is_a_single_leaf_pytree() -> None:
 def test_jax_pytree_keeps_kind_and_system_but_not_display() -> None:
     quantity = u.angstrom(_jnp.array([1.0, 2.0])).to(u.nm)
     restored = _jax.jit(_identity)(quantity)
-    np.testing.assert_allclose(restored.value, quantity.value)
+    assert_allclose(restored, quantity)
     # Display units are presentation, not tree structure (UX-017).
     assert getattr(restored, "_display") is None  # noqa: B009
     assert restored.system is quantity.system
@@ -115,7 +116,7 @@ def test_jax_pytree_keeps_kind_and_system_but_not_display() -> None:
     assert rebuilt.kind == structural.kind
     mapped = _jax.vmap(_identity)(structural)
     assert mapped.kind == structural.kind
-    np.testing.assert_allclose(mapped.value, structural.value)
+    assert_allclose(mapped, structural)
 
 
 def test_jax_derivatives_and_conversion_invariance() -> None:
@@ -130,9 +131,9 @@ def test_jax_derivatives_and_conversion_invariance() -> None:
         second = _jax.jit(hessian)(x)
         assert type(first) is Force
         assert type(second) is ForceConstant
-        np.testing.assert_allclose(first.value, [2.0, 4.0, 6.0], rtol=1e-6)
-        np.testing.assert_allclose(second.value, 2.0 * np.eye(3), rtol=1e-6)
-        np.testing.assert_allclose((-first).value, [-2.0, -4.0, -6.0])
+        assert_allclose(first, u.eV_per_angstrom(np.array([2.0, 4.0, 6.0])), rtol=1e-6)
+        assert_allclose(second, u.eV_per_angstrom_squared(2.0 * np.eye(3)), rtol=1e-6)
+        assert_allclose(-first, u.eV_per_angstrom(np.array([-2.0, -4.0, -6.0])))
 
 
 def test_jax_raw_model_boundary_and_single_evaluation() -> None:
@@ -143,10 +144,10 @@ def test_jax_raw_model_boundary_and_single_evaluation() -> None:
         return Energy.from_value(_jnp.sum(x.value**2))
 
     x = u.angstrom(_jnp.array([1.0, 2.0]))
-    np.testing.assert_allclose(ujax.grad(model)(x).value, [2.0, 4.0])
+    assert_allclose(ujax.grad(model)(x), u.eV_per_angstrom(np.array([2.0, 4.0])))
     assert len(calls) == 1
     calls.clear()
-    np.testing.assert_allclose(ujax.hessian(model)(x).value, 2.0 * np.eye(2))
+    assert_allclose(ujax.hessian(model)(x), u.eV_per_angstrom_squared(2.0 * np.eye(2)))
     assert len(calls) == 1
 
 

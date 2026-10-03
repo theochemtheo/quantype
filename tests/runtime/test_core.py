@@ -30,6 +30,7 @@ from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS, UNITS
 from quantype._internal._semantics import KINDS, Kind, dimensionless_kind, named_kind
 from quantype.core import _wrap, dimensions, get_unit, result_kind
 from quantype.systems import SI
+from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -178,10 +179,12 @@ def test_numpy_workflow() -> None:
     assert isinstance(positions.sum().value, np.ndarray)
     assert positions.sum().value == 6
     assert positions.mean().value == 2
-    np.testing.assert_allclose(qnp.sqrt(positions**2).value, raw)
-    np.testing.assert_allclose(qnp.sin(u.degree(np.array([0.0, 90.0]))).value, [0, 1])
-    np.testing.assert_allclose((u.angstrom * raw).value, raw)
-    np.testing.assert_allclose((raw * u.angstrom).value, raw)
+    assert_allclose(qnp.sqrt(positions**2), positions)
+    assert_allclose(
+        qnp.sin(u.degree(np.array([0.0, 90.0]))), u.one(np.array([0.0, 1.0]))
+    )
+    assert_allclose(u.angstrom * raw, positions)
+    assert_allclose(raw * u.angstrom, positions)
     with pytest.raises(TypeError, match="Implicit array coercion"):
         np.asarray(positions)
     untyped: Any = positions
