@@ -19,7 +19,7 @@ import math
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, ClassVar, Literal, Self, cast, override
 
-from quantype._internal._registry import BASIS
+from quantype._internal._registry import ATOMISTIC_OVERRIDES, BASIS
 from quantype._internal._semantics import KINDS, Kind
 from quantype._internal._unit import Unit, get_unit, known_kinds, units_of
 from quantype.kinds import (
@@ -34,7 +34,7 @@ from quantype.kinds import (
 )
 
 if TYPE_CHECKING:
-    from collections.abc import Iterable, Sequence
+    from collections.abc import Iterable, Mapping, Sequence
 
     from numpy.typing import DTypeLike
 
@@ -54,7 +54,7 @@ __all__ = [
     "coherence",
     "factor",
     "into_system",
-    "is_coherent",
+    "overridden_kinds",
     "require_system",
 ]
 
@@ -345,9 +345,9 @@ def _overrides(cls: type[UnitSystem]) -> dict[Kind, Unit[Any]]:
     return overridden
 
 
-def is_coherent(system: type[UnitSystem]) -> bool:
-    """Whether every kind is stored in its base-derived unit (no overrides)."""
-    return not _overrides(system)
+def overridden_kinds(system: type[UnitSystem]) -> Mapping[Kind, Unit[Any]]:
+    """The kinds ``system`` stores outside its derived units, and their units."""
+    return _overrides(system)
 
 
 def coherence(system: type[UnitSystem], semantic: Semantic) -> float:
@@ -447,8 +447,6 @@ def _compose(bases: dict[str, Unit[Any]], dimensions: Sequence[int]) -> str:
 
 def factor(system: type[UnitSystem], semantic: Semantic) -> float:
     """Reference units per stored unit of ``semantic`` in ``system``."""
-    if system is Atomistic:
-        return 1.0
     if isinstance(semantic, Kind):
         return system.unit_for(semantic).scale
     return _scale(_resolve(system), semantic.dimensions)
@@ -568,11 +566,12 @@ _deferred_validation = True
 
 
 class Atomistic(UnitSystem, name="atomistic"):
-    """Å, eV, fs, K, μB, e: the reference units, and the default system."""
+    """Å, eV, fs, K, μB, e: the reference units; mass Da, density g/cm³. Default."""
 
     length = _catalogue("angstrom", LengthKind)
     energy = _catalogue("electron_volt", EnergyKind)
     time = _catalogue("femtosecond", TimeKind)
+    overrides = _catalogue_overrides(*ATOMISTIC_OVERRIDES)
 
 
 class Metal(UnitSystem, name="metal"):

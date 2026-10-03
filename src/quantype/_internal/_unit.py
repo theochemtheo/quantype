@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from functools import cache
+from functools import cache, cached_property
 from typing import TYPE_CHECKING, Any, ClassVar, cast, override
 
 from quantype._internal._semantics import KINDS, Kind
@@ -62,6 +62,13 @@ class Unit[K]:
         ):
             object.__setattr__(self, attribute, value)
 
+    @cached_property
+    def _default_storage(self) -> tuple[float, float]:
+        """The affine map into the default system, for unit-first construction."""
+        from quantype._internal._systems import Atomistic, into_system
+
+        return into_system(cast("Any", self), Atomistic)
+
     def __call__[V](self, value: V) -> Quantity[K, V, Any]:
         """Unit-first construction: default-system storage, displayed in this unit."""
         from quantype._internal._storage import unit_conversion
@@ -84,8 +91,7 @@ class Unit[K]:
                 "for lists, use a typed quantity constructor or numpy.asarray "
                 "with a floating dtype first"
             )
-        # The reference units are the default system's units, so no factor.
-        stored = unit_conversion(raw, self.scale, self.offset)
+        stored = unit_conversion(raw, *self._default_storage)
         return cast(
             "Quantity[K, V, Any]",
             _wrap(self.semantic, stored, None, display=cast("Any", self), echo=echo),

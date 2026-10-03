@@ -170,8 +170,8 @@ Each product also names the quotients that undo it. Any other product or quotien
 | `InverseTime` | fs^-1 | ps^-1 | fs^-1 | s^-1 | s^-1 | Eh/ħ |
 | `AtomCount` | atom | atom | atom | atom | atom | atom |
 | `ElectronCount` | electron | electron | electron | electron | electron | electron |
-| `Mass` | eV fs^2/Å^2 | g/mol* | g/mol* | kg | g | m_e |
-| `MassDensity` | eV fs^2/Å^5 | g/cm^3* | g/cm^3* | kg/m^3 | g/cm^3 | m_e/a0^3 |
+| `Mass` | Da* | g/mol* | g/mol* | kg | g | m_e |
+| `MassDensity` | g/cm^3* | g/cm^3* | g/cm^3* | kg/m^3 | g/cm^3 | m_e/a0^3 |
 | `Momentum` | eV fs/Å | eV ps/Å | kcal/mol fs/Å | kg m/s | g cm/s | ħ/a0 |
 | `Acceleration` | Å/fs^2 | Å/ps^2 | Å/fs^2 | m/s^2 | cm/s^2 | a0 Eh^2/ħ^2 |
 | `Charge` | e | e | e | C | statC | e |

@@ -6,6 +6,14 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Changed
+
+- `Atomistic`, the default system, stores masses in daltons and mass densities
+  in g/cm³, instead of eV fs²/Å² and eV fs²/Å⁵. `Mass[float](12, u.Da).value`
+  is now `12.0`, and `Mass.from_value` takes daltons. Products that involve a
+  mass or a density rescale, as they do in `Metal` and `Real`. See
+  [ADR-013](docs/decisions/ADR-013-atomistic-stores-mass-in-daltons.md).
+
 ## [0.1.0] - 2026-10-03
 
 Initial release of `quantype`, which makes physical dimensions and unit systems

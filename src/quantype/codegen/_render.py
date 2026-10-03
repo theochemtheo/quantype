@@ -12,6 +12,7 @@ import keyword
 import re
 from typing import TYPE_CHECKING
 
+from quantype._internal._registry import ATOMISTIC_OVERRIDES
 from quantype.catalogue import (
     _namespace_name as namespace_name,  # pyright: ignore[reportPrivateUsage]
 )
@@ -507,15 +508,17 @@ def structural_quantity_stub() -> str:
 def kind_docstring(name: str, catalogue: Catalogue) -> str:
     """What ``help(Length)`` shows: storage, construction, and where units are."""
     namespace = namespace_name(name)
-    canonical = catalogue.quantities[name].canonical_unit
-    spec = catalogue.units[canonical]
-    symbol = spec.symbol or canonical
-    namespaces = {namespace_name(kind) for kind in catalogue.quantities}
-    unit = (
-        f"u.{canonical}"
-        if canonical not in namespaces
-        else f"u.{namespace}.{canonical}"
+    stored = next(
+        (
+            unit
+            for unit in ATOMISTIC_OVERRIDES
+            if unit in catalogue.units and catalogue.units[unit].kind == name
+        ),
+        catalogue.quantities[name].canonical_unit,
     )
+    symbol = catalogue.units[stored].symbol or stored
+    namespaces = {namespace_name(kind) for kind in catalogue.quantities}
+    unit = f"u.{stored}" if stored not in namespaces else f"u.{namespace}.{stored}"
     words = namespace.replace("_", " ")
     article = "An" if words[0] in "aeiou" else "A"
     return (

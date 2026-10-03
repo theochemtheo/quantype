@@ -1,7 +1,10 @@
 """Declarative semantic catalogue; scales convert into the reference units.
 
-The reference units (Å, eV, fs, K, μB, e) are the coherent units of the default
-``Atomistic`` system. Every other unit system is defined relative to them.
+The reference units (Å, eV, fs, K, μB, e) are the base units of the default
+``Atomistic`` system, and every kind's reference unit is their coherent product.
+``Atomistic`` stores mass and mass density in units of their own (see
+``ATOMISTIC_OVERRIDES``). Every unit system is defined relative to the reference
+units.
 
 Dimensions use the named basis below, not SI mass dimensions. Equal dimension
 vectors never imply semantic equality. Relations are deliberately explicit.
@@ -27,6 +30,10 @@ BASIS = (
     "charge",
 )
 type Dimensions = tuple[int, int, int, int, int, int, int, int]
+
+# Units the default Atomistic system stores in place of the coherent eV fs²/Å²
+# and eV fs²/Å⁵. The code generator also reads them, for kind docstrings.
+ATOMISTIC_OVERRIDES = ("dalton", "gram_per_cubic_centimeter")
 
 
 @dataclass(frozen=True)

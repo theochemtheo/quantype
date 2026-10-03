@@ -3,7 +3,7 @@
 Numerical operations intentionally use the stored object's own operators. Dynamic
 typing is confined to this dispatch boundary, not exposed as a user's result type.
 
-Each quantity holds raw numbers in the coherent units of its unit system, its
+Each quantity holds raw numbers in the units of its unit system, its
 physical kind, the system, and optionally the unit it was given in (display).
 """
 
@@ -37,7 +37,7 @@ from quantype._internal._systems import (
     coherent_symbol,
     factor,
     into_system,
-    is_coherent,
+    overridden_kinds,
     require_system,
 )
 from quantype._internal._unit import Unit, get_unit
@@ -93,7 +93,8 @@ def _product_scale(
     system: type[UnitSystem], left: Semantic, right: Semantic, result: Semantic, op: str
 ) -> float:
     """The factor taking raw operands' product or ratio to the result's storage."""
-    if is_coherent(system):
+    overridden = overridden_kinds(system)
+    if left not in overridden and right not in overridden and result not in overridden:
         return 1.0
     lhs, rhs = coherence(system, left), coherence(system, right)
     return (lhs * rhs if op == "mul" else lhs / rhs) / coherence(system, result)
@@ -107,7 +108,7 @@ def require_unit(unit: object, kind: str, hint: str = "") -> None:
     if isinstance(unit, Unit):
         return
     semantic = KINDS.get(kind)
-    example = f"u.{semantic.canonical_unit}" if semantic is not None else "u.nm"
+    example = "u.nm" if semantic is None else f"u.{Atomistic.unit_for(semantic).name}"
     if isinstance(unit, str):
         try:
             known: Unit[Any] | None = get_unit(unit)
@@ -951,7 +952,7 @@ class Constant[K]:
         #: The conventional symbol, such as ``k_B``.
         self.name = name
         self._semantic = semantic
-        # Coherent value in the reference (default-system) units.
+        # Coherent value in the reference units (Å, eV, fs, K, μB, e).
         self._reference = reference
 
     @property
