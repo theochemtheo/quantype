@@ -25,6 +25,7 @@ from quantype import (
     u,
 )
 from quantype.systems import SI, Metal
+from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -47,15 +48,15 @@ def test_numerical_arrays_scale_quantities() -> None:
     grid = step * np.arange(4)
     assert isinstance(grid, Time)
     np.testing.assert_allclose(grid.magnitude(u.fs), [0, 0.5, 1, 1.5])
-    np.testing.assert_allclose((np.arange(4) * step).value, grid.value)
+    assert_allclose(np.arange(4) * step, grid)
     weights = np.array([1.0, 0.5])
     positions = Length[npt.NDArray[np.float32]]([2, 4], u.angstrom)
     weighted = positions * weights
-    np.testing.assert_allclose(weighted.value, [2, 2])
+    assert_allclose(weighted, u.angstrom(np.array([2.0, 2.0])))
     assert weighted.value.dtype == np.float32  # the quantity's dtype is kept
     assert (positions * np.float64(2)).value.dtype == np.float32
     reciprocal = np.ones(2) / Length[float](2, u.angstrom)
-    np.testing.assert_allclose(reciprocal.value, [0.5, 0.5])
+    assert_allclose(reciprocal, 1 / u.angstrom(np.array([2.0, 2.0])))
 
 
 @pytest.mark.parametrize("factor", [True, np.True_, 1j, "2", None, [1, 2]])

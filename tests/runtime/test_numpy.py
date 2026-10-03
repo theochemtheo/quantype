@@ -27,6 +27,7 @@ from quantype import (
 )
 from quantype.products import TemperatureDifferenceSquared
 from quantype.systems import SI, Metal
+from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
     from types import ModuleType
@@ -94,9 +95,9 @@ def test_norms_distances_and_reductions() -> None:
     ):
         found: Length[Array] = norms
         assert isinstance(found, Length)
-        np.testing.assert_allclose(found.value, [0, 5])
-    np.testing.assert_allclose(numpy.sum(positions, axis=0).value, [3, 4, 0])
-    np.testing.assert_allclose(qnp.mean(positions, axis=0).value, [1.5, 2, 0])
+        assert_allclose(found, _lengths([0.0, 5.0]))
+    assert_allclose(numpy.sum(positions, axis=0), _lengths([3.0, 4.0, 0.0]))
+    assert_allclose(qnp.mean(positions, axis=0), _lengths([1.5, 2.0, 0.0]))
     assert numpy.max(positions) == 4 * u.angstrom
     assert numpy.shape(positions) == (2, 3)
 
@@ -108,10 +109,10 @@ def test_joining_choosing_and_limiting() -> None:
         assert isinstance(stacked, Length)
         assert stacked.shape == (2, 2)
         chosen = namespace.where(np.array([True, False]), first, second)
-        np.testing.assert_allclose(chosen.value, [1, 40])
-        np.testing.assert_allclose(namespace.maximum(first, second).value, [30, 40])
+        assert_allclose(chosen, _lengths([1.0, 40.0]))
+        assert_allclose(namespace.maximum(first, second), second)
         limited = namespace.clip(first, 1.5 * u.angstrom, None)
-        np.testing.assert_allclose(limited.value, [1.5, 2])
+        assert_allclose(limited, _lengths([1.5, 2.0]))
     mixed: list[Any] = [first, Energy[Array]([1.0, 2.0], u.eV)]
     with pytest.raises(TypeError, match="quantities of one kind"):
         qnp.stack(mixed)
@@ -168,7 +169,7 @@ def test_arrays_on_the_left_use_reflected_operators() -> None:
     np.testing.assert_allclose(
         (numpy.array([1.0, 2.0]) * length).magnitude(u.nm), [2, 4]
     )
-    np.testing.assert_allclose((numpy.ones(2) / length).value, [0.05, 0.05])
+    assert_allclose(numpy.ones(2) / length, 1 / _lengths([20.0, 20.0]))
     ratio = (1 * u.eV) / (2 * u.eV)
     np.testing.assert_array_equal(numpy.array([0.0, 1.0]) < ratio, [True, False])
 
@@ -287,7 +288,7 @@ def test_variances_and_squares_are_squared_kinds(namespace: ModuleType) -> None:
     assert isinstance(variance.value, np.ndarray)
     assert isinstance(namespace.nanvar(lengths), Area)
     assert isinstance(namespace.square(lengths), Area)
-    np.testing.assert_allclose(namespace.square(lengths).value, [1, 9])
+    assert_allclose(namespace.square(lengths), Area[Array]([1.0, 9.0], u.angstrom2))
     spread = cast(
         "TemperatureDifferenceSquared[Array]",
         namespace.var(Temperature[Array]([300.0, 310.0], u.K)),
@@ -308,7 +309,7 @@ def test_matrix_products_and_integrals_follow_the_algebra(
     swap = np.array([[0.0, 1.0], [1.0, 0.0]])
     rotated = cast("Length[Array]", namespace.matmul(swap, displacement))
     assert isinstance(rotated, Length)
-    np.testing.assert_allclose(rotated.value, [4, 3])
+    assert_allclose(rotated, _lengths([4.0, 3.0]))
     assert isinstance(namespace.outer(displacement, displacement), Area)
     total = namespace.dot(displacement, displacement)
     assert isinstance(total.value, np.ndarray)  # array storage stays an array
