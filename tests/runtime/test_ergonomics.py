@@ -40,7 +40,7 @@ def test_real_scalars_scale_quantities(factor: float) -> None:
     length = Length[float](2, u.nm)
     for scaled in (length * factor, factor * length, length / (1 / factor)):
         assert scaled.magnitude(u.nm) == pytest.approx(4)
-        assert type(scaled.value) is float  # storage is kept
+        assert type(scaled.value) is float
 
 
 def test_numerical_arrays_scale_quantities() -> None:
@@ -53,7 +53,7 @@ def test_numerical_arrays_scale_quantities() -> None:
     positions = Length[npt.NDArray[np.float32]]([2, 4], u.angstrom)
     weighted = positions * weights
     assert_allclose(weighted, u.angstrom(np.array([2.0, 2.0])))
-    assert weighted.value.dtype == np.float32  # the quantity's dtype is kept
+    assert weighted.value.dtype == np.float32
     assert (positions * np.float64(2)).value.dtype == np.float32
     reciprocal = np.ones(2) / Length[float](2, u.angstrom)
     assert_allclose(reciprocal, 1 / u.angstrom(np.array([2.0, 2.0])))

@@ -102,7 +102,7 @@ def test_jax_pytree_keeps_kind_and_system_but_not_display() -> None:
     quantity = u.angstrom(_jnp.array([1.0, 2.0])).to(u.nm)
     restored = _jax.jit(_identity)(quantity)
     assert_allclose(restored, quantity)
-    # Display units are presentation, not tree structure (UX-017).
+    # Display units are presentation, not tree structure.
     assert getattr(restored, "_display") is None  # noqa: B009
     assert restored.system is quantity.system
     _, presented = _trees.tree_flatten(quantity)

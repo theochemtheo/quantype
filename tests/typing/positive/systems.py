@@ -39,8 +39,6 @@ class GromacsFs(Gromacs, name="typing:gromacs-fs"):
     time = u.femtosecond
 
 
-# --- Construction and algebra within one system -----------------------------------
-
 x_si = Length[float, SI](2.0, u.nm)
 e_si = Energy[float, SI](3.0, u.eV)
 x_metal = Length[float, Metal](20.0, u.angstrom)
@@ -61,8 +59,6 @@ assert_type(Length[float, SI].parse("2 nm"), Length[float, SI])
 point = Temperature[float, SI](20.0, u.celsius)
 assert_type(point - point, TemperatureDifference[float, SI])
 
-# --- The default system keeps today's annotations -----------------------------------
-
 x_default = 2.0 * u.nm
 assert_type(x_default, Length[float])
 assert_type(x_default, Length[float, Atomistic])
@@ -76,8 +72,6 @@ def cutoff_today(r: Length[float]) -> Length[float]:
 
 cutoff_today(x_default)
 
-# --- Generic code over the system ---------------------------------------------------
-
 
 def work[S: UnitSystem](f: Force[float, S], d: Length[float, S]) -> Energy[float, S]:
     return f * d
@@ -86,8 +80,6 @@ def work[S: UnitSystem](f: Force[float, S], d: Length[float, S]) -> Energy[float
 assert_type(work(e_si / x_si, x_si), Energy[float, SI])
 f_metal = Force[float, Metal](1.0, u.eV_per_angstrom)
 assert_type(work(f_metal, x_metal), Energy[float, Metal])
-
-# --- Explicit bridges and system-specific kernels -------------------------------------
 
 assert_type(x_metal.to_system(SI), Length[float, SI])
 assert_type(x_si + x_metal.to_system(SI), Length[float, SI])
@@ -101,8 +93,6 @@ def lammps_real_kernel(r: Length[npt.NDArray[np.float64], Real]) -> None:
 lammps_real_kernel(Length[npt.NDArray[np.float64], Real](positions, u.angstrom))
 lammps_real_kernel(Length[npt.NDArray[np.float64], SI](positions, u.nm).to_system(Real))
 
-# --- Custom systems need no stub changes ----------------------------------------------
-
 cutoff = Length[float, Gromacs](1.2, u.nm)
 assert_type(cutoff + cutoff, Length[float, Gromacs])
 assert_type(cutoff.to_system(GromacsFs), Length[float, GromacsFs])
@@ -111,8 +101,6 @@ forces = Force[npt.NDArray[np.float32], Gromacs].from_value(raw)
 assert_type(forces, Force[npt.NDArray[np.float32], Gromacs])
 assert_type(forces.to_system(Atomistic), Force[npt.NDArray[np.float32]])
 assert_type(forces[0], Force[npt.NDArray[np.float32], Gromacs])
-
-# --- Autodiff stays generic over the system -------------------------------------------
 
 
 def harmonic_jax(x: Length[jax.Array, SI]) -> Energy[jax.Array, SI]:
