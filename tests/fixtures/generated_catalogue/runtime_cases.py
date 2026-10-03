@@ -11,10 +11,12 @@ from labquantities import (
     TemperatureDifference,
     u,
 )
+from labquantities.products import LengthTime
 
 from quantype import Length as OriginalLength
 from quantype import u as original_units
 from quantype.systems import SI, Atomistic
+from quantype.typing import QuantityType, quantity_type
 
 
 def test_physical_algebra() -> None:
@@ -84,6 +86,14 @@ def test_kind_names_on_classes() -> None:
     assert (2 * u.angstrom * Pressure[float](1, u.pascal)).kind == "SurfaceTension"
     product = (2 * u.angstrom) * (3 * u.fs)
     assert type(product).kind == product.kind == "Mul[Length,Time]"
+
+
+def test_quantity_annotations() -> None:
+    tension = quantity_type(SurfaceTension[float, SI])
+    assert tension == QuantityType(SurfaceTension, float, SI)
+    product = quantity_type(LengthTime[float])
+    assert product == QuantityType(LengthTime, float, Atomistic)
+    assert quantity_type(OriginalLength[float]) != quantity_type(Length[float])
 
 
 def test_portable_unit_factors() -> None:

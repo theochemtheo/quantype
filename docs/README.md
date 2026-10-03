@@ -7,7 +7,8 @@
 - [Units](units.md): units, conversion, display, temperatures, and constants
 - [Unit systems](unit-systems.md): choosing and defining the units `.value` is
   stored in
-- [Serialization](serialization.md): JSON, Pydantic, NPZ, and NPY
+- [Serialization](serialization.md): JSON, Pydantic, NPZ, NPY, and reading
+  quantity annotations
 - [Autodiff](autodiff.md): gradients with JAX and Torch
 - [Custom catalogues](custom-catalogues.md): your own kinds and relations
 - [Catalogue reference](catalogue.md): every built-in kind, unit, and relation

@@ -45,6 +45,8 @@ class StorageAlias(GenericAlias):
                 "Name the storage type first and the unit system second, "
                 "for example Length[float, SI]"
             )
+        if len(rest) > 1:
+            raise TypeError(f"{self!r} has more than a storage type and a system")
         return require_system(rest[0]) if rest else Atomistic
 
     def __call__(

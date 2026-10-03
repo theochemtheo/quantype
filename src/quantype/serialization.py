@@ -10,7 +10,7 @@ from __future__ import annotations
 import json
 import re
 from collections.abc import Iterable, Mapping
-from typing import TYPE_CHECKING, Any, TypeGuard, cast, get_args, get_origin
+from typing import TYPE_CHECKING, Any, TypeGuard, cast
 
 import numpy as np
 
@@ -29,9 +29,9 @@ from quantype._internal._systems import (
     Atomistic,
     UnitSystem,
     into_system,
-    require_system,
 )
 from quantype.core import Quantity, Unit, _wrap
+from quantype.typing import quantity_type
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -228,12 +228,10 @@ def load_npz[Q](
     ``Length[NDArray[np.float64], SI]`` restores meters. Archives are system
     independent: one written from any system decodes into any other.
     """
-    cls = get_origin(target) or target
-    arguments = get_args(target)
-    if not arguments or not isinstance(cls, type) or not issubclass(cls, Quantity):
+    annotation = quantity_type(target)
+    if annotation is None or annotation.storage is None:
         raise TypeError("Restoration requires a parameterized quantity type")
-    storage = arguments[0]
-    system = require_system(arguments[1]) if len(arguments) > 1 else Atomistic
+    cls, storage, system = annotation.kind, annotation.storage, annotation.system
     kind = cast("Kind", cls._semantic)
     with np.load(path, allow_pickle=False) as archive:
         if "metadata" not in archive:

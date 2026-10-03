@@ -19,6 +19,7 @@ in [decisions](decisions/).
 | Typed constructors and backend conversion | `src/quantype/_internal/_construction.py`, `_storage.py` | `test_refactor.py`, `test_binary_failures.py` |
 | NumPy functions and dispatch | `src/quantype/_internal/_numpy.py` (unit rules, backend namespaces, `UFUNCS`/`FUNCTIONS`/Torch names); generated `numpy.py`/`numpy.pyi` per catalogue; `Quantity.__array_ufunc__`/`__array_function__`/`__torch_function__` | `test_numpy.py`, `test_scenarios_jax.py`, `test_torch.py` |
 | JSON, archive and Pydantic boundaries | `src/quantype/serialization.py`, `_internal/_validation.py` | `test_validation.py`, `test_binary_failures.py`, `test_refactor.py` |
+| Reading quantity annotations (`quantity_type`) | `src/quantype/typing.py`; parsing in `_internal/_construction.py` | `test_annotations.py`, `tests/typing/positive/annotations.py` |
 | Optional differentiation | `src/quantype/_internal/_jax.py`, `_torch.py`, re-exported by `ujax.py`, `utorch.py`; generated adjacent stubs | `test_autodiff.py`, `test_torch.py`, `test_optional_backends.py` |
 | Application-catalogue runtime binding | `src/quantype/_internal/_runtime_catalogue.py`, `codegen/_package.py` | `test_codegen.py` and `tests/fixtures/generated_catalogue/` |
 | Public imports | `src/quantype/__init__.py` | stubtest, positive typing, runtime imports |

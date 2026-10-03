@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast, get_args
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from pydantic_core import core_schema
 
 from quantype._internal._storage import convert, storage_origin
-from quantype._internal._systems import Atomistic, require_system
+from quantype._internal._systems import Atomistic, UnitSystem
 from quantype.core import _wrap
 from quantype.serialization import (
     DIMENSIONLESS_STRING,
@@ -16,6 +16,7 @@ from quantype.serialization import (
     parse_quantity,
     to_dict,
 )
+from quantype.typing import quantity_type
 
 if TYPE_CHECKING:
     from pydantic import GetCoreSchemaHandler
@@ -39,9 +40,12 @@ def pydantic_schema(
     handler: GetCoreSchemaHandler,
 ) -> core_schema.CoreSchema:
     del handler
-    arguments = get_args(source_type)
-    storage = arguments[0] if arguments else Any
-    system = require_system(arguments[1]) if len(arguments) > 1 else Atomistic
+    annotation = quantity_type(source_type)
+    storage: object = Any
+    system: type[UnitSystem] = Atomistic
+    if annotation is not None:
+        storage = Any if annotation.storage is None else annotation.storage
+        system = annotation.system
     origin = storage_origin(storage)
 
     def validate(
