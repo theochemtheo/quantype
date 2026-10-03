@@ -379,7 +379,11 @@ def _electromechanical_units(c: _Constants) -> dict[str, UnitSpec]:
         "microsecond": UnitSpec("Time", 1e9, symbol="µs", aliases=("us", "µs", "μs")),
         "millisecond": UnitSpec("Time", 1e12, symbol="ms", aliases=("ms",)),
         # ASE's time unit, about 10.18 fs: with Å and eV, it makes masses daltons.
+        # Its velocity and momentum units are what Atoms.get_velocities() and
+        # get_momenta() return.
         "ase_time": UnitSpec("Time", math.sqrt(dalton), symbol="Å √(amu/eV)"),
+        "ase_velocity": UnitSpec("Velocity", 1 / math.sqrt(dalton), symbol="√(eV/amu)"),
+        "ase_momentum": UnitSpec("Momentum", math.sqrt(dalton), symbol="√(amu eV)"),
         "kilojoule": UnitSpec("Energy", c.kilo / ev, symbol="kJ", aliases=("kJ",)),
         "kilocalorie": UnitSpec(
             "Energy", c.kilo * c.calorie / ev, symbol="kcal", aliases=("kcal",)

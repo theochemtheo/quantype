@@ -109,23 +109,38 @@ the built-in systems it is always a named catalogue unit, as in
 
 Å, eV, and fs make the coherent mass unit eV fs²/Å², about 0.00965 Da, which
 no one quotes. `Atomistic` stores masses in daltons instead, the unit ASE uses,
-and densities in g/cm³. ASE keeps its units coherent by deriving time instead:
-`u.ase_time`, Å √(amu/eV), is about 10.18 fs.
+and densities in g/cm³:
 
 ```python
 import pytest
 
-from quantype import Energy, Mass, Velocity, u
+from quantype import Mass, Velocity, u
 
 m = Mass[float](12, u.Da)
 assert m.value == 12.0  # daltons
 v = Velocity[float](0.01, u.angstrom_per_fs)
 kinetic = 0.5 * m * v**2  # rescaled into eV: 1 Da Å²/fs² ≈ 103.6 eV
 assert kinetic.value == pytest.approx(0.0621856)
+```
 
-ase_velocity = u.angstrom(0.5) / u.ase_time(1.0)  # 0.5 in ASE's units
-assert isinstance(ase_velocity, Velocity)
-assert ase_velocity.magnitude(u.angstrom_per_fs) == pytest.approx(0.0491135)
+ASE keeps its units coherent by deriving time instead. Its time unit,
+`u.ase_time` (Å √(amu/eV)), is about 10.18 fs. `atoms.get_velocities()` returns
+`u.ase_velocity` (√(eV/amu)), and `atoms.get_momenta()` returns `u.ase_momentum`
+(√(amu eV)), so those arrays wrap as they are:
+
+```python
+import numpy as np
+import numpy.typing as npt
+import pytest
+
+from quantype import Mass, Momentum, Velocity, u
+
+raw_velocities = np.array([[0.5, 0.0, 0.0]])  # from atoms.get_velocities()
+v = Velocity[npt.NDArray[np.float64]](raw_velocities, u.ase_velocity)
+assert v.magnitude(u.angstrom_per_fs)[0, 0] == pytest.approx(0.0491135)
+p = Mass[float](12, u.Da) * v
+assert isinstance(p, Momentum)
+np.testing.assert_allclose(p.magnitude(u.ase_momentum), [[6.0, 0.0, 0.0]])
 ```
 
 ```python

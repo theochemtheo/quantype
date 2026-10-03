@@ -57,17 +57,39 @@ def test_atomistic_stores_mass_in_daltons() -> None:
     assert repr(Mass.from_value(1.0)) == "Mass(1.0 Da)"
 
 
-def test_ase_time_makes_daltons_coherent() -> None:
+class Ase(UnitSystem, name="test-physics:ase"):
+    length = u.angstrom
+    energy = u.eV
+    time = u.ase_time
+
+
+def test_ase_units_make_daltons_coherent() -> None:
     fs = 1e5 * math.sqrt(1.66053906892e-27 / 1.602176634e-19)
     assert (1 * u.ase_time).magnitude(u.fs) == pytest.approx(fs, rel=1e-12)
-    speed = Length[float](1, u.angstrom) / Time[float](1, u.ase_time)
-    assert isinstance(speed, Velocity)
+    assert (1 * u.ase_velocity).magnitude(u.angstrom_per_fs) == pytest.approx(
+        1 / fs, rel=1e-12
+    )
+    speed = Velocity[float](1, u.ase_velocity)
+    derived = Length[float](1, u.angstrom) / Time[float](1, u.ase_time)
+    assert speed.value == pytest.approx(derived.value, rel=1e-12)
     kinetic = Mass[float](1, u.Da) * speed * speed
     assert kinetic.magnitude(u.eV) == pytest.approx(1, rel=1e-12)
+    momentum = Mass[float](1, u.Da) * speed
+    assert momentum.magnitude(u.ase_momentum) == pytest.approx(1, rel=1e-12)
+    assert (momentum * speed).magnitude(u.eV) == pytest.approx(1, rel=1e-12)
     # ase.units.fs, from ASE's default CODATA 2014.
     assert 1 / unit_specs("2014")["ase_time"].scale == pytest.approx(
         0.09822694788464063, rel=1e-14
     )
+
+
+def test_a_system_on_ase_time_stores_ase_units() -> None:
+    assert Ase.unit_for(Mass) is u.dalton
+    assert Ase.unit_for(Velocity) is u.ase_velocity
+    assert Ase.unit_for(Momentum) is u.ase_momentum
+    velocities = Velocity[npt.NDArray[np.float64], Ase].from_value(np.full(3, 0.5))
+    momenta = Mass[float, Ase](2, u.Da) * velocities
+    np.testing.assert_allclose(momenta.value, np.full(3, 1.0))
 
 
 def test_atomistic_mass_arithmetic_rescales() -> None:

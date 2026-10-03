@@ -15,7 +15,7 @@ declared name, and the unit each built-in system stores it in. Each unit is on
 | `Area` | length² | `angstrom_squared` (Å^2), `angstrom2`; `square_meter` (m^2); `square_centimeter` (cm^2); `bohr_squared` (a0^2) |
 | `Volume` | length³ | `angstrom_cubed` (Å^3), `angstrom3`; `cubic_meter` (m^3); `cubic_centimeter` (cm^3); `bohr_cubed` (a0^3) |
 | `Time` | time | `femtosecond` (fs), `fs`; `picosecond` (ps), `ps`; `second` (s), `s`; `atomic_time` (ħ/Eh); `nanosecond` (ns), `ns`; `microsecond` (µs), `us`; `millisecond` (ms), `ms`; `ase_time` (Å √(amu/eV)) |
-| `Velocity` | length / time | `angstrom_per_fs` (Å/fs); `angstrom_per_ps` (Å/ps); `meter_per_second` (m/s); `centimeter_per_second` (cm/s); `atomic_velocity` (a0 Eh/ħ) |
+| `Velocity` | length / time | `angstrom_per_fs` (Å/fs); `angstrom_per_ps` (Å/ps); `meter_per_second` (m/s); `centimeter_per_second` (cm/s); `atomic_velocity` (a0 Eh/ħ); `ase_velocity` (√(eV/amu)) |
 | `Energy` | energy | `electron_volt` (eV), `eV`; `millielectron_volt` (meV), `meV`; `joule` (J), `J`; `hartree` (Ha), `Ha`; `rydberg` (Ry), `Ry`; `kcal_per_mol` (kcal/mol); `erg` (erg); `kilojoule` (kJ), `kJ`; `kilocalorie` (kcal), `kcal`; `kJ_per_mol` (kJ/mol) |
 | `EnergyPerAtom` | energy / atom | `eV_per_atom` (eV/atom); `hartree_per_atom` (Ha/atom); `J_per_atom` (J/atom); `kcal_per_mol_per_atom` (kcal/mol/atom); `erg_per_atom` (erg/atom) |
 | `Force` | energy / length | `eV_per_angstrom` (eV/Å); `newton` (N), `N`; `hartree_per_bohr` (Ha/a0); `kcal_per_mol_per_angstrom` (kcal/mol/Å); `dyne` (dyn), `dyn` |
@@ -37,7 +37,7 @@ declared name, and the unit each built-in system stores it in. Each unit is on
 | `ElectronCount` | electron | `electron` (electron) |
 | `Mass` | energy time² / length² | `eV_fs2_per_angstrom2` (eV fs^2/Å^2); `dalton` (Da), `Da`, `amu`; `gram_per_mole` (g/mol); `kilogram` (kg), `kg`; `gram` (g), `g`; `electron_mass` (m_e), `m_e` |
 | `MassDensity` | energy time² / length⁵ | `eV_fs2_per_angstrom5` (eV fs^2/Å^5); `gram_per_cubic_centimeter` (g/cm^3); `kilogram_per_cubic_meter` (kg/m^3); `electron_mass_per_bohr_cubed` (m_e/a0^3) |
-| `Momentum` | energy time / length | `eV_fs_per_angstrom` (eV fs/Å); `eV_ps_per_angstrom` (eV ps/Å); `kcal_per_mol_fs_per_angstrom` (kcal/mol fs/Å); `kilogram_meter_per_second` (kg m/s); `gram_centimeter_per_second` (g cm/s); `atomic_momentum` (ħ/a0) |
+| `Momentum` | energy time / length | `ase_momentum` (√(amu eV)); `eV_fs_per_angstrom` (eV fs/Å); `eV_ps_per_angstrom` (eV ps/Å); `kcal_per_mol_fs_per_angstrom` (kcal/mol fs/Å); `kilogram_meter_per_second` (kg m/s); `gram_centimeter_per_second` (g cm/s); `atomic_momentum` (ħ/a0) |
 | `Acceleration` | length / time² | `angstrom_per_fs2` (Å/fs^2); `angstrom_per_ps2` (Å/ps^2); `meter_per_second_squared` (m/s^2); `centimeter_per_second_squared` (cm/s^2); `atomic_acceleration` (a0 Eh^2/ħ^2) |
 | `Charge` | charge | `elementary_charge` (e), `e`; `coulomb` (C), `C`; `statcoulomb` (statC), `statC` |
 | `ElectricPotential` | energy / charge | `volt` (V), `V`; `kcal_per_mol_per_e` (kcal/mol/e); `statvolt` (statV), `statV`; `hartree_per_e` (Ha/e) |

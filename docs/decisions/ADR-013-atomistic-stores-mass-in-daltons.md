@@ -34,8 +34,9 @@ follows from its time unit, so no unit built on the femtosecond would match it.
 
 * Good, because masses from ASE wrap with `Mass.from_value` and need no
   conversion, and `Atomistic` stores densities in g/cm³ like `Metal` and `Real`.
-* Good, because the catalogue can still name ASE's time unit, `u.ase_time`,
-  for reading ASE's raw velocities and momenta.
+* Good, because the catalogue can still name ASE's units (`u.ase_time`,
+  `u.ase_velocity`, and `u.ase_momentum`), so ASE's raw velocities and momenta
+  wrap without conversion.
 * Bad, because products that produce or consume a mass or a density rescale by
   a constant factor in the default system; 1 Da Å²/fs² is about 103.6 eV.
 * Bad, because it changes the raw numbers of `Mass` and `MassDensity` in

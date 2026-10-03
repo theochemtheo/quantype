@@ -8,7 +8,9 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Added
 
-- `u.ase_time`, ASE's time unit Å √(amu/eV), about 10.18 fs.
+- ASE's units: `u.ase_time` (Å √(amu/eV), about 10.18 fs), and
+  `u.ase_velocity` and `u.ase_momentum`, the units of `atoms.get_velocities()`
+  and `atoms.get_momenta()`.
 
 ### Changed
 
