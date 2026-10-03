@@ -28,7 +28,9 @@ written back as `0.5 nanometer` in every system, and `"20.1 degC"` as exactly
 A quantity object has `magnitude` and `unit`, and `kind` if it names its kind,
 which must then match: written objects always include it, and hand-written ones
 can leave it out where the target kind is known, as in a Pydantic field or
-`Length.parse`. A string such as `"5 angstrom"` is accepted there too.
+`Length.parse`. A string such as `"5 angstrom"` is accepted there too. The
+name is the class's `kind`: `Length.kind` and a length's `.kind` are both
+`"Length"`, so data that names its kind can be checked against a class.
 `model_dump()` keeps quantities, as it keeps datetimes, and
 `model_dump(mode="json")` and `model_dump_json()` write the objects.
 
@@ -149,3 +151,41 @@ restored_positions = Length[npt.NDArray[np.float64]](
     u.nm,
 )
 ```
+
+## Reading quantity annotations
+
+A reader that fills fields from their annotations, as Pydantic does, can get
+each field's kind class, storage type, and unit system with
+`quantype.typing.quantity_type`:
+
+```python
+from typing import Annotated, get_type_hints
+
+import numpy as np
+import numpy.typing as npt
+from quantype import Energy, Force
+from quantype.systems import SI, Atomistic
+from quantype.typing import QuantityType, quantity_type
+
+
+class Sample:
+    forces: Annotated[Force[npt.NDArray[np.float64]], "REF_forces"]
+    energy: Energy[float, SI]
+    label: str
+
+
+hints = get_type_hints(Sample, include_extras=True)
+forces = quantity_type(hints["forces"])
+assert forces == QuantityType(Force, npt.NDArray[np.float64], Atomistic)
+assert quantity_type(hints["energy"]) == QuantityType(Energy, float, SI)
+assert quantity_type(hints["label"]) is None
+assert quantity_type(Force) == QuantityType(Force, None, Atomistic)
+```
+
+An annotation without a system, such as `Force[float]`, is in `Atomistic`. A
+bare class has `storage` `None`. `quantity_type` returns `None` for anything
+that isn't a quantity type, including unions such as `Force[float] | None`, so
+look at a union's members yourself. `Annotated` metadata is skipped. A
+misspelled quantity type, such as `Force[SI]` or `Force[float, int]`, raises
+`TypeError`. To read a field into other storage, subscript its class again
+with that storage and its system, as in `Energy[npt.NDArray[np.float64], SI]`.

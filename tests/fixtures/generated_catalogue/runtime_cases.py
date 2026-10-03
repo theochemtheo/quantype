@@ -11,10 +11,12 @@ from labquantities import (
     TemperatureDifference,
     u,
 )
+from labquantities.products import LengthTime
 
 from quantype import Length as OriginalLength
 from quantype import u as original_units
 from quantype.systems import SI, Atomistic
+from quantype.typing import QuantityType, quantity_type
 
 
 def test_physical_algebra() -> None:
@@ -79,9 +81,35 @@ def test_unit_systems_cover_new_kinds() -> None:
     assert qnp.sqrt(Length[float, SI](2, u.nm) ** 2).system is SI
 
 
+def test_kind_names_on_classes() -> None:
+    assert SurfaceTension.kind == "SurfaceTension"
+    assert (2 * u.angstrom * Pressure[float](1, u.pascal)).kind == "SurfaceTension"
+    product = (2 * u.angstrom) * (3 * u.fs)
+    assert type(product).kind == product.kind == "Mul[Length,Time]"
+
+
+def test_quantity_annotations() -> None:
+    tension = quantity_type(SurfaceTension[float, SI])
+    assert tension == QuantityType(SurfaceTension, float, SI)
+    product = quantity_type(LengthTime[float])
+    assert product == QuantityType(LengthTime, float, Atomistic)
+    assert quantity_type(OriginalLength[float]) != quantity_type(Length[float])
+
+
 def test_portable_unit_factors() -> None:
     assert u.lab_sqrt2(2).value == 2 * 2**0.5
     assert u.lab_point(1).value == 2.5
+
+
+def test_unit_lookup() -> None:
+    assert Length.unit_named("lab_sqrt2") is u.lab_sqrt2
+    assert Length.unit_named("Å") is u.angstrom
+    tension = u.surface_tension.surface_tension
+    assert SurfaceTension.unit_named("surface_tension") is tension
+    with pytest.raises(ValueError, match="Expected Length; received Pressure"):
+        Length.unit_named("pascal")
+    with pytest.raises(ValueError, match="Unknown unit 'furlong' for Length"):
+        Length.unit_named("furlong")
 
 
 def test_serialization_roundtrip() -> None:

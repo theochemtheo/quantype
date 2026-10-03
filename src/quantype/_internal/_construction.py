@@ -19,7 +19,9 @@ if TYPE_CHECKING:
 # pyright: reportPrivateUsage=false
 
 # GenericAlias forwards every other attribute to the unparameterized class.
-_OWN_ATTRIBUTES = frozenset({"from_value", "parse", "storage", "unit_system"})
+_OWN_ATTRIBUTES = frozenset(
+    {"from_value", "parse", "storage", "unit_named", "unit_system"}
+)
 
 
 class StorageAlias(GenericAlias):
@@ -43,10 +45,17 @@ class StorageAlias(GenericAlias):
                 "Name the storage type first and the unit system second, "
                 "for example Length[float, SI]"
             )
+        if len(rest) > 1:
+            raise TypeError(f"{self!r} has more than a storage type and a system")
         return require_system(rest[0]) if rest else Atomistic
 
     def __call__(
-        self, value: object, unit: Unit[Any] | None = None, *, dtype: object = None
+        self,
+        value: object,
+        unit: Unit[Any] | None = None,
+        *,
+        dtype: object = None,
+        display: bool = True,
     ) -> Quantity[Any, Any, Any]:
         from quantype._internal._storage import convert, storage_origin
         from quantype._internal._systems import into_system
@@ -64,6 +73,8 @@ class StorageAlias(GenericAlias):
             raise ValueError(f"Expected {cls._kind}; received {unit.kind}")
         scale, offset = into_system(unit, system)
         raw = convert(value, self.storage, dtype=dtype, scale=scale, offset=offset)
+        if not display:
+            return _wrap(cls._semantic, raw, system)
         # Python scalars are echoed exactly, so "20.1 degC" is not 20.100000000000023.
         echo = None
         if (
@@ -89,3 +100,9 @@ class StorageAlias(GenericAlias):
         from quantype.core import _parse
 
         return _parse(cast("Any", self.__origin__), data, units, self.unit_system)
+
+    def unit_named(self, name: str, *, units: tuple[Unit[Any], ...] = ()) -> Unit[Any]:
+        """Also finds the units of this alias's system, as ``parse`` does."""
+        from quantype.core import _unit_named
+
+        return _unit_named(cast("Any", self.__origin__), name, units, self.unit_system)

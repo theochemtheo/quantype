@@ -49,18 +49,23 @@ class Quantity(Generic[K, V, S]):
     _system: type[UnitSystem]
     _display: Unit[K] | None
     _echo: float | None
+    kind: ClassVar[str]
     # Without a storage parameter, a float, NumPy float, or array is the
     # storage. Calling the unit converts integers and lists to float storage,
     # which an __init__ can't express in every checker, so they leave V open.
     @overload
     def __init__(
-        self, value: int | np.integer[Any] | Sequence[Any], unit: Unit[K]
+        self,
+        value: int | np.integer[Any] | Sequence[Any],
+        unit: Unit[K],
+        *,
+        display: bool = ...,
     ) -> None: ...
     @overload
-    def __init__(self, value: V, unit: Unit[K]) -> None: ...
+    def __init__(self, value: V, unit: Unit[K], *, display: bool = ...) -> None: ...
     @overload
     def __init__(
-        self, value: object, unit: Unit[K], *, dtype: object = ...
+        self, value: object, unit: Unit[K], *, dtype: object = ..., display: bool = ...
     ) -> None: ...
     @classmethod
     def define_unit(
@@ -72,10 +77,12 @@ class Quantity(Generic[K, V, S]):
         offset: float = ...,
         symbol: str | None = ...,
     ) -> Unit[K]: ...
+    @classmethod
+    def unit_named(
+        cls, name: str, *, units: tuple[Unit[Any], ...] = ...
+    ) -> Unit[K]: ...
     @property
     def value(self) -> V: ...
-    @property
-    def kind(self) -> str: ...
     @property
     def dimensions(self) -> tuple[int, ...]: ...
     @property
@@ -429,6 +436,12 @@ def _wrap(
     display: Unit[Any] | None = ...,
     echo: float | None = ...,
 ) -> Quantity[Any, Any, Any]: ...
+def _unit_named(
+    cls: type[Quantity[Any, Any, Any]],
+    name: str,
+    units: tuple[Unit[Any], ...],
+    system: type[UnitSystem],
+) -> Unit[Any]: ...
 def _parse(
     cls: type[Quantity[Any, Any, Any]],
     data: object,

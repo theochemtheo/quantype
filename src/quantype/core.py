@@ -194,10 +194,24 @@ def _sum_display(
     return _delta_unit(left._display, cast("Kind", kind))
 
 
+class _KindName:
+    """``kind`` on a named quantity class as on its instances: ``Force.kind``."""
+
+    def __get__(self, instance: object, owner: type | None = None) -> str:
+        semantic = getattr(owner if instance is None else instance, "_semantic", None)
+        if semantic is None:
+            raise AttributeError("Only named quantity classes have a kind")
+        return str(semantic)
+
+    def __set__(self, instance: object, value: object) -> None:
+        raise AttributeError("A quantity's kind is fixed")
+
+
 class Quantity[K, V, S: UnitSystem]:
     """A semantic quantity: raw numbers in a unit system, and a display unit."""
 
     _kind: str = ""
+    kind: ClassVar[str] = cast("str", _KindName())
     _semantic: Semantic
     _system: type[UnitSystem]
     _display: Unit[K] | None
@@ -219,7 +233,18 @@ class Quantity[K, V, S: UnitSystem]:
 
         return StorageAlias(cls, parameters)
 
-    def __init__(self, value: object, unit: Unit[K], *, dtype: object = None) -> None:
+    def __init__(
+        self,
+        value: object,
+        unit: Unit[K],
+        *,
+        dtype: object = None,
+        display: bool = True,
+    ) -> None:
+        """Convert ``value`` from ``unit``, and show it in ``unit`` if ``display``.
+
+        With ``display=False`` it shows in the system's unit, as ``from_value`` does.
+        """
         if dtype is not None:
             raise TypeError("dtype requires a parameterized quantity storage type")
         if not self._kind:
@@ -228,8 +253,8 @@ class Quantity[K, V, S: UnitSystem]:
         built = cast("Any", unit)(value)
         self._value = cast("V", built._value)
         self._system = Atomistic
-        self._display = unit
-        self._echo = built._echo
+        self._display = unit if display else None
+        self._echo = built._echo if display else None
 
     @classmethod
     def define_unit(
@@ -252,14 +277,19 @@ class Quantity[K, V, S: UnitSystem]:
             symbol,
         )
 
+    @classmethod
+    def unit_named(cls, name: str, *, units: tuple[Unit[Any], ...] = ()) -> Unit[K]:
+        """The unit of this kind that ``name`` names, as ``parse`` reads it.
+
+        A catalogue name or alias comes first, then a display symbol such as
+        ``"Ha/a0"``. ``units`` adds definitions the catalogue doesn't have.
+        """
+        return cast("Unit[K]", _unit_named(cls, name, units, Atomistic))
+
     @property
     def value(self) -> V:
         """Raw numbers in the unit system's units; explicitly bypasses units."""
         return self._value
-
-    @property
-    def kind(self) -> str:
-        return str(self._semantic)
 
     @property
     def dimensions(self) -> tuple[int, ...]:
@@ -1051,6 +1081,21 @@ def _constant(name: str, semantic: Semantic, reference: float) -> Constant[Any]:
 
         cls = cast("type[Constant[Any]] | None", constant_class_for(semantic))
     return (cls or Constant)(name, semantic, reference)
+
+
+def _unit_named(
+    cls: type[Quantity[Any, Any, Any]],
+    name: str,
+    units: tuple[Unit[Any], ...],
+    system: type[UnitSystem],
+) -> Unit[Any]:
+    from quantype._internal._lookup import unit_of_kind
+
+    if getattr(cls, "_semantic", None) is None:
+        raise TypeError("unit_named requires a named quantity class")
+    if not isinstance(name, str):  # pyright: ignore[reportUnnecessaryIsInstance]
+        raise TypeError(f"Unit names are strings; received {type(name).__name__}")
+    return unit_of_kind(name, cast("Kind", cls._semantic), units, system)
 
 
 def _parse(

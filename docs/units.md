@@ -78,6 +78,27 @@ wins: use
 `u.dimensionless.one`, `u.energy_density.energy_density`, or
 `u.energy_per_volume.energy_per_volume`.
 
+To find a unit from a name held as a string, such as one in a configuration
+file, ask its kind:
+
+```python
+import pytest
+
+from quantype import Force, Length, u
+
+assert Force.unit_named("hartree_per_bohr") is u.hartree_per_bohr
+assert Length.unit_named("nm") is u.nanometer
+assert Force.unit_named("Ha/a0") is u.hartree_per_bohr  # its symbol
+with pytest.raises(ValueError, match="Expected Force; received Length"):
+    Force.unit_named("nm")
+```
+
+`unit_named` reads names as `parse` does. It tries catalogue names and aliases
+first, then the display symbols of the kind's units, and raises `ValueError` for
+a unit of another kind or a name it doesn't know, listing the kind's units in
+that case. `units=` adds [custom units](#define-a-unit-without-global-registration),
+and `Force[V, S].unit_named` also finds the units that only system `S` defines.
+
 ## Unit systems
 
 A unit system is the set of units quantities store their numbers in. Storing
@@ -105,7 +126,11 @@ rescales by a constant factor. The built-in systems are in `quantype.systems`:
 Temperature is in kelvin in every built-in system, and atom and electron counts
 are 1. `System.unit_for(Kind)` gives the unit a system stores a kind in. For
 the built-in systems it is always a named catalogue unit, as in
-`SI.unit_for(Pressure) is u.pascal`.
+`SI.unit_for(Pressure) is u.pascal`. `System.unit_for(Kind) == unit` tells
+you whether numbers given in `unit` are already in the system's units, so
+`from_value` can wrap them. Units are equal only when every field matches,
+name included: a custom unit with the same scale under another name compares
+unequal.
 
 Å, eV, and fs make the coherent mass unit eV fs²/Å², about 0.00965 Da, which
 no one quotes. `Atomistic` stores masses in daltons instead, the unit ASE uses,
@@ -204,7 +229,9 @@ The display unit sets what `.magnitude()`, `repr`, and serialization show. It
 has no effect on `.value`. It is set and kept as follows:
 
 - Construction, unit-first construction, `parse`, Pydantic, and NPZ loading
-  remember the input unit.
+  remember the input unit. Construction with `display=False` converts in the
+  same way but leaves no display unit, so the value shows in the system's unit,
+  as one from `from_value` does.
 - Same-kind operations keep it: addition and subtraction (the left operand
   wins), scaling, negation, `abs`, reductions, and indexing.
 - Point minus point gives the matching difference unit: `°C − °C → Δ°C`.
@@ -215,12 +242,13 @@ has no effect on `.value`. It is set and kept as follows:
 - JAX transformations drop it, because it isn't part of the pytree.
 
 ```python
-from quantype import Temperature, u
+from quantype import Length, Temperature, u
 
 assert repr(2 * u.nm + 5 * u.angstrom) == "Length(2.5 nm)"
 assert repr(5 * u.angstrom + 2 * u.nm) == "Length(25.0 Å)"
 assert repr((3 * u.eV) / (2 * u.nm)) == "Force(0.15 eV/Å)"
 assert repr(30 * u.celsius - 20 * u.celsius) == "TemperatureDifference(10.0 Δ°C)"
+assert repr(Length[float](2, u.nm, display=False)) == "Length(20.0 Å)"
 
 point = Temperature[float](20.1, u.celsius)
 assert point.value - 273.15 != 20.1  # 20.100000000000023 in binary64
@@ -243,8 +271,13 @@ the system if it isn't the default. `str` shows only the magnitude and unit.
 - `.to_system(T)` rescales into another unit system.
 - `Length[V, S].from_value(raw)` wraps raw numbers that are already in `S`'s
   units, keeping their storage. It trusts its input and doesn't check or
-  convert it. `Length.from_value(raw)` uses the default system.
-- `np.asarray(q)` and other implicit conversions to arrays raise `TypeError`.
+  convert it. `Length.from_value(raw)` uses the default system. The quantity
+  holds `raw` itself, not a copy, so a read-only NumPy array stays read-only.
+- Quantities have no in-place operators and no item assignment. `q += other`
+  builds a new quantity and rebinds `q`, so quantype never writes into the
+  storage it was given.
+- `np.asarray(q)` and other implicit conversions to arrays raise `TypeError`,
+  and NumPy functions can't write into a quantity with `out=`.
 
 Every conversion goes through the reference units, which are `Atomistic`'s
 base units: ångström, eV, fs, kelvin, Bohr magneton, atom, electron, and
@@ -425,6 +458,23 @@ multiplies or divides a quantity from either side, and the quantity keeps its
 dtype. A scalar quantity scaled by an array becomes an array. The static types
 don't track array shapes or dtype promotion. Builtin `sum()` works because zero
 is the one plain number that can be added to any quantity.
+
+Indexing follows NumPy. Slices and other basic indexes share memory with the
+original, and integer or boolean array indexes copy. One element of an array
+is a zero-dimensional array, and `.item()` turns it into a quantity with `float`
+storage:
+
+```python
+import numpy as np
+
+from quantype import Length
+
+positions = Length.from_value(np.arange(6.0).reshape(3, 2))
+assert np.shares_memory(positions[1:].value, positions.value)
+assert positions[np.array([0, 2])].shape == (2, 2)
+assert positions[1, 0].value.shape == ()
+assert type(positions[1, 0].item().value) is float
+```
 
 NumPy's own functions apply the same unit rules at runtime, through NumPy's
 dispatch. NumPy's type stubs reject quantities, so type-checked code should use

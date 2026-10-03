@@ -46,6 +46,11 @@ assert_type(1 - ratio, Dimensionless[float])
 assert_type(ratio < 1, bool)
 as_float: float = float(ratio)
 
+assert_type(Length.kind, str)
+assert_type(Length[float, SI].kind, str)
+assert_type(length.kind, str)
+assert_type((length * step).kind, str)
+
 # The presented unit, and naming equal dimensions explicitly.
 named_unit: Unit[LengthKind] = length.unit
 unnamed_unit: Unit[Any] | None = (length * step).unit

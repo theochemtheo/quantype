@@ -2208,6 +2208,9 @@ class Dimensionless(Quantity[DimensionlessKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[DimensionlessKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._DimensionlessUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._DimensionlessUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Dimensionless[W,S]:...
  @classmethod
  @_v
@@ -2742,6 +2745,9 @@ class Length(Quantity[LengthKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[LengthKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._LengthUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._LengthUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Length[W,S]:...
  @classmethod
  @_v
@@ -3223,6 +3229,9 @@ class Area(Quantity[AreaKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[AreaKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._AreaUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._AreaUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->Area[W,S]:...
@@ -3708,6 +3717,9 @@ class Volume(Quantity[VolumeKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[VolumeKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._VolumeUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._VolumeUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Volume[W,S]:...
  @classmethod
  @_v
@@ -4189,6 +4201,9 @@ class Time(Quantity[TimeKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[TimeKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._TimeUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._TimeUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->Time[W,S]:...
@@ -4674,6 +4689,9 @@ class Velocity(Quantity[VelocityKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[VelocityKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._VelocityUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._VelocityUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Velocity[W,S]:...
  @classmethod
  @_v
@@ -5155,6 +5173,9 @@ class Energy(Quantity[EnergyKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[EnergyKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._EnergyUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._EnergyUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->Energy[W,S]:...
@@ -5640,6 +5661,9 @@ class EnergyPerAtom(Quantity[EnergyPerAtomKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[EnergyPerAtomKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._EnergyPerAtomUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._EnergyPerAtomUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->EnergyPerAtom[W,S]:...
  @classmethod
  @_v
@@ -6121,6 +6145,9 @@ class Force(Quantity[ForceKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[ForceKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._ForceUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._ForceUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->Force[W,S]:...
@@ -6606,6 +6633,9 @@ class ForceConstant(Quantity[ForceConstantKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[ForceConstantKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._ForceConstantUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._ForceConstantUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->ForceConstant[W,S]:...
  @classmethod
  @_v
@@ -7087,6 +7117,9 @@ class Pressure(Quantity[PressureKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[PressureKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._PressureUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._PressureUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->Pressure[W,S]:...
@@ -7572,6 +7605,9 @@ class EnergyDensity(Quantity[EnergyDensityKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[EnergyDensityKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._EnergyDensityUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._EnergyDensityUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->EnergyDensity[W,S]:...
  @classmethod
  @_v
@@ -8055,6 +8091,9 @@ class EnergyPerVolume(Quantity[EnergyPerVolumeKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[EnergyPerVolumeKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._EnergyPerVolumeUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._EnergyPerVolumeUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->EnergyPerVolume[W,S]:...
  @classmethod
  @_v
@@ -8536,6 +8575,9 @@ class Temperature(Quantity[TemperatureKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[TemperatureKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._TemperatureUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._TemperatureUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->Temperature[W,S]:...
@@ -9025,6 +9067,9 @@ class TemperatureDifference(Quantity[TemperatureDifferenceKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[TemperatureDifferenceKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._TemperatureDifferenceUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._TemperatureDifferenceUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->TemperatureDifference[W,S]:...
  @classmethod
  @_v
@@ -9512,6 +9557,9 @@ class TemperatureRate(Quantity[TemperatureRateKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[TemperatureRateKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._TemperatureRateUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._TemperatureRateUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->TemperatureRate[W,S]:...
  @classmethod
  @_v
@@ -9993,6 +10041,9 @@ class MagneticMoment(Quantity[MagneticMomentKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[MagneticMomentKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._MagneticMomentUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._MagneticMomentUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->MagneticMoment[W,S]:...
@@ -10478,6 +10529,9 @@ class Magnetization(Quantity[MagnetizationKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[MagnetizationKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._MagnetizationUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._MagnetizationUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Magnetization[W,S]:...
  @classmethod
  @_v
@@ -10959,6 +11013,9 @@ class ParticleDensity(Quantity[ParticleDensityKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[ParticleDensityKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._ParticleDensityUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._ParticleDensityUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->ParticleDensity[W,S]:...
@@ -11444,6 +11501,9 @@ class ElectronDensity(Quantity[ElectronDensityKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[ElectronDensityKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._ElectronDensityUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._ElectronDensityUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->ElectronDensity[W,S]:...
  @classmethod
  @_v
@@ -11925,6 +11985,9 @@ class Angle(Quantity[AngleKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[AngleKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._AngleUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._AngleUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->Angle[W,S]:...
@@ -12410,6 +12473,9 @@ class Frequency(Quantity[FrequencyKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[FrequencyKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._FrequencyUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._FrequencyUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Frequency[W,S]:...
  @classmethod
  @_v
@@ -12891,6 +12957,9 @@ class InverseTime(Quantity[InverseTimeKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[InverseTimeKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._InverseTimeUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._InverseTimeUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->InverseTime[W,S]:...
@@ -13376,6 +13445,9 @@ class AtomCount(Quantity[AtomCountKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[AtomCountKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._AtomCountUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._AtomCountUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->AtomCount[W,S]:...
  @classmethod
  @_v
@@ -13857,6 +13929,9 @@ class ElectronCount(Quantity[ElectronCountKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[ElectronCountKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._ElectronCountUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._ElectronCountUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->ElectronCount[W,S]:...
@@ -14342,6 +14417,9 @@ class Mass(Quantity[MassKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[MassKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._MassUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._MassUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Mass[W,S]:...
  @classmethod
  @_v
@@ -14823,6 +14901,9 @@ class MassDensity(Quantity[MassDensityKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[MassDensityKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._MassDensityUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._MassDensityUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->MassDensity[W,S]:...
@@ -15308,6 +15389,9 @@ class Momentum(Quantity[MomentumKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[MomentumKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._MomentumUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._MomentumUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Momentum[W,S]:...
  @classmethod
  @_v
@@ -15789,6 +15873,9 @@ class Acceleration(Quantity[AccelerationKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[AccelerationKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._AccelerationUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._AccelerationUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->Acceleration[W,S]:...
@@ -16274,6 +16361,9 @@ class Charge(Quantity[ChargeKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[ChargeKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._ChargeUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._ChargeUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Charge[W,S]:...
  @classmethod
  @_v
@@ -16755,6 +16845,9 @@ class ElectricPotential(Quantity[ElectricPotentialKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[ElectricPotentialKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._ElectricPotentialUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._ElectricPotentialUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->ElectricPotential[W,S]:...
@@ -17240,6 +17333,9 @@ class ElectricField(Quantity[ElectricFieldKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[ElectricFieldKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._ElectricFieldUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._ElectricFieldUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->ElectricField[W,S]:...
  @classmethod
  @_v
@@ -17721,6 +17817,9 @@ class DipoleMoment(Quantity[DipoleMomentKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[DipoleMomentKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._DipoleMomentUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._DipoleMomentUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->DipoleMoment[W,S]:...
@@ -18206,6 +18305,9 @@ class Entropy(Quantity[EntropyKind,V,S]):
  def define_unit(cls,name:str,*,reference:Unit[EntropyKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._EntropyUnit:...
  @classmethod
  @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._EntropyUnit:...
+ @classmethod
+ @_v
  def from_value[W](cls,value:W)->Entropy[W,S]:...
  @classmethod
  @_v
@@ -18687,6 +18789,9 @@ class Action(Quantity[ActionKind,V,S]):
  @classmethod
  @_v
  def define_unit(cls,name:str,*,reference:Unit[ActionKind],scale:float=1.0,offset:float=0.0,symbol:str|None=None,)->_units._ActionUnit:...
+ @classmethod
+ @_v
+ def unit_named(cls,name:str,*,units:tuple[Unit[Any],...]=())->_units._ActionUnit:...
  @classmethod
  @_v
  def from_value[W](cls,value:W)->Action[W,S]:...

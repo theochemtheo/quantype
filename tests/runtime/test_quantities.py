@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import numpy.typing as npt
 import pytest
 
+import quantype
 import quantype.numpy as qnp
 from quantype import (
     Area,
@@ -18,14 +19,34 @@ from quantype import (
     Quantity,
     Temperature,
     TemperatureDifference,
+    Time,
     u,
 )
+from quantype.catalogue import builtin_catalogue
 from quantype.systems import SI, Atomistic, Metal
+
+if TYPE_CHECKING:
+    from quantype.core import Unit
+    from quantype.kinds import ForceKind
 
 
 def _dynamic(cls: object) -> Any:  # noqa: ANN401 -- deliberately invalid calls
     """Hide deliberately invalid parameters from the type checkers."""
     return cls
+
+
+def test_a_kind_class_names_its_kind() -> None:
+    for name in builtin_catalogue().quantities:
+        cls: Any = getattr(quantype, name)
+        assert cls.kind == name
+        assert cls[float].kind == name
+        assert cls.from_value(1.0).kind == name
+    product = Length[float](2, u.nm) * Time[float](1, u.fs)
+    assert type(product).kind == product.kind == "Mul[Length,Time]"
+    with pytest.raises(AttributeError, match="named quantity classes"):
+        getattr(Quantity, "kind")  # noqa: B009 -- the access is the test
+    with pytest.raises(AttributeError, match="kind is fixed"):
+        _dynamic(product).kind = "Energy"
 
 
 def test_construction_remembers_the_input_unit() -> None:
@@ -40,6 +61,43 @@ def test_construction_remembers_the_input_unit() -> None:
     assert repr(Length.parse("3 bohr")) == "Length(3.0 a0)"
     assert repr(Length[float, SI].from_value(2.0)) == "Length(2.0 m, SI)"
     assert repr(Length.from_value(2.0)) == "Length(2.0 Å)"
+
+
+@pytest.mark.parametrize(
+    ("unit", "storage", "raw"),
+    [
+        (
+            u.hartree_per_bohr,
+            npt.NDArray[np.float32],
+            np.array([[1.0, -2.0, 3.0]], dtype=np.float32),
+        ),
+        (u.eV_per_angstrom, npt.NDArray[np.float64], np.array([0.5, 1.5])),
+    ],
+)
+def test_construction_can_leave_the_display_unit_unset(
+    unit: Unit[ForceKind], storage: object, raw: npt.NDArray[np.floating[Any]]
+) -> None:
+    alias = _dynamic(Force)[storage, SI]
+    shown = alias(raw, unit)
+    stored = alias(raw, unit, display=False)
+    assert stored.value.dtype == raw.dtype
+    np.testing.assert_array_equal(stored.value, shown.value)
+    assert stored.unit is SI.unit_for(Force)
+    assert str(stored) == str(alias.from_value(shown.value))
+    assert stored.to_dict()["unit"] == "newton"
+    assert shown.to_dict()["unit"] == unit.name
+
+
+def test_construction_without_a_display_unit_converts_offsets() -> None:
+    point = Temperature[float](20.1, u.celsius, display=False)
+    assert point.value == Temperature[float](20.1, u.celsius).value
+    assert point.unit is u.kelvin
+    assert point.magnitude() == point.value
+    assert repr(point) == f"Temperature({point.value} K)"
+    bare = Length(2.0, u.nm, display=False)
+    assert bare.value == 20.0
+    assert repr(bare) == "Length(20.0 Å)"
+    assert repr(Length[float](2, u.nm, display=True)) == "Length(2.0 nm)"
 
 
 def test_same_kind_operations_keep_the_display_unit() -> None:
