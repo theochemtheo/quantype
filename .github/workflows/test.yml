@@ -121,6 +121,7 @@ jobs:
           git push -fq "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" badges
 
   python-versions:
+    name: python-versions (${{ matrix.python }})
     runs-on: ubuntu-latest
     timeout-minutes: 30
     strategy:
