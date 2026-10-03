@@ -1,6 +1,6 @@
 [project]
 name = "quantype"
-version = "0.1.0"
+version = "0.2.0"
 description = "Typed physical quantities for scientific Python and differentiable models"
 readme = "README.md"
 requires-python = ">=3.12"
