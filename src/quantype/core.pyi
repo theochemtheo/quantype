@@ -55,13 +55,17 @@ class Quantity(Generic[K, V, S]):
     # which an __init__ can't express in every checker, so they leave V open.
     @overload
     def __init__(
-        self, value: int | np.integer[Any] | Sequence[Any], unit: Unit[K]
+        self,
+        value: int | np.integer[Any] | Sequence[Any],
+        unit: Unit[K],
+        *,
+        display: bool = ...,
     ) -> None: ...
     @overload
-    def __init__(self, value: V, unit: Unit[K]) -> None: ...
+    def __init__(self, value: V, unit: Unit[K], *, display: bool = ...) -> None: ...
     @overload
     def __init__(
-        self, value: object, unit: Unit[K], *, dtype: object = ...
+        self, value: object, unit: Unit[K], *, dtype: object = ..., display: bool = ...
     ) -> None: ...
     @classmethod
     def define_unit(

@@ -225,7 +225,9 @@ The display unit sets what `.magnitude()`, `repr`, and serialization show. It
 has no effect on `.value`. It is set and kept as follows:
 
 - Construction, unit-first construction, `parse`, Pydantic, and NPZ loading
-  remember the input unit.
+  remember the input unit. Construction with `display=False` converts in the
+  same way but leaves no display unit, so the value shows in the system's unit,
+  as one from `from_value` does.
 - Same-kind operations keep it: addition and subtraction (the left operand
   wins), scaling, negation, `abs`, reductions, and indexing.
 - Point minus point gives the matching difference unit: `°C − °C → Δ°C`.
@@ -236,12 +238,13 @@ has no effect on `.value`. It is set and kept as follows:
 - JAX transformations drop it, because it isn't part of the pytree.
 
 ```python
-from quantype import Temperature, u
+from quantype import Length, Temperature, u
 
 assert repr(2 * u.nm + 5 * u.angstrom) == "Length(2.5 nm)"
 assert repr(5 * u.angstrom + 2 * u.nm) == "Length(25.0 Å)"
 assert repr((3 * u.eV) / (2 * u.nm)) == "Force(0.15 eV/Å)"
 assert repr(30 * u.celsius - 20 * u.celsius) == "TemperatureDifference(10.0 Δ°C)"
+assert repr(Length[float](2, u.nm, display=False)) == "Length(20.0 Å)"
 
 point = Temperature[float](20.1, u.celsius)
 assert point.value - 273.15 != 20.1  # 20.100000000000023 in binary64

@@ -33,6 +33,7 @@ missing_unit = Length[float](2)  # error
 wrong_named_unit = Length[float](2, Force.unit_named("newton"))  # error
 unit_name_not_string = Length.unit_named(u.nm)  # error
 Length[float](2, u.nm).kind = "Energy"  # error
+display_unit_given = Length[float](2, u.nm, display=u.nm)  # error
 
 point = 300 * u.K
 bad_point_sum = point.sum()  # error

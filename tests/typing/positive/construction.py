@@ -40,3 +40,15 @@ assert_type(hartree_per_bohr(2.0), Force[float])
 assert_type(Force[np.float64](2, Force.unit_named("Ha/a0")), Force[np.float64])
 assert_type(Force[float, SI].unit_named("newton")(2.0), Force[float])
 newton: Unit[ForceKind] = Force.unit_named("newton", units=(bleb,))
+
+assert_type(Length[float](2, u.nm, display=False), Length[float])
+assert_type(
+    Length[npt.NDArray[np.float32]]([1, 2], u.nm, display=False),
+    Length[npt.NDArray[np.float32]],
+)
+assert_type(
+    Length[torch.Tensor]([1, 2], u.nm, dtype=torch.float64, display=False),
+    Length[torch.Tensor],
+)
+assert_type(Length(2.0, u.nm, display=False), Length[float])
+assert_type(Length(values, u.nm, display=False), Length[npt.NDArray[np.float64]])

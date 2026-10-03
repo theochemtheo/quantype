@@ -50,7 +50,12 @@ class StorageAlias(GenericAlias):
         return require_system(rest[0]) if rest else Atomistic
 
     def __call__(
-        self, value: object, unit: Unit[Any] | None = None, *, dtype: object = None
+        self,
+        value: object,
+        unit: Unit[Any] | None = None,
+        *,
+        dtype: object = None,
+        display: bool = True,
     ) -> Quantity[Any, Any, Any]:
         from quantype._internal._storage import convert, storage_origin
         from quantype._internal._systems import into_system
@@ -68,6 +73,8 @@ class StorageAlias(GenericAlias):
             raise ValueError(f"Expected {cls._kind}; received {unit.kind}")
         scale, offset = into_system(unit, system)
         raw = convert(value, self.storage, dtype=dtype, scale=scale, offset=offset)
+        if not display:
+            return _wrap(cls._semantic, raw, system)
         # Python scalars are echoed exactly, so "20.1 degC" is not 20.100000000000023.
         echo = None
         if (

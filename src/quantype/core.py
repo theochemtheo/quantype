@@ -233,7 +233,18 @@ class Quantity[K, V, S: UnitSystem]:
 
         return StorageAlias(cls, parameters)
 
-    def __init__(self, value: object, unit: Unit[K], *, dtype: object = None) -> None:
+    def __init__(
+        self,
+        value: object,
+        unit: Unit[K],
+        *,
+        dtype: object = None,
+        display: bool = True,
+    ) -> None:
+        """Convert ``value`` from ``unit``, and show it in ``unit`` if ``display``.
+
+        With ``display=False`` it shows in the system's unit, as ``from_value`` does.
+        """
         if dtype is not None:
             raise TypeError("dtype requires a parameterized quantity storage type")
         if not self._kind:
@@ -242,8 +253,8 @@ class Quantity[K, V, S: UnitSystem]:
         built = cast("Any", unit)(value)
         self._value = cast("V", built._value)
         self._system = Atomistic
-        self._display = unit
-        self._echo = built._echo
+        self._display = unit if display else None
+        self._echo = built._echo if display else None
 
     @classmethod
     def define_unit(
