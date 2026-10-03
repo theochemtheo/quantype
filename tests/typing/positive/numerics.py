@@ -89,6 +89,10 @@ assert_type(positions.reshape(6), Length[Array])
 assert_type(positions.var(), Area[Array])
 assert_type(positions.ravel(), Length[Array])
 assert_type(positions[0, 0].item(), Length[float])
+assert_type(positions[np.array([0, 1])], Length[Array])
+moved = positions
+moved += positions
+assert_type(moved, Length[Array])
 assert_type(Temperature[Array]([300.0], u.K).std(), TemperatureDifference[Array])
 
 

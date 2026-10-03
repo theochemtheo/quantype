@@ -22,6 +22,7 @@ python -m pip install quantype
 
 Run the examples with `uv run python` in a uv project, or with `python` in the
 activated virtual environment.
+`quantype.__version__` gives the installed version.
 
 ## Construct, calculate, convert
 

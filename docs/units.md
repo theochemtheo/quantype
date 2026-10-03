@@ -126,7 +126,11 @@ rescales by a constant factor. The built-in systems are in `quantype.systems`:
 Temperature is in kelvin in every built-in system, and atom and electron counts
 are 1. `System.unit_for(Kind)` gives the unit a system stores a kind in. For
 the built-in systems it is always a named catalogue unit, as in
-`SI.unit_for(Pressure) is u.pascal`.
+`SI.unit_for(Pressure) is u.pascal`. `System.unit_for(Kind) == unit` tells
+you whether numbers given in `unit` are already in the system's units, so
+`from_value` can wrap them. Units are equal only when every field matches,
+name included: a custom unit with the same scale under another name compares
+unequal.
 
 Å, eV, and fs make the coherent mass unit eV fs²/Å², about 0.00965 Da, which
 no one quotes. `Atomistic` stores masses in daltons instead, the unit ASE uses,
@@ -267,8 +271,13 @@ the system if it isn't the default. `str` shows only the magnitude and unit.
 - `.to_system(T)` rescales into another unit system.
 - `Length[V, S].from_value(raw)` wraps raw numbers that are already in `S`'s
   units, keeping their storage. It trusts its input and doesn't check or
-  convert it. `Length.from_value(raw)` uses the default system.
-- `np.asarray(q)` and other implicit conversions to arrays raise `TypeError`.
+  convert it. `Length.from_value(raw)` uses the default system. The quantity
+  holds `raw` itself, not a copy, so a read-only NumPy array stays read-only.
+- Quantities have no in-place operators and no item assignment. `q += other`
+  builds a new quantity and rebinds `q`, so quantype never writes into the
+  storage it was given.
+- `np.asarray(q)` and other implicit conversions to arrays raise `TypeError`,
+  and NumPy functions can't write into a quantity with `out=`.
 
 Every conversion goes through the reference units, which are `Atomistic`'s
 base units: ångström, eV, fs, kelvin, Bohr magneton, atom, electron, and
@@ -449,6 +458,23 @@ multiplies or divides a quantity from either side, and the quantity keeps its
 dtype. A scalar quantity scaled by an array becomes an array. The static types
 don't track array shapes or dtype promotion. Builtin `sum()` works because zero
 is the one plain number that can be added to any quantity.
+
+Indexing follows NumPy. Slices and other basic indexes share memory with the
+original, and integer or boolean array indexes copy. One element of an array
+is a zero-dimensional array, and `.item()` turns it into a quantity with `float`
+storage:
+
+```python
+import numpy as np
+
+from quantype import Length
+
+positions = Length.from_value(np.arange(6.0).reshape(3, 2))
+assert np.shares_memory(positions[1:].value, positions.value)
+assert positions[np.array([0, 2])].shape == (2, 2)
+assert positions[1, 0].value.shape == ()
+assert type(positions[1, 0].item().value) is float
+```
 
 NumPy's own functions apply the same unit rules at runtime, through NumPy's
 dispatch. NumPy's type stubs reject quantities, so type-checked code should use
