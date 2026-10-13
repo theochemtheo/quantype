@@ -8,6 +8,7 @@ import os
 import subprocess
 import sys
 from dataclasses import fields
+from fractions import Fraction
 from typing import TYPE_CHECKING, assert_type, cast
 
 import numpy as np
@@ -15,7 +16,7 @@ import numpy.typing as npt
 import pytest
 
 from quantype import Length, codata, u
-from quantype._internal._registry import unit_specs
+from quantype._internal._registry import definitions, unit_specs
 from quantype.serialization import load_npz, save_npz
 
 if TYPE_CHECKING:
@@ -50,9 +51,9 @@ def test_editions_are_typed() -> None:
 def test_units_use_the_process_edition() -> None:
     values = codata.values()
     assert values.edition == codata.edition() == codata.DEFAULT
-    assert u.bohr.scale == values.bohr_radius / 1e-10
+    assert u.bohr.scale == float(Fraction(repr(values.bohr_radius)) * 10**10)
     assert u.hartree.scale == values.hartree_energy_in_ev
-    assert u.joule.scale == 1 / values.elementary_charge
+    assert u.joule.scale == float(1 / Fraction(repr(values.elementary_charge)))
     assert u.celsius.offset == 273.15
 
 
@@ -86,6 +87,32 @@ def test_exact_values_are_computed_not_truncated() -> None:
     values = codata.values("2014")
     c = values.speed_of_light_in_vacuum
     assert values.vacuum_electric_permittivity == 1 / (4e-7 * math.pi * c**2)
+
+
+@pytest.mark.parametrize("edition", codata.EDITIONS)
+def test_unit_scales_are_rounded_once(edition: codata.Edition) -> None:
+    defined = definitions(codata.values(edition))
+    inexact = {name for name, unit in defined.items() if type(unit.scale) is float}
+    assert inexact == {
+        "degree",
+        "ase_time",
+        "ase_velocity",
+        "ase_momentum",
+        "atomic_momentum",
+        "atomic_action",
+    }
+    for name, unit in defined.items():
+        assert type(unit.offset) is not float, name
+        assert unit_specs(edition)[name].scale == float(unit.scale), name
+
+
+def test_unit_identities_hold() -> None:
+    scale = {name: spec.scale for name, spec in unit_specs().items()}
+    assert scale["newton"] == scale["kilogram"] * scale["meter"] / scale["second"] ** 2
+    assert scale["pascal"] == scale["newton"] / scale["meter"] ** 2
+    assert scale["nanosecond"] == 1000 * scale["picosecond"]
+    assert scale["second"] == 1000 * scale["millisecond"]
+    assert scale["picosecond"] == 1000
 
 
 def test_default_edition_matches_scipy_when_scipy_carries_it() -> None:

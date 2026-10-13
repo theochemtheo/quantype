@@ -13,6 +13,7 @@ vectors never imply semantic equality. Relations are deliberately explicit.
 import math
 from collections.abc import Mapping
 from dataclasses import dataclass
+from fractions import Fraction
 from functools import cache
 from types import MappingProxyType
 
@@ -97,27 +98,52 @@ QUANTITIES = {
 }
 
 
+class _ExactCodata:
+    """A CODATA edition's values as the exact decimals the tables state."""
+
+    def __init__(self, values: Codata) -> None:
+        self._values = values
+
+    def __getattr__(self, name: str) -> Fraction:
+        return Fraction(repr(getattr(self._values, name)))
+
+
 @dataclass(frozen=True)
 class _Constants:
     """SI values that unit definitions use: exact definitions plus one edition."""
 
-    codata: Codata
+    exact: _ExactCodata
     # Exact by definition, whichever CODATA edition is in use.
-    angstrom = 1e-10
-    kilo, centi, milli, nano, pico, femto = 1e3, 1e-2, 1e-3, 1e-9, 1e-12, 1e-15
-    giga, tera = 1e9, 1e12
-    calorie = 4.184  # thermochemical
-    erg = 1e-7
-    zero_Celsius = 273.15  # noqa: N815 -- the conventional symbol
+    angstrom = Fraction("1e-10")
+    kilo, centi, milli = Fraction("1e3"), Fraction("1e-2"), Fraction("1e-3")
+    nano, pico, femto = Fraction("1e-9"), Fraction("1e-12"), Fraction("1e-15")
+    giga, tera = Fraction("1e9"), Fraction("1e12")
+    calorie = Fraction("4.184")  # thermochemical
+    erg = Fraction("1e-7")
+    zero_Celsius = Fraction("273.15")  # noqa: N815 -- the conventional symbol
     degree = math.pi / 180
 
     @property
-    def electron_volt(self) -> float:
-        return self.codata.elementary_charge
+    def electron_volt(self) -> Fraction:
+        return self.exact.elementary_charge
 
     @property
-    def N_A(self) -> float:  # noqa: N802 -- the conventional symbol
-        return self.codata.avogadro_constant
+    def N_A(self) -> Fraction:  # noqa: N802 -- the conventional symbol
+        return self.exact.avogadro_constant
+
+
+@dataclass(frozen=True)
+class _Definition:
+    """A unit as defined, before ``unit_specs`` rounds it once.
+
+    Scales are exact fractions, except those involving π or a square root.
+    """
+
+    kind: str
+    scale: Fraction | float = 1
+    offset: Fraction | float = 0
+    symbol: str | None = None
+    aliases: tuple[str, ...] = ()
 
 
 def unit_specs(edition: Edition | None = None) -> MappingProxyType[str, UnitSpec]:
@@ -127,214 +153,242 @@ def unit_specs(edition: Edition | None = None) -> MappingProxyType[str, UnitSpec
 
 @cache
 def _unit_specs(values: Codata) -> MappingProxyType[str, UnitSpec]:
-    c = _Constants(values)
     return MappingProxyType(
-        {**_common_units(c), **_system_units(c), **_electromechanical_units(c)}
+        {
+            name: UnitSpec(
+                spec.kind,
+                float(spec.scale),
+                float(spec.offset),
+                spec.symbol,
+                spec.aliases,
+            )
+            for name, spec in definitions(values).items()
+        }
     )
 
 
-def _common_units(c: _Constants) -> dict[str, UnitSpec]:
+def definitions(values: Codata) -> dict[str, _Definition]:
+    """Unit definitions before rounding, from one edition's values."""
+    c = _Constants(_ExactCodata(values))
+    return {**_common_units(c), **_system_units(c), **_electromechanical_units(c)}
+
+
+def _common_units(c: _Constants) -> dict[str, _Definition]:
     ev_joule = c.electron_volt
-    bohr_angstrom = c.codata.bohr_radius / c.angstrom
-    hartree_ev = c.codata.hartree_energy_in_ev
-    bohr_magneton_si = c.codata.bohr_magneton
+    bohr_angstrom = c.exact.bohr_radius / c.angstrom
+    hartree_ev = c.exact.hartree_energy_in_ev
+    bohr_magneton_si = c.exact.bohr_magneton
     return {
-        "one": UnitSpec("Dimensionless", symbol="1", aliases=("dimensionless",)),
-        "angstrom": UnitSpec("Length", symbol="Å", aliases=("Å", "Angstrom", "Ang")),
-        "meter": UnitSpec("Length", 1 / c.angstrom, symbol="m", aliases=("m", "metre")),
-        "centimeter": UnitSpec(
+        "one": _Definition("Dimensionless", symbol="1", aliases=("dimensionless",)),
+        "angstrom": _Definition("Length", symbol="Å", aliases=("Å", "Angstrom", "Ang")),
+        "meter": _Definition(
+            "Length", 1 / c.angstrom, symbol="m", aliases=("m", "metre")
+        ),
+        "centimeter": _Definition(
             "Length", c.centi / c.angstrom, symbol="cm", aliases=("cm",)
         ),
-        "nanometer": UnitSpec(
+        "nanometer": _Definition(
             "Length", c.nano / c.angstrom, symbol="nm", aliases=("nm",)
         ),
-        "bohr": UnitSpec("Length", bohr_angstrom, symbol="a0"),
-        "angstrom_squared": UnitSpec("Area", symbol="Å^2", aliases=("angstrom2",)),
-        "angstrom_cubed": UnitSpec("Volume", symbol="Å^3", aliases=("angstrom3",)),
-        "femtosecond": UnitSpec("Time", symbol="fs", aliases=("fs",)),
-        "picosecond": UnitSpec("Time", c.pico / c.femto, symbol="ps", aliases=("ps",)),
-        "second": UnitSpec("Time", 1 / c.femto, symbol="s", aliases=("s",)),
-        "angstrom_per_fs": UnitSpec("Velocity", symbol="Å/fs"),
-        "electron_volt": UnitSpec("Energy", symbol="eV", aliases=("eV",)),
-        "millielectron_volt": UnitSpec(
+        "bohr": _Definition("Length", bohr_angstrom, symbol="a0"),
+        "angstrom_squared": _Definition("Area", symbol="Å^2", aliases=("angstrom2",)),
+        "angstrom_cubed": _Definition("Volume", symbol="Å^3", aliases=("angstrom3",)),
+        "femtosecond": _Definition("Time", symbol="fs", aliases=("fs",)),
+        "picosecond": _Definition(
+            "Time", c.pico / c.femto, symbol="ps", aliases=("ps",)
+        ),
+        "second": _Definition("Time", 1 / c.femto, symbol="s", aliases=("s",)),
+        "angstrom_per_fs": _Definition("Velocity", symbol="Å/fs"),
+        "electron_volt": _Definition("Energy", symbol="eV", aliases=("eV",)),
+        "millielectron_volt": _Definition(
             "Energy", c.milli, symbol="meV", aliases=("meV",)
         ),
-        "joule": UnitSpec("Energy", 1 / ev_joule, symbol="J", aliases=("J",)),
-        "hartree": UnitSpec("Energy", hartree_ev, symbol="Ha", aliases=("Ha",)),
-        "rydberg": UnitSpec("Energy", hartree_ev / 2, symbol="Ry", aliases=("Ry",)),
-        "eV_per_atom": UnitSpec(
+        "joule": _Definition("Energy", 1 / ev_joule, symbol="J", aliases=("J",)),
+        "hartree": _Definition("Energy", hartree_ev, symbol="Ha", aliases=("Ha",)),
+        "rydberg": _Definition("Energy", hartree_ev / 2, symbol="Ry", aliases=("Ry",)),
+        "eV_per_atom": _Definition(
             "EnergyPerAtom", symbol="eV/atom", aliases=("eV / atom", "eV/atom")
         ),
-        "hartree_per_atom": UnitSpec(
+        "hartree_per_atom": _Definition(
             "EnergyPerAtom", hartree_ev, symbol="Ha/atom", aliases=("hartree / atom",)
         ),
-        "J_per_atom": UnitSpec(
+        "J_per_atom": _Definition(
             "EnergyPerAtom", 1 / ev_joule, symbol="J/atom", aliases=("J / atom",)
         ),
-        "eV_per_angstrom": UnitSpec(
+        "eV_per_angstrom": _Definition(
             "Force",
             symbol="eV/Å",
             aliases=("eV / angstrom", "eV/angstrom", "eV/Å", "eV/Ang"),
         ),
-        "newton": UnitSpec("Force", c.angstrom / ev_joule, symbol="N", aliases=("N",)),
-        "hartree_per_bohr": UnitSpec(
+        "newton": _Definition(
+            "Force", c.angstrom / ev_joule, symbol="N", aliases=("N",)
+        ),
+        "hartree_per_bohr": _Definition(
             "Force",
             hartree_ev / bohr_angstrom,
             symbol="Ha/a0",
             aliases=("hartree / bohr",),
         ),
-        "eV_per_angstrom_squared": UnitSpec("ForceConstant", symbol="eV/Å^2"),
-        "eV_per_angstrom_cubed": UnitSpec(
+        "eV_per_angstrom_squared": _Definition("ForceConstant", symbol="eV/Å^2"),
+        "eV_per_angstrom_cubed": _Definition(
             "Pressure", symbol="eV/Å^3", aliases=("eV / angstrom^3",)
         ),
-        "pascal": UnitSpec(
+        "pascal": _Definition(
             "Pressure", c.angstrom**3 / ev_joule, symbol="Pa", aliases=("Pa",)
         ),
-        "gigapascal": UnitSpec(
+        "gigapascal": _Definition(
             "Pressure",
             c.giga * c.angstrom**3 / ev_joule,
             symbol="GPa",
             aliases=("GPa",),
         ),
-        "hartree_per_bohr_cubed": UnitSpec(
+        "hartree_per_bohr_cubed": _Definition(
             "Pressure", hartree_ev / bohr_angstrom**3, symbol="Ha/a0^3"
         ),
-        "energy_density": UnitSpec("EnergyDensity", symbol="eV/Å^3"),
-        "energy_per_volume": UnitSpec("EnergyPerVolume", symbol="eV/Å^3"),
-        "kelvin": UnitSpec("Temperature", symbol="K", aliases=("K",)),
-        "celsius": UnitSpec(
+        "energy_density": _Definition("EnergyDensity", symbol="eV/Å^3"),
+        "energy_per_volume": _Definition("EnergyPerVolume", symbol="eV/Å^3"),
+        "kelvin": _Definition("Temperature", symbol="K", aliases=("K",)),
+        "celsius": _Definition(
             "Temperature", offset=c.zero_Celsius, symbol="°C", aliases=("degC",)
         ),
-        "delta_kelvin": UnitSpec(
+        "delta_kelvin": _Definition(
             "TemperatureDifference", symbol="ΔK", aliases=("delta_K",)
         ),
-        "delta_celsius": UnitSpec(
+        "delta_celsius": _Definition(
             "TemperatureDifference", symbol="Δ°C", aliases=("delta_degC",)
         ),
-        "kelvin_per_fs": UnitSpec("TemperatureRate", symbol="K/fs"),
-        "bohr_magneton": UnitSpec("MagneticMoment", symbol="μB", aliases=("mu_B",)),
-        "ampere_meter_squared": UnitSpec(
+        "kelvin_per_fs": _Definition("TemperatureRate", symbol="K/fs"),
+        "bohr_magneton": _Definition("MagneticMoment", symbol="μB", aliases=("mu_B",)),
+        "ampere_meter_squared": _Definition(
             "MagneticMoment", 1 / bohr_magneton_si, symbol="A m^2"
         ),
-        "bohr_magneton_per_angstrom_cubed": UnitSpec("Magnetization", symbol="μB/Å^3"),
-        "atom_per_angstrom_cubed": UnitSpec("ParticleDensity", symbol="atom/Å^3"),
-        "electron_per_angstrom_cubed": UnitSpec(
+        "bohr_magneton_per_angstrom_cubed": _Definition(
+            "Magnetization", symbol="μB/Å^3"
+        ),
+        "atom_per_angstrom_cubed": _Definition("ParticleDensity", symbol="atom/Å^3"),
+        "electron_per_angstrom_cubed": _Definition(
             "ElectronDensity", symbol="electron/Å^3"
         ),
-        "radian": UnitSpec("Angle", symbol="rad", aliases=("rad",)),
-        "degree": UnitSpec("Angle", c.degree, symbol="°", aliases=("deg",)),
-        "frequency_per_fs": UnitSpec("Frequency", symbol="fs^-1"),
-        "terahertz": UnitSpec(
+        "radian": _Definition("Angle", symbol="rad", aliases=("rad",)),
+        "degree": _Definition("Angle", c.degree, symbol="°", aliases=("deg",)),
+        "frequency_per_fs": _Definition("Frequency", symbol="fs^-1"),
+        "terahertz": _Definition(
             "Frequency", c.tera * c.femto, symbol="THz", aliases=("THz",)
         ),
-        "hertz": UnitSpec("Frequency", c.femto, symbol="Hz", aliases=("Hz",)),
-        "per_fs": UnitSpec("InverseTime", symbol="fs^-1"),
-        "atom": UnitSpec("AtomCount", symbol="atom"),
-        "electron": UnitSpec("ElectronCount", symbol="electron"),
+        "hertz": _Definition("Frequency", c.femto, symbol="Hz", aliases=("Hz",)),
+        "per_fs": _Definition("InverseTime", symbol="fs^-1"),
+        "atom": _Definition("AtomCount", symbol="atom"),
+        "electron": _Definition("ElectronCount", symbol="electron"),
     }
 
 
-def _system_units(c: _Constants) -> dict[str, UnitSpec]:
+def _system_units(c: _Constants) -> dict[str, _Definition]:
     """Named derived units, so every built-in system's kinds have catalogue names.
 
     Scales are products of each system's base scales, keeping the systems coherent.
     """
     ev_joule = c.electron_volt
-    au_time = c.codata.atomic_unit_of_time / c.femto
-    au_moment = c.codata.atomic_unit_of_magnetic_dipole_moment / c.codata.bohr_magneton
-    bohr = c.codata.bohr_radius / c.angstrom
-    hartree = c.codata.hartree_energy_in_ev
+    au_time = c.exact.atomic_unit_of_time / c.femto
+    au_moment = c.exact.atomic_unit_of_magnetic_dipole_moment / c.exact.bohr_magneton
+    bohr = c.exact.bohr_radius / c.angstrom
+    hartree = c.exact.hartree_energy_in_ev
     kcal_mol = c.kilo * c.calorie / c.N_A / ev_joule
     metre, centimetre = 1 / c.angstrom, c.centi / c.angstrom
     second, picosecond = 1 / c.femto, c.pico / c.femto
     joule, erg = 1 / ev_joule, c.erg / ev_joule
-    ampere_metre2 = 1 / c.codata.bohr_magneton
+    ampere_metre2 = 1 / c.exact.bohr_magneton
     erg_per_gauss = c.milli * ampere_metre2
     units = {
         # LAMMPS metal: Å, eV, ps.
-        "angstrom_per_ps": UnitSpec("Velocity", 1 / picosecond, symbol="Å/ps"),
-        "kelvin_per_ps": UnitSpec("TemperatureRate", 1 / picosecond, symbol="K/ps"),
-        "per_ps": UnitSpec("InverseTime", 1 / picosecond, symbol="ps^-1"),
+        "angstrom_per_ps": _Definition("Velocity", 1 / picosecond, symbol="Å/ps"),
+        "kelvin_per_ps": _Definition("TemperatureRate", 1 / picosecond, symbol="K/ps"),
+        "per_ps": _Definition("InverseTime", 1 / picosecond, symbol="ps^-1"),
         # LAMMPS real: Å, kcal/mol, fs.
-        "kcal_per_mol": UnitSpec(
+        "kcal_per_mol": _Definition(
             "Energy", kcal_mol, symbol="kcal/mol", aliases=("kcal/mol",)
         ),
-        "kcal_per_mol_per_atom": UnitSpec(
+        "kcal_per_mol_per_atom": _Definition(
             "EnergyPerAtom", kcal_mol, symbol="kcal/mol/atom"
         ),
-        "kcal_per_mol_per_angstrom": UnitSpec(
+        "kcal_per_mol_per_angstrom": _Definition(
             "Force", kcal_mol, symbol="kcal/mol/Å", aliases=("kcal/mol/Å",)
         ),
-        "kcal_per_mol_per_angstrom_squared": UnitSpec(
+        "kcal_per_mol_per_angstrom_squared": _Definition(
             "ForceConstant", kcal_mol, symbol="kcal/mol/Å^2"
         ),
-        "kcal_per_mol_per_angstrom_cubed": UnitSpec(
+        "kcal_per_mol_per_angstrom_cubed": _Definition(
             "Pressure", kcal_mol, symbol="kcal/mol/Å^3"
         ),
         # SI: m, J, s, A·m².
-        "square_meter": UnitSpec("Area", metre**2, symbol="m^2"),
-        "cubic_meter": UnitSpec("Volume", metre**3, symbol="m^3"),
-        "meter_per_second": UnitSpec(
+        "square_meter": _Definition("Area", metre**2, symbol="m^2"),
+        "cubic_meter": _Definition("Volume", metre**3, symbol="m^3"),
+        "meter_per_second": _Definition(
             "Velocity", metre / second, symbol="m/s", aliases=("m/s",)
         ),
-        "newton_per_meter": UnitSpec("ForceConstant", joule / metre**2, symbol="N/m"),
-        "kelvin_per_second": UnitSpec("TemperatureRate", 1 / second, symbol="K/s"),
-        "ampere_per_meter": UnitSpec(
+        "newton_per_meter": _Definition(
+            "ForceConstant", joule / metre**2, symbol="N/m"
+        ),
+        "kelvin_per_second": _Definition("TemperatureRate", 1 / second, symbol="K/s"),
+        "ampere_per_meter": _Definition(
             "Magnetization", ampere_metre2 / metre**3, symbol="A/m"
         ),
-        "atom_per_cubic_meter": UnitSpec(
+        "atom_per_cubic_meter": _Definition(
             "ParticleDensity", metre**-3, symbol="atom/m^3"
         ),
-        "electron_per_cubic_meter": UnitSpec(
+        "electron_per_cubic_meter": _Definition(
             "ElectronDensity", metre**-3, symbol="electron/m^3"
         ),
-        "per_second": UnitSpec("InverseTime", 1 / second, symbol="s^-1"),
+        "per_second": _Definition("InverseTime", 1 / second, symbol="s^-1"),
         # CGS: cm, erg, s, erg/G.
-        "square_centimeter": UnitSpec("Area", centimetre**2, symbol="cm^2"),
-        "cubic_centimeter": UnitSpec("Volume", centimetre**3, symbol="cm^3"),
-        "centimeter_per_second": UnitSpec(
+        "square_centimeter": _Definition("Area", centimetre**2, symbol="cm^2"),
+        "cubic_centimeter": _Definition("Volume", centimetre**3, symbol="cm^3"),
+        "centimeter_per_second": _Definition(
             "Velocity", centimetre / second, symbol="cm/s"
         ),
-        "erg": UnitSpec("Energy", erg, symbol="erg"),
-        "erg_per_atom": UnitSpec("EnergyPerAtom", erg, symbol="erg/atom"),
-        "dyne": UnitSpec("Force", erg / centimetre, symbol="dyn", aliases=("dyn",)),
-        "dyne_per_centimeter": UnitSpec(
+        "erg": _Definition("Energy", erg, symbol="erg"),
+        "erg_per_atom": _Definition("EnergyPerAtom", erg, symbol="erg/atom"),
+        "dyne": _Definition("Force", erg / centimetre, symbol="dyn", aliases=("dyn",)),
+        "dyne_per_centimeter": _Definition(
             "ForceConstant", erg / centimetre**2, symbol="dyn/cm"
         ),
-        "barye": UnitSpec("Pressure", erg / centimetre**3, symbol="Ba"),
-        "erg_per_gauss": UnitSpec("MagneticMoment", erg_per_gauss, symbol="erg/G"),
-        "emu_per_cubic_centimeter": UnitSpec(
+        "barye": _Definition("Pressure", erg / centimetre**3, symbol="Ba"),
+        "erg_per_gauss": _Definition("MagneticMoment", erg_per_gauss, symbol="erg/G"),
+        "emu_per_cubic_centimeter": _Definition(
             "Magnetization", erg_per_gauss / centimetre**3, symbol="emu/cm^3"
         ),
-        "atom_per_cubic_centimeter": UnitSpec(
+        "atom_per_cubic_centimeter": _Definition(
             "ParticleDensity", centimetre**-3, symbol="atom/cm^3"
         ),
-        "electron_per_cubic_centimeter": UnitSpec(
+        "electron_per_cubic_centimeter": _Definition(
             "ElectronDensity", centimetre**-3, symbol="electron/cm^3"
         ),
         # Hartree atomic units: a0, Ha, ħ/Eh, eħ/me.
-        "bohr_squared": UnitSpec("Area", bohr**2, symbol="a0^2"),
-        "bohr_cubed": UnitSpec("Volume", bohr**3, symbol="a0^3"),
-        "atomic_time": UnitSpec("Time", au_time, symbol="ħ/Eh"),
-        "atomic_velocity": UnitSpec("Velocity", bohr / au_time, symbol="a0 Eh/ħ"),
-        "hartree_per_bohr_squared": UnitSpec(
+        "bohr_squared": _Definition("Area", bohr**2, symbol="a0^2"),
+        "bohr_cubed": _Definition("Volume", bohr**3, symbol="a0^3"),
+        "atomic_time": _Definition("Time", au_time, symbol="ħ/Eh"),
+        "atomic_velocity": _Definition("Velocity", bohr / au_time, symbol="a0 Eh/ħ"),
+        "hartree_per_bohr_squared": _Definition(
             "ForceConstant", hartree / bohr**2, symbol="Ha/a0^2"
         ),
-        "kelvin_per_atomic_time": UnitSpec(
+        "kelvin_per_atomic_time": _Definition(
             "TemperatureRate", 1 / au_time, symbol="K Eh/ħ"
         ),
-        "atomic_magnetic_moment": UnitSpec("MagneticMoment", au_moment, symbol="eħ/me"),
-        "atomic_magnetization": UnitSpec(
+        "atomic_magnetic_moment": _Definition(
+            "MagneticMoment", au_moment, symbol="eħ/me"
+        ),
+        "atomic_magnetization": _Definition(
             "Magnetization", au_moment / bohr**3, symbol="eħ/me/a0^3"
         ),
-        "atom_per_bohr_cubed": UnitSpec(
+        "atom_per_bohr_cubed": _Definition(
             "ParticleDensity", bohr**-3, symbol="atom/a0^3"
         ),
-        "electron_per_bohr_cubed": UnitSpec(
+        "electron_per_bohr_cubed": _Definition(
             "ElectronDensity", bohr**-3, symbol="electron/a0^3"
         ),
-        "frequency_per_atomic_time": UnitSpec("Frequency", 1 / au_time, symbol="Eh/ħ"),
-        "per_atomic_time": UnitSpec("InverseTime", 1 / au_time, symbol="Eh/ħ"),
+        "frequency_per_atomic_time": _Definition(
+            "Frequency", 1 / au_time, symbol="Eh/ħ"
+        ),
+        "per_atomic_time": _Definition("InverseTime", 1 / au_time, symbol="Eh/ħ"),
     }
     # Pressure, EnergyDensity and EnergyPerVolume share dimensions but not kinds,
     # so each needs its own named unit in every system.
@@ -348,155 +402,192 @@ def _system_units(c: _Constants) -> dict[str, UnitSpec]:
             ("erg_per_cubic_centimeter", erg / centimetre**3, "erg/cm^3"),
             ("hartree_per_bohr_cubed", hartree / bohr**3, "Ha/a0^3"),
         ):
-            units[f"{prefix}_{suffix}"] = UnitSpec(kind, scale, symbol=symbol)
+            units[f"{prefix}_{suffix}"] = _Definition(kind, scale, symbol=symbol)
     return units
 
 
-def _electromechanical_units(c: _Constants) -> dict[str, UnitSpec]:
+def _electromechanical_units(c: _Constants) -> dict[str, _Definition]:
     """Mass, charge and their relatives, with a named unit in every built-in system.
 
     Also the everyday units that the catalogue otherwise lacks. Mass is derived
     (eV fs²/Å² in the reference units), so its scales divide by that unit in kg.
     """
     ev = c.electron_volt  # J per eV, and C per elementary charge
-    mass = ev * 1e-10  # kg per eV fs²/Å²
-    dalton = c.codata.atomic_mass_constant / mass
+    mass = ev * Fraction("1e-10")  # kg per eV fs²/Å²
+    dalton = c.exact.atomic_mass_constant / mass
     per_atom_mole = 1 / c.N_A
     kcal_mol = c.kilo * c.calorie * per_atom_mole / ev
-    bohr = c.codata.bohr_radius / c.angstrom
-    hartree = c.codata.hartree_energy_in_ev
-    au_time = c.codata.atomic_unit_of_time / c.femto
-    hbar = c.codata.planck_constant / (2 * math.pi) / ev / c.femto  # eV fs
-    statcoulomb = 1 / (10 * c.codata.speed_of_light_in_vacuum)  # C
-    statvolt = 1e-7 / statcoulomb  # V, which is eV per e
+    bohr = c.exact.bohr_radius / c.angstrom
+    hartree = c.exact.hartree_energy_in_ev
+    au_time = c.exact.atomic_unit_of_time / c.femto
+    hbar = c.exact.planck_constant / (2 * math.pi) / ev / c.femto  # eV fs
+    statcoulomb = 1 / (10 * c.exact.speed_of_light_in_vacuum)  # C
+    statvolt = Fraction("1e-7") / statcoulomb  # V, which is eV per e
     pascal = c.angstrom**3 / ev
     return {
-        "millimeter": UnitSpec("Length", 1e7, symbol="mm", aliases=("mm",)),
-        "micrometer": UnitSpec("Length", 1e4, symbol="µm", aliases=("um", "µm", "μm")),
-        "picometer": UnitSpec("Length", 1e-2, symbol="pm", aliases=("pm",)),
-        "nanosecond": UnitSpec("Time", 1e6, symbol="ns", aliases=("ns",)),
-        "microsecond": UnitSpec("Time", 1e9, symbol="µs", aliases=("us", "µs", "μs")),
-        "millisecond": UnitSpec("Time", 1e12, symbol="ms", aliases=("ms",)),
+        "millimeter": _Definition(
+            "Length", Fraction("1e7"), symbol="mm", aliases=("mm",)
+        ),
+        "micrometer": _Definition(
+            "Length", Fraction("1e4"), symbol="µm", aliases=("um", "µm", "μm")
+        ),
+        "picometer": _Definition(
+            "Length", Fraction("1e-2"), symbol="pm", aliases=("pm",)
+        ),
+        "nanosecond": _Definition(
+            "Time", Fraction("1e6"), symbol="ns", aliases=("ns",)
+        ),
+        "microsecond": _Definition(
+            "Time", Fraction("1e9"), symbol="µs", aliases=("us", "µs", "μs")
+        ),
+        "millisecond": _Definition(
+            "Time", Fraction("1e12"), symbol="ms", aliases=("ms",)
+        ),
         # ASE's time unit, about 10.18 fs: with Å and eV, it makes masses daltons.
         # Its velocity and momentum units are what Atoms.get_velocities() and
         # get_momenta() return.
-        "ase_time": UnitSpec("Time", math.sqrt(dalton), symbol="Å √(amu/eV)"),
-        "ase_velocity": UnitSpec("Velocity", 1 / math.sqrt(dalton), symbol="√(eV/amu)"),
-        "ase_momentum": UnitSpec("Momentum", math.sqrt(dalton), symbol="√(amu eV)"),
-        "kilojoule": UnitSpec("Energy", c.kilo / ev, symbol="kJ", aliases=("kJ",)),
-        "kilocalorie": UnitSpec(
+        "ase_time": _Definition("Time", math.sqrt(dalton), symbol="Å √(amu/eV)"),
+        "ase_velocity": _Definition(
+            "Velocity", 1 / math.sqrt(dalton), symbol="√(eV/amu)"
+        ),
+        "ase_momentum": _Definition("Momentum", math.sqrt(dalton), symbol="√(amu eV)"),
+        "kilojoule": _Definition("Energy", c.kilo / ev, symbol="kJ", aliases=("kJ",)),
+        "kilocalorie": _Definition(
             "Energy", c.kilo * c.calorie / ev, symbol="kcal", aliases=("kcal",)
         ),
-        "kJ_per_mol": UnitSpec(
+        "kJ_per_mol": _Definition(
             "Energy", c.kilo * per_atom_mole / ev, symbol="kJ/mol", aliases=("kJ/mol",)
         ),
-        "bar": UnitSpec("Pressure", 1e5 * pascal, symbol="bar"),
-        "kilobar": UnitSpec("Pressure", 1e8 * pascal, symbol="kbar", aliases=("kbar",)),
-        "atmosphere": UnitSpec(
+        "bar": _Definition("Pressure", Fraction("1e5") * pascal, symbol="bar"),
+        "kilobar": _Definition(
+            "Pressure", Fraction("1e8") * pascal, symbol="kbar", aliases=("kbar",)
+        ),
+        "atmosphere": _Definition(
             "Pressure", 101325 * pascal, symbol="atm", aliases=("atm",)
         ),
-        "megapascal": UnitSpec(
-            "Pressure", 1e6 * pascal, symbol="MPa", aliases=("MPa",)
+        "megapascal": _Definition(
+            "Pressure", Fraction("1e6") * pascal, symbol="MPa", aliases=("MPa",)
         ),
         # Spectroscopic wavenumbers, as the frequency c times the wavenumber.
-        "inverse_centimeter": UnitSpec(
+        "inverse_centimeter": _Definition(
             "Frequency",
-            c.codata.speed_of_light_in_vacuum / c.centi * c.femto,
+            c.exact.speed_of_light_in_vacuum / c.centi * c.femto,
             symbol="cm^-1",
             aliases=("cm^-1", "cm-1"),
         ),
         # Mass. LAMMPS writes per-particle masses in g/mol.
-        "eV_fs2_per_angstrom2": UnitSpec("Mass", symbol="eV fs^2/Å^2"),
-        "dalton": UnitSpec("Mass", dalton, symbol="Da", aliases=("Da", "amu")),
-        "gram_per_mole": UnitSpec(
-            "Mass", 1e-3 * per_atom_mole / mass, symbol="g/mol", aliases=("g/mol",)
+        "eV_fs2_per_angstrom2": _Definition("Mass", symbol="eV fs^2/Å^2"),
+        "dalton": _Definition("Mass", dalton, symbol="Da", aliases=("Da", "amu")),
+        "gram_per_mole": _Definition(
+            "Mass",
+            Fraction("1e-3") * per_atom_mole / mass,
+            symbol="g/mol",
+            aliases=("g/mol",),
         ),
-        "kilogram": UnitSpec("Mass", 1 / mass, symbol="kg", aliases=("kg",)),
-        "gram": UnitSpec("Mass", 1e-3 / mass, symbol="g", aliases=("g",)),
-        "electron_mass": UnitSpec(
-            "Mass", c.codata.electron_mass / mass, symbol="m_e", aliases=("m_e",)
+        "kilogram": _Definition("Mass", 1 / mass, symbol="kg", aliases=("kg",)),
+        "gram": _Definition(
+            "Mass", Fraction("1e-3") / mass, symbol="g", aliases=("g",)
         ),
-        "eV_fs2_per_angstrom5": UnitSpec("MassDensity", symbol="eV fs^2/Å^5"),
-        "gram_per_cubic_centimeter": UnitSpec(
-            "MassDensity", 1e-27 / mass, symbol="g/cm^3", aliases=("g/cm^3",)
+        "electron_mass": _Definition(
+            "Mass", c.exact.electron_mass / mass, symbol="m_e", aliases=("m_e",)
         ),
-        "kilogram_per_cubic_meter": UnitSpec(
-            "MassDensity", 1e-30 / mass, symbol="kg/m^3", aliases=("kg/m^3",)
+        "eV_fs2_per_angstrom5": _Definition("MassDensity", symbol="eV fs^2/Å^5"),
+        "gram_per_cubic_centimeter": _Definition(
+            "MassDensity",
+            Fraction("1e-27") / mass,
+            symbol="g/cm^3",
+            aliases=("g/cm^3",),
         ),
-        "electron_mass_per_bohr_cubed": UnitSpec(
-            "MassDensity", c.codata.electron_mass / mass / bohr**3, symbol="m_e/a0^3"
+        "kilogram_per_cubic_meter": _Definition(
+            "MassDensity",
+            Fraction("1e-30") / mass,
+            symbol="kg/m^3",
+            aliases=("kg/m^3",),
         ),
-        "eV_fs_per_angstrom": UnitSpec("Momentum", symbol="eV fs/Å"),
-        "eV_ps_per_angstrom": UnitSpec("Momentum", 1e3, symbol="eV ps/Å"),
-        "kcal_per_mol_fs_per_angstrom": UnitSpec(
+        "electron_mass_per_bohr_cubed": _Definition(
+            "MassDensity", c.exact.electron_mass / mass / bohr**3, symbol="m_e/a0^3"
+        ),
+        "eV_fs_per_angstrom": _Definition("Momentum", symbol="eV fs/Å"),
+        "eV_ps_per_angstrom": _Definition(
+            "Momentum", Fraction("1e3"), symbol="eV ps/Å"
+        ),
+        "kcal_per_mol_fs_per_angstrom": _Definition(
             "Momentum", kcal_mol, symbol="kcal/mol fs/Å"
         ),
-        "kilogram_meter_per_second": UnitSpec("Momentum", 1e-5 / mass, symbol="kg m/s"),
-        "gram_centimeter_per_second": UnitSpec(
-            "Momentum", 1e-10 / mass, symbol="g cm/s"
+        "kilogram_meter_per_second": _Definition(
+            "Momentum", Fraction("1e-5") / mass, symbol="kg m/s"
         ),
-        "atomic_momentum": UnitSpec("Momentum", hbar / bohr, symbol="ħ/a0"),
-        "angstrom_per_fs2": UnitSpec("Acceleration", symbol="Å/fs^2"),
-        "angstrom_per_ps2": UnitSpec("Acceleration", 1e-6, symbol="Å/ps^2"),
-        "meter_per_second_squared": UnitSpec(
-            "Acceleration", 1e-20, symbol="m/s^2", aliases=("m/s^2",)
+        "gram_centimeter_per_second": _Definition(
+            "Momentum", Fraction("1e-10") / mass, symbol="g cm/s"
         ),
-        "centimeter_per_second_squared": UnitSpec(
-            "Acceleration", 1e-22, symbol="cm/s^2"
+        "atomic_momentum": _Definition("Momentum", hbar / bohr, symbol="ħ/a0"),
+        "angstrom_per_fs2": _Definition("Acceleration", symbol="Å/fs^2"),
+        "angstrom_per_ps2": _Definition(
+            "Acceleration", Fraction("1e-6"), symbol="Å/ps^2"
         ),
-        "atomic_acceleration": UnitSpec(
+        "meter_per_second_squared": _Definition(
+            "Acceleration", Fraction("1e-20"), symbol="m/s^2", aliases=("m/s^2",)
+        ),
+        "centimeter_per_second_squared": _Definition(
+            "Acceleration", Fraction("1e-22"), symbol="cm/s^2"
+        ),
+        "atomic_acceleration": _Definition(
             "Acceleration", bohr / au_time**2, symbol="a0 Eh^2/ħ^2"
         ),
         # Charge and electrostatics. An elementary charge is the reference.
-        "elementary_charge": UnitSpec("Charge", symbol="e", aliases=("e",)),
-        "coulomb": UnitSpec("Charge", 1 / ev, symbol="C", aliases=("C",)),
-        "statcoulomb": UnitSpec(
+        "elementary_charge": _Definition("Charge", symbol="e", aliases=("e",)),
+        "coulomb": _Definition("Charge", 1 / ev, symbol="C", aliases=("C",)),
+        "statcoulomb": _Definition(
             "Charge", statcoulomb / ev, symbol="statC", aliases=("statC",)
         ),
-        "volt": UnitSpec("ElectricPotential", symbol="V", aliases=("V",)),
-        "kcal_per_mol_per_e": UnitSpec(
+        "volt": _Definition("ElectricPotential", symbol="V", aliases=("V",)),
+        "kcal_per_mol_per_e": _Definition(
             "ElectricPotential", kcal_mol, symbol="kcal/mol/e"
         ),
-        "statvolt": UnitSpec(
+        "statvolt": _Definition(
             "ElectricPotential", statvolt, symbol="statV", aliases=("statV",)
         ),
-        "hartree_per_e": UnitSpec("ElectricPotential", hartree, symbol="Ha/e"),
-        "volt_per_angstrom": UnitSpec(
+        "hartree_per_e": _Definition("ElectricPotential", hartree, symbol="Ha/e"),
+        "volt_per_angstrom": _Definition(
             "ElectricField", symbol="V/Å", aliases=("V/Å", "V/angstrom", "V/Ang")
         ),
-        "volt_per_meter": UnitSpec(
-            "ElectricField", 1e-10, symbol="V/m", aliases=("V/m",)
+        "volt_per_meter": _Definition(
+            "ElectricField", Fraction("1e-10"), symbol="V/m", aliases=("V/m",)
         ),
-        "statvolt_per_centimeter": UnitSpec(
-            "ElectricField", statvolt * 1e-8, symbol="statV/cm"
+        "statvolt_per_centimeter": _Definition(
+            "ElectricField", statvolt * Fraction("1e-8"), symbol="statV/cm"
         ),
-        "atomic_electric_field": UnitSpec(
+        "atomic_electric_field": _Definition(
             "ElectricField", hartree / bohr, symbol="Ha/(e a0)"
         ),
-        "e_angstrom": UnitSpec("DipoleMoment", symbol="e Å"),
-        "debye": UnitSpec(
+        "e_angstrom": _Definition("DipoleMoment", symbol="e Å"),
+        "debye": _Definition(
             "DipoleMoment",
-            1e-21 / c.codata.speed_of_light_in_vacuum / ev / c.angstrom,
+            Fraction("1e-21") / c.exact.speed_of_light_in_vacuum / ev / c.angstrom,
             symbol="D",
             aliases=("D",),
         ),
-        "coulomb_meter": UnitSpec("DipoleMoment", 1 / ev / c.angstrom, symbol="C m"),
-        "statcoulomb_centimeter": UnitSpec(
+        "coulomb_meter": _Definition("DipoleMoment", 1 / ev / c.angstrom, symbol="C m"),
+        "statcoulomb_centimeter": _Definition(
             "DipoleMoment", statcoulomb * c.centi / ev / c.angstrom, symbol="statC cm"
         ),
-        "e_bohr": UnitSpec("DipoleMoment", bohr, symbol="e a0"),
+        "e_bohr": _Definition("DipoleMoment", bohr, symbol="e a0"),
         # Entropy is the kind of the Boltzmann constant; action, of ħ.
-        "eV_per_kelvin": UnitSpec("Entropy", symbol="eV/K", aliases=("eV/K",)),
-        "joule_per_kelvin": UnitSpec("Entropy", 1 / ev, symbol="J/K", aliases=("J/K",)),
-        "erg_per_kelvin": UnitSpec("Entropy", c.erg / ev, symbol="erg/K"),
-        "kcal_per_mol_per_kelvin": UnitSpec("Entropy", kcal_mol, symbol="kcal/mol/K"),
-        "hartree_per_kelvin": UnitSpec("Entropy", hartree, symbol="Ha/K"),
-        "eV_fs": UnitSpec("Action", symbol="eV fs"),
-        "eV_ps": UnitSpec("Action", 1e3, symbol="eV ps"),
-        "kcal_per_mol_fs": UnitSpec("Action", kcal_mol, symbol="kcal/mol fs"),
-        "joule_second": UnitSpec("Action", 1 / ev / c.femto, symbol="J s"),
-        "erg_second": UnitSpec("Action", c.erg / ev / c.femto, symbol="erg s"),
-        "atomic_action": UnitSpec("Action", hbar, symbol="ħ"),
+        "eV_per_kelvin": _Definition("Entropy", symbol="eV/K", aliases=("eV/K",)),
+        "joule_per_kelvin": _Definition(
+            "Entropy", 1 / ev, symbol="J/K", aliases=("J/K",)
+        ),
+        "erg_per_kelvin": _Definition("Entropy", c.erg / ev, symbol="erg/K"),
+        "kcal_per_mol_per_kelvin": _Definition(
+            "Entropy", kcal_mol, symbol="kcal/mol/K"
+        ),
+        "hartree_per_kelvin": _Definition("Entropy", hartree, symbol="Ha/K"),
+        "eV_fs": _Definition("Action", symbol="eV fs"),
+        "eV_ps": _Definition("Action", Fraction("1e3"), symbol="eV ps"),
+        "kcal_per_mol_fs": _Definition("Action", kcal_mol, symbol="kcal/mol fs"),
+        "joule_second": _Definition("Action", 1 / ev / c.femto, symbol="J s"),
+        "erg_second": _Definition("Action", c.erg / ev / c.femto, symbol="erg s"),
+        "atomic_action": _Definition("Action", hbar, symbol="ħ"),
     }
 
 

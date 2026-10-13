@@ -44,7 +44,7 @@ def test_presentation(system: type[UnitSystem]) -> None:
     assert repr(two_nm + five_a) == f"Length(2.5 nm{suffix})"
     assert repr(five_a + two_nm) == f"Length(25.0 Å{suffix})"
     ratio = energy(3, u.eV) / two_nm
-    expected = "0.15 eV/Å" if system is Atomistic else "2.4032649509999997e-10 N"
+    expected = "0.15 eV/Å" if system is Atomistic else "2.403264951e-10 N"
     assert repr(ratio) == f"Force({expected}{suffix})"
     assert ratio.magnitude(u.eV_per_angstrom) == pytest.approx(0.15)
     array: Any = _dynamic(Length)[npt.NDArray[np.float64], system]

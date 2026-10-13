@@ -407,7 +407,7 @@ from quantype.systems import SI, Metal
 thermal = constants.k_B * Temperature[float, SI](300, u.K)
 assert isinstance(thermal, Energy)
 assert thermal.system is SI
-assert repr(constants.k_B) == "Constant(k_B = 8.617333262145179e-05 eV/K)"
+assert repr(constants.k_B) == "Constant(k_B = 8.617333262145177e-05 eV/K)"
 assert repr(constants.k_B.to_system(SI)) == "Entropy(1.380649e-23 J/K, SI)"
 assert constants.hbar.magnitude(u.joule_second) == pytest.approx(1.0545718e-34)
 assert constants.m_u.to_system(Metal).magnitude() == pytest.approx(1.0)  # g/mol
