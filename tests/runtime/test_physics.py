@@ -50,11 +50,12 @@ def test_atomistic_stores_mass_in_daltons() -> None:
     assert Atomistic.unit_for(Mass) is u.dalton
     assert Atomistic.unit_for(MassDensity) is u.gram_per_cubic_centimeter
     assert Atomistic.unit_for(Momentum) is u.eV_fs_per_angstrom
-    assert Mass[float](12, u.Da).value == 12
-    assert (12 * u.Da).value == 12
-    assert Mass.from_value(12.0).magnitude(u.Da) == 12
-    assert (1 * u.m_e).value == pytest.approx(5.485799090441e-4, rel=1e-9)
-    assert repr(Mass.from_value(1.0)) == "Mass(1.0 Da)"
+    assert Mass[float, Atomistic](12, u.Da).value == 12
+    assert (12 * u.Da).to_system(Atomistic).value == 12
+    assert Mass[float, Atomistic].from_value(12.0).magnitude(u.Da) == 12
+    electron = (1 * u.m_e).to_system(Atomistic)
+    assert electron.value == pytest.approx(5.485799090441e-4, rel=1e-9)
+    assert repr(Mass[float, Atomistic].from_value(1.0)) == "Mass(1.0 Da, Atomistic)"
 
 
 class Ase(UnitSystem, name="test-physics:ase"):
@@ -71,7 +72,9 @@ def test_ase_units_make_daltons_coherent() -> None:
     )
     speed = Velocity[float](1, u.ase_velocity)
     derived = Length[float](1, u.angstrom) / Time[float](1, u.ase_time)
-    assert speed.value == pytest.approx(derived.value, rel=1e-12)
+    assert speed.magnitude(u.angstrom_per_fs) == pytest.approx(
+        derived.magnitude(u.angstrom_per_fs), rel=1e-12
+    )
     kinetic = Mass[float](1, u.Da) * speed * speed
     assert kinetic.magnitude(u.eV) == pytest.approx(1, rel=1e-12)
     momentum = Mass[float](1, u.Da) * speed
@@ -93,26 +96,28 @@ def test_a_system_on_ase_time_stores_ase_units() -> None:
 
 
 def test_atomistic_mass_arithmetic_rescales() -> None:
-    mass = Mass[float](1, u.Da)
-    speed = Velocity[float](1, u.angstrom_per_fs)
+    mass = Mass[float, Atomistic](1, u.Da)
+    speed = Velocity[float, Atomistic](1, u.angstrom_per_fs)
     kinetic = mass * speed * speed
     assert isinstance(kinetic, Energy)
     assert kinetic.value == pytest.approx(DA_ANGSTROM2_PER_FS2, rel=1e-12)
     momentum = mass * speed
     assert isinstance(momentum, Momentum)
     assert momentum.value == pytest.approx(DA_ANGSTROM2_PER_FS2, rel=1e-12)
-    acceleration = Force[float](1, u.eV_per_angstrom) / mass
+    acceleration = Force[float, Atomistic](1, u.eV_per_angstrom) / mass
     assert isinstance(acceleration, Acceleration)
     assert acceleration.value == pytest.approx(1 / DA_ANGSTROM2_PER_FS2, rel=1e-12)
     assert (momentum / speed).value == pytest.approx(1, rel=1e-12)
-    density = Mass[float](1, u.gram) / Volume[float](1, u.cubic_centimeter)
+    density = Mass[float, Atomistic](1, u.gram) / Volume[float, Atomistic](
+        1, u.cubic_centimeter
+    )
     assert isinstance(density, MassDensity)
     assert density.value == pytest.approx(1, rel=1e-12)
-    per_cubic_angstrom = mass / Volume[float](1, u.angstrom_cubed)
+    per_cubic_angstrom = mass / Volume[float, Atomistic](1, u.angstrom_cubed)
     assert per_cubic_angstrom.value == pytest.approx(1.66053906892, rel=1e-12)
-    assert (per_cubic_angstrom * Volume[float](1, u.angstrom_cubed)).value == (
-        pytest.approx(1, rel=1e-12)
-    )
+    assert (
+        per_cubic_angstrom * Volume[float, Atomistic](1, u.angstrom_cubed)
+    ).value == (pytest.approx(1, rel=1e-12))
 
 
 def test_metal_stores_lammps_units() -> None:

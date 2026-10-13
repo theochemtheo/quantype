@@ -7,6 +7,11 @@ so ``np.cos(angle)`` and ``torch.cos(angle)`` behave like ``qnp.cos(angle)``.
 
 Arithmetic is on coherent raw numbers, so kinds a unit system overrides (such as
 LAMMPS pressure in bar) are rescaled on the way in and out.
+
+Without a unit system, rules work on the stored numbers: same-kind results keep
+the first operand's storage unit, other operands convert into it, and products
+and powers compose units. Only functions that need radians or plain numbers
+(trigonometric, ``exp``, ``log``) convert, and only from another unit.
 """
 
 # Package-private wrapping is shared by the numerical adapters.
@@ -30,13 +35,14 @@ from quantype._internal._semantics import (
     product,
 )
 from quantype._internal._storage import keep_storage
-from quantype._internal._systems import coherence
+from quantype._internal._storage_units import compose, raised, recast
+from quantype._internal._systems import NoSystem, coherence
 from quantype.core import Quantity, _rescaled, _wrap
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
 
-    from quantype._internal._systems import UnitSystem
+    from quantype._internal._systems import AnySystem
 
 type _Quantity = Quantity[Any, Any, Any]
 
@@ -266,14 +272,16 @@ def _norm(namespace: Any) -> Callable[..., Any]:
 
 
 def _raw(quantity: _Quantity) -> Any:
-    """Raw numbers in the system's coherent units."""
-    return _rescaled(quantity.value, coherence(quantity.system, quantity._semantic))
+    """Raw numbers in the system's coherent units, or the reference units."""
+    if quantity._storage is not None:
+        return quantity._reference()
+    return _rescaled(quantity._value, coherence(quantity.system, quantity._semantic))
 
 
 def _result(
     kind: Semantic,
     coherent: Any,
-    system: type[UnitSystem],
+    system: type[AnySystem],
     like: Any,
     *,
     display: Any = None,
@@ -281,6 +289,32 @@ def _result(
     """Wrap coherent raw numbers, keeping the operand's storage type and dtype."""
     raw = _rescaled(coherent, 1 / coherence(system, kind))
     return _wrap(kind, keep_storage(like, raw), system, display=display)
+
+
+def _composed(
+    kind: Semantic, raw: Any, storage: Any, like: Any, *, display: Any = None
+) -> _Quantity:
+    """Wrap numbers stored in ``storage``, keeping the operand's storage type."""
+    return _wrap(
+        kind, keep_storage(like, raw), NoSystem, display=display, storage=storage
+    )
+
+
+def _product_storage(first: _Quantity, second: _Quantity, kind: Semantic) -> Any:
+    """The product's storage unit without a system; None in a unit system."""
+    if first._storage is None or second._storage is None:
+        return None
+    return compose("mul", kind, first._storage, second._storage)
+
+
+def _respread(quantity: _Quantity, raw: Any) -> _Quantity:
+    """A spread (std, diff) of ``quantity``: a temperature difference of a
+    temperature, in the same storage unit."""
+    kind = _spread(quantity)
+    storage = quantity._storage
+    if storage is not None:
+        storage = recast(kind, storage)
+    return _wrap(kind, raw, quantity.system, storage=storage)
 
 
 def _require(quantity: _Quantity, name: str, function: str) -> None:
@@ -316,9 +350,9 @@ def _elementwise(name: str, source: str, target: str) -> Callable[[Any], Any]:
             return getattr(_xp(x), name)(x)
         quantity = x
         _require(quantity, source, name)
-        raw = getattr(_xp(quantity.value), name)(_raw(quantity))
+        raw = getattr(_xp(quantity._value), name)(_raw(quantity))
         kind = named_kind(quantity._semantic, target)
-        return _result(kind, raw, quantity.system, quantity.value)
+        return _result(kind, raw, quantity.system, quantity._value)
 
     function.__name__ = function.__qualname__ = name
     function.__doc__ = f"``{name}`` of a {source} quantity, as {target}."
@@ -364,9 +398,12 @@ def sqrt(x: Any, /) -> Any:
         return x**0.5 if isinstance(x, (int, float)) else _xp(x).sqrt(x)
     quantity = x
     kind = _root(quantity._semantic)
-    raw = _raw(quantity)
+    storage = quantity._storage
+    raw = _raw(quantity) if storage is None else quantity._value
     root = math.sqrt(raw) if isinstance(raw, (int, float)) else _xp(raw).sqrt(raw)
-    return _result(kind, root, quantity.system, quantity.value)
+    if storage is not None:
+        return _composed(kind, root, raised(kind, storage, 0.5), quantity._value)
+    return _result(kind, root, quantity.system, quantity._value)
 
 
 def absolute(x: Any, /) -> Any:
@@ -384,9 +421,10 @@ def arctan2(y: Any, x: Any, /) -> Any:
         return _xp(y, x).arctan2(y, x)
     first = y
     _same("arctan2", first, x)
-    second = x
-    raw = _xp(first.value, second.value).arctan2(first.value, second.value)
-    return _result(named_kind(first._semantic, "Angle"), raw, first.system, first.value)
+    second = first._aligned(x)
+    raw = _xp(first._value, second).arctan2(first._value, second)
+    angle = named_kind(first._semantic, "Angle")
+    return _result(angle, raw, first.system, first._value)
 
 
 def _pairwise(name: str) -> Callable[[Any, Any], Any]:
@@ -395,8 +433,8 @@ def _pairwise(name: str) -> Callable[[Any, Any], Any]:
             return getattr(_xp(a, b), name)(a, b)
         first = a
         _same(name, first, b)
-        second = b
-        raw = getattr(_xp(first.value, second.value), name)(first.value, second.value)
+        second = first._aligned(b)
+        raw = getattr(_xp(first._value, second), name)(first._value, second)
         return first._with(raw)
 
     function.__name__ = function.__qualname__ = name
@@ -415,8 +453,8 @@ def clip(x: Any, a_min: Any, a_max: Any, /) -> Any:
     quantity = x
     bounds = [bound for bound in (a_min, a_max) if bound is not None]
     _same("clip", quantity, *bounds)
-    low, high = (None if b is None else b.value for b in (a_min, a_max))
-    return quantity._with(_xp(quantity.value).clip(quantity.value, low, high))
+    low, high = (None if b is None else quantity._aligned(b) for b in (a_min, a_max))
+    return quantity._with(_xp(quantity._value).clip(quantity._value, low, high))
 
 
 def where(condition: Any, x: Any, y: Any, /) -> Any:
@@ -425,14 +463,14 @@ def where(condition: Any, x: Any, y: Any, /) -> Any:
         return _xp(condition, x, y).where(condition, x, y)
     first = x
     _same("where", first, y)
-    second = y
-    raw = _xp(first.value, second.value).where(condition, first.value, second.value)
+    second = first._aligned(y)
+    raw = _xp(first._value, second).where(condition, first._value, second)
     return first._with(raw)
 
 
 def _predicate(name: str) -> Callable[[Any], Any]:
     def function(x: Any, /) -> Any:
-        value: Any = x.value if _is_quantity(x) else x
+        value: Any = x._value if _is_quantity(x) else x
         return getattr(_xp(value), name)(value)
 
     function.__name__ = function.__qualname__ = name
@@ -445,15 +483,19 @@ isfinite = _predicate("isfinite")
 isinf = _predicate("isinf")
 
 
-def _tolerances(a: _Quantity, b: object, atol: object) -> tuple[Any, Any]:
+def _tolerances(a: _Quantity, b: object, atol: object) -> tuple[Any, Any, Any]:
+    """The compared numbers and the tolerance, under ``==``'s rule for units."""
     _same("isclose", a, b)
     other: Any = b  # _same checked that it is a quantity of a's kind
+    first, second = a._comparable(other)
     if _is_quantity(atol):
         _same("isclose", a, atol)
-        return other.value, atol.value
+        if first is a._value:
+            return first, second, a._aligned(atol)
+        return first, second, atol._reference()
     if atol != 0:
         raise TypeError("atol must be a quantity of the compared kind, or 0")
-    return other.value, 0.0
+    return first, second, 0.0
 
 
 def isclose(
@@ -462,11 +504,10 @@ def isclose(
     """Element-wise closeness; an absolute tolerance must share the kind."""
     if not _is_quantity(a):
         return _xp(a, b).isclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan)
-    first = a
-    other, tolerance = _tolerances(first, b, atol)
-    namespace = _xp(first.value, other)
+    first, other, tolerance = _tolerances(a, b, atol)
+    namespace = _xp(first, other)
     return namespace.isclose(
-        first.value, other, rtol=rtol, atol=tolerance, equal_nan=equal_nan
+        first, other, rtol=rtol, atol=tolerance, equal_nan=equal_nan
     )
 
 
@@ -476,11 +517,10 @@ def allclose(
     """Whether every element is close; an absolute tolerance must share the kind."""
     if not _is_quantity(a):
         return bool(_xp(a, b).allclose(a, b, rtol=rtol, atol=atol, equal_nan=equal_nan))
-    first = a
-    other, tolerance = _tolerances(first, b, atol)
-    namespace = _xp(first.value, other)
+    first, other, tolerance = _tolerances(a, b, atol)
+    namespace = _xp(first, other)
     close = namespace.allclose(
-        first.value, other, rtol=rtol, atol=tolerance, equal_nan=equal_nan
+        first, other, rtol=rtol, atol=tolerance, equal_nan=equal_nan
     )
     return bool(close)
 
@@ -494,8 +534,13 @@ def dot(a: Any, b: Any, /) -> Any:
     first, second = a, b
     first._same_system(second)
     kind = product("mul", first._semantic, second._semantic)
-    raw = _xp(first.value, second.value).dot(_raw(first), _raw(second))
-    return _result(kind, _as_like(first.value, raw), first.system, first.value)
+    namespace = _xp(first._value, second._value)
+    storage = _product_storage(first, second, kind)
+    if storage is not None:
+        raw = _as_like(first._value, namespace.dot(first._value, second._value))
+        return _composed(kind, raw, storage, first._value)
+    raw = namespace.dot(_raw(first), _raw(second))
+    return _result(kind, _as_like(first._value, raw), first.system, first._value)
 
 
 def cross(a: Any, b: Any, /, axis: int = -1) -> Any:
@@ -507,8 +552,13 @@ def cross(a: Any, b: Any, /, axis: int = -1) -> Any:
     first, second = a, b
     first._same_system(second)
     kind = Expression("mul", first._semantic, second._semantic)
-    raw = _xp(first.value, second.value).cross(_raw(first), _raw(second), axis=axis)
-    return _result(kind, raw, first.system, first.value)
+    namespace = _xp(first._value, second._value)
+    storage = _product_storage(first, second, kind)
+    if storage is not None:
+        raw = namespace.cross(first._value, second._value, axis=axis)
+        return _composed(kind, raw, storage, first._value)
+    raw = namespace.cross(_raw(first), _raw(second), axis=axis)
+    return _result(kind, raw, first.system, first._value)
 
 
 def _norm_of(x: Any, axis: int | None = None, *, keepdims: bool = False) -> Any:
@@ -516,8 +566,8 @@ def _norm_of(x: Any, axis: int | None = None, *, keepdims: bool = False) -> Any:
         return _norm(_xp(x))(x, axis=axis, keepdims=keepdims)
     quantity = x
     _not_affine(quantity, "norm")
-    raw = _norm(_xp(quantity.value))(quantity.value, axis=axis, keepdims=keepdims)
-    return quantity._with(keep_storage(quantity.value, raw))
+    raw = _norm(_xp(quantity._value))(quantity._value, axis=axis, keepdims=keepdims)
+    return quantity._with(keep_storage(quantity._value, raw))
 
 
 class _Linalg:
@@ -539,7 +589,7 @@ def _joined(name: str) -> Callable[..., Any]:
         if not _is_quantity(first):
             return getattr(_xp(*items), name)(items, axis=axis)
         _same(name, first, *items[1:])
-        raws = [item.value for item in items]
+        raws = [first._aligned(item) for item in items]
         return first._with(getattr(_xp(*raws), name)(raws, axis=axis))
 
     function.__name__ = function.__qualname__ = name
@@ -557,7 +607,7 @@ def _reshaping(name: str) -> Callable[..., Any]:
             return getattr(_xp(x), name)(x, *args, **kwargs)
         quantity = x
         return quantity._with(
-            getattr(_xp(quantity.value), name)(quantity.value, *args, **kwargs)
+            getattr(_xp(quantity._value), name)(quantity._value, *args, **kwargs)
         )
 
     function.__name__ = function.__qualname__ = name
@@ -575,7 +625,7 @@ def zeros_like(x: Any) -> Any:
     """Zeros shaped like ``x``, keeping its kind and display unit."""
     if not _is_quantity(x):
         return _xp(x).zeros_like(x)
-    return x._with(_xp(x.value).zeros_like(x.value))
+    return x._with(_xp(x._value).zeros_like(x._value))
 
 
 def _reduction(name: str) -> Callable[..., Any]:
@@ -610,11 +660,10 @@ def std(
     if not _is_quantity(x):
         return _xp(x).std(x, axis=axis, ddof=ddof, keepdims=keepdims)
     quantity = x
-    raw = _xp(quantity.value).std(
-        quantity.value, axis=axis, ddof=ddof, keepdims=keepdims
+    raw = _xp(quantity._value).std(
+        quantity._value, axis=axis, ddof=ddof, keepdims=keepdims
     )
-    raw = keep_storage(quantity.value, _as_like(quantity.value, raw))
-    return _wrap(_spread(quantity), raw, quantity.system)
+    return _respread(quantity, keep_storage(quantity._value, _as_like(x._value, raw)))
 
 
 def diff(x: Any, n: int = 1, axis: int = -1) -> Any:
@@ -622,8 +671,9 @@ def diff(x: Any, n: int = 1, axis: int = -1) -> Any:
     if not _is_quantity(x):
         return _xp(x).diff(x, n=n, axis=axis)
     quantity = x
-    raw = _xp(quantity.value).diff(quantity.value, n=n, axis=axis)
-    return _wrap(_spread(quantity), raw, quantity.system)
+    return _respread(
+        quantity, _xp(quantity._value).diff(quantity._value, n=n, axis=axis)
+    )
 
 
 def cumsum(x: Any, axis: int | None = None) -> Any:
@@ -632,7 +682,7 @@ def cumsum(x: Any, axis: int | None = None) -> Any:
         return _xp(x).cumsum(x, axis=axis)
     quantity = x
     _not_affine(quantity, "cumsum")
-    return quantity._with(_xp(quantity.value).cumsum(quantity.value, axis=axis))
+    return quantity._with(_xp(quantity._value).cumsum(quantity._value, axis=axis))
 
 
 def _as_like(like: Any, result: Any) -> Any:
@@ -647,14 +697,14 @@ def _as_like(like: Any, result: Any) -> Any:
 
 def _kept(quantity: _Quantity, raw: Any) -> _Quantity:
     """A same-kind result, keeping the display unit and array storage."""
-    return quantity._with(keep_storage(quantity.value, _as_like(quantity.value, raw)))
+    return quantity._with(keep_storage(quantity._value, _as_like(quantity._value, raw)))
 
 
 def sort(x: Any, axis: int = -1) -> Any:
     """Sorted along an axis, keeping the kind."""
     if not _is_quantity(x):
         return _xp(x).sort(x, axis=axis)
-    return x._with(_xp(x.value).sort(x.value, axis=axis))
+    return x._with(_xp(x._value).sort(x._value, axis=axis))
 
 
 def _same_kind_reduction(name: str, *, affine: bool) -> Callable[..., Any]:
@@ -663,7 +713,7 @@ def _same_kind_reduction(name: str, *, affine: bool) -> Callable[..., Any]:
             return getattr(_xp(x), name)(x, axis=axis, keepdims=keepdims)
         if not affine:
             _not_affine(x, name)
-        raw = getattr(_xp(x.value), name)(x.value, axis=axis, keepdims=keepdims)
+        raw = getattr(_xp(x._value), name)(x._value, axis=axis, keepdims=keepdims)
         return _kept(x, raw)
 
     function.__name__ = function.__qualname__ = name
@@ -685,7 +735,7 @@ def _quantile(name: str) -> Callable[..., Any]:
     ) -> Any:
         if not _is_quantity(x):
             return getattr(_xp(x), name)(x, q, axis=axis, keepdims=keepdims)
-        raw = getattr(_xp(x.value), name)(x.value, q, axis=axis, keepdims=keepdims)
+        raw = getattr(_xp(x._value), name)(x._value, q, axis=axis, keepdims=keepdims)
         return _kept(x, raw)
 
     function.__name__ = function.__qualname__ = name
@@ -703,9 +753,8 @@ def nanstd(
     """Standard deviation ignoring NaNs; of absolute temperatures, a difference."""
     if not _is_quantity(x):
         return _xp(x).nanstd(x, axis=axis, ddof=ddof, keepdims=keepdims)
-    raw = _xp(x.value).nanstd(x.value, axis=axis, ddof=ddof, keepdims=keepdims)
-    raw = keep_storage(x.value, _as_like(x.value, raw))
-    return _wrap(_spread(x), raw, x.system)
+    raw = _xp(x._value).nanstd(x._value, axis=axis, ddof=ddof, keepdims=keepdims)
+    return _respread(x, keep_storage(x._value, _as_like(x._value, raw)))
 
 
 def _variance(name: str) -> Callable[..., Any]:
@@ -714,11 +763,20 @@ def _variance(name: str) -> Callable[..., Any]:
     ) -> Any:
         if not _is_quantity(x):
             return getattr(_xp(x), name)(x, axis=axis, ddof=ddof, keepdims=keepdims)
-        raw = getattr(_xp(x.value), name)(
-            _raw(x), axis=axis, ddof=ddof, keepdims=keepdims
+        storage = x._storage
+        raw = getattr(_xp(x._value), name)(
+            _raw(x) if storage is None else x._value,
+            axis=axis,
+            ddof=ddof,
+            keepdims=keepdims,
         )
-        kind = power(_spread(x), 2)
-        return _result(kind, _as_like(x.value, raw), x.system, x.value)
+        spread = _spread(x)
+        kind = power(spread, 2)
+        raw = _as_like(x._value, raw)
+        if storage is not None:
+            squared = raised(kind, recast(spread, storage), 2)
+            return _composed(kind, raw, squared, x._value)
+        return _result(kind, raw, x.system, x._value)
 
     function.__name__ = function.__qualname__ = name
     function.__doc__ = (
@@ -737,7 +795,10 @@ def square(x: Any, /) -> Any:
     if not _is_quantity(x):
         return _xp(x).square(x)
     kind = power(x._semantic, 2)
-    return _result(kind, _xp(x.value).square(_raw(x)), x.system, x.value)
+    if x._storage is not None:
+        squared = raised(kind, x._storage, 2)
+        return _composed(kind, _xp(x._value).square(x._value), squared, x._value)
+    return _result(kind, _xp(x._value).square(_raw(x)), x.system, x._value)
 
 
 def hypot(a: Any, b: Any, /) -> Any:
@@ -746,8 +807,8 @@ def hypot(a: Any, b: Any, /) -> Any:
         return _xp(a, b).hypot(a, b)
     _same("hypot", a, b)
     _not_affine(a, "hypot")
-    second = cast("_Quantity", b)
-    return a._with(_xp(a.value, second.value).hypot(a.value, second.value))
+    second = a._aligned(cast("_Quantity", b))
+    return a._with(_xp(a._value, second).hypot(a._value, second))
 
 
 fabs = absolute
@@ -755,7 +816,7 @@ fabs = absolute
 
 def _plain_result(name: str) -> Callable[..., Any]:
     def function(x: Any, *args: Any, **kwargs: Any) -> Any:
-        raw = x.value if _is_quantity(x) else x
+        raw = x._value if _is_quantity(x) else x
         return getattr(_xp(raw), name)(raw, *args, **kwargs)
 
     function.__name__ = function.__qualname__ = name
@@ -770,7 +831,7 @@ argmax = _plain_result("argmax")
 
 def sign(x: Any, /) -> Any:
     """Element-wise signs of the numbers, which carry no unit."""
-    raw = x.value if _is_quantity(x) else x
+    raw = x._value if _is_quantity(x) else x
     return _xp(raw).sign(raw)
 
 
@@ -779,11 +840,9 @@ def linspace(start: Any, stop: Any, num: int = 50, *, endpoint: bool = True) -> 
     if not _is_quantity(start):
         return _xp(start, stop).linspace(start, stop, num, endpoint=endpoint)
     _same("linspace", start, stop)
-    end = cast("_Quantity", stop)
-    namespace = _xp(start.value, end.value)
-    return start._with(
-        namespace.linspace(start.value, end.value, num, endpoint=endpoint)
-    )
+    end = start._aligned(cast("_Quantity", stop))
+    namespace = _xp(start._value, end)
+    return start._with(namespace.linspace(start._value, end, num, endpoint=endpoint))
 
 
 def _product_of(name: str) -> Callable[..., Any]:
@@ -799,14 +858,19 @@ def _product_of(name: str) -> Callable[..., Any]:
             quantity = a if _is_quantity(a) else b
             other = b if quantity is a else a
             first, second = (
-                (quantity.value, other) if quantity is a else (other, quantity.value)
+                (quantity._value, other) if quantity is a else (other, quantity._value)
             )
             raw = call(_xp(first, second), first, second)
             return _kept(quantity, raw)
         a._same_system(b)
         kind = product("mul", a._semantic, b._semantic)
-        raw = call(_xp(a.value, b.value), _raw(a), _raw(b))
-        return _result(kind, _as_like(a.value, raw), a.system, a.value)
+        namespace = _xp(a._value, b._value)
+        storage = _product_storage(a, b, kind)
+        if storage is not None:
+            raw = _as_like(a._value, call(namespace, a._value, b._value))
+            return _composed(kind, raw, storage, a._value)
+        raw = call(namespace, _raw(a), _raw(b))
+        return _result(kind, _as_like(a._value, raw), a.system, a._value)
 
     function.__name__ = function.__qualname__ = name
     function.__doc__ = f"``{name}``; declared products name the result, as for ``*``."
@@ -822,24 +886,36 @@ def trapezoid(y: Any, x: Any = None, dx: Any = 1.0, axis: int = -1) -> Any:
     step = x if x is not None else dx
     if not _is_quantity(y) and not _is_quantity(step):
         return _xp(y).trapezoid(y, x=x, dx=dx, axis=axis)
-    raw_y = _raw(y) if _is_quantity(y) else y
-    raw_step = _raw(step) if _is_quantity(step) else step
+    quantities = [value for value in (y, step) if _is_quantity(value)]
+    stored = all(value._storage is not None for value in quantities)
+
+    def numbers(value: Any) -> Any:
+        if not _is_quantity(value):
+            return value
+        return value._value if stored else _raw(value)
+
+    raw_y, raw_step = numbers(y), numbers(step)
     namespace = _xp(raw_y, raw_step)
     if x is not None:
         raw = namespace.trapezoid(raw_y, x=raw_step, axis=axis)
     else:
         raw = namespace.trapezoid(raw_y, dx=raw_step, axis=axis)
-    if not _is_quantity(step):
-        return _result(
-            y._semantic, _as_like(y.value, raw), y.system, y.value, display=y._display
-        )
-    if not _is_quantity(y):
-        return _result(
-            step._semantic, _as_like(step.value, raw), step.system, step.value
-        )
+    if len(quantities) == 1:
+        (only,) = quantities
+        display = only._display if only is y else None
+        raw = _as_like(only._value, raw)
+        if stored:
+            return _composed(
+                only._semantic, raw, only._storage, only._value, display=display
+            )
+        return _result(only._semantic, raw, only.system, only._value, display=display)
     y._same_system(step)
     kind = product("mul", y._semantic, step._semantic)
-    return _result(kind, _as_like(y.value, raw), y.system, y.value)
+    raw = _as_like(y._value, raw)
+    storage = _product_storage(y, step, kind)
+    if storage is not None:
+        return _composed(kind, raw, storage, y._value)
+    return _result(kind, raw, y.system, y._value)
 
 
 # NumPy's ufuncs and array functions, by name, that quantities support.
@@ -999,7 +1075,7 @@ def torch_function(func: Any, args: Sequence[Any], kwargs: dict[str, Any]) -> An
     if function is None or name in _TORCH_DIFFERENT:
         raise TypeError(
             f"torch.{name} does not know the units of a quantity; use "
-            "quantype.numpy, quantity methods, or .value and .magnitude(unit)"
+            "quantype.numpy, quantity methods, or .magnitude(unit)"
         )
     keywords = {_TORCH_KEYWORDS.get(key, key): value for key, value in kwargs.items()}
     arguments = list(args)

@@ -12,7 +12,7 @@ import pytest
 from quantype import Energy, Force, Length, Quantity, u
 from quantype.kinds import ForceKind
 from quantype.products import LengthTime
-from quantype.systems import SI, Atomistic, UnitSystem
+from quantype.systems import SI, Atomistic, NoSystem, UnitSystem
 from quantype.typing import QuantityType, quantity_type
 
 ARRAY = npt.NDArray[np.float64]
@@ -27,14 +27,14 @@ class _Gromacs(UnitSystem, name="test-annotations:gromacs"):
 @pytest.mark.parametrize(
     ("annotation", "expected"),
     [
-        (Force[float], QuantityType(Force, float, Atomistic)),
-        (Force[npt.NDArray[np.float64]], QuantityType(Force, ARRAY, Atomistic)),
+        (Force[float], QuantityType(Force, float, NoSystem)),
+        (Force[npt.NDArray[np.float64]], QuantityType(Force, ARRAY, NoSystem)),
         (Force[float, Atomistic], QuantityType(Force, float, Atomistic)),
         (Force[float, SI], QuantityType(Force, float, SI)),
         (Force[np.float32, _Gromacs], QuantityType(Force, np.float32, _Gromacs)),
-        (LengthTime[float], QuantityType(LengthTime, float, Atomistic)),
-        (Annotated[Force[float], "meta"], QuantityType(Force, float, Atomistic)),
-        (Force, QuantityType(Force, None, Atomistic)),
+        (LengthTime[float], QuantityType(LengthTime, float, NoSystem)),
+        (Annotated[Force[float], "meta"], QuantityType(Force, float, NoSystem)),
+        (Force, QuantityType(Force, None, NoSystem)),
     ],
 )
 def test_annotations_give_kind_storage_and_system(
@@ -56,7 +56,7 @@ def test_an_optional_quantity_is_a_union_holding_one() -> None:
     assert isinstance(optional, types.UnionType)
     assert quantity_type(optional) is None
     inner = [quantity_type(member) for member in get_args(optional)]
-    assert inner == [QuantityType(Force, float, Atomistic), None]
+    assert inner == [QuantityType(Force, float, NoSystem), None]
 
 
 class _Record:
@@ -66,7 +66,7 @@ class _Record:
 
 def test_class_annotations_read_through_get_type_hints() -> None:
     hints = get_type_hints(_Record, include_extras=True)
-    assert quantity_type(hints["forces"]) == QuantityType(Force, ARRAY, Atomistic)
+    assert quantity_type(hints["forces"]) == QuantityType(Force, ARRAY, NoSystem)
     energy, none = get_args(hints["energy"])
     assert quantity_type(energy) == QuantityType(Energy, float, SI)
     assert none is type(None)
@@ -78,7 +78,7 @@ def test_subscripting_the_kind_changes_the_storage() -> None:
     kind: Any = scalar.kind
     batched = kind[ARRAY, scalar.system]
     assert quantity_type(batched) == QuantityType(Energy, ARRAY, SI)
-    assert quantity_type(kind[ARRAY]) == QuantityType(Energy, ARRAY, Atomistic)
+    assert quantity_type(kind[ARRAY]) == QuantityType(Energy, ARRAY, NoSystem)
     raw = np.array([1.0, 2.0])
     assert batched.from_value(raw).value is raw
 

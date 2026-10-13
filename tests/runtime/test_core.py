@@ -29,7 +29,7 @@ from quantype import units as u
 from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS, UNITS
 from quantype._internal._semantics import KINDS, Kind, dimensionless_kind, named_kind
 from quantype.core import _wrap, dimensions, get_unit, result_kind
-from quantype.systems import SI
+from quantype.systems import SI, Atomistic
 from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
@@ -46,10 +46,10 @@ def test_scalar_workflow() -> None:
     assert isinstance(r**2, Area)
     assert isinstance(r**3, Volume)
     assert isinstance((e / r) / (r**2), Pressure)
-    assert (r / t).value == 0.5
-    assert (e / r).value == -1.6
-    assert (r**2).value == 4.0
-    assert (r**3).value == 8.0
+    assert (r / t).magnitude(u.angstrom_per_fs) == 0.5
+    assert (e / r).magnitude(u.eV_per_angstrom) == -1.6
+    assert (r**2).magnitude(u.angstrom_squared) == 4.0
+    assert (r**3).magnitude(u.angstrom_cubed) == 8.0
     assert isinstance((e / r) * r, Energy)
     assert isinstance(e / (r**3), EnergyDensity)
 
@@ -74,7 +74,7 @@ def test_conversions(unit: str, canonical: float) -> None:
     # Runtime catalogue iteration intentionally bypasses the nominal static API.
     constructor: Any = get_unit(unit)
     q = constructor(1)
-    assert q.value == pytest.approx(canonical)
+    assert q.to_system(Atomistic).value == pytest.approx(canonical)
     assert q.magnitude(constructor) == pytest.approx(1.0)
 
 
@@ -82,7 +82,8 @@ def test_explicit_conversion() -> None:
     q = 1.0 * u.hartree
     converted = q.to(u.eV)
     assert isinstance(converted, Energy)
-    assert converted.value == q.value
+    assert converted == q
+    assert converted.unit is u.eV
     assert converted.magnitude() == pytest.approx(27.211386245988)
     assert q.magnitude(u.hartree) == 1.0
     assert repr(5 * u.angstrom) == "Length(5.0 Å)"
@@ -95,14 +96,14 @@ def test_explicit_conversion() -> None:
 def test_temperature_affine_algebra() -> None:
     cold = 0 * u.celsius
     warm = 300 * u.K
-    assert cold.value == pytest.approx(273.15)
+    assert cold.magnitude(u.K) == pytest.approx(273.15)
     difference = warm - cold
     assert isinstance(difference, TemperatureDifference)
-    assert difference.value == pytest.approx(26.85)
+    assert difference.magnitude(u.delta_K) == pytest.approx(26.85)
     assert isinstance(cold + difference, Temperature)
-    assert (cold + difference).value == pytest.approx(300)
-    assert (difference + cold).value == pytest.approx(300)
-    assert (warm - difference).value == pytest.approx(cold.value)
+    assert (cold + difference).magnitude(u.K) == pytest.approx(300)
+    assert (difference + cold).magnitude(u.K) == pytest.approx(300)
+    assert (warm - difference).magnitude(u.K) == pytest.approx(cold.magnitude(u.K))
     assert isinstance(difference / (2 * u.s), TemperatureRate)
     untyped: Any = warm
     with pytest.raises(TypeError, match="Cannot add two absolute Temperatures"):
@@ -110,20 +111,20 @@ def test_temperature_affine_algebra() -> None:
     array: Any = Temperature[npt.NDArray[np.float64]]([280, 300], u.K)
     with pytest.raises(TypeError, match="Cannot sum absolute Temperatures"):
         array.sum()
-    assert array.mean().value == pytest.approx(290)
+    assert array.mean().magnitude(u.K) == pytest.approx(290)
 
 
 def test_absolute_temperatures_multiply_and_scale() -> None:
     # Kelvin-scaled storage makes products of absolute temperatures meaningful.
     warm = 300 * u.K
-    assert (2 * warm).value == 600
-    assert (warm / warm).value == 1
-    assert (warm**2).value == 90000
-    assert (-warm).value == -300
+    assert (2 * warm).magnitude(u.K) == 600
+    assert float(warm / warm) == 1
+    assert (warm**2).magnitude() == 90000
+    assert (-warm).magnitude(u.K) == -300
     boltzmann = Entropy[float](8.617333262e-5, u.eV_per_kelvin)
     thermal = boltzmann * warm
     assert isinstance(thermal, Energy)
-    assert thermal.value == pytest.approx(0.025852, rel=1e-4)
+    assert thermal.magnitude(u.eV) == pytest.approx(0.025852, rel=1e-4)
     assert isinstance(thermal / boltzmann, Temperature)
     assert isinstance(thermal / warm, Entropy)
 
@@ -131,7 +132,7 @@ def test_absolute_temperatures_multiply_and_scale() -> None:
 def test_scaling_drops_an_offset_display_unit() -> None:
     # Twice 20 °C is 586.3 K; shown in °C it would read as a misleading 313.15.
     doubled = 2 * (20 * u.celsius)
-    assert doubled.value == pytest.approx(586.3)
+    assert doubled.magnitude(u.K) == pytest.approx(586.3)
     assert repr(doubled) == "Temperature(586.3 K)"
     assert repr(2 * (300 * u.K).to(u.kelvin)) == "Temperature(600.0 K)"
     assert repr(-(1 * u.delta_celsius)) == "TemperatureDifference(-1.0 Δ°C)"
@@ -162,7 +163,7 @@ def test_structural_arithmetic_keeps_dimensions() -> None:
     uncommon = (2 * u.angstrom) * (3 * u.fs)
     assert isinstance(uncommon, Quantity)
     assert uncommon.kind == "Mul[Length,Time]"
-    assert uncommon.value == 6
+    assert uncommon.magnitude() == 6
     assert uncommon.dimensions == (1, 0, 1, 0, 0, 0, 0, 0)
     # No global dimensional simplification invents a semantic named kind.
     again: Any = uncommon
@@ -175,10 +176,10 @@ def test_structural_arithmetic_keeps_dimensions() -> None:
 def test_numpy_workflow() -> None:
     raw = np.array([1.0, 2.0, 3.0])
     positions = u.angstrom(raw)
-    assert positions.value is raw
-    assert isinstance(positions.sum().value, np.ndarray)
-    assert positions.sum().value == 6
-    assert positions.mean().value == 2
+    assert positions.magnitude(u.angstrom) is raw
+    assert isinstance(positions.sum().magnitude(u.angstrom), np.ndarray)
+    assert positions.sum().magnitude(u.angstrom) == 6
+    assert positions.mean().magnitude(u.angstrom) == 2
     assert_allclose(qnp.sqrt(positions**2), positions)
     assert_allclose(
         qnp.sin(u.degree(np.array([0.0, 90.0]))), u.one(np.array([0.0, 1.0]))
@@ -283,8 +284,10 @@ def test_scalar_storage_hashes_by_value_and_arrays_do_not_hash() -> None:
 
 def test_structural_results_display_their_units() -> None:
     product = (2 * u.nm) * (3 * u.fs) * u.eV(1)
-    assert repr(product**2) == "Quantity(3600.0 (((Å * fs) * eV))^2)"
-    assert repr(product - product) == "Quantity(0.0 ((Å * fs) * eV))"
+    assert repr(product**2) == "Quantity(36.0 ((nm·fs)·eV)^2)"
+    assert repr(product - product) == "Quantity(0.0 (nm·fs)·eV)"
+    bound = product.to_system(Atomistic)
+    assert repr(bound**2) == "Quantity(3600.0 (((Å * fs) * eV))^2, Atomistic)"
     assert repr(u.nm) == "nm"
 
 

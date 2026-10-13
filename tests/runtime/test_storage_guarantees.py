@@ -37,12 +37,19 @@ def _read_only(shape: tuple[int, ...] = (4, 3)) -> npt.NDArray[np.float64]:
 def test_from_value_keeps_the_array_it_is_given() -> None:
     raw = _read_only()
     for forces in (
-        Force.from_value(raw),
-        Force[npt.NDArray[np.float64]].from_value(raw),
+        Force[npt.NDArray[np.float64], Atomistic].from_value(raw),
         Force[npt.NDArray[np.float64], SI].from_value(raw),
     ):
         assert forces.value is raw
         assert not forces.value.flags.writeable
+
+
+def test_construction_without_a_system_keeps_the_array_it_is_given() -> None:
+    raw = _read_only()
+    for unit in (u.eV_per_angstrom, u.hartree_per_bohr):
+        forces = Force[npt.NDArray[np.float64]](raw, unit)
+        assert forces.magnitude(unit) is raw
+        assert forces.magnitude() is raw
 
 
 def test_the_storage_unit_test_is_exact_equality() -> None:
@@ -56,19 +63,19 @@ def test_the_storage_unit_test_is_exact_equality() -> None:
 
 def test_basic_indexing_shares_memory() -> None:
     raw = _read_only()
-    forces = Force.from_value(raw)
+    forces = Force[npt.NDArray[np.float64]](raw, u.eV_per_angstrom)
     for key in (slice(1, 3), 0, (slice(None), 1), np.s_[::2]):
         selected = forces[key]
-        assert np.shares_memory(selected.value, raw)
-        assert not selected.value.flags.writeable
+        assert np.shares_memory(selected.magnitude(), raw)
+        assert not selected.magnitude().flags.writeable
 
 
 def test_integer_and_boolean_array_indexing_select_rows() -> None:
-    forces = Force.from_value(_read_only())
+    forces = Force[npt.NDArray[np.float64]](_read_only(), u.eV_per_angstrom)
     rows = forces[np.array([0, 2])]
-    np.testing.assert_array_equal(rows.value, forces.value[[0, 2]])
+    np.testing.assert_array_equal(rows.magnitude(), forces.magnitude()[[0, 2]])
     mask = forces[np.array([True, False, True, False])]
-    np.testing.assert_array_equal(mask.value, rows.value)
+    np.testing.assert_array_equal(mask.magnitude(), rows.magnitude())
     assert isinstance(rows, Force)
 
 
@@ -100,19 +107,19 @@ def test_quantities_have_no_in_place_operators(cls: object) -> None:
 def test_augmented_assignment_rebinds_and_leaves_storage_alone() -> None:
     raw = _read_only((3,))
     before = raw.copy()
-    lengths = Length.from_value(raw)
+    lengths = Length[npt.NDArray[np.float64]](raw, u.angstrom)
     original = lengths
-    lengths += Length.from_value(raw)
+    lengths += Length[npt.NDArray[np.float64]](raw, u.nm)
     lengths *= 2.0
     lengths -= original
     assert lengths is not original
-    assert original.value is raw
+    assert original.magnitude() is raw
     np.testing.assert_array_equal(raw, before)
-    np.testing.assert_array_equal(lengths.value, 3 * before)
+    np.testing.assert_array_equal(lengths.magnitude(u.angstrom), 21 * before)
 
 
 def test_numpy_cannot_write_into_a_quantity() -> None:
-    lengths: Any = Length.from_value(np.zeros(3))
+    lengths: Any = Length[npt.NDArray[np.float64]](np.zeros(3), u.nm)
     with pytest.raises(TypeError, match="does not know the units"):
         np.add(lengths, lengths, out=lengths)
     plain = np.zeros(3)

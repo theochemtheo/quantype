@@ -12,6 +12,8 @@ from typing import TYPE_CHECKING, Any, Literal, TypeGuard
 import numpy as np
 
 from quantype._internal._semantics import TEMPERATURE_DIFFERENCES, Kind
+from quantype._internal._storage_units import reference_unit
+from quantype._internal._systems import UnitSystem
 from quantype.core import Quantity
 
 if TYPE_CHECKING:
@@ -42,7 +44,10 @@ def _quantity(value: object, role: str) -> Quantity[Any, Any, Any]:
 
 
 def _tolerance(atol: object, desired: Quantity[Any, Any, Any], kind: object) -> float:
-    """``atol`` in the unit system's units; absolute temperatures take differences."""
+    """``atol`` in the system's units, or the reference units without a system.
+
+    Absolute temperatures take differences.
+    """
     if isinstance(atol, int) and atol == 0:
         return 0.0
     bound = _quantity(atol, "atol")
@@ -53,7 +58,7 @@ def _tolerance(atol: object, desired: Quantity[Any, Any, Any], kind: object) -> 
         raise TypeError(
             f"atol must be a {desired.kind} in {desired.system.__name__}, or 0"
         )
-    return float(_numbers(bound.value))
+    return float(_numbers(bound._reference()))  # noqa: SLF001
 
 
 # One type variable for both quantities: with a shared kind parameter instead,
@@ -72,7 +77,8 @@ def assert_allclose[Q: Quantity[Any, Any, Any]](  # noqa: PLR0913 -- numpy.testi
     Both must have the same kind and unit system; their display units may
     differ, so ``2 nm`` is close to ``20 Å``. ``atol`` is a quantity of the
     same kind (a temperature difference for absolute temperatures), or zero.
-    The comparison uses the unit system's units, which the message names.
+    The comparison uses the unit system's units, or without a system the
+    reference units (Å, eV, fs), which the message names.
     """
     first = _quantity(actual, "actual")
     second = _quantity(desired, "desired")
@@ -85,11 +91,14 @@ def assert_allclose[Q: Quantity[Any, Any, Any]](  # noqa: PLR0913 -- numpy.testi
         )
     kind = second._semantic  # noqa: SLF001
     where = f"{second.kind} in {second.system.__name__}"
-    if isinstance(kind, Kind):
+    if not issubclass(second.system, UnitSystem):
+        if isinstance(kind, Kind):
+            where += f", compared in {reference_unit(kind).symbol}"
+    elif isinstance(kind, Kind):
         where += f", compared in {second.system.unit_for(kind).symbol}"
     np.testing.assert_allclose(
-        _numbers(first.value),
-        _numbers(second.value),
+        _numbers(first._reference()),  # noqa: SLF001
+        _numbers(second._reference()),  # noqa: SLF001
         rtol=rtol,
         atol=_tolerance(atol, second, kind),
         equal_nan=equal_nan,

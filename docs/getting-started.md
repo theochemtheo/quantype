@@ -34,13 +34,14 @@ energy = Energy[float](3, u.eV)
 force = energy / length
 
 assert isinstance(force, Force)
-assert length.value == 20.0  # stored in ångströms, the default system's unit
-assert length.magnitude() == 2.0  # shown in the unit it was given in
+assert length.magnitude() == 2.0  # kept in the unit it was given in
+assert length.magnitude(u.angstrom) == 20.0
 assert repr(length) == "Length(2.0 nm)"
+assert repr(force) == "Force(1.5 eV/nm)"  # the division composes the units
 assert force.magnitude(u.eV_per_angstrom) == 0.15
 
 shown = length.to(u.angstrom)
-assert shown.value == 20.0  # .to() changes the display unit, not the stored value
+assert shown == length  # .to() changes the display unit, not the stored numbers
 assert shown.magnitude() == 20.0
 
 wire = length.to_dict()
@@ -51,23 +52,26 @@ assert restored == length
 
 `2 * u.nm` is a shorter way to write `Length[float](2, u.nm)`. The type argument
 chooses the storage and converts the input into it: `Length[np.float64]` gives a
-NumPy scalar, and `Length[npt.NDArray[np.float64]]` a NumPy array. Bare
+NumPy scalar, and `Length[npt.NDArray[np.float64]]` a NumPy array. A NumPy array
+already of that dtype is kept, not copied. Bare
 `Length(2.0, u.nm)` takes its storage from the value, as `u.nm(2.0)` does, so
 type checkers see a `Length[float]`. For an integer such as `Length(2, u.nm)`,
 they leave the storage open; write `Length[float](2, u.nm)`. Unit-first
 construction takes arrays but not lists; for a list, use a typed constructor or
 `u.nm(np.asarray(values))`.
 
-Pass `.magnitude(unit)` to a library that expects a particular unit, and
-`.value` to one that expects the unit system's raw numbers: ångströms, eV, and
-femtoseconds by default. Either way, you get a plain float or array with no
-unit attached.
+Pass `.magnitude(unit)` to a library that expects a particular unit. You get a
+plain float or array with no unit attached, and nothing converts when `unit` is
+the one the quantity was given in.
 
 ## Choose a unit system
 
 ```python
-from quantype import Energy, Length, u
-from quantype.systems import SI, Real
+from quantype import Length, u
+from quantype.systems import SI, Atomistic, Real
+
+length = Length[float](2, u.nm)
+assert length.to_system(Atomistic).value == 20.0  # Atomistic storage: ångströms
 
 x = Length[float, SI](2, u.nm)
 assert x.value == 2e-9  # SI storage: meters
@@ -76,17 +80,22 @@ assert repr(x) == "Length(2.0 nm, SI)"
 kernel_input = (1.0 * u.eV).to_system(Real)  # LAMMPS real units
 assert round(kernel_input.value, 4) == 23.0605  # kcal/mol
 
-try:
-    x + Length[float](2, u.nm)  # SI plus the default system
-except TypeError as error:
-    assert "to_system" in str(error)
-else:
-    raise AssertionError("unit systems never mix")
+for misuse in (lambda: length.value, lambda: x + length):
+    try:
+        misuse()  # no raw numbers without a system; SI plus no system
+    except TypeError as error:
+        assert "to_system" in str(error)
+    else:
+        raise AssertionError("raw numbers need a unit system")
 ```
 
-The unit system is the second type argument. It defaults to `Atomistic`, so
-`Length[float]` is `Length[float, Atomistic]`. Mixing systems is a type error
-and a runtime `TypeError` whose message points to `.to_system(...)`. See
+The unit system is the second type argument. It defaults to `NoSystem`, so
+`Length[float]` is `Length[float, NoSystem]`: its numbers stay in the unit they
+were given in, and it has no `.value`. In a system such as `Atomistic` (Å, eV,
+and fs) or `SI`, `.value` holds the numbers in that system's units, so it has
+one meaning for each type. `.to_system(...)` converts once. Reading `.value`
+without a system, and mixing systems, are type errors and runtime `TypeError`s
+whose messages point to `.to_system(...)`. See
 [units and unit systems](units.md#unit-systems) and
 [defining your own system](unit-systems.md).
 
@@ -124,7 +133,7 @@ NumPy's and Torch's own functions, such as `np.cos(q)` and `np.sum(q)`, apply th
 same rules at runtime. NumPy's type stubs reject quantities, so use `qnp` in
 type-checked code. JAX's `jnp` functions can't see quantities at all, so use
 `qnp` in JAX code too. Functions with no unit rule, such as FFTs, raise, and so
-does `np.asarray(q)`. Pass `q.value` or `q.magnitude(unit)` instead.
+does `np.asarray(q)`. Pass `q.magnitude(unit)` instead.
 
 Indexing, iteration, `len()`, `.shape`, `.max()`, `.min()`, `.reshape(...)`,
 `.ravel()`, `.copy()`, `.T`, `.squeeze()`, `.cumsum()`, and `.std()` all keep the
@@ -132,11 +141,12 @@ kind. `.var()` gives the squared kind, and `.item()` gives a quantity with float
 storage. `<` and `>` need
 the same kind and unit system, and return backend booleans. `==` compares
 values, element-wise for arrays, and quantities of different kinds or systems
-compare unequal. A plain number needs a unit to compare with a quantity:
-`q == 0` raises, and `q == 0 * u.nm` works.
+compare unequal. Quantities in different units compare in Å, eV, and fs, so
+`1 * u.nm == 10 * u.angstrom`. A plain number needs a unit to compare with a
+quantity: `q == 0` raises, and `q == 0 * u.nm` works.
 
-For any other array operation, apply it to `.value` and give the result back
-with `with_value`, which keeps the kind, unit system, and display unit:
+For any other array operation, pass a function to `apply`. It runs on the
+stored numbers, and the result keeps the kind, unit system, and units:
 
 ```python
 import numpy as np
@@ -144,12 +154,16 @@ import numpy as np
 from quantype import u
 
 positions = u.nm(np.array([3.0, 1.0, 2.0]))
-shifted = positions.with_value(np.roll(positions.value, 1))
+shifted = positions.apply(lambda raw: np.roll(raw, 1))
 assert shifted.unit is u.nm
+np.testing.assert_array_equal(shifted.magnitude(u.nm), [2.0, 3.0, 1.0])
 ```
 
-`with_value` trusts its input, as `from_value` does: the numbers must already be
-in the unit system's units.
+The function must give the same physical result whatever unit the numbers are
+in. Sorting, slicing, reshaping, detaching, and moving to a device do, while
+`np.log` and adding a constant don't, and nothing checks it. In a unit system,
+`with_value` takes new raw numbers, which must already be in the system's
+units.
 
 A plain number or a NumPy, JAX, or Torch array scales a quantity without
 changing its dtype. Builtin `sum()`, format specs, and `reinterpret` work too:
@@ -198,7 +212,7 @@ import numpy as np
 import numpy.typing as npt
 from pydantic import BaseModel, ValidationError
 
-from quantype import Length
+from quantype import Length, u
 
 
 class Configuration(BaseModel):
@@ -213,10 +227,10 @@ config = Configuration.model_validate(
     }
 )
 restored = Configuration.model_validate_json(config.model_dump_json())
-assert restored.cutoff.value == 5.0
+assert restored.cutoff.magnitude(u.angstrom) == 5.0
 assert '"magnitude":0.5,"unit":"nanometer"' in config.model_dump_json()
-assert restored.positions.value.dtype == np.float64
-np.testing.assert_allclose(restored.positions.value, [[10, 20, 30]])
+assert restored.positions.dtype == np.float64
+np.testing.assert_allclose(restored.positions.magnitude(u.angstrom), [[10, 20, 30]])
 
 try:
     Configuration.model_validate({"cutoff": "1 eV", "positions": config.positions})
@@ -233,7 +247,7 @@ input, and `TypeAdapter` comes from `pydantic`.
 | --- | --- |
 | Numerical data with a known unit and desired storage | `Length[float](data, u.nm)` |
 | The same, stored in another unit system | `Length[float, SI](data, u.nm)` |
-| Trusted raw numbers, preserving storage and graphs | `Length.from_value(data)` or `Length[V, SI].from_value(data)` |
+| Trusted raw numbers in a system's units, preserving storage and graphs | `Length[V, Atomistic].from_value(data)` |
 | External quantity object or scalar string, default storage | `Length.parse(data)` |
 | External data with a particular storage type | `TypeAdapter(Length[np.float32]).validate_python(data)` |
 | Several validated fields | A Pydantic `BaseModel` |
@@ -269,7 +283,7 @@ assert isclose(restored.magnitude(u.celsius), 20.0)
 adapter = TypeAdapter(Temperature[float])
 context = {"units": (lab_degree,)}
 typed = adapter.validate_json(adapter.dump_json(point), context=context)
-assert isclose(typed.value, point.value)
+assert typed == point
 ```
 
 Subtracting two absolute temperatures gives a `TemperatureDifference`, measured
@@ -294,8 +308,9 @@ Serialization saves values; device placement and autodiff graphs are lost.
 | `Gradient only defined for scalar-output functions. Output was 2.5 eV.`, or a quantity `is not a valid JAX type` | Use `ujax.grad`; `jax.grad` can't differentiate a quantity-valued function. |
 | `Units are objects, such as u.nm, not strings` | Pass a unit from `u`, or read the whole string with `Length.parse("2 nm")`. |
 | `u.length.nm` raises `AttributeError` | Namespaces use full names, as in `u.length.nanometer`. Abbreviations are flat, as in `u.nm`. |
-| `np.fft does not know the units of a quantity` | That function has no unit rule. Pass `.value` or `.magnitude(unit)`. `quantype.numpy` lists the functions that have one. |
-| `Implicit array coercion drops units` | In tests, compare with `quantype.testing.assert_allclose`. Elsewhere, pass `.value` or `.magnitude(unit)`. |
+| `np.fft does not know the units of a quantity` | That function has no unit rule. Pass `.magnitude(unit)`, or use `apply`. `quantype.numpy` lists the functions that have one. |
+| `Implicit array coercion drops units` | In tests, compare with `quantype.testing.assert_allclose`. Elsewhere, pass `.magnitude(unit)`. |
+| `Length has no raw numbers without a unit system` | Read `.magnitude(unit)`, or choose a system with `.to_system(...)` first. |
 | `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists can't scale a quantity. Convert lists with `np.asarray`. |
 | `Cannot add int and Length; give it a unit` | Plain numbers can only be added to `Dimensionless` values, and zero to anything (so `sum()` works). Give the number a unit. |
 | `Cannot compare Length and int; give it a unit` | Compare with a quantity, as in `q > 0 * u.nm`. Plain numbers compare only with `Dimensionless` values. |

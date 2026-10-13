@@ -25,11 +25,12 @@ from quantype._internal._storage import (
     reject_booleans,
     unit_conversion,
 )
-from quantype._internal._systems import (
-    Atomistic,
-    UnitSystem,
-    into_system,
+from quantype._internal._storage_units import (
+    ComposedUnit,
+    reference_unit,
+    storage_map,
 )
+from quantype._internal._systems import AnySystem, NoSystem
 from quantype.core import Quantity, Unit, _wrap
 from quantype.typing import quantity_type
 
@@ -47,9 +48,10 @@ def selected_unit(
 ) -> Unit[Any]:
     if not isinstance(quantity._semantic, Kind):
         raise ValueError("Serialization requires a named quantity")
-    selected = (
-        unit or quantity._display or quantity._system.unit_for(quantity._semantic)
-    )
+    selected = unit or quantity.unit
+    if selected is None or isinstance(selected, ComposedUnit):
+        # A composed unit such as eV/nm has no name to decode by.
+        selected = reference_unit(quantity._semantic)
     quantity._check_unit(selected)
     return selected
 
@@ -137,9 +139,12 @@ def parse_quantity(
     data: object,
     *,
     units: Iterable[Unit[Any]] = (),
-    system: type[UnitSystem] = Atomistic,
+    system: type[AnySystem] = NoSystem,
 ) -> Quantity[Any, Any, Any]:
-    """Decode into ``system``'s storage, remembering the unit the data used."""
+    """Decode into ``system``'s storage, remembering the unit the data used.
+
+    Without a system, the numbers stay in that unit.
+    """
     if _is_quantity(data):
         if data._semantic is not cls._semantic:
             raise ValueError(f"Expected {cls._kind}; received {data.kind}")
@@ -158,10 +163,12 @@ def parse_quantity(
             "Quantity magnitudes must be real numbers, not booleans or strings"
         )
     raw = float(array) if array.ndim == 0 else array.astype(np.float64)
-    scale, offset = into_system(unit, system)
+    scale, offset, storage = storage_map(unit, system)
     stored = unit_conversion(raw, scale, offset)
     echo = raw if isinstance(raw, float) else None
-    return _wrap(cls._semantic, stored, system, display=unit, echo=echo)
+    return _wrap(
+        cls._semantic, stored, system, display=unit, echo=echo, storage=storage
+    )
 
 
 def save_npz(
@@ -179,7 +186,7 @@ def save_npz(
         arrays[key] = host_array(quantity.magnitude(unit))
         entry = {"kind": quantity.kind, "unit": unit.name, "array": key}
         if record_backend:
-            entry["source_backend"] = backend_name(quantity.value)
+            entry["source_backend"] = backend_name(quantity._value)
         entries[name] = entry
     # The CODATA edition is provenance: it fixes what units such as bohr meant.
     metadata = {"version": 1, "codata": codata.edition(), "quantities": entries}
@@ -245,6 +252,8 @@ def load_npz[Q](
         array = archive[entry["array"]]
         if array.dtype.kind not in "iuf":
             raise ValueError("Archive magnitude must have a real numerical dtype")
-        scale, offset = into_system(unit, system)
+        scale, offset, stored = storage_map(unit, system)
         raw = convert(array, storage, dtype=dtype, scale=scale, offset=offset)
-        return cast("Q", _wrap(cls._semantic, raw, system, display=unit))
+        return cast(
+            "Q", _wrap(cls._semantic, raw, system, display=unit, storage=stored)
+        )

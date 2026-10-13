@@ -45,220 +45,220 @@ from quantype._generated import (
 )
 from quantype.core import Quantity
 from quantype.kinds import Div
-from quantype.systems import UnitSystem
+from quantype.systems import AnySystem
 
 __all__ = ["grad", "hessian", "jit", "value_and_grad", "vmap"]
 
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Area[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Area[Array, S], P], ForceConstant[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], ForceConstant[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Area[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Area[Array, S], P], Pressure[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Volume[Array, S], P], EnergyDensity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], MagneticMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Volume[Array, S], P], Magnetization[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[AtomCount[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[AtomCount[Array, S], P], EnergyPerAtom[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], AtomCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Volume[Array, S], P], ParticleDensity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], ElectronCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Volume[Array, S], P], ElectronDensity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], TemperatureDifference[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Time[Array, S], P], TemperatureRate[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Dimensionless[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Time[Array, S], P], InverseTime[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Entropy[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Entropy[Array, S], P], Temperature[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], Dimensionless[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Length[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Area[Array, S], P], Area[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Area[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Area[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Area[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Volume[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Volume[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Time[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Time[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Time[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Time[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Velocity[Array, S], P], Velocity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Velocity[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Velocity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Velocity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Energy[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Energy[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Energy[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[EnergyPerAtom[Array, S], P], EnergyPerAtom[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[EnergyPerAtom[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], EnergyPerAtom[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], EnergyPerAtom[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Force[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Force[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Force[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ForceConstant[Array, S], P], ForceConstant[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ForceConstant[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ForceConstant[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ForceConstant[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Pressure[Array, S], P], Pressure[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Pressure[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Pressure[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Pressure[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[EnergyDensity[Array, S], P], EnergyDensity[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[EnergyDensity[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], EnergyDensity[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], EnergyDensity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[EnergyPerVolume[Array, S], P], EnergyPerVolume[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[EnergyPerVolume[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], EnergyPerVolume[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], EnergyPerVolume[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Temperature[Array, S], P], Temperature[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Temperature[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Temperature[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Temperature[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[TemperatureDifference[Array, S], P], TemperatureDifference[Array, S]
     ],
@@ -267,7 +267,7 @@ def grad[S: UnitSystem, **P](
     Concatenate[TemperatureDifference[Array, S], P], Dimensionless[Array, S]
 ]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], TemperatureDifference[Array, S]
     ],
@@ -276,474 +276,474 @@ def grad[S: UnitSystem, **P](
     Concatenate[Dimensionless[Array, S], P], TemperatureDifference[Array, S]
 ]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[TemperatureRate[Array, S], P], TemperatureRate[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[TemperatureRate[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], TemperatureRate[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], TemperatureRate[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[MagneticMoment[Array, S], P], MagneticMoment[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[MagneticMoment[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], MagneticMoment[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], MagneticMoment[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Magnetization[Array, S], P], Magnetization[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Magnetization[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], Magnetization[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Magnetization[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ParticleDensity[Array, S], P], ParticleDensity[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ParticleDensity[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ParticleDensity[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ParticleDensity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectronDensity[Array, S], P], ElectronDensity[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ElectronDensity[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectronDensity[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ElectronDensity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Angle[Array, S], P], Angle[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Angle[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Angle[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Angle[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Frequency[Array, S], P], Frequency[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Frequency[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Frequency[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Frequency[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[InverseTime[Array, S], P], InverseTime[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[InverseTime[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], InverseTime[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], InverseTime[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[AtomCount[Array, S], P], AtomCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[AtomCount[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], AtomCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], AtomCount[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectronCount[Array, S], P], ElectronCount[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ElectronCount[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectronCount[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ElectronCount[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Mass[Array, S], P], Mass[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Mass[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Mass[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Mass[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[MassDensity[Array, S], P], MassDensity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[MassDensity[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], MassDensity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], MassDensity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Momentum[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Momentum[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Momentum[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Acceleration[Array, S], P], Acceleration[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Acceleration[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Acceleration[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Acceleration[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Charge[Array, S], P], Charge[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Charge[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Charge[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Charge[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectricPotential[Array, S], P], ElectricPotential[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ElectricPotential[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectricPotential[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ElectricPotential[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectricField[Array, S], P], ElectricField[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ElectricField[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectricField[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ElectricField[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[DipoleMoment[Array, S], P], DipoleMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[DipoleMoment[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], DipoleMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], DipoleMoment[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Entropy[Array, S], P], Entropy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Entropy[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Entropy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Entropy[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Action[Array, S], P], Action[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Action[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Action[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Action[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Area[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], Length[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Area[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Area[Array, S], P], Length[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], Area[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Force[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Force[Array, S], P], Length[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], Force[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[ForceConstant[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ForceConstant[Array, S], P], Length[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[ForceConstant[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ForceConstant[Array, S], P], Area[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Pressure[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Pressure[Array, S], P], Volume[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Velocity[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Velocity[Array, S], P], Time[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Time[Array, S], P], Velocity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Acceleration[Array, S], P], Velocity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Acceleration[Array, S], P], Time[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Velocity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Time[Array, S], P], Acceleration[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Mass[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Mass[Array, S], P], Velocity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Velocity[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Velocity[Array, S], P], Mass[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Mass[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Mass[Array, S], P], Acceleration[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Acceleration[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Acceleration[Array, S], P], Mass[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Momentum[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Momentum[Array, S], P], Velocity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Velocity[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Velocity[Array, S], P], Momentum[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Force[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Force[Array, S], P], Time[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Time[Array, S], P], Force[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[MassDensity[Array, S], P], Mass[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[MassDensity[Array, S], P], Volume[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], Mass[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Volume[Array, S], P], MassDensity[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[EnergyPerAtom[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[EnergyPerAtom[Array, S], P], AtomCount[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[ParticleDensity[Array, S], P], AtomCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ParticleDensity[Array, S], P], Volume[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectronDensity[Array, S], P], ElectronCount[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ElectronDensity[Array, S], P], Volume[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Magnetization[Array, S], P], MagneticMoment[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Magnetization[Array, S], P], Volume[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[TemperatureRate[Array, S], P], TemperatureDifference[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[TemperatureRate[Array, S], P], Time[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Temperature[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Temperature[Array, S], P], Entropy[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[TemperatureDifference[Array, S], P], Energy[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[TemperatureDifference[Array, S], P], Entropy[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Charge[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Charge[Array, S], P], ElectricPotential[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[ElectricPotential[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ElectricPotential[Array, S], P], Charge[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Charge[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Charge[Array, S], P], ElectricField[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[ElectricField[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ElectricField[Array, S], P], Charge[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectricField[Array, S], P], ElectricPotential[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ElectricField[Array, S], P], Length[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], ElectricPotential[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], ElectricField[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Charge[Array, S], P], DipoleMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Charge[Array, S], P], Length[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], DipoleMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], Charge[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[DipoleMoment[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[DipoleMoment[Array, S], P], ElectricField[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[ElectricField[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[ElectricField[Array, S], P], DipoleMoment[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Energy[Array, S], P], Action[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Energy[Array, S], P], Time[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Action[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Time[Array, S], P], Energy[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Action[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Action[Array, S], P], InverseTime[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[InverseTime[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[InverseTime[Array, S], P], Action[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[Frequency[Array, S], P], Dimensionless[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Frequency[Array, S], P], Time[Array, S]]: ...
 @overload
-def grad[S: UnitSystem, **P](
+def grad[S: AnySystem, **P](
     function: Callable[Concatenate[InverseTime[Array, S], P], Dimensionless[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[InverseTime[Array, S], P], Time[Array, S]]: ...
 @overload
-def grad[I, O, S: UnitSystem, **P](
+def grad[I, O, S: AnySystem, **P](
     function: Callable[Concatenate[Quantity[I, Array, S], P], Quantity[O, Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Quantity[I, Array, S], P], Quantity[Div[O, I], Array, S]]: ...
@@ -752,35 +752,35 @@ def grad(
     function: Callable[..., Quantity[Any, Array, Any]], argnums: int | tuple[int, ...]
 ) -> Callable[..., Any]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Area[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Area[Array, S], P], tuple[Energy[Array, S], ForceConstant[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Length[Array, S], P], tuple[Force[Array, S], ForceConstant[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Area[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Area[Array, S], P], tuple[Force[Array, S], Pressure[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Volume[Array, S], P], tuple[Energy[Array, S], EnergyDensity[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], MagneticMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -788,7 +788,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[MagneticMoment[Array, S], Magnetization[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[AtomCount[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -796,7 +796,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Energy[Array, S], EnergyPerAtom[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], AtomCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -804,7 +804,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[AtomCount[Array, S], ParticleDensity[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], ElectronCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -812,7 +812,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectronCount[Array, S], ElectronDensity[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], TemperatureDifference[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -820,7 +820,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[TemperatureDifference[Array, S], TemperatureRate[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Dimensionless[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -828,14 +828,14 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Dimensionless[Array, S], InverseTime[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Entropy[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Entropy[Array, S], P], tuple[Energy[Array, S], Temperature[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], Dimensionless[Array, S]
     ],
@@ -845,63 +845,63 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Dimensionless[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Length[Array, S], P], tuple[Length[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Length[Array, S], Length[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Area[Array, S], P], Area[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Area[Array, S], P], tuple[Area[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Area[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Area[Array, S], Area[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Volume[Array, S], P], tuple[Volume[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Volume[Array, S], Volume[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Time[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Time[Array, S], P], tuple[Time[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Time[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Time[Array, S], Time[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Velocity[Array, S], P], Velocity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -909,7 +909,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Velocity[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Velocity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -917,21 +917,21 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Velocity[Array, S], Velocity[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Energy[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Energy[Array, S], P], tuple[Energy[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Energy[Array, S], Energy[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[EnergyPerAtom[Array, S], P], EnergyPerAtom[Array, S]
     ],
@@ -941,7 +941,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[EnergyPerAtom[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], EnergyPerAtom[Array, S]
     ],
@@ -951,21 +951,21 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[EnergyPerAtom[Array, S], EnergyPerAtom[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Force[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Force[Array, S], P], tuple[Force[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Force[Array, S], Force[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ForceConstant[Array, S], P], ForceConstant[Array, S]
     ],
@@ -975,7 +975,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ForceConstant[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ForceConstant[Array, S]
     ],
@@ -985,7 +985,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ForceConstant[Array, S], ForceConstant[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Pressure[Array, S], P], Pressure[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -993,7 +993,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Pressure[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Pressure[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1001,7 +1001,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Pressure[Array, S], Pressure[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[EnergyDensity[Array, S], P], EnergyDensity[Array, S]
     ],
@@ -1011,7 +1011,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[EnergyDensity[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], EnergyDensity[Array, S]
     ],
@@ -1021,7 +1021,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[EnergyDensity[Array, S], EnergyDensity[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[EnergyPerVolume[Array, S], P], EnergyPerVolume[Array, S]
     ],
@@ -1031,7 +1031,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[EnergyPerVolume[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], EnergyPerVolume[Array, S]
     ],
@@ -1041,7 +1041,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[EnergyPerVolume[Array, S], EnergyPerVolume[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Temperature[Array, S], P], Temperature[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1049,7 +1049,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Temperature[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Temperature[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1057,7 +1057,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Temperature[Array, S], Temperature[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[TemperatureDifference[Array, S], P], TemperatureDifference[Array, S]
     ],
@@ -1067,7 +1067,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[TemperatureDifference[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], TemperatureDifference[Array, S]
     ],
@@ -1077,7 +1077,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[TemperatureDifference[Array, S], TemperatureDifference[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[TemperatureRate[Array, S], P], TemperatureRate[Array, S]
     ],
@@ -1087,7 +1087,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[TemperatureRate[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], TemperatureRate[Array, S]
     ],
@@ -1097,7 +1097,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[TemperatureRate[Array, S], TemperatureRate[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[MagneticMoment[Array, S], P], MagneticMoment[Array, S]
     ],
@@ -1107,7 +1107,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[MagneticMoment[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], MagneticMoment[Array, S]
     ],
@@ -1117,7 +1117,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[MagneticMoment[Array, S], MagneticMoment[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Magnetization[Array, S], P], Magnetization[Array, S]
     ],
@@ -1127,7 +1127,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Magnetization[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], Magnetization[Array, S]
     ],
@@ -1137,7 +1137,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Magnetization[Array, S], Magnetization[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ParticleDensity[Array, S], P], ParticleDensity[Array, S]
     ],
@@ -1147,7 +1147,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ParticleDensity[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ParticleDensity[Array, S]
     ],
@@ -1157,7 +1157,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ParticleDensity[Array, S], ParticleDensity[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectronDensity[Array, S], P], ElectronDensity[Array, S]
     ],
@@ -1167,7 +1167,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectronDensity[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectronDensity[Array, S]
     ],
@@ -1177,21 +1177,21 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectronDensity[Array, S], ElectronDensity[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Angle[Array, S], P], Angle[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Angle[Array, S], P], tuple[Angle[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Angle[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Angle[Array, S], Angle[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Frequency[Array, S], P], Frequency[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1199,7 +1199,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Frequency[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Frequency[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1207,7 +1207,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Frequency[Array, S], Frequency[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[InverseTime[Array, S], P], InverseTime[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1215,7 +1215,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[InverseTime[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], InverseTime[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1223,7 +1223,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[InverseTime[Array, S], InverseTime[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[AtomCount[Array, S], P], AtomCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1231,7 +1231,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[AtomCount[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], AtomCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1239,7 +1239,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[AtomCount[Array, S], AtomCount[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectronCount[Array, S], P], ElectronCount[Array, S]
     ],
@@ -1249,7 +1249,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectronCount[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectronCount[Array, S]
     ],
@@ -1259,21 +1259,21 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectronCount[Array, S], ElectronCount[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Mass[Array, S], P], Mass[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Mass[Array, S], P], tuple[Mass[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Mass[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Mass[Array, S], Mass[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[MassDensity[Array, S], P], MassDensity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1281,7 +1281,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[MassDensity[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], MassDensity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1289,7 +1289,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[MassDensity[Array, S], MassDensity[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Momentum[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1297,7 +1297,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Momentum[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1305,7 +1305,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Momentum[Array, S], Momentum[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Acceleration[Array, S], P], Acceleration[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1313,7 +1313,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Acceleration[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Acceleration[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1321,21 +1321,21 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Acceleration[Array, S], Acceleration[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Charge[Array, S], P], Charge[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Charge[Array, S], P], tuple[Charge[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Charge[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Charge[Array, S], Charge[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectricPotential[Array, S], P], ElectricPotential[Array, S]
     ],
@@ -1345,7 +1345,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectricPotential[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectricPotential[Array, S]
     ],
@@ -1355,7 +1355,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectricPotential[Array, S], ElectricPotential[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectricField[Array, S], P], ElectricField[Array, S]
     ],
@@ -1365,7 +1365,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectricField[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectricField[Array, S]
     ],
@@ -1375,7 +1375,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectricField[Array, S], ElectricField[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[DipoleMoment[Array, S], P], DipoleMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1383,7 +1383,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[DipoleMoment[Array, S], Dimensionless[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], DipoleMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1391,189 +1391,189 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[DipoleMoment[Array, S], DipoleMoment[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Entropy[Array, S], P], Entropy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Entropy[Array, S], P], tuple[Entropy[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Entropy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Entropy[Array, S], Entropy[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Action[Array, S], P], Action[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Action[Array, S], P], tuple[Action[Array, S], Dimensionless[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Action[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Dimensionless[Array, S], P], tuple[Action[Array, S], Action[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Area[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Length[Array, S], P], tuple[Area[Array, S], Length[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Area[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Area[Array, S], P], tuple[Volume[Array, S], Length[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Length[Array, S], P], tuple[Volume[Array, S], Area[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Force[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Force[Array, S], P], tuple[Energy[Array, S], Length[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Length[Array, S], P], tuple[Energy[Array, S], Force[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[ForceConstant[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[ForceConstant[Array, S], P], tuple[Force[Array, S], Length[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[ForceConstant[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[ForceConstant[Array, S], P], tuple[Energy[Array, S], Area[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Pressure[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Pressure[Array, S], P], tuple[Energy[Array, S], Volume[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Velocity[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Velocity[Array, S], P], tuple[Length[Array, S], Time[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Time[Array, S], P], tuple[Length[Array, S], Velocity[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Acceleration[Array, S], P], Velocity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Acceleration[Array, S], P], tuple[Velocity[Array, S], Time[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Velocity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Time[Array, S], P], tuple[Velocity[Array, S], Acceleration[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Mass[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Mass[Array, S], P], tuple[Momentum[Array, S], Velocity[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Velocity[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Velocity[Array, S], P], tuple[Momentum[Array, S], Mass[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Mass[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Mass[Array, S], P], tuple[Force[Array, S], Acceleration[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Acceleration[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Acceleration[Array, S], P], tuple[Force[Array, S], Mass[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Momentum[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Momentum[Array, S], P], tuple[Energy[Array, S], Velocity[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Velocity[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Velocity[Array, S], P], tuple[Energy[Array, S], Momentum[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Force[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Force[Array, S], P], tuple[Momentum[Array, S], Time[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Time[Array, S], P], tuple[Momentum[Array, S], Force[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[MassDensity[Array, S], P], Mass[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[MassDensity[Array, S], P], tuple[Mass[Array, S], Volume[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Volume[Array, S], P], Mass[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Volume[Array, S], P], tuple[Mass[Array, S], MassDensity[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[EnergyPerAtom[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1581,7 +1581,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Energy[Array, S], AtomCount[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[ParticleDensity[Array, S], P], AtomCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1589,7 +1589,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[AtomCount[Array, S], Volume[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectronDensity[Array, S], P], ElectronCount[Array, S]
     ],
@@ -1599,7 +1599,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectronCount[Array, S], Volume[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[Magnetization[Array, S], P], MagneticMoment[Array, S]
     ],
@@ -1609,7 +1609,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[MagneticMoment[Array, S], Volume[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[TemperatureRate[Array, S], P], TemperatureDifference[Array, S]
     ],
@@ -1619,14 +1619,14 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[TemperatureDifference[Array, S], Time[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Temperature[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Temperature[Array, S], P], tuple[Energy[Array, S], Entropy[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[TemperatureDifference[Array, S], P], Energy[Array, S]
     ],
@@ -1636,7 +1636,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Energy[Array, S], Entropy[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Charge[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1644,7 +1644,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Energy[Array, S], ElectricPotential[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[ElectricPotential[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1652,21 +1652,21 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Energy[Array, S], Charge[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Charge[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Charge[Array, S], P], tuple[Force[Array, S], ElectricField[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[ElectricField[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[ElectricField[Array, S], P], tuple[Force[Array, S], Charge[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[
         Concatenate[ElectricField[Array, S], P], ElectricPotential[Array, S]
     ],
@@ -1676,7 +1676,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectricPotential[Array, S], Length[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], ElectricPotential[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1684,21 +1684,21 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[ElectricPotential[Array, S], ElectricField[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Charge[Array, S], P], DipoleMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Charge[Array, S], P], tuple[DipoleMoment[Array, S], Length[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], DipoleMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Length[Array, S], P], tuple[DipoleMoment[Array, S], Charge[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[DipoleMoment[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1706,7 +1706,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Energy[Array, S], ElectricField[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[ElectricField[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1714,42 +1714,42 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Energy[Array, S], DipoleMoment[Array, S]],
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Energy[Array, S], P], Action[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Energy[Array, S], P], tuple[Action[Array, S], Time[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Action[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Time[Array, S], P], tuple[Action[Array, S], Energy[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Action[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Action[Array, S], P], tuple[Energy[Array, S], InverseTime[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[InverseTime[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[InverseTime[Array, S], P], tuple[Energy[Array, S], Action[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[Frequency[Array, S], P], Dimensionless[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
     Concatenate[Frequency[Array, S], P], tuple[Dimensionless[Array, S], Time[Array, S]]
 ]: ...
 @overload
-def value_and_grad[S: UnitSystem, **P](
+def value_and_grad[S: AnySystem, **P](
     function: Callable[Concatenate[InverseTime[Array, S], P], Dimensionless[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1757,7 +1757,7 @@ def value_and_grad[S: UnitSystem, **P](
     tuple[Dimensionless[Array, S], Time[Array, S]],
 ]: ...
 @overload
-def value_and_grad[I, O, S: UnitSystem, **P](
+def value_and_grad[I, O, S: AnySystem, **P](
     function: Callable[Concatenate[Quantity[I, Array, S], P], Quantity[O, Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[
@@ -1769,92 +1769,92 @@ def value_and_grad(
     function: Callable[..., Quantity[Any, Array, Any]], argnums: int | tuple[int, ...]
 ) -> Callable[..., Any]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], Dimensionless[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Length[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Area[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Area[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Volume[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Time[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Time[Array, S], P], InverseTime[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Time[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Time[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Velocity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Velocity[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Energy[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], EnergyPerAtom[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], EnergyPerAtom[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Force[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Force[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ForceConstant[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ForceConstant[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Pressure[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Pressure[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], EnergyDensity[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], EnergyDensity[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], EnergyPerVolume[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], EnergyPerVolume[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Temperature[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Temperature[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], TemperatureDifference[Array, S]
     ],
@@ -1863,158 +1863,158 @@ def hessian[S: UnitSystem, **P](
     Concatenate[Dimensionless[Array, S], P], TemperatureDifference[Array, S]
 ]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], TemperatureRate[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], TemperatureRate[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], MagneticMoment[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], MagneticMoment[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], Magnetization[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Magnetization[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ParticleDensity[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ParticleDensity[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectronDensity[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ElectronDensity[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Angle[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Angle[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Frequency[Array, S], P], Frequency[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Frequency[Array, S], P], Time[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Frequency[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Frequency[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[InverseTime[Array, S], P], InverseTime[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[InverseTime[Array, S], P], Time[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], InverseTime[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], InverseTime[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], AtomCount[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], AtomCount[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectronCount[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ElectronCount[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Mass[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Mass[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], MassDensity[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], MassDensity[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Momentum[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Momentum[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Acceleration[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Acceleration[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Charge[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Charge[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectricPotential[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ElectricPotential[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[
         Concatenate[Dimensionless[Array, S], P], ElectricField[Array, S]
     ],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], ElectricField[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], DipoleMoment[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], DipoleMoment[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Entropy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Entropy[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Dimensionless[Array, S], P], Action[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Dimensionless[Array, S], P], Action[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Area[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], Dimensionless[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Volume[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], Length[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Length[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Length[Array, S], P], ForceConstant[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Time[Array, S], P], Length[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Time[Array, S], P], Acceleration[Array, S]]: ...
 @overload
-def hessian[S: UnitSystem, **P](
+def hessian[S: AnySystem, **P](
     function: Callable[Concatenate[Velocity[Array, S], P], Energy[Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[Concatenate[Velocity[Array, S], P], Mass[Array, S]]: ...
 @overload
-def hessian[I, O, S: UnitSystem, **P](
+def hessian[I, O, S: AnySystem, **P](
     function: Callable[Concatenate[Quantity[I, Array, S], P], Quantity[O, Array, S]],
     argnums: Literal[0] = 0,
 ) -> Callable[

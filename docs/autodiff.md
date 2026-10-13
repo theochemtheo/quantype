@@ -62,8 +62,10 @@ untyped.
 Importing `ujax` registers quantities as single-leaf pytrees, so `jit` and
 `vmap` accept them. The pytree records a quantity's kind and unit system, but
 not its display unit. A function compiles once whether its inputs were given in
-nm, Å, or bohr, and `lax.cond` and `lax.scan` accept branches shown in different
-units. Results come back shown in the system's unit. Quantities in different
+nm, Å, or bohr, and `lax.cond` and `lax.scan` accept branches in different
+units. Without a system, the pytree holds the numbers in the reference units (Å,
+eV, and fs), and results come back stored and shown in them. In a system,
+results come back shown in the system's unit. Quantities in different
 systems have different pytree structures, just as they have different static
 types.
 
@@ -88,7 +90,7 @@ def spread(positions: Length[jax.Array]) -> Length[jax.Array]:
 
 
 positions = Length[jax.Array]([[0.0, 0.0], [3.0, 4.0]], u.angstrom)
-assert float(spread(positions).value) == 2.5
+assert float(spread(positions).magnitude(u.angstrom)) == 2.5
 ```
 
 ## Torch
@@ -121,13 +123,15 @@ Torch's own functions, such as `torch.cos(angle)` and
 `force.magnitude(u.eV_per_angstrom).detach().cpu().numpy()`. That detaches the
 graph; arithmetic on quantities keeps it.
 `.to(unit)` sets the display unit. To move a quantity to another device, or
-detach it, apply the tensor method to its value: `x.with_value(x.value.to("cuda"))`
-or `x.with_value(x.value.detach())`. A training loop calls
-`loss.value.backward()`.
+detach it, apply the tensor method to its numbers: `x.apply(lambda t: t.to("cuda"))`
+or `x.apply(lambda t: t.detach())`. A training loop calls
+`loss.magnitude(u.eV).backward()`.
 
-To wrap a raw model's output, use `from_value`. It trusts its input:
-`Energy.from_value(raw)` asserts that `raw` is an energy in the unit system's
-units. A model written with quantities throughout, as above, doesn't need it.
+To wrap a raw model's output, give it its unit: `Energy[torch.Tensor](raw, u.eV)`
+keeps the tensor and its graph. In a unit system, `from_value` trusts its input:
+`Energy[torch.Tensor, Atomistic].from_value(raw)` asserts that `raw` is an
+energy in the system's units. A model written with quantities throughout, as
+above, needs neither.
 
 ## Unit systems
 
@@ -147,7 +151,9 @@ force = -ujax.grad(harmonic_si)(x)  # Force[jax.Array, SI], in newtons
 ```
 
 A function's inputs and output are in the same system, so the raw derivative is
-already in that system's units. Where a system stores a kind in a unit of its
+already in that system's units. Without a system, derivatives are in the
+reference units: an energy in kcal/mol differentiated with respect to a length
+in nm gives a force in eV/Å. Where a system stores a kind in a unit of its
 own, such as pressure in bar for `Metal`, the derivative is rescaled to match.
 The adapters raise `TypeError` if the output is in a different system from the
 input. The static signatures are generic over the system: a function from

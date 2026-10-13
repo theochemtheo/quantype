@@ -9,6 +9,10 @@ quantities at ``argnums``; other arguments, such as model parameters or neighbor
 lists, pass through untouched. Gradients are positive derivatives; physical
 forces are their explicit negation. Inside one unit system the raw derivative
 is already in that system's coherent units.
+
+Without a unit system, the leaves are in the reference units (Å, eV, fs), so
+one trace serves inputs in any unit, and transformed values come out stored
+and displayed in the reference units.
 """
 
 # Internal pytree registration deliberately shares core's wrapping/metadata.
@@ -24,12 +28,12 @@ import jax
 from quantype import _generated
 from quantype._internal import _products
 from quantype._internal._semantics import Semantic
-from quantype._internal._systems import UnitSystem, coherence
+from quantype._internal._systems import AnySystem, coherence
 from quantype.core import Quantity, _rescaled, _wrap, result_kind
 
 # These aliases describe the intentionally dynamic backend integration boundary.
 type _Quantity = Quantity[Any, Any, Any]
-type _Metadata = tuple[Semantic, type[UnitSystem]]
+type _Metadata = tuple[Semantic, type[AnySystem]]
 type _RawFunction = Callable[..., tuple[Any, _Quantity]]
 type _Argnums = int | tuple[int, ...]
 
@@ -79,7 +83,7 @@ def _is_quantity_class(candidate: object) -> TypeGuard[type[_Quantity]]:
 
 
 def _flatten(quantity: _Quantity) -> tuple[tuple[Any], _Metadata]:
-    return (quantity.value,), (quantity._semantic, quantity._system)
+    return (quantity._reference(),), (quantity._semantic, quantity._system)
 
 
 def _unflatten(metadata: _Metadata, leaves: tuple[Any]) -> _Quantity:
@@ -164,7 +168,7 @@ def _raw_function(
                 )
         # Carry output metadata through has_aux, rather than evaluating the
         # user's function a second time just to discover its physical kind.
-        return output.value, output
+        return output._reference(), output
 
     return evaluate
 
@@ -205,7 +209,7 @@ def grad(
         inputs = _inputs(args, positions)
         raw = _raw_function(function, args, kwargs, positions, inputs)
         values, output = _jax.grad(raw, tuple(range(len(positions))), has_aux=True)(
-            *(argument.value for argument in inputs)
+            *(argument._reference() for argument in inputs)
         )
         return _results(argnums, inputs, output, values)
 
@@ -228,7 +232,9 @@ def value_and_grad(
         transformed = _jax.value_and_grad(
             raw, tuple(range(len(positions))), has_aux=True
         )
-        (_, output), values = transformed(*(argument.value for argument in inputs))
+        (_, output), values = transformed(
+            *(argument._reference() for argument in inputs)
+        )
         return output, _results(argnums, inputs, output, values)
 
     return evaluate
@@ -243,7 +249,7 @@ def hessian(
         inputs = _inputs(args, (argnums,))
         raw = _raw_function(function, args, kwargs, (argnums,), inputs)
         first = _jax.grad(raw, 0, has_aux=True)
-        value, output = _jax.jacfwd(first, has_aux=True)(inputs[0].value)
+        value, output = _jax.jacfwd(first, has_aux=True)(inputs[0]._reference())
         return _derivative(inputs[0], output, value, order=2)
 
     return derivative

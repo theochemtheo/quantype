@@ -15,6 +15,7 @@ from pydantic import TypeAdapter
 
 from quantype import Length, Temperature, Time, u
 from quantype.serialization import load_npz, save_npz
+from quantype.systems import Atomistic
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -24,9 +25,9 @@ if TYPE_CHECKING:
 def test_float16_construction_converts_before_rounding(*, array_storage: bool) -> None:
     storage: Any = npt.NDArray[np.float16] if array_storage else np.float16
     with np.errstate(over="raise", invalid="raise"):
-        length = Length[storage](3e-6, u.meter)
-        time = Time[storage](1e-11, u.second)
-        point = Temperature[storage](0, u.celsius)
+        length = Length[storage, Atomistic](3e-6, u.meter)
+        time = Time[storage, Atomistic](1e-11, u.second)
+        point = Temperature[storage, Atomistic](0, u.celsius)
     assert length.value.dtype == np.float16
     assert time.value.dtype == np.float16
     assert isinstance(length.value, np.ndarray) == array_storage
@@ -39,9 +40,9 @@ def test_float16_construction_converts_before_rounding(*, array_storage: bool) -
 def test_float16_presentation_and_unit_first_storage(*, array_storage: bool) -> None:
     storage: Any = npt.NDArray[np.float16] if array_storage else np.float16
     with np.errstate(over="raise", invalid="raise"):
-        magnitude = Length[storage](30000, u.angstrom).magnitude(u.meter)
+        magnitude = Length[storage, Atomistic](30000, u.angstrom).magnitude(u.meter)
         raw = np.asarray(3e-6, dtype=np.float16) if array_storage else np.float16(3e-6)
-        canonical = u.meter(raw).value
+        canonical = u.meter(raw).to_system(Atomistic).value
     assert magnitude.dtype == np.float16
     assert magnitude == np.float16(30000 / u.meter.scale)
     assert canonical.dtype == np.float16
@@ -53,24 +54,24 @@ def test_float16_npz_conversion_and_roundtrip(tmp_path: Path) -> None:
     path = tmp_path / "length.npz"
     source = Length[npt.NDArray[np.float64]]([3e-6], u.meter).to(u.meter)
     save_npz(path, length=source)
-    restored = load_npz(path, "length", Length[npt.NDArray[np.float16]])
+    restored = load_npz(path, "length", Length[npt.NDArray[np.float16], Atomistic])
     np.testing.assert_array_equal(restored.value, [np.float16(30000)])
     assert restored.value.dtype == np.float16
     # Loading remembers meters, which float16 can hold only as a subnormal.
     # Presenting in ångströms keeps the round trip exact.
     save_npz(path, length=restored.to(u.angstrom))
-    again = load_npz(path, "length", Length[npt.NDArray[np.float16]])
+    again = load_npz(path, "length", Length[npt.NDArray[np.float16], Atomistic])
     np.testing.assert_array_equal(again.value, restored.value)
     # Noncanonical float16 wire magnitudes round normally in their final dtype.
     save_npz(path, length=restored.to(u.meter))
-    presented = load_npz(path, "length", Length[npt.NDArray[np.float16]])
+    presented = load_npz(path, "length", Length[npt.NDArray[np.float16], Atomistic])
     expected = np.float16(float(np.float16(30000 / u.meter.scale)) * u.meter.scale)
     np.testing.assert_array_equal(presented.value, [expected])
 
 
 def test_tiny_input_survives_large_numpy_unit_factor() -> None:
     unit = Length.define_unit("lab:huge", reference=u.angstrom, scale=1e100)
-    assert Length[np.float16](1e-100, unit).value == 1
+    assert Length[np.float16, Atomistic](1e-100, unit).value == 1
 
 
 @pytest.mark.parametrize("x64", [False, True])
@@ -83,6 +84,9 @@ import numpy as np
 import jax
 import jax.numpy as jnp
 from quantype import Length, Time, u
+from quantype.systems import Atomistic
+JaxLength = Length[jax.Array, Atomistic]
+JaxTime = Time[jax.Array, Atomistic]
 from quantype.serialization import load_npz
 jax.config.update('jax_enable_x64', {x64!r})
 for raw in (
@@ -90,49 +94,49 @@ for raw in (
     np.array([2**32 + 1], dtype=np.uint64),
     np.int64(2**40), np.uint64(2**32 + 1), [2**40], 2**40,
 ):
-    q = Length[jax.Array](raw, u.angstrom)
+    q = JaxLength(raw, u.angstrom)
     assert q.value.dtype == jnp.float32
     np.testing.assert_array_equal(q.value, np.asarray(raw, dtype=np.float32))
-    explicit = Length[jax.Array](raw, u.angstrom, dtype='float32')
+    explicit = JaxLength(raw, u.angstrom, dtype='float32')
     np.testing.assert_array_equal(explicit.value, q.value)
 path = {str(tmp_path / "integer.npz")!r}
 np.savez(path, array_0=np.array([2**40], dtype=np.int64),
     metadata=np.asarray(json.dumps({{'version': 1, 'quantities': {{
         'q': {{'kind': 'Length', 'unit': 'angstrom', 'array': 'array_0'}}}}}})))
-np.testing.assert_array_equal(load_npz(path, 'q', Length[jax.Array]).value, [2**40])
+np.testing.assert_array_equal(load_npz(path, 'q', JaxLength).value, [2**40])
 if not {x64!r}:
     try:
-        Length[jax.Array]([1], u.meter, dtype='float64')
+        JaxLength([1], u.meter, dtype='float64')
     except ValueError as exc:
         assert 'unavailable' in str(exc)
     else:
         raise AssertionError('unavailable float64 was accepted')
 unit = Length.define_unit('lab:huge', reference=u.angstrom, scale=1e100)
 if {x64!r}:
-    np.testing.assert_array_equal(Length[jax.Array]([1e-100], unit).value, [1])
-    narrow = Length[jax.Array]([1.0], u.angstrom, dtype='float32')
+    np.testing.assert_array_equal(JaxLength([1e-100], unit).value, [1])
+    narrow = JaxLength([1.0], u.angstrom, dtype='float32')
     assert (narrow * jnp.array(2.0, dtype=jnp.float64)).value.dtype == jnp.float32
 else:
     try:
         with np.errstate(over='raise', invalid='raise'):
-            Length[jax.Array]([1e-100], unit)
+            JaxLength([1e-100], unit)
     except ValueError as exc:
         assert 'working precision' in str(exc)
     else:
         raise AssertionError('unrepresentable conversion factor was accepted')
 for dtype in (jnp.float16, jnp.bfloat16):
-    q = Length[jax.Array]([3e-6], u.meter, dtype=dtype)
+    q = JaxLength([3e-6], u.meter, dtype=dtype)
     np.testing.assert_allclose(q.value.astype(jnp.float32), [30000], rtol=.01)
-    t = Time[jax.Array]([1e-11], u.second, dtype=dtype)
+    t = JaxTime([1e-11], u.second, dtype=dtype)
     np.testing.assert_allclose(t.value.astype(jnp.float32), [10000], rtol=.01)
     assert q.value.dtype == dtype
     @jax.jit
     def convert(raw):
-        return Length[jax.Array](raw, u.meter, dtype=dtype).value
+        return JaxLength(raw, u.meter, dtype=dtype).value
     np.testing.assert_array_equal(convert(jnp.asarray([3e-6])), q.value)
-    result = Length[jax.Array]([30000], u.angstrom, dtype=dtype).magnitude(u.meter)
+    result = JaxLength([30000], u.angstrom, dtype=dtype).magnitude(u.meter)
     np.testing.assert_allclose(result.astype(jnp.float32), [3e-6], rtol=.02)
-gradient = jax.grad(lambda raw: Length[jax.Array](raw, u.nm).value)(jnp.asarray(2.))
+gradient = jax.grad(lambda raw: JaxLength(raw, u.nm).value)(jnp.asarray(2.))
 assert gradient == 10
 """
     subprocess.run([sys.executable, "-c", program], check=True)  # noqa: S603
@@ -142,27 +146,32 @@ def test_torch_float16_construction_and_graph() -> None:
     pytest.importorskip("torch")
     import torch  # noqa: PLC0415
 
-    q = Length[torch.Tensor]([3e-6], u.meter, dtype=torch.float16)
-    t = Time[torch.Tensor]([1e-11], u.second, dtype=torch.float16)
+    q = Length[torch.Tensor, Atomistic]([3e-6], u.meter, dtype=torch.float16)
+    t = Time[torch.Tensor, Atomistic]([1e-11], u.second, dtype=torch.float16)
     assert q.value.dtype == torch.float16
     assert q.value.item() == 30000
     assert t.value.item() == 10000
-    result = Length[torch.Tensor]([30000], u.angstrom, dtype=torch.float16)
+    result = Length[torch.Tensor, Atomistic]([30000], u.angstrom, dtype=torch.float16)
     assert result.magnitude(u.meter).item() == float(np.float16(3e-6))
     raw = torch.tensor([3e-6], dtype=torch.float64, requires_grad=True)
-    converted = Length[torch.Tensor](raw, u.meter, dtype=torch.float16)
+    converted = Length[torch.Tensor, Atomistic](raw, u.meter, dtype=torch.float16)
     assert converted.value.device == raw.device
     (gradient,) = torch.autograd.grad(converted.value.sum(), raw)
     np.testing.assert_array_equal(gradient.numpy(), [u.meter.scale])
     unit = Length.define_unit("lab:huge", reference=u.angstrom, scale=1e100)
-    assert Length[torch.Tensor]([1e-100], unit, dtype=torch.float16).value.item() == 1
+    assert (
+        Length[torch.Tensor, Atomistic](
+            [1e-100], unit, dtype=torch.float16
+        ).value.item()
+        == 1
+    )
     for numpy_dtype, torch_dtype in (
         (np.float16, torch.float16),
         (np.float32, torch.float32),
         (np.float64, torch.float64),
     ):
         source = np.array([2.0], dtype=numpy_dtype)
-        converted = Length[torch.Tensor](source, u.nm)
+        converted = Length[torch.Tensor, Atomistic](source, u.nm)
         assert converted.value.dtype == torch_dtype
         assert converted.value.item() == 20
 
@@ -202,5 +211,5 @@ def test_longdouble_npz_preserves_dtype(tmp_path: Path) -> None:
     )
     save_npz(path, q=q)
     restored = load_npz(path, "q", Length[npt.NDArray[np.longdouble]])
-    assert restored.value.dtype == np.longdouble
-    np.testing.assert_array_equal(restored.value, q.value)
+    assert restored.dtype == np.longdouble
+    np.testing.assert_array_equal(restored.magnitude(), q.magnitude())

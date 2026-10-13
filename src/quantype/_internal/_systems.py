@@ -45,9 +45,11 @@ if TYPE_CHECKING:
 __all__ = [
     "CGS",
     "SI",
+    "AnySystem",
     "Atomic",
     "Atomistic",
     "Metal",
+    "NoSystem",
     "RangeIssue",
     "Real",
     "UnitSystem",
@@ -133,6 +135,8 @@ class _SystemUnits:
 
 
 def _is_catalogue_unit(unit: Unit[Any]) -> bool:
+    if not isinstance(unit.semantic, Kind):
+        return False
     try:
         return get_unit(unit.name, kind=unit.semantic) is unit
     except ValueError:
@@ -144,7 +148,33 @@ def _is_catalogue_unit(unit: Unit[Any]) -> bool:
 _deferred_validation = False
 
 
-class UnitSystem:
+class AnySystem:
+    """What a quantity's system parameter can be: a ``UnitSystem``, or ``NoSystem``.
+
+    Code that accepts quantities with or without a system is generic over
+    ``[S: AnySystem]``; code that reads raw numbers needs ``[S: UnitSystem]``.
+    """
+
+    name: ClassVar[str]
+
+    def __new__(cls) -> Self:
+        raise TypeError(
+            f"Unit systems are used as classes: write {cls.__name__}, "
+            f"not {cls.__name__}()"
+        )
+
+
+class NoSystem(AnySystem):
+    """No unit system, the default: each quantity keeps the unit it was given in.
+
+    A quantity without a system has no raw numbers (``.value``); read them with
+    ``.magnitude(unit)``, or choose a system with ``.to_system(...)``.
+    """
+
+    name = "none"
+
+
+class UnitSystem(AnySystem):
     """Base class for unit systems.
 
     Subclass it with ``name=`` and a base unit for ``length``, ``energy`` and
@@ -191,14 +221,8 @@ class UnitSystem:
             super().__init_subclass__(**kwargs)
             _define(cls, name)
 
-    def __new__(cls) -> Self:
-        raise TypeError(
-            f"Unit systems are used as classes: write {cls.__name__}, "
-            f"not {cls.__name__}()"
-        )
-
     @classmethod
-    def unit_for(cls, kind: Kind | str | type[Any]) -> Unit[Any]:
+    def unit_for(cls, kind: Semantic | str | type[Any]) -> Unit[Any]:
         """The unit that raw numbers of ``kind`` are stored in, in this system."""
         semantic = _kind_of(kind)
         derived = cast("dict[Kind, Unit[Any]] | None", cls.__dict__.get("_derived"))
@@ -338,26 +362,34 @@ def _overrides(cls: type[UnitSystem]) -> dict[Kind, Unit[Any]]:
                 f"{cls.__name__} overrides {unit.kind}, a base axis; "
                 f"set its base unit instead"
             )
-        if unit.semantic in overridden:
+        semantic = unit.semantic
+        if not isinstance(semantic, Kind):
+            raise TypeError(
+                f"{cls.__name__} overrides {unit.kind}, which is not a named kind"
+            )
+        if semantic in overridden:
             raise TypeError(f"{cls.__name__} overrides {unit.kind} twice")
-        overridden[unit.semantic] = unit
+        overridden[semantic] = unit
     cls._overridden = overridden
     return overridden
 
 
-def overridden_kinds(system: type[UnitSystem]) -> Mapping[Kind, Unit[Any]]:
+def overridden_kinds(system: type[AnySystem]) -> Mapping[Kind, Unit[Any]]:
     """The kinds ``system`` stores outside its derived units, and their units."""
+    if not issubclass(system, UnitSystem):
+        return {}
     return _overrides(system)
 
 
-def coherence(system: type[UnitSystem], semantic: Semantic) -> float:
+def coherence(system: type[AnySystem], semantic: Semantic) -> float:
     """Coherent units per stored unit of ``semantic``: 1 unless it is overridden.
 
     Arithmetic works in coherent units: a product's raw numbers are the
     operands' raw numbers times their coherence, divided by the result's.
-    Structural (unnamed) quantities are always stored coherently.
+    Structural (unnamed) quantities are always stored coherently, and
+    ``NoSystem`` has no system units to be coherent with.
     """
-    if not isinstance(semantic, Kind):
+    if not isinstance(semantic, Kind) or not issubclass(system, UnitSystem):
         return 1.0
     unit = _overrides(system).get(semantic)
     if unit is None:
@@ -393,7 +425,7 @@ def _checked_scale(
     return scale
 
 
-def _kind_of(kind: Kind | str | type[Any]) -> Kind:
+def _kind_of(kind: Semantic | str | type[Any]) -> Kind:
     semantic: object = kind
     if isinstance(kind, str):
         semantic = KINDS.get(kind)
@@ -468,6 +500,19 @@ def require_system(candidate: object) -> type[UnitSystem]:
     ):
         return candidate
     raise TypeError(f"Expected a unit system class such as SI; received {candidate!r}")
+
+
+def require_any_system(candidate: object) -> type[AnySystem]:
+    """A unit system, or ``NoSystem``."""
+    if candidate is NoSystem:
+        return NoSystem
+    try:
+        return require_system(candidate)
+    except TypeError:
+        raise TypeError(
+            "Expected a unit system class such as SI, or NoSystem; "
+            f"received {candidate!r}"
+        ) from None
 
 
 # Representative magnitudes in reference units (Å, eV, fs, K, μB), used by
@@ -566,7 +611,7 @@ _deferred_validation = True
 
 
 class Atomistic(UnitSystem, name="atomistic"):
-    """Å, eV, fs, K, μB, e: the reference units; mass Da, density g/cm³. Default."""
+    """Å, eV, fs, K, μB, e: the reference units; mass Da, density g/cm³."""
 
     length = _catalogue("angstrom", LengthKind)
     energy = _catalogue("electron_volt", EnergyKind)
@@ -626,3 +671,15 @@ class Atomic(UnitSystem, name="atomic"):
 
 
 _deferred_validation = False
+
+# A nested composition without a system displays in the first of these that
+# stores each operand's kind in that operand's unit, else in SI.
+DISPLAY_SYSTEMS: tuple[type[UnitSystem], ...] = (
+    Atomistic,
+    Metal,
+    Real,
+    SI,
+    CGS,
+    Atomic,
+)
+DISPLAY_FALLBACK = SI

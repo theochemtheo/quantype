@@ -38,6 +38,7 @@ from quantype.systems import (
     Atomic,
     Atomistic,
     Metal,
+    NoSystem,
     Real,
     StorageRangeWarning,
     UnitSystem,
@@ -249,9 +250,9 @@ def test_gromacs_units_decode_at_the_boundary(tmp_path: Path) -> None:
     # Untyped entry points need the definitions; any system can decode them.
     with pytest.raises(ValueError, match="Unknown unit"):
         Force.parse(wire)
-    atomistic = Force.parse(wire, units=Gromacs.units)
-    assert atomistic.system is Atomistic
-    assert atomistic.magnitude(force_unit) == pytest.approx(3.0)
+    unbound = Force.parse(wire, units=Gromacs.units)
+    assert unbound.system is NoSystem
+    assert unbound.magnitude(force_unit) == pytest.approx(3.0)
     # A target type that names the system finds its units automatically.
     adapter = TypeAdapter(Force[float, Gromacs])
     typed = adapter.validate_json(json.dumps(wire))
@@ -344,7 +345,7 @@ def test_pydantic_fields_choose_their_system() -> None:
     assert dumped["cutoff"] == {"kind": "Length", "magnitude": 0.5, "unit": "nanometer"}
     assert SIConfig.model_validate_json(config.model_dump_json()) == config
     with pytest.raises(
-        ValueError, match=r"Expected a quantity in SI; received one in Atomistic"
+        ValueError, match=r"Expected a quantity in SI; received one in NoSystem"
     ):
         SIConfig(cutoff=u.nm(1.0), timestep=Time[float, Metal](1, u.fs))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 

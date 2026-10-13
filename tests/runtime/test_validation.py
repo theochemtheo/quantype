@@ -36,7 +36,7 @@ class Simulation(BaseModel):
 
 def test_scalar_roundtrip_and_display_unit() -> None:
     length = Length.parse({"kind": "Length", "magnitude": 0.5, "unit": "nm"})
-    assert length.value == pytest.approx(5)
+    assert length.magnitude(u.angstrom) == pytest.approx(5)
     # The input unit is remembered, so a config's "0.5 nm" is written back as-is.
     wire = {"kind": "Length", "magnitude": 0.5, "unit": "nanometer"}
     assert to_dict(length) == wire
@@ -48,7 +48,7 @@ def test_scalar_roundtrip_and_display_unit() -> None:
     assert to_dict(length, u.nm) == wire
     assert length.to(u.nm).to_dict() == wire
     assert parse_quantity(Length, length) is length
-    assert Length.parse(wire).value == length.value
+    assert Length.parse(wire) == length
 
 
 def test_pydantic_roundtrip() -> None:
@@ -61,14 +61,16 @@ def test_pydantic_roundtrip() -> None:
         }
     )
     restored = Simulation.model_validate_json(model.model_dump_json())
-    np.testing.assert_array_equal(restored.positions.value, [[10, 20, 30]])
-    assert restored.cutoff.value == model.cutoff.value
-    assert restored.temperature.value == pytest.approx(293.15)
+    np.testing.assert_array_equal(
+        restored.positions.magnitude(u.angstrom), [[10, 20, 30]]
+    )
+    assert restored.cutoff == model.cutoff
+    assert restored.temperature.magnitude(u.K) == pytest.approx(293.15)
 
 
 def test_schema_and_bare_annotation() -> None:
     adapter: TypeAdapter[Any] = TypeAdapter(Length)
-    assert adapter.validate_python("5 angstrom").value == 5
+    assert adapter.validate_python("5 angstrom").magnitude(u.angstrom) == 5
     schema = Simulation.model_json_schema()["properties"]["cutoff"]["anyOf"][0]
     assert set(schema["required"]) == {"magnitude", "unit"}  # the field names the kind
     assert schema["properties"]["magnitude"]["type"] == "number"
@@ -125,19 +127,19 @@ def test_zero_dimensional_array_json_schema_and_roundtrip() -> None:
         warnings.simplefilter("error")
         wire = adapter.dump_json(original)
     restored = adapter.validate_json(wire)
-    assert restored.value.shape == ()
-    assert restored.value.dtype == np.float64
-    assert restored.value == original.value
+    assert restored.shape == ()
+    assert restored.dtype == np.float64
+    assert restored == original
 
 
 def test_storage_conversion() -> None:
     scalar = TypeAdapter(Length[np.float64])
-    assert type(scalar.validate_python("2 nm").value) is np.float64
+    assert type(scalar.validate_python("2 nm").magnitude()) is np.float64
     array = TypeAdapter(Length[NDArray[np.float32]])
     result = array.validate_python(
         {"kind": "Length", "magnitude": [1, 2], "unit": "nm"}
     )
-    assert result.value.dtype == np.float32
+    assert result.dtype == np.float32
     with pytest.raises(ValidationError, match="storage"):
         scalar.validate_python(u.angstrom(np.array([1.0])))
 
@@ -185,16 +187,16 @@ def test_custom_affine_unit() -> None:
     )
     zero = Temperature[np.float64](0, bleb)
     one = Temperature[np.float64](1, bleb)
-    assert zero.value == pytest.approx(273.15)
+    assert zero.magnitude(u.K) == pytest.approx(273.15)
     assert one.magnitude(u.celsius) == pytest.approx(math.sqrt(2))
     wire = one.to(bleb).to_dict()
     assert wire["unit"] == "lab:bleb"
     with pytest.raises(ValueError, match="Unknown unit"):
         Temperature.parse(wire)
     restored = Temperature.parse(wire, units=(bleb,))
-    assert restored.value == one.value
+    assert restored == one
     adapter = TypeAdapter(Temperature[np.float64])
-    assert adapter.validate_python(wire, context={"units": (bleb,)}).value == one.value
+    assert adapter.validate_python(wire, context={"units": (bleb,)}) == one
     with pytest.raises(ValueError, match="Duplicate"):
         Temperature.parse(wire, units=(bleb, bleb))
 
@@ -219,10 +221,9 @@ def test_invalid_unit_definitions() -> None:
     ],
 )
 def test_quantity_strings_allow_an_optional_space(text: str, expected: float) -> None:
-    assert Length.parse(text).value == pytest.approx(expected)
-    assert TypeAdapter(Length[float]).validate_python(text).value == pytest.approx(
-        expected
-    )
+    assert Length.parse(text).magnitude(u.angstrom) == pytest.approx(expected)
+    validated = TypeAdapter(Length[float]).validate_python(text)
+    assert validated.magnitude(u.angstrom) == pytest.approx(expected)
 
 
 @pytest.mark.parametrize("text", ["nm", "five nm", ""])
@@ -298,12 +299,12 @@ def test_units_must_be_named_by_strings_of_the_expected_kind() -> None:
 
 def test_parse_restores_float64_array_storage() -> None:
     narrow = Length[NDArray[np.float32]]([1.0], u.nm)
-    restored = Length.parse(narrow).value
+    restored = Length.parse(narrow).magnitude()
     assert isinstance(restored, np.ndarray)
     assert restored.dtype == np.float64
 
 
 def test_parse_keeps_float64_arrays_as_they_are() -> None:
-    restored = Length.parse({"magnitude": [1.0, 2.0], "unit": "nm"}).value
+    restored = Length.parse({"magnitude": [1.0, 2.0], "unit": "nm"}).magnitude()
     assert isinstance(restored, np.ndarray)
     assert restored.dtype == np.float64

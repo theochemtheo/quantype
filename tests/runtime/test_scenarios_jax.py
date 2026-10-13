@@ -13,13 +13,15 @@ import numpy as np
 
 import quantype.numpy as qnp
 from quantype import Angle, Dimensionless, Energy, Force, ForceConstant, Length, u, ujax
-from quantype.systems import SI, Atomistic, Metal, UnitSystem
+from quantype.systems import SI, AnySystem, Atomistic, Metal, NoSystem
 from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-SYSTEMS = pytest.mark.parametrize("system", [Atomistic, SI], ids=["Atomistic", "SI"])
+SYSTEMS = pytest.mark.parametrize(
+    "system", [NoSystem, Atomistic, SI], ids=["NoSystem", "Atomistic", "SI"]
+)
 # JAX's upstream annotations are incomplete; keep them at this boundary.
 _jax: Any = jax
 _jit: Any = _jax.jit
@@ -36,12 +38,12 @@ def _double(x: Any) -> Any:  # noqa: ANN401 -- any quantity
     return x * 2.0
 
 
-def _suffix(system: type[UnitSystem]) -> str:
-    return "" if system is Atomistic else f", {system.__name__}"
+def _suffix(system: type[AnySystem]) -> str:
+    return "" if system is NoSystem else f", {system.__name__}"
 
 
 @SYSTEMS
-def test_jax_traces_once_per_system(system: type[UnitSystem]) -> None:
+def test_jax_traces_once_per_system(system: type[AnySystem]) -> None:
     traces = 0
 
     def double_sum(x: Any) -> Any:  # noqa: ANN401 -- system-generic helper
@@ -57,10 +59,11 @@ def test_jax_traces_once_per_system(system: type[UnitSystem]) -> None:
 
 
 @SYSTEMS
-def test_jax_structure_ignores_display(system: type[UnitSystem]) -> None:
+def test_jax_structure_ignores_display(system: type[AnySystem]) -> None:
     length: Any = _dynamic(Length)[jax.Array, system]
     suffix = _suffix(system)
-    fallback = "20.0 Å" if system is Atomistic else "2e-09 m"
+    # Without a system, values out of a transformation are in reference units.
+    fallback = "2e-09 m" if system is SI else "20.0 Å"
     doubled = _jit(_double)(length(_jnp.array(1.0), u.nm))
     assert repr(doubled) == f"Length({fallback}{suffix})"
     step = length(_jnp.array(1.0), u.angstrom)
@@ -86,7 +89,7 @@ def test_jax_cond_across_systems_is_rejected() -> None:
 
 
 @SYSTEMS
-def test_force_from_grad(system: type[UnitSystem]) -> None:
+def test_force_from_grad(system: type[AnySystem]) -> None:
     spring: Any = _dynamic(ForceConstant)[float, system](2.0, u.eV_per_angstrom_squared)
 
     def energy(x: Any) -> Any:  # noqa: ANN401 -- system-generic helper
@@ -124,7 +127,7 @@ def test_value_and_grad_evaluates_once_and_passes_parameters_through() -> None:
     energy, gradient = ujax.value_and_grad(_pair_energy)(x, k)
     assert isinstance(energy, Energy)
     assert isinstance(gradient, Force)
-    assert float(energy.value) == 5.0
+    assert float(energy.magnitude(u.eV)) == 5.0
     assert_allclose(gradient, u.eV_per_angstrom(np.array([2.0, 4.0])))
     compiled: Any = _jit(ujax.value_and_grad(_pair_energy))
     energy, gradient = compiled(x, k)

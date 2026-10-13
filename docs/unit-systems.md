@@ -1,7 +1,8 @@
 # Unit systems
 
-A unit system is the set of units quantities store their numbers in.
-[Units and unit systems](units.md#unit-systems) explains why quantype uses them
+A unit system is the set of units quantities store their numbers in. Without
+one, a quantity keeps the unit it was given in.
+[Units and unit systems](units.md#unit-systems) explains when to choose one
 and lists the built-in ones. This page covers defining your own system and
 writing library code that works in any system.
 
@@ -146,27 +147,39 @@ same check.
 ## Write system-generic code
 
 Library code usually shouldn't choose a unit system for its callers. Annotate
-with a type parameter bounded by `UnitSystem` instead:
+with a type parameter bounded by `AnySystem`, which accepts quantities with or
+without a system, or by `UnitSystem` where the code reads `.value`:
 
 ```python
 from quantype import Energy, Force, Length, u
-from quantype.systems import SI, Metal, UnitSystem
+from quantype.systems import SI, AnySystem, Metal, UnitSystem
 
 
-def work[S: UnitSystem](f: Force[float, S], d: Length[float, S]) -> Energy[float, S]:
+def work[S: AnySystem](f: Force[float, S], d: Length[float, S]) -> Energy[float, S]:
     return f * d
+
+
+def raw_cutoff[S: UnitSystem](cutoff: Length[float, S]) -> float:
+    return cutoff.value
 
 
 si = work(Force[float, SI](1, u.newton), Length[float, SI](2, u.meter))
 metal = work(Force[float, Metal](1, u.eV_per_angstrom), Length[float, Metal](2, u.nm))
+unbound = work(Force[float](1, u.eV_per_angstrom), Length[float](2, u.nm))
+assert raw_cutoff(Length[float, Metal](2, u.nm)) == 20.0
 ```
 
-The checker accepts SI pairs and metal pairs, and rejects a mixed pair. Inside
-the function, arithmetic needs no conversion: every operand is in `S`.
+The checker accepts SI pairs, metal pairs, and pairs without a system, and
+rejects a mixed pair. Inside `work`, arithmetic needs no conversion in a
+system, because every operand is in `S`. `raw_cutoff` rejects a length without a
+system, because `.value` needs a `UnitSystem`. Checker messages for that name
+the descriptor behind `.value`: mypy says
+``Value of type variable "T" of "__get__" of "_Value" cannot be "NoSystem"``.
 
-Annotations without a system, such as `Length[float]`, mean the default system.
-A function typed `Length[float]` rejects SI quantities; the error message names
-`.to_system(...)` as the fix. Prefer the generic form in shared libraries, and
+Annotations without a system, such as `Length[float]`, mean `NoSystem`. A
+function typed `Length[float]` rejects SI quantities, and one typed
+`Length[float, SI]` rejects quantities without a system; the runtime error
+message names `.to_system(...)` as the fix. Prefer the generic form in shared libraries, and
 the explicit form (`Length[npt.NDArray[np.float64], Real]`) for kernels whose raw
 numbers must be in particular units.
 
@@ -215,4 +228,4 @@ first `larger` checks them at runtime through `>`.
 The unit-system parameter has a default (PEP 696). The stubs declare it with
 `typing_extensions.TypeVar`, which is tested on Python 3.12 with mypy 2.3.1,
 Pyright 1.1.414, Pyrefly 1.3.2, and ty 0.0.84. Older checkers without PEP 696
-support may not treat `Length[float]` as `Length[float, Atomistic]`.
+support may not treat `Length[float]` as `Length[float, NoSystem]`.

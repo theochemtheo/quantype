@@ -81,8 +81,8 @@ restored_point = adapter.validate_python(wire, context={"units": (bleb,)})
 Pydantic converts to the annotated storage, including the NumPy dtype, and to
 the annotated unit system. A bare annotation such as `Length` works at runtime,
 but strict type checkers want the storage spelled out. `Length.parse(...)`
-returns a float or a float64 array in the default system, and
-`Length[float, SI].parse(...)` chooses the system. For a particular storage
+returns a float or a float64 array without a system, kept in the unit the data
+used, and `Length[float, SI].parse(...)` chooses the system. For a particular storage
 type, use a typed constructor or a `TypeAdapter`. When the target type names a
 custom system, that system's units are found without `units=`.
 
@@ -127,7 +127,8 @@ it also records `source_backend`, such as `"numpy"` or `"torch"`. That field is
 only a record, and loading never imports the backend. The target type decides
 the storage and unit system, so a Torch-produced archive can be read into NumPy
 without Torch installed, and an archive written from SI quantities can be read
-into `Atomistic`. Restored quantities keep the archived unit for display. Pass
+into `Atomistic`. Restored quantities keep the archived unit for display, and
+without a system they store their numbers in it. Pass
 `units=(...)` to decode custom units.
 
 Dtypes NumPy can't represent, such as Torch's bfloat16, raise `TypeError`.
@@ -164,7 +165,7 @@ from typing import Annotated, get_type_hints
 import numpy as np
 import numpy.typing as npt
 from quantype import Energy, Force
-from quantype.systems import SI, Atomistic
+from quantype.systems import SI, NoSystem
 from quantype.typing import QuantityType, quantity_type
 
 
@@ -176,13 +177,13 @@ class Sample:
 
 hints = get_type_hints(Sample, include_extras=True)
 forces = quantity_type(hints["forces"])
-assert forces == QuantityType(Force, npt.NDArray[np.float64], Atomistic)
+assert forces == QuantityType(Force, npt.NDArray[np.float64], NoSystem)
 assert quantity_type(hints["energy"]) == QuantityType(Energy, float, SI)
 assert quantity_type(hints["label"]) is None
-assert quantity_type(Force) == QuantityType(Force, None, Atomistic)
+assert quantity_type(Force) == QuantityType(Force, None, NoSystem)
 ```
 
-An annotation without a system, such as `Force[float]`, is in `Atomistic`. A
+An annotation without a system, such as `Force[float]`, has `NoSystem`. A
 bare class has `storage` `None`. `quantity_type` returns `None` for anything
 that isn't a quantity type, including unions such as `Force[float] | None`, so
 look at a union's members yourself. `Annotated` metadata is skipped. A

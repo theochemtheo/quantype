@@ -3,7 +3,7 @@
 import quantype.numpy as qnp
 from quantype import Energy, EnergyPerAtom, Force, Length, Pressure, Temperature
 from quantype import units as u
-from quantype.systems import SI, Metal, UnitSystem
+from quantype.systems import SI, AnySystem, Metal, UnitSystem
 
 
 def energy_only(value: Energy[float]) -> None:
@@ -70,6 +70,19 @@ def work[S: UnitSystem](f: Force[float, S], d: Length[float, S]) -> Energy[float
 
 
 mixed_generic = work(e_si / x_si, x_metal)  # error
+
+# Without a system there are no raw numbers, and nothing mixes with a system.
+x_none = Length[float](2.0, u.nm)
+raw_without_system = x_none.value  # error
+mixed_with_system = x_none + x_si  # error
+mixed_comparison_with_system = x_none < x_si  # error
+unbound_is_not_bound: Length[float, SI] = x_none  # error
+unbound_work = work(e_si / x_si, x_none)  # error
+
+
+def raw_anywhere[S: AnySystem](r: Length[float, S]) -> float:
+    return r.value  # error
+
 
 # Plain numbers are only added to Dimensionless values; only those convert to float.
 bad_plain_addition = (2 * u.nm) + 1  # error

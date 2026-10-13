@@ -24,7 +24,17 @@ from quantype import (
     ujax,
 )
 from quantype.products import LengthEnergy
-from quantype.systems import CGS, SI, Atomic, Atomistic, Metal, Real, UnitSystem
+from quantype.systems import (
+    CGS,
+    SI,
+    AnySystem,
+    Atomic,
+    Atomistic,
+    Metal,
+    NoSystem,
+    Real,
+    UnitSystem,
+)
 from quantype.testing import assert_allclose
 
 
@@ -89,13 +99,14 @@ def test_jax_every_quantity_class_is_a_single_leaf_pytree() -> None:
         if _is_quantity_class(candidate) and candidate is not Quantity
     )
     for cls in classes:
-        quantity = cls.from_value(_jnp.array(2.0))
+        quantity = cls[jax.Array, Atomistic].from_value(_jnp.array(2.0))
         leaves, tree = _trees.tree_flatten(quantity)
         assert len(leaves) == 1
         assert leaves[0] is quantity.value
         restored = _trees.tree_unflatten(tree, leaves)
         assert type(restored) is cls
         assert restored.kind == quantity.kind
+        assert restored.system is quantity.system
 
 
 def test_jax_pytree_keeps_kind_and_system_but_not_display() -> None:
@@ -113,7 +124,7 @@ def test_jax_pytree_keeps_kind_and_system_but_not_display() -> None:
     assert type(structural) is LengthEnergy
     leaves, tree = _trees.tree_flatten(structural)
     assert len(leaves) == 1
-    assert leaves[0] is structural.value
+    assert leaves[0] is structural.magnitude()
     rebuilt = _trees.tree_unflatten(tree, leaves)
     assert type(rebuilt) is LengthEnergy
     assert rebuilt.kind == structural.kind
@@ -144,19 +155,24 @@ def test_jax_raw_model_boundary_and_single_evaluation() -> None:
 
     def model(x: Length[jax.Array]) -> Energy[jax.Array]:
         calls.append(None)
-        return Energy.from_value(_jnp.sum(x.value**2))
+        return Energy[jax.Array](_jnp.sum(x.magnitude(u.angstrom) ** 2), u.eV)
 
-    x = u.angstrom(_jnp.array([1.0, 2.0]))
+    def bound(x: Length[jax.Array, Atomistic]) -> Energy[jax.Array, Atomistic]:
+        return Energy[jax.Array, Atomistic].from_value(_jnp.sum(x.value**2))
+
+    x = u.nm(_jnp.array([0.1, 0.2]))
     assert_allclose(ujax.grad(model)(x), u.eV_per_angstrom(np.array([2.0, 4.0])))
     assert len(calls) == 1
     calls.clear()
     assert_allclose(ujax.hessian(model)(x), u.eV_per_angstrom_squared(2.0 * np.eye(2)))
     assert len(calls) == 1
+    force = ujax.grad(bound)(x.to_system(Atomistic))
+    assert_allclose(force.to_system(NoSystem), u.eV_per_angstrom(np.array([2.0, 4.0])))
 
 
 def test_jax_rejects_nonscalar_energy() -> None:
     def vector_energy(x: Length[jax.Array]) -> Energy[jax.Array]:
-        return Energy.from_value(x.value**2)
+        return Energy[jax.Array](x.magnitude(u.angstrom) ** 2, u.eV)
 
     with pytest.raises(TypeError, match="scalar"):
         ujax.grad(vector_energy)(u.angstrom(_jnp.array([1.0, 2.0])))
@@ -172,13 +188,13 @@ class Gromacs(UnitSystem, name="test-autodiff:gromacs"):
 
 SYSTEMS = pytest.mark.parametrize(
     "system",
-    [Atomistic, Metal, Real, SI, CGS, Atomic, Gromacs],
+    [NoSystem, Atomistic, Metal, Real, SI, CGS, Atomic, Gromacs],
     ids=lambda system: system.__name__,
 )
 
 
 @SYSTEMS
-def test_jax_transformations_in_each_system(system: type[UnitSystem]) -> None:
+def test_jax_transformations_in_each_system(system: type[AnySystem]) -> None:
     length: Any = _dynamic(Length)[jax.Array, system]
     spring: Any = _dynamic(ForceConstant)[float, system](2.0, u.eV_per_angstrom_squared)
 
@@ -213,12 +229,12 @@ def test_jax_transformations_in_each_system(system: type[UnitSystem]) -> None:
 
 
 def test_jax_grad_rescales_atomistic_masses() -> None:
-    mass = Mass[float](12, u.Da)
+    mass = Mass[float, Atomistic](12, u.Da)
 
-    def kinetic(v: Velocity[jax.Array]) -> Energy[jax.Array]:
+    def kinetic(v: Velocity[jax.Array, Atomistic]) -> Energy[jax.Array, Atomistic]:
         return 0.5 * mass * (v * v).sum()
 
-    v = Velocity[jax.Array](_jnp.array([0.01, 0.02]), u.angstrom_per_fs)
+    v = Velocity[jax.Array, Atomistic](_jnp.array([0.01, 0.02]), u.angstrom_per_fs)
     momentum = _jax.jit(ujax.grad(kinetic))(v)
     assert type(momentum) is Momentum
     assert_allclose(momentum, (mass * v).to(u.eV_fs_per_angstrom), rtol=1e-6)
@@ -230,7 +246,7 @@ def test_jax_grad_rescales_atomistic_masses() -> None:
 def test_jax_grad_requires_one_system() -> None:
     def leaks(x: Length[jax.Array, SI]) -> Energy[jax.Array]:
         del x
-        return Energy.from_value(_jnp.array(1.0))
+        return Energy[jax.Array](_jnp.array(1.0), u.eV)
 
     untyped: Any = ujax.grad
     with pytest.raises(TypeError, match=r"argument's unit system \(SI\)"):
@@ -248,7 +264,7 @@ def test_jax_storage_rejects_complex_and_integer_dtypes() -> None:
 
 def test_jax_differentiates_only_functions_returning_quantities() -> None:
     def raw(x: Length[jax.Array]) -> jax.Array:
-        return x.value.sum()
+        return x.magnitude(u.nm).sum()
 
     grad: Any = ujax.grad
     with pytest.raises(TypeError, match="must return a Quantity"):

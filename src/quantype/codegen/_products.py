@@ -126,7 +126,7 @@ def pair_class(pair: Pair, table: Table) -> str:
             ],
             overrides=True,
         )
-    text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[V, T]: ...\n"
+    text += f"    @override\n    def to_system[T: AnySystem](self, system: type[T]) -> {name}[V, T]: ...\n"
     text += f"    @classmethod\n    @override\n    def from_value[W](cls, value: W) -> {name}[W, S]: ...\n"
     return text
 
@@ -140,7 +140,7 @@ def constant_class(pair: Pair, table: Table) -> str:
     name, marker = pair.name, pair.marker
     own = f"_{name}Constant"
     text = f"\nclass {own}(Constant[{marker}]):\n"
-    text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[float, T]: ...\n"
+    text += f"    @override\n    def to_system[T: AnySystem](self, system: type[T]) -> {name}[float, T]: ...\n"
     text += (
         f"    @override\n    def to(self, unit: Unit[{marker}]) -> {name}[float]: ...\n"
     )
@@ -161,11 +161,11 @@ def constant_class(pair: Pair, table: Table) -> str:
             f"def {method}(self, other: _Scalar, /) -> {own}: ...",
         ]
         signatures += [
-            f"def {method}[W, T: UnitSystem](self, other: {right}[W, T], /) -> {result}[W, T]: ..."
+            f"def {method}[W, T: AnySystem](self, other: {right}[W, T], /) -> {result}[W, T]: ..."
             for right, result in entries
         ]
         signatures.append(
-            f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{marker}, L], W, T]: ..."
+            f"def {method}[L, W, T: AnySystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{marker}, L], W, T]: ..."
         )
         text += overloads(signatures, overrides=True)
     for method, expression, scalar in (
@@ -175,7 +175,7 @@ def constant_class(pair: Pair, table: Table) -> str:
         text += overloads(
             [
                 f"def {method}(self, other: _Scalar, /) -> {scalar}: ...",
-                f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[L, {marker}], W, T]: ...",
+                f"def {method}[L, W, T: AnySystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[L, {marker}], W, T]: ...",
             ],
             overrides=True,
         )
@@ -184,8 +184,8 @@ def constant_class(pair: Pair, table: Table) -> str:
     ):
         for (op, left, right), result in table.entries.items():
             if op == operation and right == name:
-                text += f"    def {member}{left}_f[T: UnitSystem](self, other: {left}[float, T], /) -> {result}[float, T]: ...\n"
-                text += f"    def {member}{left}[W, T: UnitSystem](self, other: {left}[W, T], /) -> {result}[W, T]: ...\n"
+                text += f"    def {member}{left}_f[T: AnySystem](self, other: {left}[float, T], /) -> {result}[float, T]: ...\n"
+                text += f"    def {member}{left}[W, T: AnySystem](self, other: {left}[W, T], /) -> {result}[W, T]: ...\n"
                 text += f"    def {constant_member}{left}(self, other: _{left}Constant, /) -> _{result}Constant: ...\n"
     return text
 
@@ -215,7 +215,7 @@ def _pair_module(pair: Pair, catalogue: Catalogue, package: str, table: Table) -
     text += "from typing import " + ", ".join(n for n in _TYPING if n in used) + "\n"
     text += numpy_imports(used)
     text += "from typing_extensions import TypeVar\n"
-    text += "from quantype.systems import Atomistic, UnitSystem\n"
+    text += "from quantype.systems import AnySystem, NoSystem\n"
     text += (
         "from quantype.core import " + ", ".join(n for n in _CORE if n in used) + "\n"
     )
@@ -239,9 +239,7 @@ def _pair_module(pair: Pair, catalogue: Catalogue, package: str, table: Table) -
     text += f"from {package}.products import {pair.name} as _C\n"
     text += "# Public parameter names read better in diagnostics than private ones.\n"
     text += "# ruff: noqa: PYI001\n"
-    text += (
-        "V = TypeVar('V')\nS = TypeVar('S', bound=UnitSystem, default=Atomistic)\n\n"
-    )
+    text += "V = TypeVar('V')\nS = TypeVar('S', bound=AnySystem, default=NoSystem)\n\n"
     return text + body
 
 

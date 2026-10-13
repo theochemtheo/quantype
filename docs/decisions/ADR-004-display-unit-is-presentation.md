@@ -1,5 +1,8 @@
 # A quantity remembers its input unit for display only
 
+[ADR-014](ADR-014-opt-in-unit-system.md) replaces the rule for products,
+ratios, and powers of quantities without a unit system.
+
 ## Context and Problem Statement
 
 `Length[float](2, u.nm)` printed `20.0 Å`, and a configuration's `"0.5 nm"` was

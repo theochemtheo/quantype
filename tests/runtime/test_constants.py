@@ -85,7 +85,9 @@ def test_constants_adopt_the_operand_system(system: type[UnitSystem]) -> None:
 def test_coulomb_energy_through_the_constant() -> None:
     energy = constants.k_e * (1 * u.e) * (1 * u.e) / (1 * u.angstrom)
     assert energy.dimensions == Energy[float](1, u.eV).dimensions
-    assert energy.value == pytest.approx(14.3996, rel=1e-5)
+    assert Energy.reinterpret(energy).magnitude(u.eV) == pytest.approx(
+        14.3996, rel=1e-5
+    )
 
 
 def test_constant_arithmetic() -> None:

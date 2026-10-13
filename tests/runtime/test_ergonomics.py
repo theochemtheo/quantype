@@ -24,7 +24,7 @@ from quantype import (
     Volume,
     u,
 )
-from quantype.systems import SI, Metal
+from quantype.systems import SI, Atomistic, Metal
 from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
@@ -40,7 +40,7 @@ def test_real_scalars_scale_quantities(factor: float) -> None:
     length = Length[float](2, u.nm)
     for scaled in (length * factor, factor * length, length / (1 / factor)):
         assert scaled.magnitude(u.nm) == pytest.approx(4)
-        assert type(scaled.value) is float
+        assert type(scaled.magnitude(u.nm)) is float
 
 
 def test_numerical_arrays_scale_quantities() -> None:
@@ -53,8 +53,8 @@ def test_numerical_arrays_scale_quantities() -> None:
     positions = Length[npt.NDArray[np.float32]]([2, 4], u.angstrom)
     weighted = positions * weights
     assert_allclose(weighted, u.angstrom(np.array([2.0, 2.0])))
-    assert weighted.value.dtype == np.float32
-    assert (positions * np.float64(2)).value.dtype == np.float32
+    assert weighted.dtype == np.float32
+    assert (positions * np.float64(2)).dtype == np.float32
     reciprocal = np.ones(2) / Length[float](2, u.angstrom)
     assert_allclose(reciprocal, 1 / u.angstrom(np.array([2.0, 2.0])))
 
@@ -69,7 +69,7 @@ def test_non_real_factors_are_rejected(factor: object) -> None:
 
 
 def test_absolute_temperatures_scale() -> None:
-    assert (2 * (300 * u.K)).value == 600
+    assert (2 * (300 * u.K)).magnitude(u.K) == 600
 
 
 def test_zero_is_the_additive_identity() -> None:
@@ -97,7 +97,7 @@ def test_dimensionless_values_mix_with_plain_numbers() -> None:
     assert str(ratio) == "0.25"
     assert float(ratio) == 0.25
     assert isinstance(ratio + 1, Dimensionless)
-    assert (1 - ratio).value == 0.75
+    assert float(1 - ratio) == 0.75
     assert ratio < 1
     assert ratio == 0.25
     assert ratio != 0.5
@@ -117,11 +117,14 @@ def test_truthiness_is_ambiguous() -> None:
 
 
 def test_quantities_from_different_systems_are_unequal() -> None:
-    atomistic = 2 * u.nm
-    si: Any = atomistic.to_system(SI)
-    assert atomistic != si
-    assert atomistic not in [si, 3 * u.nm]
-    assert len({atomistic, si}) == 2
+    unbound = 2 * u.nm
+    si: Any = unbound.to_system(SI)
+    assert unbound != si
+    assert unbound not in [si, 3 * u.nm]
+    assert len({unbound, si}) == 2
+    with pytest.raises(TypeError, match="Cannot combine NoSystem and SI"):
+        _ = unbound < si
+    atomistic: Any = unbound.to_system(Atomistic)
     with pytest.raises(TypeError, match="Cannot combine Atomistic and SI"):
         _ = atomistic < si
 
@@ -138,10 +141,13 @@ def test_format_specs_apply_to_the_magnitude() -> None:
 
 def test_unit_names_the_presented_unit() -> None:
     assert (2 * u.nm).unit is u.nanometer
-    assert Length.from_value(1.0).unit is u.angstrom
+    assert Length[float, Atomistic].from_value(1.0).unit is u.angstrom
     assert Length[float, SI].from_value(1.0).unit is u.meter
     assert Pressure[float, Metal].from_value(1.0).unit is u.bar
-    assert ((1 * u.nm) * (1 * u.fs)).unit is None
+    product = (1 * u.nm) * (1 * u.fs)
+    assert product.unit is not None
+    assert product.unit.symbol == "nm·fs"
+    assert product.to_system(Atomistic).unit is None
 
 
 def test_reinterpret_names_equal_dimensions_explicitly() -> None:

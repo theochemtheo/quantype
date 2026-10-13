@@ -18,6 +18,7 @@
 
 # functools.cache exposes a variadic checker signature but preserves runtime __wrapped__.
 ^quantype\._internal\._registry\._unit_specs$
+^quantype\._internal\._storage_units\.(_catalogue_systems|compose|raised|recast|reference_unit|system_unit)$
 
 # Standard static generics are retained; the runtime alias adds conversion on call.
 ^quantype\.core\.Quantity\.__class_getitem__$

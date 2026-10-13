@@ -15,7 +15,7 @@ from labquantities.products import LengthTime
 
 from quantype import Length as OriginalLength
 from quantype import u as original_units
-from quantype.systems import SI, Atomistic
+from quantype.systems import SI, Atomistic, NoSystem
 from quantype.typing import QuantityType, quantity_type
 
 
@@ -25,17 +25,17 @@ def test_physical_algebra() -> None:
 
     assert isinstance(length * pressure, SurfaceTension)
     assert isinstance(pressure * length, SurfaceTension)
-    assert (length * pressure).value == (pressure * length).value
+    assert length * pressure == pressure * length
     assert not isinstance(length, OriginalLength)
     product = length * (3 * u.fs)
-    assert (product + product).value == 12
-    assert (product * 2).mean().value == 12
+    assert (product + product).magnitude() == 12
+    assert (product * 2).mean().magnitude() == 12
     inverse = 1.0 / (2 * u.fs)
     assert isinstance(inverse, InverseTime)
-    assert inverse.value == 0.5
+    assert inverse.magnitude() == 0.5
     inverse_tension = 1.0 / (length * pressure)
     assert inverse_tension.kind == "Pow[SurfaceTension,-1]"  # as tension ** -1
-    assert inverse_tension.value == 1.0 / (length * pressure).value
+    assert inverse_tension.magnitude() == 1.0 / (length * pressure).magnitude()
 
 
 def test_structural_reciprocals() -> None:
@@ -50,14 +50,14 @@ def test_structural_reciprocals() -> None:
         scalar_inverse = 1 / q
         assert type(scalar_inverse) is Quantity
         explicit_inverse = u.one(1) / q
-        assert (scalar_inverse + explicit_inverse).value == 2 / q.value
+        assert (scalar_inverse + explicit_inverse).magnitude() == 2 / q.magnitude()
         assert (1 / (1 / q)).kind == (u.one(1) / scalar_inverse).kind
     mixed = (2 * u.angstrom) * (3 * original_units.fs)
     with pytest.raises(TypeError, match="mixed-catalogue"):
         1 / mixed
     # An explicit numerator remains usable without merging nominal identities.
     explicit = u.one(1) / mixed
-    assert explicit.value == 1 / mixed.value
+    assert explicit.magnitude() == 1 / mixed.magnitude()
     other = original_units.one(1) / quantities[0]
     with pytest.raises(TypeError, match="Cannot add"):
         other + 1 / quantities[0]
@@ -92,13 +92,13 @@ def test_quantity_annotations() -> None:
     tension = quantity_type(SurfaceTension[float, SI])
     assert tension == QuantityType(SurfaceTension, float, SI)
     product = quantity_type(LengthTime[float])
-    assert product == QuantityType(LengthTime, float, Atomistic)
+    assert product == QuantityType(LengthTime, float, NoSystem)
     assert quantity_type(OriginalLength[float]) != quantity_type(Length[float])
 
 
 def test_portable_unit_factors() -> None:
-    assert u.lab_sqrt2(2).value == 2 * 2**0.5
-    assert u.lab_point(1).value == 2.5
+    assert u.lab_sqrt2(2).magnitude(u.angstrom) == 2 * 2**0.5
+    assert u.lab_point(1).magnitude(u.kelvin) == 2.5
 
 
 def test_unit_lookup() -> None:
@@ -118,8 +118,8 @@ def test_serialization_roundtrip() -> None:
     restored = Length.parse(length.to(u.length.nanometer).to_dict())
 
     assert isinstance(restored, Length)
-    assert restored.value == length.value
-    assert Length.parse("2 nm", units=(u.nm,)).value == length.value
+    assert restored == length
+    assert Length.parse("2 nm", units=(u.nm,)) == length
     assert u.nm is u.length.nanometer
     assert u.nm is not original_units.nm
     with pytest.raises(ValueError, match="shadows builtin"):
@@ -132,7 +132,7 @@ def test_math_preserves_catalogue() -> None:
     result = qnp.sqrt(length**2)
 
     assert isinstance(result, Length)
-    assert result.value == length.value
+    assert result == length
     ratio = length / length
     assert type(qnp.exp(ratio)) is type(ratio)  # the catalogue's own Dimensionless
     assert type(qnp.arccos(ratio)).__module__.startswith("labquantities")
@@ -145,4 +145,5 @@ def test_temperature_difference() -> None:
     difference = warm - cold
 
     assert isinstance(difference, TemperatureDifference)
-    assert difference.value == warm.value - cold.value
+    kelvin = [q.to_system(Atomistic).value for q in (difference, warm, cold)]
+    assert kelvin[0] == kelvin[1] - kelvin[2]

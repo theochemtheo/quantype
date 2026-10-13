@@ -22,7 +22,15 @@ from quantype import (
     utorch,
 )
 from quantype import units as u
-from quantype.systems import SI, Atomistic, Metal, Real, UnitSystem
+from quantype.systems import (
+    SI,
+    AnySystem,
+    Atomistic,
+    Metal,
+    NoSystem,
+    Real,
+    UnitSystem,
+)
 
 kJ_per_mol = Energy.define_unit(  # noqa: N816 -- conventional unit spelling
     "typing:kJ_per_mol", reference=u.joule, scale=1e3 / 6.02214076e23
@@ -61,9 +69,27 @@ assert_type(point - point, TemperatureDifference[float, SI])
 
 x_default = 2.0 * u.nm
 assert_type(x_default, Length[float])
-assert_type(x_default, Length[float, Atomistic])
-assert_type(Length.from_value(2.0), Length[float])
-assert_type(Length[float](2, u.nm), Length[float, Atomistic])
+assert_type(x_default, Length[float, NoSystem])
+assert_type(Length[float](2, u.nm), Length[float, NoSystem])
+assert_type(Length[float, Atomistic].from_value(2.0), Length[float, Atomistic])
+
+# Raw numbers come from choosing a system, and unbinding keeps the type's kind.
+assert_type(x_default.to_system(Real).value, float)
+assert_type(x_default.to_system(Real).to_system(NoSystem), Length[float])
+assert_type(x_default.apply(lambda raw: raw * 2), Length[float])
+
+
+def anywhere[S: AnySystem](f: Force[float, S], d: Length[float, S]) -> Energy[float, S]:
+    return f * d
+
+
+def raw_numbers[S: UnitSystem](r: Length[float, S]) -> float:
+    return r.value
+
+
+assert_type(anywhere(Force[float](1.0, u.eV_per_angstrom), x_default), Energy[float])
+assert_type(anywhere(Force[float, SI](1.0, u.newton), x_si), Energy[float, SI])
+assert_type(raw_numbers(x_si), float)
 
 
 def cutoff_today(r: Length[float]) -> Length[float]:
@@ -99,7 +125,8 @@ assert_type(cutoff.to_system(GromacsFs), Length[float, GromacsFs])
 raw: npt.NDArray[np.float32] = np.zeros((4, 3), dtype=np.float32)
 forces = Force[npt.NDArray[np.float32], Gromacs].from_value(raw)
 assert_type(forces, Force[npt.NDArray[np.float32], Gromacs])
-assert_type(forces.to_system(Atomistic), Force[npt.NDArray[np.float32]])
+assert_type(forces.to_system(Atomistic), Force[npt.NDArray[np.float32], Atomistic])
+assert_type(forces.to_system(NoSystem), Force[npt.NDArray[np.float32]])
 assert_type(forces[0], Force[npt.NDArray[np.float32], Gromacs])
 
 

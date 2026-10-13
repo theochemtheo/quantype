@@ -11,7 +11,7 @@ changes data on the way through: 125,373 of 1,000,000 random float64 values
 given in nm come back different from `.magnitude(u.nm)`.
 
 Can a user opt into a unit system where raw numbers are needed, without losing
-what [ADR-003](../decisions/ADR-003-unit-system-is-a-type-parameter.md) gives:
+what [ADR-003](superseded/ADR-003-unit-system-is-a-type-parameter.md) gives:
 `.value` has one meaning for each static type, and systems never mix silently?
 
 The decision covers the default system, how default-system quantities store
@@ -39,15 +39,13 @@ four checkers enforce the null system's rules with no change in stub size or
 checking time. The prototypes and measurements are in
 [opt-in unit systems](../design/opt-in-unit-system.md).
 
-`NoSystem` is a working name; see [open questions](#open-questions).
-
 ```python notest
-x = Length[float](2, u.nm)        # Length[float, NoSystem]; stores 2.0 in nm
-f = Energy[float](3, u.eV) / x    # Force; stores 1.5 in eV/nm, no conversion
+x = Length[float](2, u.nm)  # Length[float, NoSystem]; stores 2.0 in nm
+f = Energy[float](3, u.eV) / x  # Force; stores 1.5 in eV/nm, no conversion
 x + Length[float](3, u.angstrom)  # 2.3 nm: the right operand converts to nm
-x.value                           # type error, and a TypeError at runtime
-x.to_system(Real).value           # 20.0: choosing a system converts once
-x + Length[float, SI](1, u.m)     # type error, and a TypeError at runtime
+x.value  # type error, and a TypeError at runtime
+x.to_system(Real).value  # 20.0: choosing a system converts once
+x + Length[float, SI](1, u.m)  # type error, and a TypeError at runtime
 ```
 
 The rules for null-system quantities:
@@ -84,9 +82,8 @@ Statically, `NoSystem` is the default system parameter and is not a
 `Quantity[Any, W, T]` with `T: UnitSystem`. Code that accepts both bound and
 null quantities is generic over `[S: AnySystem]`.
 
-When accepted, this supersedes ADR-003, whose system type parameter carries
-over unchanged, and replaces one rule of
-[ADR-004](../decisions/ADR-004-display-unit-is-presentation.md): products,
+This supersedes ADR-003, whose system type parameter carries over unchanged,
+and replaces one rule of [ADR-004](ADR-004-display-unit-is-presentation.md): products,
 ratios, and powers of null-system quantities show their composed unit instead
 of the system's unit.
 
@@ -128,17 +125,19 @@ of the system's unit.
 * Bad, because arrays share memory with their input in more cases: today only
   when the input unit is the system's unit, afterwards for any unit.
 * Bad, because arrays in offset units still convert to kelvin.
+* Bad, because only `.value` is rejected statically. `from_value` and
+  `with_value` raise `TypeError` at runtime without a system, but their stubs
+  are unchanged, so checkers accept those calls.
 
-### Required before this lands
+### Catalogue scales round once
 
-Catalogue scales are computed in floating point from exact definitions, and 46
-of 156 are not the nearest float to their exact value (1 to 5 ulp). The
-picosecond is `999.9999999999999` fs, so 3 ps is stored as
-`2999.9999999999995` fs today. Null-system quantities compose and compare
-through these scales, so the errors reach users more often. Compute each scale
-exactly and round once; that fixes all 46 and makes N = kg·m/s²,
-Pa = N/m², ns = 1000 ps, and s = 1000 ms hold. This is independent of the rest
-and can land first.
+Catalogue scales were computed in floating point from exact definitions, and 46
+of 156 were not the nearest float to their exact value (1 to 5 ulp). The
+picosecond was `999.9999999999999` fs, so 3 ps was stored as
+`2999.9999999999995` fs. Null-system quantities compose and compare through
+these scales, so the errors would reach users more often. Each scale, and each
+physical constant, is now computed exactly and rounded once. That fixes all 46
+and makes N = kg·m/s², Pa = N/m², ns = 1000 ps, and s = 1000 ms hold.
 
 ### Not addressed here
 
@@ -175,16 +174,16 @@ For null-system quantities the options are:
   `quantype.numpy` covering the rest. That shrinks the need for an escape
   hatch without removing it.
 
-Proposed: `apply`, on every quantity, documented with its contract.
+Chosen: `apply`, on every quantity, documented with its contract.
 `with_magnitude` can follow if code turns up that has its numbers in a unit it
 can name.
 
-### Open questions
+### Names and display order
 
-* The null system's name. `NoSystem` reads clearly in every message
+* The null system is `NoSystem`, which reads clearly in every message
   (`Cannot combine NoSystem and SI quantities`). `Unspecified` and `Portable`
-  are alternatives. The prototype used `Unbound`, which collides with
+  were alternatives. The prototype used `Unbound`, which collides with
   "unbound type variable" in checker output. `Free` was rejected.
-* The fixed order and fallback for displaying nested compositions. Proposed:
-  `Atomistic`, `Metal`, `Real`, `SI`, `CGS`, `Atomic`, with `SI` as the
-  fallback, so g × (m/s)² displays in J.
+* Nested compositions display in the first of `Atomistic`, `Metal`, `Real`,
+  `SI`, `CGS`, and `Atomic` that stores each operand's kind in the operand's
+  unit, with `SI` as the fallback, so g × (m/s)² displays in J.

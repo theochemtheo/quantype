@@ -2,7 +2,7 @@
 
 Quantity stubs are generic over storage ``V`` and unit system ``S``. ``S`` is a
 defaulted ``typing_extensions.TypeVar`` (PEP 696), so ``Length[float]`` means
-``Length[float, Atomistic]``. It passes through every overload unchanged, and is
+``Length[float, NoSystem]``. It passes through every overload unchanged, and is
 invariant, so operands from different systems match no overload.
 """
 
@@ -35,9 +35,9 @@ TYPE_VARIABLES = (
     "# Public parameter names read better in diagnostics than private ones.\n"
     "# ruff: noqa: PYI001\n"
     "from typing_extensions import TypeVar\n"
-    "from quantype.systems import Atomistic, UnitSystem\n"
+    "from quantype.systems import AnySystem, NoSystem\n"
     "V = TypeVar('V')\n"
-    "S = TypeVar('S', bound=UnitSystem, default=Atomistic)\n"
+    "S = TypeVar('S', bound=AnySystem, default=NoSystem)\n"
 )
 # Protocol members are named after the kinds they take: _rmul_Length.
 PROTOCOL_MEMBERS = "# ruff: noqa: N802\n"
@@ -101,7 +101,7 @@ def protocol_stubs(catalogue: Catalogue) -> str:
     for name in catalogue.quantities:
         for _, _, _, protocol, member in PROTOCOLS:
             text += (
-                f"\nclass {protocol}{name}F[T: UnitSystem, R](Protocol):\n"
+                f"\nclass {protocol}{name}F[T: AnySystem, R](Protocol):\n"
                 f"    def {member}{name}_f(self, other: {name}[float, T], /) -> R: ...\n"
                 f"\nclass {protocol}{name}[L, R](Protocol):\n"
                 f"    def {member}{name}(self, other: L, /) -> R: ...\n"
@@ -300,14 +300,14 @@ def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
     text = f"    @classmethod\n    @override\n    def define_unit(cls, name: str, *, reference: Unit[{name}Kind], scale: float = 1.0, offset: float = 0.0, symbol: str | None = None) -> _units._{name}Unit: ...\n"
     text += f"    @classmethod\n    @override\n    def unit_named(cls, name: str, *, units: tuple[Unit[Any], ...] = ()) -> _units._{name}Unit: ...\n"
     text += f"    @classmethod\n    @override\n    def from_value[W](cls, value: W) -> {name}[W, S]: ...\n"
-    text += f"    @classmethod\n    @override\n    def reinterpret[W, T: UnitSystem](cls, quantity: Quantity[Any, W, T]) -> {name}[W, T]: ...\n"
+    text += f"    @classmethod\n    @override\n    def reinterpret[W, T: AnySystem](cls, quantity: Quantity[Any, W, T]) -> {name}[W, T]: ...\n"
     # A string holds one number; other inputs may hold arrays.
     text += f"    @overload\n    @classmethod\n    @override\n    def parse(cls, data: str, *, units: tuple[Unit[Any], ...] = ()) -> {name}[float, S]: ...\n"
     text += f"    @overload\n    @classmethod\n    def parse(cls, data: object, *, units: tuple[Unit[Any], ...] = ()) -> {name}[float | npt.NDArray[np.float64], S]: ...\n"
     text += (
         f"    @property\n    @override\n    def unit(self) -> _units._{name}Unit: ...\n"
     )
-    text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[V, T]: ...\n"
+    text += f"    @override\n    def to_system[T: AnySystem](self, system: type[T]) -> {name}[V, T]: ...\n"
     text += additive_stubs(name)
     for method in ("__neg__", "__abs__"):
         text += f"    @override\n    def {method}(self) -> {name}[V, S]: ...\n"
@@ -359,7 +359,7 @@ def constant_stub(name: str, catalogue: Catalogue, table: Table) -> str:
     """
     own = f"_{name}Constant"
     text = f"\nclass {own}(Constant[{name}Kind]):\n"
-    text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[float, T]: ...\n"
+    text += f"    @override\n    def to_system[T: AnySystem](self, system: type[T]) -> {name}[float, T]: ...\n"
     text += f"    @override\n    def to(self, unit: Unit[{name}Kind]) -> {name}[float]: ...\n"
     reciprocal = product_name("div", "Dimensionless", name, catalogue, table)
     for method, protocol, expression, reflected in (
@@ -375,7 +375,7 @@ def constant_stub(name: str, catalogue: Catalogue, table: Table) -> str:
             signatures += [
                 f"def {method}[R](self, other: _C{protocol}{name}[R], /) -> R: ...",
                 f"def {method}[L](self, other: Constant[L], /) -> Constant[{expression}[{name}Kind, L]]: ...",
-                f"def {method}[R, T: UnitSystem](self, other: _R{protocol}{name}F[T, R], /) -> R: ...",
+                f"def {method}[R, T: AnySystem](self, other: _R{protocol}{name}F[T, R], /) -> R: ...",
             ]
         if method == "__rtruediv__":
             scalar = (
@@ -388,7 +388,7 @@ def constant_stub(name: str, catalogue: Catalogue, table: Table) -> str:
         pair = f"L, {name}Kind" if reflected else f"{name}Kind, L"
         signatures += [
             f"def {method}(self, other: _Scalar, /) -> {scalar}: ...",
-            f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{pair}], W, T]: ...",
+            f"def {method}[L, W, T: AnySystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{pair}], W, T]: ...",
         ]
         block = overloads(signatures, overrides=True)
         # A named reciprocal refines the base's structural return type, which
@@ -406,8 +406,8 @@ def constant_stub(name: str, catalogue: Catalogue, table: Table) -> str:
     for operation, _, _, _, member in PROTOCOLS:
         for left in catalogue.quantities:
             result = product_type(operation, left, name, catalogue, table)
-            text += f"    def {member}{left}_f[T: UnitSystem](self, other: {left}[float, T], /) -> {result('float', 'T')}: ...\n"
-            text += f"    def {member}{left}[W, T: UnitSystem](self, other: {left}[W, T], /) -> {result('W', 'T')}: ...\n"
+            text += f"    def {member}{left}_f[T: AnySystem](self, other: {left}[float, T], /) -> {result('float', 'T')}: ...\n"
+            text += f"    def {member}{left}[W, T: AnySystem](self, other: {left}[W, T], /) -> {result('W', 'T')}: ...\n"
     for operation, _, expression, _, member in CONSTANT_PROTOCOLS:
         for left in catalogue.quantities:
             named = product_name(operation, left, name, catalogue, table)
@@ -432,7 +432,7 @@ def structural_scaling(method: str, result: str) -> list[str]:
 def structural_quantity_stub() -> str:
     """A generated base carries its own dimensionless marker through trees."""
     text = "K = TypeVar('K')\n"
-    text += "type _StructuralQuantity[A, B, X, Y: UnitSystem] = Quantity[Mul[A, B], X, Y] | Quantity[Div[A, B], X, Y] | Quantity[Pow[A, B], X, Y]\n"
+    text += "type _StructuralQuantity[A, B, X, Y: AnySystem] = Quantity[Mul[A, B], X, Y] | Quantity[Div[A, B], X, Y] | Quantity[Pow[A, B], X, Y]\n"
     text += "class Quantity(_BaseQuantity[K, V, S]):\n"
     for method in ("__add__", "__sub__"):
         text += overloads(
@@ -509,6 +509,7 @@ def structural_quantity_stub() -> str:
 def kind_docstring(name: str, catalogue: Catalogue) -> str:
     """What ``help(Length)`` shows: storage, construction, and where units are."""
     namespace = namespace_name(name)
+    # Atomistic's own unit, where it has one, makes the more familiar example.
     stored = next(
         (
             unit
@@ -517,13 +518,12 @@ def kind_docstring(name: str, catalogue: Catalogue) -> str:
         ),
         catalogue.quantities[name].canonical_unit,
     )
-    symbol = catalogue.units[stored].symbol or stored
     namespaces = {namespace_name(kind) for kind in catalogue.quantities}
     unit = f"u.{stored}" if stored not in namespaces else f"u.{namespace}.{stored}"
     words = namespace.replace("_", " ")
     article = "An" if words[0] in "aeiou" else "A"
     return (
-        f'    """{article} {words}, stored in {symbol} in the default Atomistic system.\n\n'
+        f'    """{article} {words}, kept in the unit it is given in.\n\n'
         f"    Build one with ``{name}[float](2, {unit})``.\n"
         f"    Its units are in ``u.{namespace}``.\n"
         '    """\n\n'
@@ -548,14 +548,14 @@ def quantity_outputs(
     # Constant classes register themselves by kind; nothing names them here.
     runtime = HEADER + "# pyright: reportUnusedClass=false\n" + markers
     runtime += (
-        "from quantype.systems import UnitSystem\nfrom quantype.core import Constant\n"
+        "from quantype.systems import AnySystem\nfrom quantype.core import Constant\n"
     )
     if package == "quantype":
         runtime += "from quantype.core import Quantity\n"
     else:
         runtime += "from quantype.core import Quantity as _BaseQuantity\n"
         runtime += f"from {package}._catalogue import runtime\n"
-        runtime += "class Quantity[K, V, S: UnitSystem](_BaseQuantity[K, V, S]):\n    _catalogue_dimensionless = runtime.kinds['Dimensionless']\n"
+        runtime += "class Quantity[K, V, S: AnySystem](_BaseQuantity[K, V, S]):\n    _catalogue_dimensionless = runtime.kinds['Dimensionless']\n"
     # The naming table loads with the products module, when a product first needs it.
     runtime += f"import importlib as _importlib\nfrom quantype._internal._semantics import defer_table as _defer_table\n_defer_table(lambda: _importlib.import_module({package + '.products'!r}))\n"
     stub = (
@@ -591,7 +591,7 @@ def quantity_outputs(
         stub += structural_quantity_stub()
     stub += protocol_stubs(catalogue)
     for name in catalogue.quantities:
-        runtime += f"\nclass {name}[V, S: UnitSystem](Quantity[{name}Kind, V, S]):\n"
+        runtime += f"\nclass {name}[V, S: AnySystem](Quantity[{name}Kind, V, S]):\n"
         runtime += kind_docstring(name, catalogue) + f"    _kind = {name!r}\n"
         if package != "quantype":
             runtime += f"    _semantic = runtime.kinds[{name!r}]\n"
@@ -638,7 +638,7 @@ def constant_module(name: str, catalogue: Catalogue, package: str, table: Table)
         if package == "quantype"
         else f"from {package}._generated import Quantity\n"
     )
-    text += "from quantype.systems import UnitSystem\n"
+    text += "from quantype.systems import AnySystem\n"
     markers = sorted(
         word for word in used if word.endswith("Kind") or word in {"Mul", "Div", "Pow"}
     )
@@ -775,11 +775,11 @@ def jax_signatures(catalogue: Catalogue, name: str) -> list[str]:
         return f"tuple[{output}, {result}]" if name == "value_and_grad" else result
 
     signatures = [
-        f"def {name}[S: UnitSystem, **P](function: Callable[Concatenate[{input_}[Array, S], P], {output}[Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[{input_}[Array, S], P], {returned(f'{output}[Array, S]', f'{result}[Array, S]')}]: ..."
+        f"def {name}[S: AnySystem, **P](function: Callable[Concatenate[{input_}[Array, S], P], {output}[Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[{input_}[Array, S], P], {returned(f'{output}[Array, S]', f'{result}[Array, S]')}]: ..."
         for output, input_, result in _derivatives(catalogue)
     ]
     signatures += [
-        f"def {name}[I, O, S: UnitSystem, **P](function: Callable[Concatenate[Quantity[I, Array, S], P], Quantity[O, Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[Quantity[I, Array, S], P], {returned('Quantity[O, Array, S]', 'Quantity[Div[O, I], Array, S]')}]: ...",
+        f"def {name}[I, O, S: AnySystem, **P](function: Callable[Concatenate[Quantity[I, Array, S], P], Quantity[O, Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[Quantity[I, Array, S], P], {returned('Quantity[O, Array, S]', 'Quantity[Div[O, I], Array, S]')}]: ...",
         f"def {name}(function: Callable[..., Quantity[Any, Array, Any]], argnums: int | tuple[int, ...]) -> Callable[..., Any]: ...",
     ]
     return signatures
@@ -788,12 +788,12 @@ def jax_signatures(catalogue: Catalogue, name: str) -> list[str]:
 def torch_signatures(catalogue: Catalogue) -> list[str]:
     options = "*, create_graph: bool = False, retain_graph: bool | None = None"
     signatures = [
-        f"def grad[S: UnitSystem](output: {output}[Tensor, S], inputs: {input_}[Tensor, S], {options}) -> {result}[Tensor, S]: ..."
+        f"def grad[S: AnySystem](output: {output}[Tensor, S], inputs: {input_}[Tensor, S], {options}) -> {result}[Tensor, S]: ..."
         for output, input_, result in _derivatives(catalogue)
     ]
     signatures += [
-        f"def grad[I, O, S: UnitSystem](output: Quantity[O, Tensor, S], inputs: Quantity[I, Tensor, S], {options}) -> Quantity[Div[O, I], Tensor, S]: ...",
-        f"def grad[S: UnitSystem](output: Quantity[Any, Tensor, S], inputs: Sequence[Quantity[Any, Tensor, S]], {options}) -> tuple[Quantity[Any, Tensor, S], ...]: ...",
+        f"def grad[I, O, S: AnySystem](output: Quantity[O, Tensor, S], inputs: Quantity[I, Tensor, S], {options}) -> Quantity[Div[O, I], Tensor, S]: ...",
+        f"def grad[S: AnySystem](output: Quantity[Any, Tensor, S], inputs: Sequence[Quantity[Any, Tensor, S]], {options}) -> tuple[Quantity[Any, Tensor, S], ...]: ...",
     ]
     return signatures
 
@@ -804,10 +804,10 @@ def hessian_signatures(catalogue: Catalogue) -> list[str]:
         second = catalogue.algebra.get(("div", result, input_))
         if second is not None:
             signatures.append(
-                f"def hessian[S: UnitSystem, **P](function: Callable[Concatenate[{input_}[Array, S], P], {output}[Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[{input_}[Array, S], P], {second}[Array, S]]: ..."
+                f"def hessian[S: AnySystem, **P](function: Callable[Concatenate[{input_}[Array, S], P], {output}[Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[{input_}[Array, S], P], {second}[Array, S]]: ..."
             )
     signatures += [
-        "def hessian[I, O, S: UnitSystem, **P](function: Callable[Concatenate[Quantity[I, Array, S], P], Quantity[O, Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[Quantity[I, Array, S], P], Quantity[Div[Div[O, I], I], Array, S]]: ...",
+        "def hessian[I, O, S: AnySystem, **P](function: Callable[Concatenate[Quantity[I, Array, S], P], Quantity[O, Array, S]], argnums: Literal[0] = 0) -> Callable[Concatenate[Quantity[I, Array, S], P], Quantity[Div[Div[O, I], I], Array, S]]: ...",
         "def hessian(function: Callable[..., Quantity[Any, Array, Any]], argnums: int) -> Callable[..., Any]: ...",
     ]
     return signatures
@@ -828,7 +828,7 @@ def adapter_outputs(catalogue: Catalogue, package: str) -> dict[str, str]:
                 if backend == "ujax"
                 else "from typing import Any, overload\nfrom collections.abc import Sequence\n"
             )
-            + "from quantype.systems import UnitSystem\n"
+            + "from quantype.systems import AnySystem\n"
         )
         derivative_kinds = {
             kind
@@ -916,11 +916,11 @@ def unnamed_products(
     makes Pyright infer Any when array storage has Any in its shape.
     """
     left = [
-        f"def {function}[A, B, L, V, S: UnitSystem]({first}: _BaseQuantity[{e}[A, B], V, S], {second}: _BaseQuantity[L, V, S]{extra}) -> Quantity[Mul[{e}[A, B], L], V, S]: ..."
+        f"def {function}[A, B, L, V, S: AnySystem]({first}: _BaseQuantity[{e}[A, B], V, S], {second}: _BaseQuantity[L, V, S]{extra}) -> Quantity[Mul[{e}[A, B], L], V, S]: ..."
         for e in STRUCTURES
     ]
     right = [
-        f"def {function}[K, A, B, V, S: UnitSystem]({first}: _BaseQuantity[K, V, S], {second}: _BaseQuantity[{e}[A, B], V, S]{extra}) -> Quantity[Mul[K, {e}[A, B]], V, S]: ..."
+        f"def {function}[K, A, B, V, S: AnySystem]({first}: _BaseQuantity[K, V, S], {second}: _BaseQuantity[{e}[A, B], V, S]{extra}) -> Quantity[Mul[K, {e}[A, B]], V, S]: ..."
         for e in STRUCTURES
     ]
     return left + right
@@ -936,7 +936,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     )
     text += "from collections.abc import Sequence\nfrom typing import Any, Literal, overload\n"
     text += "import numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Quantity as _BaseQuantity, _Numerical\n"
-    text += "from quantype.systems import UnitSystem\n"
+    text += "from quantype.systems import AnySystem\n"
     text += (
         f"from {package}._generated import (" + ", ".join(catalogue.quantities) + ")\n"
     )
@@ -966,26 +966,26 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     for name, source, target in NUMPY_UNARY:
         text += overloads(
             [
-                f"def {name}[V, S: UnitSystem](x: {source}[V, S], /) -> {target}[V, S]: ...",
+                f"def {name}[V, S: AnySystem](x: {source}[V, S], /) -> {target}[V, S]: ...",
                 *(raw.format(name) for raw in RAW_UNARY),
             ],
             indent="",
         )
     roots = [
-        f"def sqrt[V, S: UnitSystem](x: {result}[V, S], /) -> {base}[V, S]: ..."
+        f"def sqrt[V, S: AnySystem](x: {result}[V, S], /) -> {base}[V, S]: ..."
         for (base, exponent), result in catalogue.powers.items()
         if exponent == 2  # noqa: PLR2004 -- square roots undo squares
     ]
     roots += [
-        f"def sqrt[V, S: UnitSystem](x: {name}[V, S], /) -> {base}[V, S]: ..."
+        f"def sqrt[V, S: AnySystem](x: {name}[V, S], /) -> {base}[V, S]: ..."
         for name, base in squares
     ]
     roots.append(
-        "def sqrt[V, S: UnitSystem](x: Dimensionless[V, S], /) -> Dimensionless[V, S]: ..."
+        "def sqrt[V, S: AnySystem](x: Dimensionless[V, S], /) -> Dimensionless[V, S]: ..."
     )
     # Squares of unnamed kinds, written x ** 2 or x * x; named ones are above.
     roots += [
-        f"def sqrt[A, B, V, S: UnitSystem](x: _BaseQuantity[{square}, V, S], /) -> Quantity[{e}[A, B], V, S]: ..."
+        f"def sqrt[A, B, V, S: AnySystem](x: _BaseQuantity[{square}, V, S], /) -> Quantity[{e}[A, B], V, S]: ..."
         for e in STRUCTURES
         for square in (f"Pow[{e}[A, B], Literal[2]]", f"Mul[{e}[A, B], {e}[A, B]]")
     ]
@@ -1000,7 +1000,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         )
     text += overloads(
         [
-            "def arctan2[K, V, S: UnitSystem](y: _BaseQuantity[K, V, S], x: _BaseQuantity[K, V, S], /) -> Angle[V, S]: ...",
+            "def arctan2[K, V, S: AnySystem](y: _BaseQuantity[K, V, S], x: _BaseQuantity[K, V, S], /) -> Angle[V, S]: ...",
             "def arctan2[A: _Numerical](y: A, x: A, /) -> A: ...",
             "def arctan2(y: float, x: float, /) -> float: ...",
         ],
@@ -1041,7 +1041,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     text += numpy_products(catalogue, quantity)
     text += overloads(
         [
-            "def cross[K, L, V, S: UnitSystem](a: _BaseQuantity[K, V, S], b: _BaseQuantity[L, V, S], /, axis: int = ...) -> Quantity[Mul[K, L], V, S]: ...",
+            "def cross[K, L, V, S: AnySystem](a: _BaseQuantity[K, V, S], b: _BaseQuantity[L, V, S], /, axis: int = ...) -> Quantity[Mul[K, L], V, S]: ...",
             "def cross[A: _Numerical](a: A, b: A, /, axis: int = ...) -> A: ...",
         ],
         indent="",
@@ -1090,7 +1090,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     text += numpy_statistics(catalogue, table, quantity)
     text += overloads(
         [
-            "def diff[V, S: UnitSystem](x: Temperature[V, S], n: int = ..., axis: int = ...) -> TemperatureDifference[V, S]: ...",
+            "def diff[V, S: AnySystem](x: Temperature[V, S], n: int = ..., axis: int = ...) -> TemperatureDifference[V, S]: ...",
             f"def diff[Q: {quantity}](x: Q, n: int = ..., axis: int = ...) -> Q: ...",
             "def diff[A: _Numerical](x: A, n: int = ..., axis: int = ...) -> A: ...",
         ],
@@ -1113,8 +1113,8 @@ def numpy_products(catalogue: Catalogue, quantity: str) -> str:
         signature
         for name in catalogue.quantities
         for signature in (
-            f"def dot[S: UnitSystem, R](a: {name}[float, S], b: _RMul{name}F[S, R], /) -> R: ...",
-            f"def dot[V, S: UnitSystem, R](a: {name}[V, S], b: _RMul{name}[{name}[V, S], R], /) -> R: ...",
+            f"def dot[S: AnySystem, R](a: {name}[float, S], b: _RMul{name}F[S, R], /) -> R: ...",
+            f"def dot[V, S: AnySystem, R](a: {name}[V, S], b: _RMul{name}[{name}[V, S], R], /) -> R: ...",
         )
     ]
     text += overloads(
@@ -1145,8 +1145,8 @@ def numpy_products(catalogue: Catalogue, quantity: str) -> str:
         signature
         for name in catalogue.quantities
         for signature in (
-            f"def trapezoid[S: UnitSystem, R](y: {name}[float, S], x: _RMul{name}F[S, R], dx: float = ..., axis: int = ...) -> R: ...",
-            f"def trapezoid[V, S: UnitSystem, R](y: {name}[V, S], x: _RMul{name}[{name}[V, S], R], dx: float = ..., axis: int = ...) -> R: ...",
+            f"def trapezoid[S: AnySystem, R](y: {name}[float, S], x: _RMul{name}F[S, R], dx: float = ..., axis: int = ...) -> R: ...",
+            f"def trapezoid[V, S: AnySystem, R](y: {name}[V, S], x: _RMul{name}[{name}[V, S], R], dx: float = ..., axis: int = ...) -> R: ...",
         )
     ]
     text += overloads(
@@ -1180,7 +1180,7 @@ def numpy_statistics(catalogue: Catalogue, table: Table, quantity: str) -> str:
     for name in ("std", "nanstd"):
         text += overloads(
             [
-                f"def {name}[V, S: UnitSystem](x: Temperature[V, S], {spread}) -> TemperatureDifference[V, S]: ...",
+                f"def {name}[V, S: AnySystem](x: Temperature[V, S], {spread}) -> TemperatureDifference[V, S]: ...",
                 f"def {name}[Q: {quantity}](x: Q, {spread}) -> Q: ...",
                 f"def {name}(x: _Numerical, {spread}) -> Any: ...",
             ],
@@ -1193,7 +1193,7 @@ def numpy_statistics(catalogue: Catalogue, table: Table, quantity: str) -> str:
         ("square", ", /", [signature.format("square") for signature in RAW_UNARY]),
     ):
         squared = [
-            f"def {name}[V, S: UnitSystem](x: {kind}[V, S]{parameters}) -> {power_type(base, 2, catalogue, table)}: ..."
+            f"def {name}[V, S: AnySystem](x: {kind}[V, S]{parameters}) -> {power_type(base, 2, catalogue, table)}: ..."
             for kind in catalogue.quantities
             for base in (
                 "TemperatureDifference"
@@ -1205,7 +1205,7 @@ def numpy_statistics(catalogue: Catalogue, table: Table, quantity: str) -> str:
             [
                 *squared,
                 *(
-                    f"def {name}[A, B, V, S: UnitSystem](x: _BaseQuantity[{e}[A, B], V, S]{parameters}) -> Quantity[Pow[{e}[A, B], Literal[2]], V, S]: ..."
+                    f"def {name}[A, B, V, S: AnySystem](x: _BaseQuantity[{e}[A, B], V, S]{parameters}) -> Quantity[Pow[{e}[A, B], Literal[2]], V, S]: ..."
                     for e in STRUCTURES
                 ),
                 *raw,
@@ -1228,10 +1228,10 @@ def numpy_statistics(catalogue: Catalogue, table: Table, quantity: str) -> str:
     text += overloads(
         [
             *(
-                f"def linspace[S: UnitSystem](start: {kind}[float, S], stop: {kind}[float, S], {endpoints}) -> {kind}[npt.NDArray[np.float64], S]: ..."
+                f"def linspace[S: AnySystem](start: {kind}[float, S], stop: {kind}[float, S], {endpoints}) -> {kind}[npt.NDArray[np.float64], S]: ..."
                 for kind in catalogue.quantities
             ),
-            f"def linspace[K, S: UnitSystem](start: _BaseQuantity[K, float, S], stop: _BaseQuantity[K, float, S], {endpoints}) -> Quantity[K, npt.NDArray[np.float64], S]: ...",
+            f"def linspace[K, S: AnySystem](start: _BaseQuantity[K, float, S], stop: _BaseQuantity[K, float, S], {endpoints}) -> Quantity[K, npt.NDArray[np.float64], S]: ...",
             f"def linspace[Q: {quantity}](start: Q, stop: Q, {endpoints}) -> Q: ...",
             f"def linspace(start: float, stop: float, {endpoints}) -> npt.NDArray[np.float64]: ...",
             f"def linspace[A: _Numerical](start: A, stop: A, {endpoints}) -> A: ...",

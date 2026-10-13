@@ -3,8 +3,10 @@
 Numerical operations intentionally use the stored object's own operators. Dynamic
 typing is confined to this dispatch boundary, not exposed as a user's result type.
 
-Each quantity holds raw numbers in the units of its unit system, its
-physical kind, the system, and optionally the unit it was given in (display).
+Each quantity holds raw numbers, its physical kind, its unit system, and
+optionally the unit it was given in (display). In a unit system the numbers
+are in the system's units; without one (``NoSystem``) they are in a storage
+unit: the unit they were given in, or one composed from the operands' units.
 """
 
 # Runtime metadata is deliberately shared by the package's boundary modules.
@@ -30,15 +32,25 @@ from quantype._internal._semantics import (
     product,
 )
 from quantype._internal._storage import keep_storage, real_operand
+from quantype._internal._storage_units import (
+    compose,
+    presented,
+    raised,
+    recast,
+    reference_unit,
+    system_unit,
+)
 from quantype._internal._systems import (
+    AnySystem,
     Atomistic,
+    NoSystem,
     UnitSystem,
     coherence,
     coherent_symbol,
     factor,
     into_system,
     overridden_kinds,
-    require_system,
+    require_any_system,
 )
 from quantype._internal._unit import Unit, get_unit
 
@@ -90,7 +102,7 @@ def _rescaled(raw: Any, scale: float) -> Any:
 
 
 def _product_scale(
-    system: type[UnitSystem], left: Semantic, right: Semantic, result: Semantic, op: str
+    system: type[AnySystem], left: Semantic, right: Semantic, result: Semantic, op: str
 ) -> float:
     """The factor taking raw operands' product or ratio to the result's storage."""
     overridden = overridden_kinds(system)
@@ -125,19 +137,37 @@ def require_unit(unit: object, kind: str, hint: str = "") -> None:
     raise TypeError(f"{message} {hint}".rstrip())
 
 
+def _no_raw_numbers(
+    method: str, example: str | None, *, alternative: str | None = None
+) -> TypeError:
+    if example is not None:
+        hint = f"; name one, as in {example}.{method}(raw)"
+    else:
+        hint = f"; use .{alternative}(...)" if alternative else ""
+    return TypeError(
+        f"{method} trusts raw numbers in a unit system, which a quantity "
+        f"without one doesn't have{hint}"
+    )
+
+
 _CLASSES: dict[Kind, type[Quantity[Any, Any, Any]]] = {}
 _STRUCTURAL_CLASSES: dict[Kind, type[Quantity[Any, Any, Any]]] = {}
 
 
-def _wrap(
+def _wrap(  # noqa: PLR0913 -- one keyword argument per optional field
     kind: str | Semantic,
     value: Any,
-    system: type[UnitSystem] | None,
+    system: type[AnySystem] | None,
     *,
     display: Unit[Any] | None = None,
     echo: float | None = None,
+    storage: Unit[Any] | None = None,
 ) -> Quantity[Any, Any, Any]:
-    """Wrap trusted raw numbers; ``system=None`` means the default system."""
+    """Wrap trusted raw numbers; ``system=None`` means ``NoSystem``.
+
+    Without a system, ``storage`` is the unit the numbers are in; the default
+    is the kind's reference unit (Å, eV, fs, and their products).
+    """
     # No coercion: JAX reconstruction also supplies sentinel leaves.
     semantic = KINDS[kind] if isinstance(kind, str) else kind
     if isinstance(semantic, Kind):
@@ -155,7 +185,12 @@ def _wrap(
     result = cast("Any", object.__new__(cls))
     result._value = value
     result._semantic = semantic
-    result._system = Atomistic if system is None else system
+    if system is None or system is NoSystem:
+        result._system = NoSystem
+        result._storage = reference_unit(semantic) if storage is None else storage
+    else:
+        result._system = system
+        result._storage = None
     result._display = display
     result._echo = echo
     return cast("Quantity[Any, Any, Any]", result)
@@ -207,16 +242,36 @@ class _KindName:
         raise AttributeError("A quantity's kind is fixed")
 
 
-class Quantity[K, V, S: UnitSystem]:
-    """A semantic quantity: raw numbers in a unit system, and a display unit."""
+class _Value:
+    """``q.value``: raw numbers, which only a quantity in a unit system has."""
+
+    def __get__(self, obj: object, owner: object, /) -> Any:
+        if obj is None:
+            return self
+        quantity = cast("Quantity[Any, Any, Any]", obj)
+        if quantity._system is NoSystem:
+            raise TypeError(
+                f"{quantity.kind} has no raw numbers without a unit system; "
+                "use .magnitude(unit), or choose a system with .to_system(...)"
+            )
+        return quantity._value
+
+
+class Quantity[K, V, S: AnySystem]:
+    """A semantic quantity: numbers, a kind, a unit system, and a display unit."""
 
     _kind: str = ""
     kind: ClassVar[str] = cast("str", _KindName())
     _semantic: Semantic
-    _system: type[UnitSystem]
+    _system: type[AnySystem]
+    # The unit the numbers are in, without a system; None in a unit system.
+    _storage: Unit[Any] | None
     _display: Unit[K] | None
     _echo: float | None
     __array_priority__: ClassVar[int] = 10000
+    #: Raw numbers in the unit system's units; explicitly bypasses units. Only
+    #: quantities in a unit system have them.
+    value = cast("V", _Value())
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
@@ -241,9 +296,10 @@ class Quantity[K, V, S: UnitSystem]:
         dtype: object = None,
         display: bool = True,
     ) -> None:
-        """Convert ``value`` from ``unit``, and show it in ``unit`` if ``display``.
+        """Store ``value`` in ``unit`` and show it there; no unit system.
 
-        With ``display=False`` it shows in the system's unit, as ``from_value`` does.
+        Units with an offset (°C) store kelvin. With ``display=False`` it shows
+        in the storage unit.
         """
         if dtype is not None:
             raise TypeError("dtype requires a parameterized quantity storage type")
@@ -252,7 +308,8 @@ class Quantity[K, V, S: UnitSystem]:
         self._check_unit(unit)
         built = cast("Any", unit)(value)
         self._value = cast("V", built._value)
-        self._system = Atomistic
+        self._system = NoSystem
+        self._storage = built._storage
         self._display = unit if display else None
         self._echo = built._echo if display else None
 
@@ -284,28 +341,30 @@ class Quantity[K, V, S: UnitSystem]:
         A catalogue name or alias comes first, then a display symbol such as
         ``"Ha/a0"``. ``units`` adds definitions the catalogue doesn't have.
         """
-        return cast("Unit[K]", _unit_named(cls, name, units, Atomistic))
-
-    @property
-    def value(self) -> V:
-        """Raw numbers in the unit system's units; explicitly bypasses units."""
-        return self._value
+        return cast("Unit[K]", _unit_named(cls, name, units, NoSystem))
 
     @property
     def dimensions(self) -> tuple[int, ...]:
         return self._semantic.dimensions
 
     @property
-    def system(self) -> type[UnitSystem]:
+    def system(self) -> type[AnySystem]:
         return self._system
 
     @property
     def unit(self) -> Unit[K] | None:
-        """The unit ``magnitude()`` and ``repr`` use; None for unnamed products."""
+        """The unit ``magnitude()`` and ``repr`` use.
+
+        None for unnamed products in a unit system, which show the system's
+        units composed.
+        """
         if self._display is not None:
             return self._display
+        if self._storage is not None:
+            return cast("Unit[K]", presented(self._storage, self._semantic))
         if isinstance(self._semantic, Kind):
-            return cast("Unit[K]", self._system.unit_for(self._semantic))
+            system = cast("type[UnitSystem]", self._system)
+            return cast("Unit[K]", system.unit_for(self._semantic))
         return None
 
     @property
@@ -318,13 +377,14 @@ class Quantity[K, V, S: UnitSystem]:
 
     @classmethod
     def from_value[W](cls, value: W) -> Quantity[K, W, Any]:
-        """Trusted wrap of raw numbers already in the default system's units."""
+        """Trusted wrap of raw numbers in a unit system: ``Length[float, SI]``."""
+        del value
         if getattr(cls, "_semantic", None) is None:
             raise TypeError("from_value requires a named quantity class")
-        return cast("Quantity[K, W, Any]", _wrap(cls._semantic, value, None))
+        raise _no_raw_numbers("from_value", f"{cls._kind}[float, Atomistic]")
 
     @classmethod
-    def reinterpret[W, T: UnitSystem](
+    def reinterpret[W, T: AnySystem](
         cls, quantity: Quantity[Any, W, T]
     ) -> Quantity[K, W, T]:
         """The same physical value named as this kind, which must share its dimensions.
@@ -354,11 +414,17 @@ class Quantity[K, V, S: UnitSystem]:
         scale = coherence(system, source) / coherence(system, target)
         raw = _rescaled(quantity._value, scale)
         display = quantity._display if source is target else None
-        return cast("Quantity[K, W, T]", _wrap(target, raw, system, display=display))
+        storage = quantity._storage
+        if storage is not None:
+            storage = recast(target, storage)
+        return cast(
+            "Quantity[K, W, T]",
+            _wrap(target, raw, system, display=display, storage=storage),
+        )
 
     @classmethod
     def parse(cls, data: object, *, units: tuple[Unit[Any], ...] = ()) -> Self:
-        return cast("Self", _parse(cls, data, units, Atomistic))
+        return cast("Self", _parse(cls, data, units, NoSystem))
 
     @classmethod
     def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any) -> Any:
@@ -368,24 +434,41 @@ class Quantity[K, V, S: UnitSystem]:
 
     def _check_unit(self, unit: Unit[K], hint: str = "") -> None:
         require_unit(unit, self._kind, hint)
-        if unit.semantic is not self._semantic:
+        # Named kinds are nominal, so compared by identity; products of them,
+        # as in a composed storage unit, by structure.
+        semantic = unit.semantic
+        if semantic is not self._semantic and not (
+            isinstance(semantic, Expression) and semantic == self._semantic
+        ):
             raise ValueError(
                 f"Expected {self.kind}; unit {unit.name!r} represents {unit.kind}"
             )
 
     def magnitude(self, unit: Unit[K] | None = None) -> V:
-        """Magnitude in ``unit``, else the display unit, else the system's unit."""
+        """Magnitude in ``unit``, else in ``self.unit``.
+
+        Without ``unit``, an unnamed product in a unit system gives its raw
+        numbers, in the system's units composed.
+        """
         if self._echo is not None and (unit is None or unit == self._display):
             return cast("V", self._echo)
-        selected: Unit[Any] | None = unit or self._display
+        selected: Unit[Any] | None = unit or self.unit
         if selected is None:
-            if not isinstance(self._semantic, Kind):
-                return self._value
-            selected = self._system.unit_for(self._semantic)
+            return self._value
         self._check_unit(selected)
         from quantype._internal._storage import unit_conversion
 
-        scale, offset = into_system(selected, self._system)
+        storage = self._storage
+        if storage is None:
+            system = cast("type[UnitSystem]", self._system)
+            scale, offset = into_system(selected, system)
+        elif selected is storage:
+            return self._value
+        else:
+            scale, offset = (
+                selected.scale / storage.scale,
+                selected.offset / storage.scale,
+            )
         return cast("V", unit_conversion(self._value, scale, offset, inverse=True))
 
     def to(self, unit: Unit[K]) -> Self:
@@ -393,26 +476,48 @@ class Quantity[K, V, S: UnitSystem]:
         self._check_unit(
             unit,
             "`.to` sets the display unit; to move a tensor to another device, "
-            "use `q.with_value(q.value.to(device))`.",
+            "use `q.apply(lambda t: t.to(device))`.",
         )
         return cast(
-            "Self", _wrap(self._semantic, self._value, self._system, display=unit)
+            "Self",
+            _wrap(
+                self._semantic,
+                self._value,
+                self._system,
+                display=unit,
+                storage=self._storage,
+            ),
         )
 
-    def to_system(self, system: type[UnitSystem]) -> Quantity[K, V, Any]:
-        """Rescale the raw numbers into another unit system; the display is kept."""
-        target = require_system(system)
+    def to_system(self, system: type[AnySystem]) -> Quantity[K, V, Any]:
+        """Rescale the numbers into another unit system; the display is kept.
+
+        Into ``NoSystem``, nothing converts: the numbers stay in the units of
+        the system they came from.
+        """
+        target = require_any_system(system)
         raw: Any = self._value
-        if target is not self._system:
+        storage = self._storage
+        if target is NoSystem:
+            if storage is None:
+                source = cast("type[UnitSystem]", self._system)
+                storage = system_unit(source, self._semantic)
+        elif target is not self._system:
             from quantype._internal._storage import (
                 unit_conversion,
                 warn_if_out_of_range,
             )
 
             # Temperatures share kelvin-scaled bases, so there is never an offset.
-            ratio = factor(self._system, self._semantic) / factor(
-                target, self._semantic
+            source_scale = (
+                factor(cast("type[UnitSystem]", self._system), self._semantic)
+                if storage is None
+                else storage.scale
             )
+            ratio = source_scale / factor(
+                cast("type[UnitSystem]", target), self._semantic
+            )
+            storage = None
             converted = unit_conversion(raw, ratio, 0.0)
             if type(raw).__module__.startswith("numpy"):
                 import numpy as np
@@ -422,7 +527,14 @@ class Quantity[K, V, S: UnitSystem]:
             raw = converted
         return cast(
             "Quantity[K, V, Any]",
-            _wrap(self._semantic, raw, target, display=self._display, echo=self._echo),
+            _wrap(
+                self._semantic,
+                raw,
+                target,
+                display=self._display,
+                echo=self._echo,
+                storage=storage,
+            ),
         )
 
     def to_dict(self, unit: Unit[K] | None = None) -> dict[str, object]:
@@ -442,15 +554,30 @@ class Quantity[K, V, S: UnitSystem]:
         """New raw numbers with this quantity's kind, unit system and display unit.
 
         The numbers are trusted, as for ``from_value``: they must already be in
-        the unit system's units. ``x.with_value(np.sort(x.value))`` or
-        ``x.with_value(x.value.detach())`` applies an operation quantype has no
-        rule for.
+        the unit system's units. Without a unit system there are none; use
+        ``apply``.
         """
         if isinstance(value, Quantity):
             raise TypeError(
                 "with_value takes raw numbers, such as q.value, not a quantity"
             )
+        if self._system is NoSystem:
+            raise _no_raw_numbers("with_value", None, alternative="apply")
         return self._with(value)
+
+    def apply[W](self, function: Callable[[V], W], /) -> Quantity[K, W, S]:
+        """Apply ``function`` to the stored numbers, keeping kind, units and system.
+
+        ``x.apply(np.sort)`` or ``x.apply(lambda t: t.detach())`` applies an
+        operation quantype has no rule for. The function must give the same
+        physical result whatever unit the numbers are in: sorting, slicing,
+        reshaping, detaching, or moving to a device, but not ``np.log`` or
+        adding a constant. Nothing checks that.
+        """
+        result = function(self._value)
+        if isinstance(result, Quantity):
+            raise TypeError("apply's function returns numbers, not a quantity")
+        return cast("Quantity[K, W, S]", self._with(result))
 
     def _scaled(self, raw: Any) -> Self:
         """Scaling keeps the display unit, unless it has an offset (°C).
@@ -461,7 +588,7 @@ class Quantity[K, V, S: UnitSystem]:
         return self._with(raw, display=display)
 
     def _with(self, raw: Any, *, display: bool = True) -> Self:
-        """Same kind and system; same-kind operations keep the display unit."""
+        """Same kind, system and storage unit; keeps the display unit by default."""
         return cast(
             "Self",
             _wrap(
@@ -469,8 +596,22 @@ class Quantity[K, V, S: UnitSystem]:
                 raw,
                 self._system,
                 display=self._display if display else None,
+                storage=self._storage,
             ),
         )
+
+    def _aligned(self, other: Quantity[Any, Any, Any]) -> Any:
+        """``other``'s numbers in this quantity's storage unit, or system's units."""
+        if self._storage is None or other._storage is None:
+            return other._value
+        ratio = other._storage.scale / self._storage.scale
+        return _rescaled(other._value, ratio)
+
+    def _reference(self) -> Any:
+        """The numbers in the reference units, which comparison and hashing use."""
+        if self._storage is None:
+            return self._value
+        return _rescaled(self._value, self._storage.scale)
 
     def _is_dimensionless(self) -> bool:
         semantic = self._semantic
@@ -508,8 +649,13 @@ class Quantity[K, V, S: UnitSystem]:
         left._same_system(right)
         kind = addition(left._semantic, right._semantic, subtract=subtract)
         lhs: Any = left._value
-        raw = lhs - right._value if subtract else lhs + right._value
-        return _wrap(kind, raw, self._system, display=_sum_display(kind, left, right))
+        aligned: Any = left._aligned(right)
+        raw = lhs - aligned if subtract else lhs + aligned
+        storage = left._storage
+        if storage is not None:
+            storage = recast(kind, storage)
+        display = _sum_display(kind, left, right)
+        return _wrap(kind, raw, self._system, display=display, storage=storage)
 
     def __add__(self, other: object) -> Quantity[Any, Any, Any]:
         return self._add_sub(other, subtract=False)
@@ -529,6 +675,9 @@ class Quantity[K, V, S: UnitSystem]:
             rhs = cast("Quantity[Any, Any, Any]", other)
             self._same_system(rhs)
             kind = product("mul", self._semantic, rhs._semantic)
+            if self._storage is not None and rhs._storage is not None:
+                storage = compose("mul", kind, self._storage, rhs._storage)
+                return _wrap(kind, lhs * rhs._value, NoSystem, storage=storage)
             scale = _product_scale(
                 self._system, self._semantic, rhs._semantic, kind, "mul"
             )
@@ -546,6 +695,9 @@ class Quantity[K, V, S: UnitSystem]:
             rhs = cast("Quantity[Any, Any, Any]", other)
             self._same_system(rhs)
             kind = product("div", self._semantic, rhs._semantic)
+            if self._storage is not None and rhs._storage is not None:
+                storage = compose("div", kind, self._storage, rhs._storage)
+                return _wrap(kind, lhs / rhs._value, NoSystem, storage=storage)
             scale = _product_scale(
                 self._system, self._semantic, rhs._semantic, kind, "div"
             )
@@ -558,9 +710,13 @@ class Quantity[K, V, S: UnitSystem]:
         operand = self._operand(other)
         numerator = dimensionless_kind(self._semantic)
         kind = product("div", numerator, self._semantic)
-        scale = _product_scale(self._system, numerator, self._semantic, kind, "div")
         raw: Any = self._value
         quotient = keep_storage(raw, operand / raw)
+        if self._storage is not None:
+            one = reference_unit(numerator)
+            storage = compose("div", kind, one, self._storage)
+            return _wrap(kind, quotient, NoSystem, storage=storage)
+        scale = _product_scale(self._system, numerator, self._semantic, kind, "div")
         return _wrap(kind, _rescaled(quotient, scale), self._system)
 
     def __matmul__(self, other: Any) -> Quantity[Any, Any, Any]:
@@ -587,6 +743,9 @@ class Quantity[K, V, S: UnitSystem]:
             raise TypeError("Only integer quantity powers are supported")
         kind = power(self._semantic, exponent)
         raw: Any = self._value
+        if self._storage is not None:
+            storage = raised(kind, self._storage, exponent)
+            return _wrap(kind, raw**exponent, NoSystem, storage=storage)
         base = coherence(self._system, self._semantic)
         scale = base**exponent / coherence(self._system, kind)
         return _wrap(kind, _rescaled(raw**exponent, scale), self._system)
@@ -626,7 +785,15 @@ class Quantity[K, V, S: UnitSystem]:
         self._same_system(rhs)
         if rhs._semantic != self._semantic:
             raise TypeError(f"Cannot compare {self.kind} and {rhs.kind}")
-        return compare(self._value, rhs._value)
+        return compare(*self._comparable(rhs))
+
+    def _comparable(self, other: Quantity[Any, Any, Any]) -> tuple[Any, Any]:
+        # Converting only one side would make 0.3 nm == 3 Å and 3 Å == 0.3 nm
+        # disagree, and break __hash__'s agreement with ==.
+        mine, theirs = self._storage, other._storage
+        if mine is None or theirs is None or mine.scale == theirs.scale:
+            return self._value, other._value
+        return self._reference(), other._reference()
 
     @override
     def __eq__(self, other: object) -> Any:
@@ -634,6 +801,8 @@ class Quantity[K, V, S: UnitSystem]:
 
         As with naive and aware datetimes, quantities that cannot be compared
         are unequal, while ordering them raises. A plain number raises for both.
+        Without a system, quantities in different units compare in the
+        reference units, so ``1 nm == 10 Å``.
         """
         if not isinstance(other, Quantity):
             plain = self._number(other)
@@ -668,21 +837,22 @@ class Quantity[K, V, S: UnitSystem]:
         if not self._is_dimensionless() or getattr(raw, "ndim", 0) != 0:
             raise TypeError(
                 f"Only a scalar Dimensionless quantity converts to float, not "
-                f"{self.kind}; use .value or .magnitude(unit)"
+                f"{self.kind}; use .magnitude(unit)"
             )
-        return float(raw)
+        return float(self._reference())
 
     @override
     def __hash__(self) -> int:
         """Scalars hash by value, consistently with ``==``; arrays are unhashable.
 
-        Equal quantities share a kind, a system and stored value, so the display
-        unit and exact echo are deliberately excluded: ``1 nm`` and ``10 Å`` agree.
+        Equal quantities share a kind, a system and a value in the reference
+        units, so the display unit and exact echo are deliberately excluded:
+        ``1 nm`` and ``10 Å`` agree.
         """
         raw: Any = self._value
         if not _is_scalar(raw):
             raise TypeError(f"unhashable array storage: {type(raw).__name__}")
-        return hash((self._semantic, self._system, cast("object", raw)))
+        return hash((self._semantic, self._system, cast("object", self._reference())))
 
     def __lt__(self, other: object) -> Any:
         return self._compare(other, operator.lt)
@@ -814,9 +984,7 @@ class Quantity[K, V, S: UnitSystem]:
         return argsort(self, axis=axis)
 
     def __array__(self, dtype: object = None, copy: object = None) -> Any:
-        raise TypeError(
-            "Implicit array coercion drops units; use .value or .magnitude(unit)"
-        )
+        raise TypeError("Implicit array coercion drops units; use .magnitude(unit)")
 
     def __array_ufunc__(
         self, ufunc: Any, method: str, *inputs: Any, **kwargs: Any
@@ -835,7 +1003,7 @@ class Quantity[K, V, S: UnitSystem]:
             raise TypeError(
                 f"np.{name}{'' if method == '__call__' else '.' + method} does not "
                 "know the units of a quantity; use quantype.numpy, quantity "
-                "methods, or .value and .magnitude(unit) explicitly"
+                "methods, or .magnitude(unit) explicitly"
             )
         # An array on the left (array * q) arrives here from ndarray.__mul__, so
         # hand it to the quantity's reflected operator instead of recursing.
@@ -862,7 +1030,7 @@ class Quantity[K, V, S: UnitSystem]:
         if function is None:
             raise TypeError(
                 f"np.{name} does not know the units of a quantity; use "
-                "quantype.numpy, quantity methods, or .value and .magnitude(unit)"
+                "quantype.numpy, quantity methods, or .magnitude(unit)"
             )
         return function(*args, **kwargs)
 
@@ -917,9 +1085,10 @@ class Quantity[K, V, S: UnitSystem]:
 
     def _symbol(self) -> str:
         unit = self.unit
-        symbol = (
-            unit.symbol if unit is not None else _symbol(self._semantic, self._system)
-        )
+        if unit is None:
+            symbol = _symbol(self._semantic, cast("type[UnitSystem]", self._system))
+        else:
+            symbol = unit.symbol
         return "" if symbol == "1" else f" {symbol}"
 
     def _presentation(self) -> str:
@@ -951,7 +1120,7 @@ class Quantity[K, V, S: UnitSystem]:
 
     @override
     def __repr__(self) -> str:
-        system = "" if self._system is Atomistic else f", {self._system.__name__}"
+        system = "" if self._system is NoSystem else f", {self._system.__name__}"
         return f"{type(self).__name__}({self._presentation()}{system})"
 
 
@@ -993,19 +1162,27 @@ class Constant[K]:
     def dimensions(self) -> tuple[int, ...]:
         return self._semantic.dimensions
 
-    def to_system(self, system: type[UnitSystem]) -> Quantity[K, float, Any]:
-        """The constant's value in ``system``, as a quantity of that system."""
-        target = require_system(system)
-        raw = self._reference / factor(target, self._semantic)
+    def to_system(self, system: type[AnySystem]) -> Quantity[K, float, Any]:
+        """The constant's value in ``system``, as a quantity of that system.
+
+        Without a system, it is stored in the reference units.
+        """
+        target = require_any_system(system)
+        if target is NoSystem:
+            raw = self._reference
+        else:
+            raw = self._reference / factor(
+                cast("type[UnitSystem]", target), self._semantic
+            )
         return cast("Quantity[K, float, Any]", _wrap(self._semantic, raw, target))
 
     def magnitude(self, unit: Unit[K]) -> float:
         """The constant's value in a compatible unit."""
-        return self.to_system(Atomistic).magnitude(unit)
+        return self.to_system(NoSystem).magnitude(unit)
 
     def to(self, unit: Unit[K]) -> Quantity[K, float, Any]:
-        """The constant as a default-system quantity presented in ``unit``."""
-        return self.to_system(Atomistic).to(unit)
+        """The constant as a quantity without a system, presented in ``unit``."""
+        return self.to_system(NoSystem).to(unit)
 
     def _combine(self, other: object, op: str, *, reflected: bool = False) -> Any:
         if isinstance(other, Quantity):
@@ -1087,7 +1264,7 @@ def _unit_named(
     cls: type[Quantity[Any, Any, Any]],
     name: str,
     units: tuple[Unit[Any], ...],
-    system: type[UnitSystem],
+    system: type[AnySystem],
 ) -> Unit[Any]:
     from quantype._internal._lookup import unit_of_kind
 
@@ -1102,14 +1279,14 @@ def _parse(
     cls: type[Quantity[Any, Any, Any]],
     data: object,
     units: tuple[Unit[Any], ...],
-    system: type[UnitSystem],
+    system: type[AnySystem],
 ) -> Quantity[Any, Any, Any]:
     import numpy as np
 
     from quantype.serialization import parse_quantity
 
     result: Any = parse_quantity(cast("Any", cls), data, units=units, system=system)
-    raw: Any = result.value
+    raw: Any = result._value
     if not isinstance(raw, (float, np.ndarray)):
         raise TypeError(
             "parse accepts scalar/NumPy storage; use a typed Pydantic field "
@@ -1123,5 +1300,6 @@ def _parse(
                 np.asarray(array, dtype=np.float64),
                 system,
                 display=result._display,
+                storage=result._storage,
             )
     return result

@@ -6,12 +6,14 @@ Every quantity carries three things:
 | --- | --- | --- |
 | **Kind** | the quantity class | `Length`, `Pressure` |
 | **Storage** | the first type parameter | `float`, `npt.NDArray[np.float64]`, `jax.Array` |
-| **Unit system** | the second type parameter | `Atomistic` (default), `SI`, `Metal`, or your own |
+| **Unit system** | the second type parameter | `NoSystem` (default), `Atomistic`, `SI`, `Metal`, or your own |
 
-`.value` holds the raw numbers in the unit system's units: `Length[float]`,
-which is `Length[float, Atomistic]`, stores ångströms, and `Length[float, SI]`
-stores meters. A unit such as `u.nm` converts the input and sets how the
-quantity is shown. It doesn't change the kind or the system.
+`Length[float]`, which is `Length[float, NoSystem]`, keeps its numbers in the
+unit it was given in and has no `.value`. In a unit system, `.value` holds the
+raw numbers in the system's units: `Length[float, Atomistic]` stores ångströms,
+and `Length[float, SI]` stores meters. A unit such as `u.nm` names the input's
+unit and sets how the quantity is shown. It doesn't change the kind or the
+system.
 
 ## Construction and storage
 
@@ -26,8 +28,9 @@ from quantype.systems import SI
 
 length = Length[np.float64](2, u.length.nanometer)
 assert_type(length, Length[np.float64])
-assert length.value == 20  # ångströms, stored as a NumPy float64 scalar
-assert length.magnitude() == 2  # presented in the unit it was given in
+assert length.magnitude() == 2  # stored in nanometers, as a NumPy float64 scalar
+assert type(length.magnitude()) is np.float64
+assert length.magnitude(u.angstrom) == 20
 
 positions = Length[npt.NDArray[np.float64]]([[1, 2, 3]], u.length.nanometer)
 energy = Energy[np.float64](3, u.energy.electron_volt)
@@ -39,8 +42,10 @@ assert repr(meters) == "Length(2.0 nm, SI)"
 ```
 
 The type arguments convert the input when a quantity is built. The storage
-argument chooses the numerical type, and the system argument chooses the units
-of `.value`. `np.float64` gives a NumPy scalar, and `npt.NDArray[np.float64]` an
+argument chooses the numerical type. Without a system, the numbers stay in the
+input unit, except that units with an offset (°C and °F) store kelvin. A system
+argument converts them into the system's units, which `.value` then holds.
+`np.float64` gives a NumPy scalar, and `npt.NDArray[np.float64]` an
 array, including zero-dimensional arrays. Python `float` works too. Scalar
 storage rejects arrays, and floating storage rejects booleans, complex numbers,
 and non-numbers.
@@ -51,8 +56,8 @@ already lost in low-precision input can't be recovered. The backend limits the
 working precision (JAX without x64, for example), and a conversion factor
 outside its range raises `ValueError`.
 
-Multiplying by a unit, or calling one, also builds a quantity, always in the
-default system:
+Multiplying by a unit, or calling one, also builds a quantity, always without
+a system:
 
 ```python
 import numpy as np
@@ -64,7 +69,8 @@ positions = u.angstrom(np.zeros((100, 3)))
 ```
 
 Unit-first construction keeps floating storage as it is, including NumPy
-floating scalars, where the conversion allows. Python integers become `float`.
+floating scalars, and holds the array it is given. Python integers become
+`float`.
 Booleans, complex numbers, non-numbers, and integer arrays or backend scalars
 are rejected. For integer arrays or Python lists, use a typed constructor.
 `unit(array)` works on every backend; `array * unit` is only guaranteed for
@@ -101,12 +107,13 @@ and `Force[V, S].unit_named` also finds the units that only system `S` defines.
 
 ## Unit systems
 
-A unit system is the set of units quantities store their numbers in. Storing
-everything in one set gives `.value` a single meaning, keeps arithmetic free of
-conversions, and lets JAX compile a function once, whatever units its inputs
-were written in. The system is the second type argument. `Atomistic` is the
-default, and you can choose another built-in system or
-[define your own](unit-systems.md).
+A unit system is the set of units quantities store their numbers in, and it is
+the second type argument. The default, `NoSystem`, has no set: each quantity
+keeps the unit it was given in, and products compose their operands' units, as
+[display units](#display-units) shows. Choose a system where raw numbers are
+needed. Storing every quantity of a type in one set of units gives `.value` a
+single meaning, and keeps arithmetic inside the system free of conversions. You
+can choose a built-in system or [define your own](unit-systems.md).
 
 A system names one unit per base axis, and each kind's unit follows from its
 dimensions: `Atomistic` stores forces in eV/Å because it stores energies in eV
@@ -116,7 +123,7 @@ rescales by a constant factor. The built-in systems are in `quantype.systems`:
 
 | System | Length | Energy | Time | Charge | Magnetic moment | Own units |
 | --- | --- | --- | --- | --- | --- | --- |
-| `Atomistic` (default) | Å | eV | fs | e | μB | mass Da, density g/cm³ |
+| `Atomistic` | Å | eV | fs | e | μB | mass Da, density g/cm³ |
 | `Metal` (LAMMPS) | Å | eV | ps | e | μB | mass g/mol, pressure bar, density g/cm³ |
 | `Real` (LAMMPS) | Å | kcal/mol | fs | e | μB | mass g/mol, pressure atm, electric field V/Å, density g/cm³ |
 | `SI` | m | J | s | C | A·m² | |
@@ -140,10 +147,11 @@ and densities in g/cm³:
 import pytest
 
 from quantype import Mass, Velocity, u
+from quantype.systems import Atomistic
 
-m = Mass[float](12, u.Da)
+m = Mass[float, Atomistic](12, u.Da)
 assert m.value == 12.0  # daltons
-v = Velocity[float](0.01, u.angstrom_per_fs)
+v = Velocity[float, Atomistic](0.01, u.angstrom_per_fs)
 kinetic = 0.5 * m * v**2  # rescaled into eV: 1 Da Å²/fs² ≈ 103.6 eV
 assert kinetic.value == pytest.approx(0.0621856)
 ```
@@ -216,9 +224,11 @@ rounded to about seven digits (in `metal`, `boltz = 8.617343e-5`). Values it
 derives from them, such as a temperature from kinetic energy, can differ from
 quantype's in the seventh significant figure.
 
-Combining quantities from two systems is a type error in mypy, Pyright,
-Pyrefly, and ty, and a `TypeError` at runtime. Convert one with
-`.to_system(T)`, which rescales the raw numbers and keeps the display unit.
+Combining quantities from two systems, or one without a system with one in a
+system, is a type error in mypy, Pyright, Pyrefly, and ty, and a `TypeError` at
+runtime. Convert one with `.to_system(T)`, which rescales the raw numbers and
+keeps the display unit. `.to_system(NoSystem)` converts nothing: the numbers
+stay in the units of the system they came from.
 Temperatures convert without an offset, because every system measures
 temperature on a kelvin scale. To define your own system, or to write code that
 works in any system, see [unit systems](unit-systems.md).
@@ -226,53 +236,76 @@ works in any system, see [unit systems](unit-systems.md).
 ## Display units
 
 The display unit sets what `.magnitude()`, `repr`, and serialization show. It
-has no effect on `.value`. It is set and kept as follows:
+has no effect on the stored numbers. It is set and kept as follows:
 
 - Construction, unit-first construction, `parse`, Pydantic, and NPZ loading
-  remember the input unit. Construction with `display=False` converts in the
-  same way but leaves no display unit, so the value shows in the system's unit,
-  as one from `from_value` does.
+  remember the input unit. Construction with `display=False` leaves no display
+  unit, so the value shows in the unit it is stored in: the input unit without a
+  system, or the system's unit, as one from `from_value` does.
 - Same-kind operations keep it: addition and subtraction (the left operand
   wins), scaling, negation, `abs`, reductions, and indexing.
 - Point minus point gives the matching difference unit: `°C − °C → Δ°C`.
-- Products, ratios, and powers fall back to the system's unit for the result.
+- Without a system, one product, ratio, or power shows its composed unit, such
+  as `eV/nm`, `nm·ps`, or `nm^3`, or a catalogue unit of the same scale, so
+  kcal/mol/Å times Å shows kcal/mol. A product of products of a named kind,
+  such as Da·((Å/fs)^2) for an energy, shows in the kind's unit in the first of
+  `Atomistic`, `Metal`, `Real`, `SI`, `CGS`, and `Atomic` that stores each
+  operand's kind in that operand's unit, and in `SI` when none does. Either way,
+  the numbers stay in the composed unit.
+- In a unit system, products, ratios, and powers show in the system's unit for
+  the result.
 - `.to(unit)` selects a display unit without changing the stored numbers, and
-  `.unit` reports the unit in use (`None` for unnamed products).
+  `.unit` reports the unit in use (`None` for unnamed products in a system).
 - Format specs apply to the magnitude: `f"{q:.3f}"` gives `2.000 nm`.
 - JAX transformations drop it, because it isn't part of the pytree.
 
 ```python
-from quantype import Length, Temperature, u
+from quantype import Energy, Length, Mass, Temperature, Velocity, u
+from quantype.systems import Atomistic
 
 assert repr(2 * u.nm + 5 * u.angstrom) == "Length(2.5 nm)"
 assert repr(5 * u.angstrom + 2 * u.nm) == "Length(25.0 Å)"
-assert repr((3 * u.eV) / (2 * u.nm)) == "Force(0.15 eV/Å)"
+assert repr((3 * u.eV) / (2 * u.nm)) == "Force(1.5 eV/nm)"
+assert repr((2 * u.nm) * (3 * u.ps)) == "LengthTime(6.0 nm·ps)"
+speed = Velocity[float](1, u.angstrom_per_fs)
+kinetic = Mass[float](2, u.Da) * speed**2
+assert repr(kinetic) == "Energy(207.2853933432161 eV)"
 assert repr(30 * u.celsius - 20 * u.celsius) == "TemperatureDifference(10.0 Δ°C)"
-assert repr(Length[float](2, u.nm, display=False)) == "Length(20.0 Å)"
+assert repr(Length[float](2, u.nm, display=False)) == "Length(2.0 nm)"
+bound = Length[float, Atomistic](2, u.nm, display=False)
+assert repr(bound) == "Length(20.0 Å, Atomistic)"
+assert repr(Energy[float, Atomistic](3, u.eV) / bound) == "Force(0.15 eV/Å, Atomistic)"
 
 point = Temperature[float](20.1, u.celsius)
-assert point.value - 273.15 != 20.1  # 20.100000000000023 in binary64
+assert point.magnitude(u.kelvin) - 273.15 != 20.1  # 20.100000000000023
 assert point.magnitude() == 20.1  # the Python scalar it was built from
 ```
 
 A quantity built from a Python scalar remembers that scalar, so `20.1 degC`
 comes back as exactly 20.1 instead of 20.100000000000023. Any operation, or
 `.to()`, forgets it, and `.to_system()` keeps it. `repr` shows the kind, and
-the system if it isn't the default. `str` shows only the magnitude and unit.
+the system if there is one. `str` shows only the magnitude and unit.
 
 ## Explicit numerical boundaries
 
 - `.value` gives the raw numbers in the quantity's unit system. The static
   type says which system, so a kernel annotated `Length[NDArray, Real]` receives
-  `real` numbers.
-- `.magnitude(unit)` converts to a compatible unit; `.magnitude()` uses the
-  display unit, else the system's unit.
+  `real` numbers. Without a system there is no `.value`: reading it is a type
+  error in every checker and a `TypeError` at runtime.
+- `.magnitude(unit)` converts to a compatible unit; `.magnitude()` uses
+  `.unit`. In the unit the numbers are stored in, it returns them unconverted.
 - `.to(unit)` selects a display unit without changing data.
-- `.to_system(T)` rescales into another unit system.
+- `.to_system(T)` rescales into another unit system, once.
 - `Length[V, S].from_value(raw)` wraps raw numbers that are already in `S`'s
   units, keeping their storage. It trusts its input and doesn't check or
-  convert it. `Length.from_value(raw)` uses the default system. The quantity
-  holds `raw` itself, not a copy, so a read-only NumPy array stays read-only.
+  convert it. The quantity holds `raw` itself, not a copy, so a read-only NumPy
+  array stays read-only. Without a system it raises, as there are no raw
+  numbers to trust, and so does `with_value`.
+- `q.apply(function)` applies a function to the stored numbers, keeping the
+  kind, system, and units: `q.apply(np.sort)` or
+  `q.apply(lambda t: t.detach())`. The function must give the same physical
+  result in any unit, as sorting, slicing, and moving to a device do. Nothing
+  checks that.
 - Quantities have no in-place operators and no item assignment. `q += other`
   builds a new quantity and rebinds `q`, so quantype never writes into the
   storage it was given.
@@ -283,7 +316,10 @@ Every conversion goes through the reference units, which are `Atomistic`'s
 base units: ångström, eV, fs, kelvin, Bohr magneton, atom, electron, and
 elementary charge. Atom, electron, and charge are dimensions of their own. Mass
 is derived, as energy time² / length², so its reference unit is eV fs²/Å², not
-the dalton that `Atomistic` stores it in.
+the dalton that `Atomistic` stores it in. Without a system, quantities in
+different units compare and hash in the reference units. JAX pytrees and the
+`ujax` and `utorch` derivatives work in them too, so `jit` traces once whatever
+units its inputs were given in.
 Importing `quantype` doesn't import NumPy, Pydantic, Torch, or JAX.
 
 ## CODATA edition
@@ -440,7 +476,10 @@ assert 1 * u.nm == 10 * u.angstrom
 
 `==` compares values. It returns a `bool` for scalar storage and an
 element-wise result for arrays, as NumPy does. Quantities of different kinds or
-systems compare unequal, as naive and aware datetimes do. Scalar quantities hash
+systems compare unequal, as naive and aware datetimes do. Without a system,
+quantities stored in the same unit compare their stored numbers, and others
+compare in the reference units. That is floating-point equality, so two
+distinct nm values can each equal the same Å value. Scalar quantities hash
 by value, so they work as dict keys and in sets. Quantities with array storage
 are unhashable, like NumPy arrays. `<` and the other orderings need the same
 kind and system, statically and at runtime, and return backend booleans.
@@ -466,14 +505,15 @@ storage:
 
 ```python
 import numpy as np
+import numpy.typing as npt
 
-from quantype import Length
+from quantype import Length, u
 
-positions = Length.from_value(np.arange(6.0).reshape(3, 2))
-assert np.shares_memory(positions[1:].value, positions.value)
+positions = Length[npt.NDArray[np.float64]](np.arange(6.0).reshape(3, 2), u.nm)
+assert np.shares_memory(positions[1:].magnitude(), positions.magnitude())
 assert positions[np.array([0, 2])].shape == (2, 2)
-assert positions[1, 0].value.shape == ()
-assert type(positions[1, 0].item().value) is float
+assert positions[1, 0].magnitude().shape == ()
+assert type(positions[1, 0].item().magnitude()) is float
 ```
 
 NumPy's own functions apply the same unit rules at runtime, through NumPy's
@@ -500,7 +540,10 @@ with pytest.raises(TypeError, match="does not know the units"):
 
 ## Numerical range
 
-Choosing a unit system also chooses the range of the stored numbers. SI
+Without a system, the numbers stay in the units they were given in, and a
+square is stored in the square of its unit, so a variance of energies given in
+meV is in meV². Choosing a unit system also chooses the range of the stored
+numbers. SI
 underflows float32 for ordinary atomistic values: squared meV-scale energies are
 about 2.5e-44 J², so a float32 variance comes out 1.7% wrong. The table below
 comes from `System.check_range(dtype)`, which compares typical atomistic

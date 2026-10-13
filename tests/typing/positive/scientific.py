@@ -29,6 +29,7 @@ from quantype import (
 )
 from quantype import units as u
 from quantype.products import EnergyPerTime, LengthTime
+from quantype.systems import Atomistic
 
 r = 2.0 * u.angstrom
 t = 4.0 * u.fs
@@ -87,7 +88,10 @@ assert_type(
 tx = u.angstrom(torch.tensor([1.0, 2.0, 3.0], requires_grad=True))
 assert_type(tx, Length[torch.Tensor])
 assert_type(utorch.grad(harmonic_torch(tx), tx), Force[torch.Tensor])
-assert_type(Energy.from_value(array), Energy[npt.NDArray[np.float64]])
+assert_type(
+    Energy[npt.NDArray[np.float64], Atomistic].from_value(array),
+    Energy[npt.NDArray[np.float64], Atomistic],
+)
 assert_type(
     Length.parse({"kind": "Length", "magnitude": 1.0, "unit": "angstrom"}),
     Length[float | npt.NDArray[np.float64]],

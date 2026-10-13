@@ -2,7 +2,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
-from quantype._internal._semantics import Kind
+from quantype._internal._semantics import Kind, Semantic
 
 @dataclass(frozen=True, init=False, repr=False, match_args=False)
 class Unit[K]:
@@ -11,17 +11,17 @@ class Unit[K]:
     scale: float
     offset: float
     symbol: str
-    semantic: Kind
+    semantic: Semantic
     def __init__(
         self,
         name: str,
-        kind: str | Kind,
+        kind: str | Semantic,
         scale: float = ...,
         offset: float = ...,
         symbol: str | None = ...,
     ) -> None: ...
 
-def get_unit(name: str, *, kind: Kind | None = ...) -> Unit[Any]: ...
+def get_unit(name: str, *, kind: Semantic | None = ...) -> Unit[Any]: ...
 def units_of(kind: Kind) -> tuple[Unit[Any], ...]: ...
 def known_kinds() -> tuple[Kind, ...]: ...
 

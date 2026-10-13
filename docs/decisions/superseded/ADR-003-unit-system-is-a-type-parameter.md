@@ -1,5 +1,7 @@
 # The unit system is a type parameter, and values are stored in its units
 
+Superseded by [ADR-014](../ADR-014-opt-in-unit-system.md).
+
 ## Context and Problem Statement
 
 Every value was stored in one fixed set of units (Å, eV, fs). Kernels written in
@@ -26,13 +28,13 @@ silently, and existing annotations keep their meaning.
 `Length[float]` is `Length[float, Atomistic]`, and `Length[float, SI]` stores
 meters. Combining systems is rejected by all four checkers and raises
 `TypeError` at runtime; `.to_system(T)` is the only bridge. The prototypes
-behind this are in [unit storage](../design/unit-storage.md).
+behind this are in [unit storage](../../design/unit-storage.md).
 
 ### Consequences
 
 * Good, because arithmetic inside one system doesn't convert, except for the
   kinds a system overrides
-  ([ADR-007](ADR-007-lammps-systems-store-lammps-units.md)).
+  ([ADR-007](../ADR-007-lammps-systems-store-lammps-units.md)).
 * Good, because code generic over `[S: UnitSystem]` works in any system, and
   JAX traces once per system.
 * Bad, because a library typed `Length[float]` rejects SI quantities unless it

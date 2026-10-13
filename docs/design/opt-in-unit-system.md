@@ -1,6 +1,6 @@
 # Opt-in unit systems: prototype comparison
 
-Evidence for the [opt-in unit system proposal](../proposals/opt-in-unit-system.md),
+Evidence for the [opt-in unit system decision](../decisions/ADR-014-opt-in-unit-system.md),
 and notes for implementing it. The prototypes were built in October 2026 as
 copies of quantype 0.2.0 (commit `056c344`), changed by script. They live
 outside the repository, in `/Users/tk/p/quantype-opt-in/`, which git can't
@@ -162,7 +162,9 @@ class _Value:
     @overload
     def __get__(self, obj: None, owner: Any, /) -> _Value: ...
     @overload
-    def __get__[W, T: UnitSystem](self, obj: Quantity[Any, W, T], owner: Any, /) -> W: ...
+    def __get__[W, T: UnitSystem](
+        self, obj: Quantity[Any, W, T], owner: Any, /
+    ) -> W: ...
 ```
 
 The null system and `UnitSystem` both derive from `AnySystem`, which bounds

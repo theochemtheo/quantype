@@ -15,6 +15,7 @@ import pytest
 import quantype
 from quantype import Energy, Length, Temperature, u
 from quantype.serialization import load_npz, save_npz
+from quantype.systems import Atomistic
 from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
@@ -22,21 +23,25 @@ if TYPE_CHECKING:
 
 
 def test_typed_constructor_converts_storage_and_units() -> None:
-    scalar = Length[np.float64](2, u.length.nanometer)
+    scalar = Length[np.float64, Atomistic](2, u.length.nanometer)
     assert type(scalar.value) is np.float64
     assert scalar.value == 20
-    array = Length[npt.NDArray[np.float32]]([[1, 2, 3]], u.length.nanometer)
+    array = Length[npt.NDArray[np.float32], Atomistic]([[1, 2, 3]], u.nm)
     assert array.value.dtype == np.float32
     np.testing.assert_array_equal(array.value, [[10, 20, 30]])
     raw = np.ones(3)
-    assert Length[npt.NDArray[np.float64]](raw, u.length.angstrom).value is raw
-    assert Length.from_value(raw).value is raw
+    assert Length[npt.NDArray[np.float64]](raw, u.length.nanometer).magnitude() is raw
+    assert Length[npt.NDArray[np.float64], Atomistic].from_value(raw).value is raw
+    unbound = Length[npt.NDArray[np.float32]]([[1, 2, 3]], u.nm)
+    assert unbound.dtype == np.float32
+    np.testing.assert_array_equal(unbound.magnitude(u.angstrom), [[10, 20, 30]])
     wrong: Any = u.eV
     with pytest.raises(ValueError, match="Expected Length"):
         Length[np.float64](2, wrong)
     with pytest.raises(ValueError, match="scalar storage"):
         Length[np.float64]([1, 2], u.nm)
-    assert Temperature[float](0, u.temperature.celsius).value == 273.15
+    zero = Temperature[float](0, u.temperature.celsius)
+    assert zero.magnitude(u.kelvin) == 273.15
 
 
 def test_import_defers_numerical_dependencies() -> None:
@@ -53,9 +58,9 @@ def test_npz_roundtrip_and_backend_metadata(tmp_path: Path) -> None:
     energy = Energy[np.float64](2, u.eV)
     save_npz(path, positions=positions, energy=energy, record_backend=True)
     restored = load_npz(path, "positions", Length[npt.NDArray[np.float64]])
-    assert restored.value.dtype == np.float64
-    np.testing.assert_array_equal(restored.value, positions.value)
-    assert load_npz(path, "energy", Energy[np.float64]).value == 2
+    assert restored.dtype == np.float64
+    np.testing.assert_array_equal(restored.magnitude(), positions.magnitude())
+    assert load_npz(path, "energy", Energy[np.float64]).magnitude(u.eV) == 2
     with np.load(path, allow_pickle=False) as archive:
         metadata = json.loads(str(archive["metadata"]))
         assert metadata["quantities"]["positions"]["source_backend"] == "numpy"
@@ -71,7 +76,7 @@ def test_npz_custom_units_and_zero_dimensional_storage(tmp_path: Path) -> None:
     restored = load_npz(
         path, "point", Temperature[npt.NDArray[np.float64]], units=(bleb,)
     )
-    assert restored.value.shape == ()
+    assert restored.shape == ()
     assert_allclose(restored, point)
 
 
@@ -81,14 +86,16 @@ def test_torch_constructor_and_archive(tmp_path: Path) -> None:
 
     raw = torch.tensor([1.0, 2.0], requires_grad=True)
     length = Length[torch.Tensor](raw, u.nm, dtype=torch.float64)
-    assert length.value.dtype == torch.float64
-    (gradient,) = torch.autograd.grad(length.value.sum(), raw)
+    assert length.dtype == torch.float64
+    (gradient,) = torch.autograd.grad(length.magnitude(u.angstrom).sum(), raw)
     np.testing.assert_array_equal(gradient.numpy(), [10, 10])
     path = tmp_path / "torch.npz"
     save_npz(path, length=length, record_backend=True)
     restored = load_npz(path, "length", Length[torch.Tensor], dtype=torch.float64)
-    assert not restored.value.requires_grad
-    np.testing.assert_array_equal(restored.value.numpy(), [10, 20])
+    assert not restored.magnitude().requires_grad
+    np.testing.assert_array_equal(
+        restored.magnitude(u.angstrom).detach().numpy(), [10, 20]
+    )
 
 
 def test_jax_constructor_and_archive(tmp_path: Path) -> None:
@@ -99,7 +106,7 @@ def test_jax_constructor_and_archive(tmp_path: Path) -> None:
     path = tmp_path / "jax.npz"
     save_npz(path, length=length, record_backend=True)
     restored = load_npz(path, "length", Length[jax.Array])
-    np.testing.assert_array_equal(restored.value, [10, 20])
+    np.testing.assert_array_equal(restored.magnitude(u.angstrom), [10, 20])
 
 
 def test_version_matches_the_installed_distribution() -> None:

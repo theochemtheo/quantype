@@ -23,7 +23,7 @@ from quantype import (
     u,
 )
 from quantype.catalogue import builtin_catalogue
-from quantype.systems import SI, Atomistic, Metal
+from quantype.systems import SI, Atomistic, Metal, NoSystem
 
 if TYPE_CHECKING:
     from quantype.core import Unit
@@ -40,7 +40,7 @@ def test_a_kind_class_names_its_kind() -> None:
         cls: Any = getattr(quantype, name)
         assert cls.kind == name
         assert cls[float].kind == name
-        assert cls.from_value(1.0).kind == name
+        assert cls[float, Atomistic].from_value(1.0).kind == name
     product = Length[float](2, u.nm) * Time[float](1, u.fs)
     assert type(product).kind == product.kind == "Mul[Length,Time]"
     with pytest.raises(AttributeError, match="named quantity classes"):
@@ -57,10 +57,10 @@ def test_construction_remembers_the_input_unit() -> None:
     assert repr(2 * u.nm) == "Length(2.0 nm)"
     bare: Length[float] = Length(2, u.nm)
     assert repr(bare) == "Length(2.0 nm)"
-    assert bare.system is Atomistic
+    assert bare.system is NoSystem
     assert repr(Length.parse("3 bohr")) == "Length(3.0 a0)"
     assert repr(Length[float, SI].from_value(2.0)) == "Length(2.0 m, SI)"
-    assert repr(Length.from_value(2.0)) == "Length(2.0 Å)"
+    assert repr(Length[float, Atomistic].from_value(2.0)) == "Length(2.0 Å, Atomistic)"
 
 
 @pytest.mark.parametrize(
@@ -90,13 +90,15 @@ def test_construction_can_leave_the_display_unit_unset(
 
 def test_construction_without_a_display_unit_converts_offsets() -> None:
     point = Temperature[float](20.1, u.celsius, display=False)
-    assert point.value == Temperature[float](20.1, u.celsius).value
+    assert point == Temperature[float](20.1, u.celsius)
     assert point.unit is u.kelvin
-    assert point.magnitude() == point.value
-    assert repr(point) == f"Temperature({point.value} K)"
+    assert point.magnitude() == point.magnitude(u.kelvin)
+    assert repr(point) == f"Temperature({point.magnitude()} K)"
     bare = Length(2.0, u.nm, display=False)
-    assert bare.value == 20.0
-    assert repr(bare) == "Length(20.0 Å)"
+    assert bare.magnitude(u.angstrom) == 20.0
+    assert repr(bare) == "Length(2.0 nm)"
+    bound = Length[float, Atomistic](2.0, u.nm, display=False)
+    assert repr(bound) == "Length(20.0 Å, Atomistic)"
     assert repr(Length[float](2, u.nm, display=True)) == "Length(2.0 nm)"
 
 
@@ -125,7 +127,8 @@ def test_addition_prefers_the_left_display_unit() -> None:
     nm, angstrom = 2 * u.nm, 5 * u.angstrom
     assert repr(nm + angstrom) == "Length(2.5 nm)"
     assert repr(angstrom + nm) == "Length(25.0 Å)"
-    assert repr(Length.from_value(5.0) + nm) == "Length(2.5 nm)"
+    undisplayed = Length[float](5.0, u.angstrom, display=False)
+    assert repr(undisplayed + nm) == "Length(2.5 nm)"
     assert repr(nm - angstrom) == "Length(1.5 nm)"
 
 
@@ -134,9 +137,14 @@ def test_products_ratios_and_powers_fall_back_to_the_system() -> None:
     assert repr(x * x) == "Area(4e-18 m^2, SI)"
     assert repr(x**2) == "Area(4e-18 m^2, SI)"
     assert repr(Energy[float, SI](3, u.eV) / x).startswith("Force(")
-    assert repr((2 * u.nm) * (3 * u.nm)) == "Area(600.0 Å^2)"
+    area = (2 * u.nm) * (3 * u.nm)
+    assert repr(area) == "Area(6.0 nm^2)"
+    assert repr(area.to_system(Atomistic)) == "Area(600.0 Å^2, Atomistic)"
     structural = (2 * u.angstrom) * (3 * u.fs)
-    assert repr(structural) == "LengthTime(6.0 (Å * fs))"
+    assert repr(structural) == "LengthTime(6.0 Å·fs)"
+    assert (
+        repr(structural.to_system(Atomistic)) == "LengthTime(6.0 (Å * fs), Atomistic)"
+    )
     assert "Mul" not in repr(structural)
 
 
@@ -154,7 +162,7 @@ def test_temperature_points_and_differences() -> None:
 
 def test_exact_echo_of_python_scalars() -> None:
     point = Temperature[float](20.1, u.celsius)
-    assert point.value == pytest.approx(293.25)
+    assert point.magnitude(u.kelvin) == pytest.approx(293.25)
     assert point.magnitude() == 20.1
     assert point.magnitude(u.celsius) == 20.1
     assert point.to_dict()["magnitude"] == 20.1
@@ -204,7 +212,7 @@ def test_value_equality() -> None:
     assert a != mixed
     assert (a == mixed) is False
     assert a not in [mixed, 2 * u.nm]
-    with pytest.raises(TypeError, match="Cannot combine Atomistic and SI"):
+    with pytest.raises(TypeError, match="Cannot combine NoSystem and SI"):
         _ = a < mixed
 
 
@@ -248,7 +256,7 @@ def test_indexing_shape_and_length() -> None:
     assert isinstance(row, Length)
     np.testing.assert_array_equal(row.magnitude(), [3.0, 4.0])
     element = positions[1, 0]
-    assert isinstance(element.value, np.ndarray)
+    assert isinstance(element.magnitude(), np.ndarray)
     assert element.shape == ()
     assert [float(q.magnitude()) for q in positions[0]] == [1.0, 2.0]
     scalar = 1 * u.nm
@@ -263,11 +271,13 @@ def test_indexing_shape_and_length() -> None:
 
 def test_reductions_along_an_axis() -> None:
     q = Length[npt.NDArray[np.float64]]([[1.0, 5.0], [3.0, 2.0]], u.angstrom)
-    np.testing.assert_array_equal(q.max(axis=0).value, [3.0, 5.0])
-    np.testing.assert_array_equal(q.min(axis=1, keepdims=True).value, [[1.0], [2.0]])
+    np.testing.assert_array_equal(q.max(axis=0).magnitude(), [3.0, 5.0])
+    np.testing.assert_array_equal(
+        q.min(axis=1, keepdims=True).magnitude(), [[1.0], [2.0]]
+    )
     points = Temperature[npt.NDArray[np.float64]]([300.0, 310.0], u.K)
-    assert points.max().value == 310
-    assert points.min().value == 300
+    assert points.max().magnitude() == 310
+    assert points.min().magnitude() == 300
 
 
 def test_reflected_numpy_scalars() -> None:
@@ -277,7 +287,7 @@ def test_reflected_numpy_scalars() -> None:
         assert result.magnitude() == 2
     inverse = np.float64(2) / (2 * u.fs)
     assert inverse.kind == "InverseTime"
-    assert inverse.value == 1.0
+    assert inverse.magnitude(u.per_fs) == 1.0
     untyped: Any = q
     with pytest.raises(TypeError, match="Cannot add float64 and Length"):
         np.add(np.float64(1), untyped)

@@ -12,6 +12,7 @@ import pytest
 import quantype.numpy as qnp
 from quantype import Length, u
 from quantype.serialization import load_npz, save_npz
+from quantype.systems import Atomistic
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -56,7 +57,9 @@ def test_loading_object_arrays_is_rejected(tmp_path: Path) -> None:
 
 
 def test_saving_object_arrays_is_rejected(tmp_path: Path) -> None:
-    quantity = Length.from_value(np.array([object()], dtype=object))
+    quantity = Length[npt.NDArray[Any], Atomistic].from_value(
+        np.array([object()], dtype=object)
+    )
 
     with pytest.raises(ValueError, match="dtype"):
         save_npz(tmp_path / "object.npz", q=quantity)
@@ -67,7 +70,7 @@ def test_npy_uses_an_explicit_external_unit(tmp_path: Path) -> None:
     path = tmp_path / "positions.npy"
     np.save(path, quantity.magnitude(u.nm), allow_pickle=False)
     restored = Length[npt.NDArray[np.float64]](np.load(path, allow_pickle=False), u.nm)
-    np.testing.assert_array_equal(restored.value, quantity.value)
+    np.testing.assert_array_equal(restored.magnitude(), quantity.magnitude())
 
 
 def test_storage_dtype_and_unit_invariants() -> None:
@@ -75,12 +78,12 @@ def test_storage_dtype_and_unit_invariants() -> None:
         with pytest.raises(ValueError, match="real numbers"):
             Length[npt.NDArray[np.float64]](value, u.nm)
     scalar = Length[np.float32](2, u.nm)
-    assert type(scalar.sum().value) is np.float32
-    assert type(qnp.sqrt(scalar**2).value) is np.float32
+    assert type(scalar.sum().magnitude()) is np.float32
+    assert type(qnp.sqrt(scalar**2).magnitude()) is np.float32
     unit: Any = u.nm
     with pytest.raises(AttributeError, match="assign"):
         unit.scale = 100
-    assert u.dimensionless.one(2).value == 2
+    assert float(u.dimensionless.one(2)) == 2
     assert u.energy_density.energy_density(2).kind == "EnergyDensity"
 
 
@@ -148,11 +151,11 @@ def test_numpy_storage_annotations_must_be_real_floating() -> None:
     with pytest.raises(TypeError, match="Unsupported quantity storage"):
         cast("Any", Length)[object](1.0, u.nm)
     spelled = Length[np.ndarray[Any, np.dtype[np.float32]]]([1.0], u.nm)
-    assert spelled.value.dtype == np.float32
+    assert spelled.dtype == np.float32
     unspecified = Length[npt.NDArray[Any]]([1.0], u.nm)
-    assert unspecified.value.dtype == np.float64
+    assert unspecified.dtype == np.float64
 
 
 def test_numpy_scalar_storage_keeps_its_dtype_when_scaled() -> None:
     scaled = Length[np.float32](2, u.nm) * np.float64(2)
-    assert type(scaled.value) is np.float32
+    assert type(scaled.magnitude()) is np.float32
