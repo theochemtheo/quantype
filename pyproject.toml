@@ -74,7 +74,7 @@ test = [
 ]
 
 [build-system]
-requires = ["uv_build>=0.12.13,<0.13.0"]
+requires = ["uv_build>=0.13.0,<0.14.0"]
 build-backend = "uv_build"
 
 [tool.coverage.run]
@@ -208,7 +208,7 @@ all = "error"
 [tool.uv]
 # Pinned exactly, and matched by the `version:` on every setup-uv step: the
 # lockfile is written by one uv version, so CI must not float onto another.
-required-version = "==0.12.17"
+required-version = "==0.13.0"
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
