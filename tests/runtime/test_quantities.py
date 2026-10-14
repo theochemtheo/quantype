@@ -25,7 +25,7 @@ from quantype import (
 )
 from quantype.catalogue import builtin_catalogue
 from quantype.constants import c, h, k_B
-from quantype.systems import SI, Atomistic, Metal, NoSystem, Real
+from quantype.systems import SI, Atomistic, Metal, NoSystem, Real, UnitSystem
 
 if TYPE_CHECKING:
     from quantype.core import Unit
@@ -285,9 +285,7 @@ def test_value_equality() -> None:
     arrays = Length[npt.NDArray[np.float64]]([1.0, 2.0], u.nm)
     np.testing.assert_array_equal(arrays == arrays.to(u.angstrom), [True, True])
     np.testing.assert_array_equal(arrays != 1 * u.nm, [False, True])
-    with pytest.raises(TypeError, match="unhashable"):
-        hash(arrays)
-    # Like naive and aware datetimes: unequal across two systems, unordered.
+    # Unequal across two systems, and unordered, as arithmetic doesn't mix them.
     si: Any = a.to_system(SI)
     real: Any = a.to_system(Real)
     assert si != real
@@ -297,26 +295,53 @@ def test_value_equality() -> None:
     # A quantity without a system adopts the other's.
     assert a == si
     assert a <= si
-    assert hash(a) == hash(si)
     assert (si + a).system is SI
     assert (a + si).system is SI
 
 
-def test_scalar_quantities_hash_by_value() -> None:
-    a, b = Length[float](1, u.nm), Length[float](10, u.angstrom)
-    assert hash(a) == hash(b)
-    assert hash(a) == hash(Length[np.float64](1, u.nm))
-    assert hash(-(0 * u.nm)) == hash(0 * u.nm)
-    assert len({a, b, 2 * u.nm}) == 2
-    assert {a: "cutoff"}[b] == "cutoff"
-    structural = (2 * u.angstrom) * (3 * u.fs)
-    assert hash(structural) == hash((6 * u.angstrom) * (1 * u.fs))
-    for unhashable in (
+@pytest.mark.parametrize("system", [SI, Atomistic, Metal, Real])
+@pytest.mark.parametrize(
+    "quantity",
+    [
+        *(Length[float](value, u.nm) for value in (0.3, 7.58, 1e-3, 123.456)),
+        *(Energy[float](value, u.kcal_per_mol) for value in (0.3, 7.58, 123.456)),
+    ],
+    ids=str,
+)
+def test_a_quantity_equals_itself_converted_into_a_system_and_back(
+    system: type[UnitSystem], quantity: Quantity[Any, float, NoSystem]
+) -> None:
+    bound = quantity.to_system(system)
+    back = bound.to_system(NoSystem)
+    assert quantity == bound
+    assert bound == quantity
+    assert back == quantity
+    assert quantity <= bound <= quantity
+    assert not quantity < bound
+    assert (quantity != back) is False
+
+
+def test_ordering_agrees_with_equality_across_units() -> None:
+    nm, angstrom = Length[float](0.3, u.nm), Length[float](3, u.angstrom)
+    assert nm == angstrom == nm
+    assert nm <= angstrom
+    assert nm >= angstrom
+    assert not nm < angstrom
+    assert not angstrom > nm
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    [
+        Length[float](1, u.nm),
+        Length[np.float64](1, u.nm),
+        (2 * u.angstrom) * (3 * u.fs),
         Length[npt.NDArray[np.float64]]([1.0], u.nm),
-        Length[npt.NDArray[np.float64]](1.0, u.nm),
-    ):
-        with pytest.raises(TypeError, match="unhashable array storage"):
-            hash(unhashable)
+    ],
+)
+def test_quantities_are_unhashable(quantity: Quantity[Any, Any, Any]) -> None:
+    with pytest.raises(TypeError, match="unhashable type"):
+        hash(quantity)
 
 
 def test_ordering_comparisons() -> None:

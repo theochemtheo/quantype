@@ -248,7 +248,7 @@ def test_tensors_on_the_left_and_storage_dtypes() -> None:
     assert isinstance(scaled, Length)
     wide = narrow * torch.tensor([2.0], dtype=torch.float64)
     assert wide.dtype == torch.float32
-    with pytest.raises(TypeError, match="unhashable array storage: Tensor"):
+    with pytest.raises(TypeError, match="unhashable type"):
         hash(narrow)
     with pytest.raises(TypeError, match="parse accepts scalar/NumPy storage"):
         Length.parse(narrow)

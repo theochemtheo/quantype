@@ -1,5 +1,7 @@
 """Each marked line must produce a diagnostic in every supported checker."""
 
+from collections.abc import Hashable
+
 import numpy as np
 import numpy.typing as npt
 
@@ -105,3 +107,4 @@ apply_keeps_the_storage = Length[float](1.0, u.nm).apply(_pair)  # error
 any_system_is_no_system = x_si.to_system(AnySystem)  # error
 mixed_kinds_in_numpy = qnp.maximum(2.0 * u.nm, 2.0 * u.eV)  # error
 shown_without_a_system = x_si.to(NoSystem)  # error
+quantities_are_unhashable: Hashable = Length[float](1.0, u.nm)  # error

@@ -153,6 +153,7 @@ def literals_adopt[S: AnySystem](r: Length[float, S], f: Force[float, S]) -> Non
 
 
 literals_adopt(x_metal, Force[float, Metal](1.0, u.eV_per_angstrom))
+assert_type(x_si.__hash__, None)
 grid = Length[npt.NDArray[np.float64]](np.ones(3), u.nm)
 assert_type(x_si * grid, Area[npt.NDArray[np.float64], SI])
 assert_type(e_si / grid, Force[npt.NDArray[np.float64], SI])

@@ -500,9 +500,8 @@ def _tolerances(a: _Quantity, b: object, atol: object) -> tuple[Any, Any, Any]:
     a, other, *bound = _same("isclose", a, b, *tolerance)
     first, second = a._comparable(other)
     if bound:
-        if first is a._value:
-            return first, second, a._aligned(bound[0])
-        return first, second, bound[0]._reference()
+        shared = a if first is a._value else other
+        return first, second, shared._aligned(bound[0])
     if atol != 0:
         raise TypeError("atol must be a quantity of the compared kind, or 0")
     return first, second, 0.0

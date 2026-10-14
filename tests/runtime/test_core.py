@@ -279,13 +279,6 @@ def test_operations_without_physical_meaning_raise() -> None:
         _ = length * cast("Any", np.dtype("float64"))
 
 
-def test_scalar_storage_hashes_by_value_and_arrays_do_not_hash() -> None:
-    first = Length[np.float64](2, u.nm)
-    assert hash(first) == hash(Length[np.float64](20, u.angstrom))
-    with pytest.raises(TypeError, match="unhashable array storage: ndarray"):
-        hash(u.nm(np.array([1.0])))
-
-
 def test_structural_results_display_their_units() -> None:
     product = (2 * u.nm) * (3 * u.fs) * u.eV(1)
     assert repr(product**2) == "Quantity(36.0 eV^2·fs^2·nm^2)"
@@ -312,7 +305,7 @@ def test_product_classes_are_listed_for_completion() -> None:
 
 def test_numpy_scalar_storage_behaves_as_a_scalar() -> None:
     narrow = Length[np.float32](2, u.nm)
-    assert hash(narrow) == hash(Length[np.float32](20, u.angstrom))
+    assert narrow == Length[np.float32](20, u.angstrom)
     with pytest.raises(TypeError, match="Scalar quantities cannot be indexed"):
         _ = narrow[0]
     with pytest.raises(TypeError, match="Scalar quantities have no length"):

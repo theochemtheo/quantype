@@ -143,8 +143,9 @@ kind. `.var()` gives the squared kind, and `.item()` gives a quantity with float
 storage. `<` and `>` need
 the same kind and unit system, and return backend booleans. `==` compares
 values, element-wise for arrays, and quantities of different kinds or systems
-compare unequal. Quantities in different units compare in Å, eV, and fs, so
-`1 * u.nm == 10 * u.angstrom`. A plain number needs a unit to compare with a
+compare unequal. Quantities in different units are equal when one converts
+exactly onto the other, so `1 * u.nm == 10 * u.angstrom`. Quantities are
+unhashable, so key a dict or cache on `q.magnitude(unit)`. A plain number needs a unit to compare with a
 quantity: `q == 0` raises, and `q == 0 * u.nm` works.
 
 For any other array operation, pass a function to `apply`. It runs on the

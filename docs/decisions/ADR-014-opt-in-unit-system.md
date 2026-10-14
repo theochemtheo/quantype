@@ -65,8 +65,13 @@ The rules for null-system quantities:
   kcal/mol/Å × Å is kcal/mol. Unnamed products, such as nm × ps, store a
   composed unit too. A dimensionless result stores plain numbers, so ns/fs is
   1e6, and it composes with nothing. Composed symbols parse back.
-* `==`, ordering, and `__hash__` compare stored numbers when both sides share a
-  storage unit, and values in the reference units otherwise.
+* `==` and ordering compare as arithmetic does: a null-system quantity adopts
+  the other's system, so `q == q.to_system(S)`. Stored numbers compare
+  directly when both sides share a storage unit. Otherwise the two are equal
+  when either converts exactly onto the other, which keeps a round trip
+  through a system equal whichever way it rounded, and ordering compares in
+  the larger unit. Quantities in two unit systems are unequal. Quantities
+  are unhashable.
 * A product, quotient, or power displays its unit composed the same way from
   its operands' displayed units, the left operand's winning where they
   cancel: `1.5 eV/nm`,
@@ -121,8 +126,9 @@ composed instead of the system's unit.
   `from_value` without a system, and mixing two unit systems.
 * Good, because a literal such as `1.0 * u.nm` works in code that chose a
   system: it adopts that system.
-* Good, because equality across units is symmetric and agrees with `__hash__`:
-  `{Length(1, u.nm), Length(10, u.angstrom)}` has one element.
+* Good, because `==`, ordering, subtraction, and `to_system` agree: a
+  quantity equals itself converted into any system and back, and
+  `1 nm == 10 Å`.
 * Bad, because operations across units convert: adding a million nm values to
   Å values took 1,013 µs instead of 513 µs. Scalar products cost 0.72 µs
   instead of 0.58 µs, mostly to choose the unit a product shows in.
@@ -136,9 +142,15 @@ composed instead of the system's unit.
   left ty and Pyrefly faster on a user file than before (0.10 s and 0.26 s,
   from 0.25 s and 0.39 s) and Pyright and mypy about as fast. Pyright checking
   the whole repository needs a 12 GB heap.
-* Bad, because equality across units is floating-point equality in reference
-  units. Two distinct nm values can each equal the same Å value, and `a == b`
-  can hold while `a - b != 0`.
+* Bad, because quantities are unhashable, scalars included, so they can't be
+  dict keys, set members, `functools.cache` arguments, or `jax.jit` static
+  arguments; code keys on `q.magnitude(unit)` instead. Equality that adopts a
+  system admits no hash: `1 nm` equals its SI and `Real` conversions, which
+  are unequal to each other. Hashing by value in the reference units, as
+  before, left `q == q.to_system(SI)` false for about a quarter of values and
+  let a cache return a result in another system. Equality is also not
+  transitive across systems, and is floating-point equality, so two distinct
+  nm values can each equal the same Å value.
 * Bad, because it breaks existing code, with no deprecation period while
   quantype is before 1.0: `.value` on default quantities, `from_value`, which
   now takes the system, `with_value`, which is gone, `.magnitude()` of a

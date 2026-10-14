@@ -336,7 +336,7 @@ base units: ångström, eV, fs, kelvin, Bohr magneton, atom, electron, and
 elementary charge. Atom, electron, and charge are dimensions of their own. Mass
 is derived, as energy time² / length², so its reference unit is eV fs²/Å², not
 the dalton that `Atomistic` stores it in. Without a system, quantities in
-different units compare and hash in the reference units. JAX pytrees and the
+different units convert into a shared unit to compare. JAX pytrees and the
 `ujax` and `utorch` derivatives work in them too, so `jit` traces once whatever
 units its inputs were given in. Numbers stored in another unit are rescaled
 when they enter a transformation, which rounds them, and the rescaling happens
@@ -495,17 +495,21 @@ assert positions.max().magnitude() == 3.0
 assert 1 * u.nm == 10 * u.angstrom
 ```
 
-`==` compares values. It returns a `bool` for scalar storage and an
-element-wise result for arrays, as NumPy does. Quantities of different kinds,
-or in two different unit systems, compare unequal, as naive and aware
-datetimes do. A quantity without a system compares with one in any system.
-Quantities stored in the same unit compare their stored numbers, and others
-compare in the reference units. That is floating-point equality, so two
-distinct nm values can each equal the same Å value. Scalar quantities hash
-by value in the reference units, so they work as dict keys and in sets, and
-`1 nm` and `10 Å` hash alike. Quantities with array storage are unhashable,
-like NumPy arrays. `<` and the other orderings need the same kind and a shared
-system, statically and at runtime, and return backend booleans.
+`==` compares values as arithmetic does. It returns a `bool` for scalar storage
+and an element-wise result for arrays, as NumPy does. A quantity without a
+system adopts the other's system, as it does for `-`, so `q == q.to_system(SI)`.
+Quantities stored in the same unit compare their stored numbers. Quantities in
+different units are equal when either converts exactly onto the other, so a
+quantity equals itself converted into a system and back. Quantities of
+different kinds, or in two different unit systems, compare unequal. `<` and the
+other orderings need the same kind and a shared system, statically and at
+runtime, agree with `==`, and return backend booleans.
+
+Quantities are unhashable, scalars included, like NumPy arrays. A quantity
+without a system equals its conversions into several systems, which differ from
+each other, so no hash could agree with `==`. Key a dict, a set, a
+`functools.cache`, or a `jax.jit` static argument on `q.magnitude(unit)`
+instead.
 Comparing a quantity with a plain number, as in `2 * u.nm == 2`, raises
 `TypeError` for `==` and the orderings alike, except for `Dimensionless`
 values. Zero means the same in every unit, so `q == 0` and `q != 0` work for

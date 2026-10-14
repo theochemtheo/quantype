@@ -405,3 +405,13 @@ def test_integrals_adopt_a_system_before_integrating(namespace: ModuleType) -> N
     assert_allclose(namespace.trapezoid(energies.to_system(SI), lengths), expected)
     stepped = numpy.trapezoid(energies.to_system(SI), dx=Length[float](1.0, u.m))
     assert_allclose(stepped, expected)
+
+
+def test_closeness_tolerance_is_in_the_unit_values_compare_in() -> None:
+    angstrom, nm = Length[float](10.0, u.angstrom), Length[float](1.05, u.nm)
+    tight = Length[float](0.1, u.angstrom)
+    assert not qnp.isclose(angstrom, nm, rtol=0, atol=tight)
+    assert not qnp.isclose(nm, angstrom, rtol=0, atol=tight)
+    loose = Length[float](1.0, u.angstrom)
+    assert qnp.isclose(angstrom, nm, rtol=0, atol=loose)
+    assert qnp.isclose(nm, angstrom, rtol=0, atol=loose)

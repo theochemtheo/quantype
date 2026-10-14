@@ -127,7 +127,6 @@ def test_quantities_from_two_unit_systems_are_unequal() -> None:
     # Without a system, a quantity adopts the other's.
     assert unbound == si
     assert unbound == atomistic
-    assert len({unbound, si}) == 1
     assert unbound < si + 1 * u.nm
 
 

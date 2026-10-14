@@ -118,6 +118,21 @@ def _between(raw: Any, source: float, target: float) -> Any:
     return raw / (target / source)
 
 
+def _either(left: Any, right: Any) -> Any:
+    """``or`` of Python booleans, element-wise for boolean arrays."""
+    return (left or right) if isinstance(left, bool) else left | right
+
+
+def _both(left: Any, right: Any) -> Any:
+    """``and`` of Python booleans, element-wise for boolean arrays."""
+    return (left and right) if isinstance(left, bool) else left & right
+
+
+def _negated(value: Any) -> Any:
+    """``not`` of a Python boolean, element-wise for boolean arrays."""
+    return (not value) if isinstance(value, bool) else ~value
+
+
 def _product_scale(
     system: type[AnySystem], left: Semantic, right: Semantic, result: Semantic, op: str
 ) -> float:
@@ -742,17 +757,10 @@ class Quantity[K, V, S: AnySystem]:
         return _between(other._value, other._storage.scale, self._storage.scale)
 
     def _reference(self) -> Any:
-        """The numbers in the reference units, which comparison and hashing use."""
+        """The numbers in the reference units."""
         if self._storage is None:
             return self._value
         return _between(self._value, self._storage.scale, 1.0)
-
-    def _canonical(self) -> Any:
-        """The numbers in the reference units, with or without a system."""
-        if self._storage is not None:
-            return self._reference()
-        system = cast("type[UnitSystem]", self._system)
-        return _between(self._value, factor(system, self._semantic), 1.0)
 
     def _is_dimensionless(self) -> bool:
         semantic = self._semantic
@@ -937,15 +945,41 @@ class Quantity[K, V, S: AnySystem]:
         if other._semantic != self._semantic:
             raise TypeError(f"Cannot compare {self.kind} and {other.kind}")
         left, rhs = self._adopted(cast("Quantity[Any, Any, Any]", other))
-        return compare(*left._comparable(rhs))
+        return left._ordered(rhs, compare)
 
     def _comparable(self, other: Quantity[Any, Any, Any]) -> tuple[Any, Any]:
-        # Converting only one side would make 0.3 nm == 3 Å and 3 Å == 0.3 nm
-        # disagree, and break __hash__'s agreement with ==.
+        """Both sides' numbers in one unit: the larger, so only one side rounds."""
         mine, theirs = self._storage, other._storage
         if mine is None or theirs is None or mine.scale == theirs.scale:
             return self._value, other._value
-        return self._reference(), other._reference()
+        if mine.scale > theirs.scale:
+            return self._value, _between(other._value, theirs.scale, mine.scale)
+        return _between(self._value, mine.scale, theirs.scale), other._value
+
+    def _ordered(
+        self, other: Quantity[Any, Any, Any], compare: Callable[[Any, Any], Any]
+    ) -> Any:
+        """``compare`` of two quantities in one system, in either's unit.
+
+        Quantities in two units are equal when either converts exactly onto the
+        other, so a quantity equals itself converted into a system and back,
+        whichever way that rounded. Rounding is monotonic, so the conversions
+        never order a pair oppositely, and ordering agrees with equality.
+        """
+        mine, theirs = self._storage, other._storage
+        if mine is None or theirs is None or mine.scale == theirs.scale:
+            return compare(self._value, other._value)
+        into_theirs = _between(self._value, mine.scale, theirs.scale)
+        into_mine = _between(other._value, theirs.scale, mine.scale)
+        equal = _either(into_theirs == other._value, self._value == into_mine)
+        if compare is operator.eq:
+            return equal
+        if compare is operator.ne:
+            return _negated(equal)
+        ordered = compare(*self._comparable(other))
+        if compare in {operator.lt, operator.gt}:
+            return _both(ordered, _negated(equal))
+        return _either(ordered, equal)
 
     def _equality(self, other: object, compare: Callable[[Any, Any], Any]) -> Any:
         if not isinstance(other, Quantity):
@@ -954,21 +988,20 @@ class Quantity[K, V, S: AnySystem]:
         rhs = cast("Quantity[Any, Any, Any]", other)
         if rhs._semantic != self._semantic:
             return compare is operator.ne
-        if rhs._system is self._system:
-            return self._compare(rhs, compare)
-        if NoSystem not in (self._system, rhs._system):
+        systems = (self._system, rhs._system)
+        if systems[0] is not systems[1] and NoSystem not in systems:
             return compare is operator.ne
-        # Adopting the system would round on one side only; __hash__ agrees.
-        return compare(self._canonical(), rhs._canonical())
+        return self._compare(rhs, compare)
 
     @override
     def __eq__(self, other: object) -> Any:
-        """Value equality within a kind; otherwise simply unequal.
+        """Value equality within a kind, as arithmetic compares; else unequal.
 
-        As with naive and aware datetimes, quantities in two unit systems are
-        unequal, while ordering them raises; a quantity without a system
-        compares with any. A plain number raises for both. Quantities in
-        different units compare in the reference units, so ``1 nm == 10 Å``.
+        A quantity without a system adopts the other's, as for ``-`` and
+        ``<``, so ``q == q.to_system(SI)``. Quantities in two unit systems are
+        unequal, while ordering them raises. A plain number raises for both.
+        Quantities in different units are equal when either converts exactly
+        onto the other, so ``1 nm == 10 Å``.
         """
         return self._equality(other, operator.eq)
 
@@ -991,18 +1024,10 @@ class Quantity[K, V, S: AnySystem]:
             )
         return float(self._reference())
 
-    @override
-    def __hash__(self) -> int:
-        """Scalars hash by value, consistently with ``==``; arrays are unhashable.
-
-        Equal quantities share a kind and a value in the reference units, so the
-        system, display unit and exact echo are deliberately excluded: ``1 nm``
-        and ``10 Å`` agree, with or without a system.
-        """
-        raw: Any = self._value
-        if not _is_scalar(raw):
-            raise TypeError(f"unhashable array storage: {type(raw).__name__}")
-        return hash((self._semantic, cast("object", self._canonical())))
+    # Equality adopts a system, as arithmetic does, so no hash of one side's
+    # numbers could agree with it: a quantity without a system equals values
+    # in several systems that differ from each other.
+    __hash__ = None  # type: ignore[assignment]
 
     def __lt__(self, other: object) -> Any:
         return self._compare(other, operator.lt)
