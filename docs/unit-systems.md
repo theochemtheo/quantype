@@ -172,7 +172,10 @@ assert raw_cutoff(Length[float, Metal](2, u.nm)) == 20.0
 The checker accepts SI pairs, metal pairs, and pairs without a system, and
 rejects a mixed pair. Inside `work`, arithmetic needs no conversion in a
 system, because every operand is in `S`, and a literal such as `1.0 * u.nm`
-has no system, so it adopts `S`. `raw_cutoff` rejects a length without a
+has no system, so it adopts `S`. Pyright and ty find a product's kind from its
+right operand, and can't adopt `S` from there: write the literal on the left,
+as in `(1.0 * u.nm) * force`, or give it the system, as in
+`cutoff / (1.0 * u.fs).to_system(cutoff.system)`. `raw_cutoff` rejects a length without a
 system, because `.value` needs a `UnitSystem`. Checker messages for that name
 the descriptor behind `.value`: mypy says
 ``Value of type variable "T" of "__get__" of "_Value" cannot be "NoSystem"``,

@@ -164,12 +164,28 @@ def test_products_without_a_system_show_named_units() -> None:
     assert repr(tension * Length[float](2, u.angstrom)) == "Energy(2.0 kcal/mol)"
     nm, angstrom = Length[float](1, u.nm), Length[float](2, u.angstrom)
     assert repr(nm * angstrom) == repr(angstrom * nm) == "Area(2.0 nm·Å)"
-    assert repr(1 / nm) == repr(nm**-1) == "PerLength(1.0 1/nm)"
+    assert repr(1 / nm) == repr(nm**-1) == "PerLength(1.0 nm^-1)"
+    assert repr(nm**0) == repr(Energy[float](2, u.eV) ** 0) == "Quantity(1.0)"
     force = Energy[float](3, u.eV) / Length[float](2, u.nm)
     assert repr(force) == "Force(1.5 eV/nm)"
     assert repr(force * Length[float](2, u.nm)) == "Energy(3.0 eV)"
     mass, speed = Mass[float](2, u.Da), Length[float](1, u.nm) / Time[float](1, u.ps)
     assert repr(mass * speed**2) == "Energy(2.0 Da·nm^2/ps^2)"
+
+
+def test_units_of_one_dimension_cancel_into_the_left_operands() -> None:
+    energy, nm, angstrom = Energy[float](3, u.eV), 2 * u.nm, 4 * u.angstrom
+    assert repr(energy * nm / angstrom) == "Energy(15.0 eV)"
+    assert repr(energy * (nm / angstrom)) == "Energy(15.0 eV)"
+    stride = Length[float](1, u.nm) * Time[float](1, u.fs) / Time[float](1, u.ps)
+    assert repr(stride) == "Length(0.001 nm)"
+    assert repr(nm * angstrom) == "Area(8.0 nm·Å)"
+    scaled = energy
+    for _ in range(400):
+        scaled = scaled * nm / (20 * u.angstrom)
+    assert scaled.unit is u.eV
+    assert scaled.magnitude() == pytest.approx(3)
+    assert str(qnp.dot(energy * nm, 1 / angstrom)) == "15.0 eV"
 
 
 def test_simplified_and_system_units_change_only_the_display() -> None:

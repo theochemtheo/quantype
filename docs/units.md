@@ -247,8 +247,10 @@ has no effect on the stored numbers. It is set and kept as follows:
   wins), scaling, negation, `abs`, reductions, and indexing.
 - Point minus point gives the matching difference unit: `°C − °C → Δ°C`.
 - Without a system, a product, ratio, or power shows in its operands' units
-  multiplied out: eV/nm, nm^2, Da·nm^2/ps^2. A unit above and below the line
-  cancels, so (eV/nm)·nm is eV. When the result's scale is the kind's unit in
+  multiplied out: eV/nm, nm^-1, Da·nm^2/ps^2. A unit above and below the line
+  cancels, so (eV/nm)·nm is eV, and a unit of the right operand that would
+  cancel one of the left's dimension converts into it, so 3 eV × 2 nm / 4 Å is
+  15 eV. When the result's scale is the kind's unit in
   `Atomistic`, `Metal`, `Real`, `SI`, `CGS`, or `Atomic`, it takes that name:
   J/m shows as N, and kcal/mol/Å times Å as kcal/mol. A constant takes the
   units its operand uses, so h·c over 500 nm shows in eV. A dimensionless

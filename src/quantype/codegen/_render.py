@@ -74,8 +74,9 @@ def adopting(signatures: list[str], receiver: str) -> list[str]:
 
     Each operand typed in the system ``S`` also takes ``NoSystem``, and a copy
     of each overload binds a receiver without a system to an operand in any
-    unit system ``T``, which the result takes. ``receiver`` is the implicit
-    type of ``self``.
+    system ``T``, which the result takes. ``T`` is bounded by ``AnySystem`` so
+    that it also binds a caller's ``[S: AnySystem]``. ``receiver`` is the
+    implicit type of ``self``.
     """
     widened, adopted = _adoption(signatures, receiver)
     return widened + adopted
@@ -102,7 +103,7 @@ def _adoption(signatures: list[str], receiver: str) -> tuple[list[str], list[str
         self_type = (
             match["self"].removeprefix("self: ") if ":" in match["self"] else receiver
         )
-        parameters = ", ".join(filter(None, (match["parameters"], "T: UnitSystem")))
+        parameters = ", ".join(filter(None, (match["parameters"], "T: AnySystem")))
         adopted.append(
             f"def {match['method']}[{parameters}]"
             f"(self: {self_type.removesuffix(', S]')}, NoSystem], "
@@ -320,9 +321,7 @@ def multiplicative_stubs(name: str, catalogue: Catalogue, table: Table) -> str:
         signatures += [
             f"def {method}[R](self: {name}[float, S], other: {protocol}{name}F[S, R], /) -> R: ...",
             f"def {method}[R](self, other: {protocol}{name}[{name}[V, S], R], /) -> R: ...",
-            *structural_fallback(
-                method, name, f"Quantity[{expression}[{name}Kind, K], {{}}, S]"
-            ),
+            *unnamed_fallback(method, name, expression),
         ]
         text += overloads(adopting(signatures, f"{name}[V, S]"), overrides=True)
     return text + members(name, catalogue, table)
@@ -334,6 +333,24 @@ def structural_fallback(method: str, name: str, result: str) -> list[str]:
         f"def {method}[K, W](self: {name}[float, S], other: Quantity[K, W, S], /) -> {result.format('W')}: ...",
         f"def {method}[K](self, other: Quantity[K, V, S] | Quantity[K, float, S], /) -> {result.format('V')}: ...",
     ]
+
+
+def unnamed_fallback(method: str, name: str, expression: str) -> list[str]:
+    """``structural_fallback`` for operands of unnamed kinds only.
+
+    Every named kind has a protocol member for this one. A fallback that also
+    took named kinds would make ty infer Unknown when array storage has Any in
+    its shape, as an operand without a system then matches both.
+    """
+    signatures: list[str] = []
+    for structure in STRUCTURES:
+        kind = f"{structure}[A, B]"
+        result = f"Quantity[{expression}[{name}Kind, {kind}], {{}}, S]"
+        signatures += [
+            f"def {method}[A, B, W](self: {name}[float, S], other: Quantity[{kind}, W, S], /) -> {result.format('W')}: ...",
+            f"def {method}[A, B](self, other: Quantity[{kind}, V, S] | Quantity[{kind}, float, S], /) -> {result.format('V')}: ...",
+        ]
+    return signatures
 
 
 def power_name(
@@ -1064,9 +1081,9 @@ def same_kind(catalogue: Catalogue, template: str) -> list[str]:
             "{0}[V, S] | {0}[V, NoSystem] | {0}[float, S] | {0}[float, NoSystem]",
             "{0}[V, S]",
         ),
-        ("W, T: UnitSystem", "{0}[float, NoSystem]", "{0}[W, T]", "{0}[W, T]"),
+        ("W, T: AnySystem", "{0}[float, NoSystem]", "{0}[W, T]", "{0}[W, T]"),
         (
-            "V, T: UnitSystem",
+            "V, T: AnySystem",
             "{0}[V, NoSystem]",
             "{0}[V, T] | {0}[float, T]",
             "{0}[V, T]",
@@ -1113,7 +1130,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     )
     text += "from collections.abc import Sequence\nfrom typing import Any, Literal, overload\n"
     text += "import numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Quantity as _BaseQuantity, _Numerical\n"
-    text += "from quantype.systems import AnySystem, NoSystem, UnitSystem\n"
+    text += "from quantype.systems import AnySystem, NoSystem\n"
     text += (
         f"from {package}._generated import (" + ", ".join(catalogue.quantities) + ")\n"
     )
@@ -1179,8 +1196,8 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     text += overloads(
         [
             "def arctan2[K, V, S: AnySystem](y: _BaseQuantity[K, V, S], x: _BaseQuantity[K, V, S], /) -> Angle[V, S]: ...",
-            "def arctan2[K, V, T: UnitSystem](y: _BaseQuantity[K, V, NoSystem], x: _BaseQuantity[K, V, T], /) -> Angle[V, T]: ...",
-            "def arctan2[K, V, T: UnitSystem](y: _BaseQuantity[K, V, T], x: _BaseQuantity[K, V, NoSystem], /) -> Angle[V, T]: ...",
+            "def arctan2[K, V, T: AnySystem](y: _BaseQuantity[K, V, NoSystem], x: _BaseQuantity[K, V, T], /) -> Angle[V, T]: ...",
+            "def arctan2[K, V, T: AnySystem](y: _BaseQuantity[K, V, T], x: _BaseQuantity[K, V, NoSystem], /) -> Angle[V, T]: ...",
             "def arctan2[A: _Numerical](y: A, x: A, /) -> A: ...",
             "def arctan2(y: float, x: float, /) -> float: ...",
         ],
@@ -1428,7 +1445,7 @@ def numpy_statistics(catalogue: Catalogue, table: Table, quantity: str) -> str:
                 for kind in catalogue.quantities
                 for signature in (
                     f"def linspace[S: AnySystem](start: {kind}[float, S], stop: {kind}[float, S] | {kind}[float, NoSystem], {endpoints}) -> {kind}[npt.NDArray[np.float64], S]: ...",
-                    f"def linspace[T: UnitSystem](start: {kind}[float, NoSystem], stop: {kind}[float, T], {endpoints}) -> {kind}[npt.NDArray[np.float64], T]: ...",
+                    f"def linspace[T: AnySystem](start: {kind}[float, NoSystem], stop: {kind}[float, T], {endpoints}) -> {kind}[npt.NDArray[np.float64], T]: ...",
                 )
             ),
             f"def linspace[K, S: AnySystem](start: _BaseQuantity[K, float, S], stop: _BaseQuantity[K, float, S], {endpoints}) -> Quantity[K, npt.NDArray[np.float64], S]: ...",

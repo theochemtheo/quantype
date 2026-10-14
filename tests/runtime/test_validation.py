@@ -15,10 +15,13 @@ from quantype import (
     Dimensionless,
     Energy,
     Force,
+    InverseTime,
     Length,
+    Momentum,
     Pressure,
     Temperature,
     Time,
+    Velocity,
     u,
 )
 from quantype._internal._registry import unit_specs
@@ -53,7 +56,7 @@ def test_scalar_roundtrip_and_display_unit() -> None:
 
 def test_products_are_written_in_the_unit_they_show() -> None:
     force = Energy[float](3, u.eV) / Length[float](2, u.nm)
-    wire = {"kind": "Force", "magnitude": 1.5, "unit": "eV/nm"}
+    wire = {"kind": "Force", "magnitude": 1.5, "unit": "electron_volt/nanometer"}
     assert to_dict(force) == wire
     assert to_dict(force, u.newton)["unit"] == "newton"
     assert Force.parse(wire) == force
@@ -64,6 +67,25 @@ def test_products_are_written_in_the_unit_they_show() -> None:
     assert energy.unit.symbol == "Da·nm^2/ps^2"
     with pytest.raises(ValueError, match="Unknown unit"):
         Force.parse("1 eV·nm")
+
+
+def test_products_parse_back_from_units_with_spaces_and_reciprocals() -> None:
+    length = Velocity[float](1, u.atomic_velocity) * Time[float](3, u.fs)
+    assert str(length) == "3.0 (a0 Eh/ħ)·fs"
+    assert Length.parse(str(length)) == length
+    force = Momentum[float](1, u.eV_ps_per_angstrom) / Time[float](1, u.fs)
+    assert Force.parse(str(force)) == Force.parse(force.to_dict()) == force
+    rate = 1 / Time[float](2, u.ns)
+    assert str(rate) == "0.5 ns^-1"
+    assert InverseTime.parse(str(rate)) == rate
+
+
+def test_products_are_written_by_unit_names_not_symbols() -> None:
+    lookalike = Length.define_unit("lab:lookalike", reference=u.meter, symbol="nm")
+    force = Energy[float](1, u.eV) / Length[float](1, lookalike)
+    assert str(force) == "1.0 eV/nm"
+    assert force.to_dict()["unit"] == "electron_volt/lab:lookalike"
+    assert Force.parse(force.to_dict(), units=(lookalike,)) == force
 
 
 def test_pydantic_roundtrip() -> None:

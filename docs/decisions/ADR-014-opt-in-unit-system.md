@@ -54,9 +54,13 @@ The rules for null-system quantities:
   Units with an offset (°C, °F) store kelvin.
 * `+`, `-`, and the multi-operand `quantype.numpy` functions convert the other
   operands into the first operand's unit.
-* Products, quotients, and powers compose their units and never convert. A
-  composed unit is a product of catalogue units with exponents, so an
-  identical unit cancels exactly: (eV/nm)·nm is eV. When its scale is the
+* Products, quotients, and powers compose their units. A composed unit is a
+  product of catalogue units with exponents, so an identical unit cancels
+  exactly: (eV/nm)·nm is eV. A unit of the right operand that would cancel
+  one of the left's dimension converts into it, as a sum's right operand
+  does: eV·nm/Å is eV and nm·fs/ps is nm. A product so shows no unit its
+  operands don't, and a repeated product such as `q * x / y` keeps one unit
+  instead of growing nm^n/Å^n until its scale overflows. When its scale is the
   kind's unit in a display system, it takes that name, so J/m is N and
   kcal/mol/Å × Å is kcal/mol. Unnamed products, such as nm × ps, store a
   composed unit too. A dimensionless result stores plain numbers, so ns/fs is
@@ -64,7 +68,8 @@ The rules for null-system quantities:
 * `==`, ordering, and `__hash__` compare stored numbers when both sides share a
   storage unit, and values in the reference units otherwise.
 * A product, quotient, or power displays its unit composed the same way from
-  its operands' displayed units, whatever their order: `1.5 eV/nm`,
+  its operands' displayed units, the left operand's winning where they
+  cancel: `1.5 eV/nm`,
   `9.0 Da·nm^2/ps^2`. A constant takes the base units its operand uses, so
   h·c over 500 nm shows in eV. Nothing chooses a system for it:
   `.simplified()` merges units of one dimension and shows a named kind in a
@@ -159,6 +164,11 @@ composed instead of the system's unit.
 * Bad, because ty solves a function's system parameter as a union, such as
   `SI | Real`, where the other checkers reject the call, so
   `qnp.maximum(si, real)` passes ty. It does so before this decision too.
+* Bad, because Pyright and ty don't adopt a generic system from a literal on
+  the right of a product: with `d: Length[float, S]`, `d / (1.0 * u.fs)` has
+  no named kind in either, as neither solves the right operand's protocol
+  member against `S`. The literal goes on the left, or takes
+  `.to_system(d.system)`.
 
 ### Catalogue scales round once
 

@@ -393,3 +393,15 @@ def test_integrating_plain_numbers_over_a_quantity_keeps_its_kind() -> None:
     total = qnp.trapezoid(np.ones(3), times)
     assert isinstance(total, Time)
     assert total.magnitude(u.fs) == pytest.approx(2)
+
+
+@pytest.mark.parametrize("namespace", [qnp, numpy], ids=["qnp", "np"])
+def test_integrals_adopt_a_system_before_integrating(namespace: ModuleType) -> None:
+    energies = Energy[Array]([1.0, 1.0, 1.0], u.eV)
+    lengths = Length[Array]([0.0, 1.0, 2.0], u.m)
+    expected = Energy[float](2.0, u.eV).to_system(SI) * Length[float, SI](1.0, u.m)
+    adopted = namespace.trapezoid(energies, lengths.to_system(SI))
+    assert_allclose(adopted, expected)
+    assert_allclose(namespace.trapezoid(energies.to_system(SI), lengths), expected)
+    stepped = numpy.trapezoid(energies.to_system(SI), dx=Length[float](1.0, u.m))
+    assert_allclose(stepped, expected)

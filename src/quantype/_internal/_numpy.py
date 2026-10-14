@@ -35,9 +35,16 @@ from quantype._internal._semantics import (
     product,
 )
 from quantype._internal._storage import keep_storage
-from quantype._internal._storage_units import compose, raised, recast
+from quantype._internal._storage_units import raised, recast
 from quantype._internal._systems import NoSystem, coherence
-from quantype.core import Quantity, _composite, _delta_unit, _rescaled, _wrap
+from quantype.core import (
+    Quantity,
+    _composite,
+    _delta_unit,
+    _product,
+    _rescaled,
+    _wrap,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -298,14 +305,8 @@ def _composed(kind: Semantic, raw: Any, units: tuple[Any, Any], like: Any) -> _Q
     return _composite(kind, keep_storage(like, raw), storage, display)
 
 
-def _product_units(first: _Quantity, second: _Quantity, kind: Semantic) -> Any:
-    """The product's storage and display units without a system; None in one."""
-    if first._storage is None or second._storage is None:
-        return None
-    return (
-        compose("mul", kind, first._storage, second._storage),
-        compose("mul", kind, first.unit, second.unit),
-    )
+def _unbound(first: _Quantity, second: _Quantity) -> bool:
+    return first._storage is not None and second._storage is not None
 
 
 def _respread(quantity: _Quantity, raw: Any) -> _Quantity:
@@ -544,10 +545,9 @@ def dot(a: Any, b: Any, /) -> Any:
     first, second = first._adopted(second)
     kind = product("mul", first._semantic, second._semantic)
     namespace = _xp(first._value, second._value)
-    storage = _product_units(first, second, kind)
-    if storage is not None:
+    if _unbound(first, second):
         raw = _as_like(first._value, namespace.dot(first._value, second._value))
-        return _composed(kind, raw, storage, first._value)
+        return _product("mul", kind, keep_storage(first._value, raw), first, second)
     raw = namespace.dot(_raw(first), _raw(second))
     return _result(kind, _as_like(first._value, raw), first.system, first._value)
 
@@ -562,10 +562,9 @@ def cross(a: Any, b: Any, /, axis: int = -1) -> Any:
     first, second = first._adopted(second)
     kind = Expression("mul", first._semantic, second._semantic)
     namespace = _xp(first._value, second._value)
-    storage = _product_units(first, second, kind)
-    if storage is not None:
+    if _unbound(first, second):
         raw = namespace.cross(first._value, second._value, axis=axis)
-        return _composed(kind, raw, storage, first._value)
+        return _product("mul", kind, keep_storage(first._value, raw), first, second)
     raw = namespace.cross(_raw(first), _raw(second), axis=axis)
     return _result(kind, raw, first.system, first._value)
 
@@ -878,10 +877,9 @@ def _product_of(name: str) -> Callable[..., Any]:
         a, b = a._adopted(b)
         kind = product("mul", a._semantic, b._semantic)
         namespace = _xp(a._value, b._value)
-        storage = _product_units(a, b, kind)
-        if storage is not None:
+        if _unbound(a, b):
             raw = _as_like(a._value, call(namespace, a._value, b._value))
-            return _composed(kind, raw, storage, a._value)
+            return _product("mul", kind, keep_storage(a._value, raw), a, b)
         raw = call(namespace, _raw(a), _raw(b))
         return _result(kind, _as_like(a._value, raw), a.system, a._value)
 
@@ -899,6 +897,8 @@ def trapezoid(y: Any, x: Any = None, dx: Any = 1.0, axis: int = -1) -> Any:
     step = x if x is not None else dx
     if not _is_quantity(y) and not _is_quantity(step):
         return _xp(y).trapezoid(y, x=x, dx=dx, axis=axis)
+    if _is_quantity(y) and _is_quantity(step):
+        y, step = y._adopted(step)
     quantities = [value for value in (y, step) if _is_quantity(value)]
     stored = all(value._storage is not None for value in quantities)
 
@@ -926,12 +926,10 @@ def trapezoid(y: Any, x: Any = None, dx: Any = 1.0, axis: int = -1) -> Any:
                 storage=only._storage,
             )
         return _result(only._semantic, raw, only.system, only._value, display=display)
-    y, step = y._adopted(step)
     kind = product("mul", y._semantic, step._semantic)
     raw = _as_like(y._value, raw)
-    storage = _product_units(y, step, kind)
-    if storage is not None:
-        return _composed(kind, raw, storage, y._value)
+    if _unbound(y, step):
+        return _product("mul", kind, keep_storage(y._value, raw), y, step)
     return _result(kind, raw, y.system, y._value)
 
 

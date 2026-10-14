@@ -2,10 +2,12 @@
 
 Construction keeps the input unit. Products, quotients and powers compose their
 operands' units as a product of catalogue units with exponents, in which an
-identical unit cancels exactly, so (eV/nm)·nm is eV. A composed unit takes the
-name of the kind's unit in a display system when its scale is that unit's, so
-J/m is N and kcal/mol/Å·Å is kcal/mol. A product is shown the same way, from
-its operands' displayed units, and its symbol parses back (``parsed``).
+identical unit cancels exactly, so (eV/nm)·nm is eV, and a right operand's unit
+that would cancel a left one of its dimension converts into it, so eV·nm/Å is
+eV. A composed unit takes the name of the kind's unit in a display system when
+its scale is that unit's, so J/m is N and kcal/mol/Å·Å is kcal/mol. A product
+is shown the same way, from its operands' displayed units, and its symbol
+parses back (``parsed``).
 """
 
 from __future__ import annotations
@@ -46,15 +48,17 @@ class ComposedUnit(Unit[Any]):
     """A product of catalogue units with exponents: eV/nm, Da·nm^2/ps^2.
 
     ``factors`` are the units, which are never composed themselves, with
-    nonzero exponents, sorted by sign and symbol.
+    nonzero exponents, sorted by sign and symbol. The name composes the units'
+    names, since a custom unit may reuse a catalogue unit's symbol.
     """
 
     factors: Factors
 
     def __init__(self, kind: Semantic, factors: Factors) -> None:
         scale = math.prod(unit.scale**exponent for unit, exponent in factors)
-        symbol = _symbol(factors)
-        super().__init__(symbol, kind, scale, symbol=symbol)
+        name = _composed(factors, lambda unit: unit.name)
+        symbol = _composed(factors, lambda unit: unit.symbol)
+        super().__init__(name, kind, scale, symbol=symbol)
         object.__setattr__(self, "factors", factors)
 
     @override
@@ -74,24 +78,28 @@ def _exponent(value: float) -> str:
     return str(int(value)) if float(value).is_integer() else str(value)
 
 
-def _term(unit: Unit[Any], exponent: float) -> str:
-    symbol = unit.symbol
+def _term(text: str, exponent: float) -> str:
     if exponent == 1:
-        return f"({symbol})" if _COMPOUND & set(symbol) else symbol
-    if (_COMPOUND | {"^"}) & set(symbol):
-        symbol = f"({symbol})"
-    return f"{symbol}^{_exponent(exponent)}"
+        return f"({text})" if _COMPOUND & set(text) else text
+    if (_COMPOUND | {"^"}) & set(text):
+        text = f"({text})"
+    return f"{text}^{_exponent(exponent)}"
 
 
-def _symbol(factors: Factors) -> str:
+def _composed(factors: Factors, text: Callable[[Unit[Any]], str]) -> str:
     if len(factors) == 1 and factors[0][1] == 1:
-        return factors[0][0].symbol
-    above = [_term(unit, exponent) for unit, exponent in factors if exponent > 0]
-    below = [_term(unit, -exponent) for unit, exponent in factors if exponent < 0]
-    text = "·".join(above) or "1"
+        return text(factors[0][0])
+    if not factors:
+        return "1"
+    above = [_term(text(unit), power) for unit, power in factors if power > 0]
+    if not above:
+        # ns^-1 rather than 1/ns, which would read as a number before a unit.
+        return "·".join(_term(text(unit), power) for unit, power in factors)
+    below = [_term(text(unit), -power) for unit, power in factors if power < 0]
+    numerator = "·".join(above)
     if len(below) == 1:
-        return f"{text}/{below[0]}"
-    return f"{text}/({'·'.join(below)})" if below else text
+        return f"{numerator}/{below[0]}"
+    return f"{numerator}/({'·'.join(below)})" if below else numerator
 
 
 def factors_of(unit: Unit[Any]) -> Factors:
@@ -121,8 +129,10 @@ def _combined(*parts: tuple[Factors, float]) -> Factors:
 
 def _built(kind: Semantic, factors: Factors) -> Unit[Any]:
     """A unit of ``kind`` from ``factors``: a catalogue unit, when it is one."""
-    if not factors:
+    if not factors and isinstance(kind, Kind):
         return reference_unit(kind)
+    if not factors:
+        return ComposedUnit(kind, ())
     if len(factors) == 1 and factors[0][1] == 1:
         return recast(kind, factors[0][0])
     return ComposedUnit(kind, factors)
@@ -148,11 +158,38 @@ def settled(kind: Semantic, unit: Unit[Any]) -> Unit[Any]:
 @cache
 def compose(
     operation: Literal["mul", "div"], kind: Semantic, left: Unit[Any], right: Unit[Any]
-) -> Unit[Any]:
-    """The unit of a product or quotient of quantities in these units."""
+) -> tuple[Unit[Any], float, float]:
+    """The unit of a product or quotient of quantities in these units.
+
+    A unit of the right operand that would cancel one of the left's dimension
+    converts into it, so eV·nm/Å is eV and nm·fs/ps is nm; the product of the
+    numbers then takes the factor ``source / target``. The result shows no
+    unit its operands don't.
+    """
     power = 1.0 if operation == "mul" else -1.0
-    factors = _combined((factors_of(left), 1.0), (factors_of(right), power))
-    return settled(kind, _built(kind, factors))
+    mine = factors_of(left)
+    source = target = 1.0
+    theirs: list[tuple[Unit[Any], float]] = []
+    for unit, exponent in _combined((factors_of(right), power)):
+        into = _cancelled(mine, unit, exponent)
+        if into is not unit:
+            above, below = (unit, into) if exponent > 0 else (into, unit)
+            source *= above.scale ** abs(exponent)
+            target *= below.scale ** abs(exponent)
+        theirs.append((into, exponent))
+    factors = _combined((mine, 1.0), (tuple(theirs), 1.0))
+    return settled(kind, _built(kind, factors)), source, target
+
+
+def _cancelled(mine: Factors, unit: Unit[Any], exponent: float) -> Unit[Any]:
+    """The unit in ``mine`` that ``unit`` to ``exponent`` would cancel, else it."""
+    dimensions = unit.semantic.dimensions
+    if not any(dimensions):
+        return unit
+    for leaf, own in mine:
+        if own * exponent < 0 and leaf.semantic.dimensions == dimensions:
+            return leaf
+    return unit
 
 
 @cache
@@ -345,7 +382,7 @@ def storage_map(
     return 1.0, 0.0, unit
 
 
-_TOKENS = re.compile(r"\s*([()·*/^]|[^\s()·*/^]+)")
+_TOKENS = re.compile(r"[()·*/^]|[^\s()·*/^]+")
 
 
 def parsed(text: str, kind: Kind, leaf: Callable[[str], Unit[Any]]) -> Unit[Any] | None:
@@ -356,11 +393,11 @@ def parsed(text: str, kind: Kind, leaf: Callable[[str], Unit[Any]]) -> Unit[Any]
     works. Operators apply left to right, as in ``a/b·c = (a/b)·c``. None if
     ``text`` isn't composed or isn't of ``kind``'s dimensions.
     """
-    tokens = _TOKENS.findall(text)
-    if not set(tokens) & set("()·*/^"):
+    tokens = list(_TOKENS.finditer(text))
+    if not {token.group() for token in tokens} & set("()·*/^"):
         return None
     try:
-        factors = _Parser(tokens, leaf).factors()
+        factors = _Parser(text, tokens, leaf).factors()
     except (ValueError, IndexError):
         return None
     dimensions = [0.0] * len(kind.dimensions)
@@ -373,7 +410,10 @@ def parsed(text: str, kind: Kind, leaf: Callable[[str], Unit[Any]]) -> Unit[Any]
 
 
 class _Parser:
-    def __init__(self, tokens: list[str], leaf: Callable[[str], Unit[Any]]) -> None:
+    def __init__(
+        self, text: str, tokens: list[re.Match[str]], leaf: Callable[[str], Unit[Any]]
+    ) -> None:
+        self.text = text
         self.tokens = tokens
         self.position = 0
         self.leaf = leaf
@@ -388,13 +428,16 @@ class _Parser:
             factors = _combined((factors, 1.0), (self._term(), power))
         return factors
 
+    def _next(self) -> str:
+        return self.tokens[self.position].group()
+
     def _take(self) -> str:
         self.position += 1
-        return self.tokens[self.position - 1]
+        return self.tokens[self.position - 1].group()
 
     def _term(self) -> Factors:
         factors = self._atom()
-        if self.position < len(self.tokens) and self.tokens[self.position] == "^":
+        if self.position < len(self.tokens) and self._next() == "^":
             self._take()
             factors = _combined((factors, float(self._take())))
         return factors
@@ -407,7 +450,9 @@ class _Parser:
         while depth:
             depth += {"(": 1, ")": -1}.get(self._take(), 0)
         inner = self.tokens[start : self.position - 1]
+        # A leaf symbol such as ``eV ps/Å`` keeps its spaces.
+        whole = self.text[inner[0].start() : inner[-1].end()]
         try:
-            return factors_of(self.leaf("".join(inner)))
+            return factors_of(self.leaf(whole))
         except ValueError:
-            return _Parser(inner, self.leaf).factors()
+            return _Parser(self.text, inner, self.leaf).factors()

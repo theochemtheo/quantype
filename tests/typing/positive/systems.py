@@ -19,6 +19,7 @@ from quantype import (
     Temperature,
     TemperatureDifference,
     Time,
+    Velocity,
     ujax,
     utorch,
 )
@@ -142,6 +143,19 @@ def shifted[S: AnySystem](r: Length[float, S]) -> Length[float, S]:
 
 
 assert_type(shifted(x_metal), Length[float, Metal])
+
+
+def literals_adopt[S: AnySystem](r: Length[float, S], f: Force[float, S]) -> None:
+    assert_type((1.0 * u.angstrom) + r, Length[float, S])
+    assert_type((1.0 * u.angstrom) - r, Length[float, S])
+    assert_type((1.0 * u.angstrom) * f, Energy[float, S])
+    assert_type(r / (1.0 * u.fs).to_system(r.system), Velocity[float, S])
+
+
+literals_adopt(x_metal, Force[float, Metal](1.0, u.eV_per_angstrom))
+grid = Length[npt.NDArray[np.float64]](np.ones(3), u.nm)
+assert_type(x_si * grid, Area[npt.NDArray[np.float64], SI])
+assert_type(e_si / grid, Force[npt.NDArray[np.float64], SI])
 positions: npt.NDArray[np.float64] = np.zeros(3)
 
 

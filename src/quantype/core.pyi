@@ -598,6 +598,13 @@ def _wrap(
 def _composite(
     kind: Semantic, raw: Any, storage: Unit[Any], display: Unit[Any]
 ) -> Quantity[Any, Any, Any]: ...
+def _product(
+    operation: Literal["mul", "div"],
+    kind: Semantic,
+    raw: Any,
+    left: Quantity[Any, Any, Any],
+    right: Quantity[Any, Any, Any],
+) -> Quantity[Any, Any, Any]: ...
 def _delta_unit(point: Unit[Any], kind: Kind) -> Unit[Any] | None: ...
 def _unit_named(
     cls: type[Quantity[Any, Any, Any]],

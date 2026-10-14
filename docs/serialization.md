@@ -18,8 +18,10 @@ A serialized quantity names its kind:
 ```
 
 `to_dict` writes the value in its display unit: the unit it was given in, the
-one chosen with `.to(unit)`, or for a product the unit it shows in, such as
-`eV/nm`, which reads back. A value with no display unit is written in its system's unit
+one chosen with `.to(unit)`, or for a product the unit it shows in, written
+with unit names: eV/nm is `electron_volt/nanometer`, so a custom unit that
+reuses a catalogue symbol reads back as itself. A value with no display unit is
+written in its system's unit
 for the kind. That is a catalogue name for built-in systems, or a
 system-qualified identifier such as `gromacs:Force` for
 [custom systems](unit-systems.md#decoding). A configuration's `"0.5 nm"` is

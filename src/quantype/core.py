@@ -230,7 +230,7 @@ def _product(
     right: Quantity[Any, Any, Any],
 ) -> Quantity[Any, Any, Any]:
     """``_composite`` for a product or quotient, in one lookup: the hot path."""
-    composed, stored, display = _product_units(
+    stored, display, source, target = _product_units(
         operation,
         kind,
         cast("Unit[Any]", left._storage),
@@ -238,8 +238,8 @@ def _product(
         cast("Unit[Any]", left._display or left.unit),
         cast("Unit[Any]", right._display or right.unit),
     )
-    if stored is not composed:
-        raw = keep_storage(raw, _between(raw, composed.scale, stored.scale))
+    if source != target:
+        raw = keep_storage(raw, _between(raw, source, target))
     return _wrap(kind, raw, NoSystem, display=display, storage=stored)
 
 
@@ -251,10 +251,15 @@ def _product_units(  # noqa: PLR0913, PLR0917 -- the cache key
     right: Unit[Any],
     left_shown: Unit[Any],
     right_shown: Unit[Any],
-) -> tuple[Unit[Any], Unit[Any], Unit[Any]]:
-    composed = compose(operation, kind, left, right)
-    shown = compose(operation, kind, left_shown, right_shown)
-    return (composed, *_result_units(kind, composed, shown))
+) -> tuple[Unit[Any], Unit[Any], float, float]:
+    """A product's storage and display units, and the factor ``source / target``
+    taking the product of its operands' numbers into the storage unit."""
+    composed, source, target = compose(operation, kind, left, right)
+    shown, _, _ = compose(operation, kind, left_shown, right_shown)
+    stored, display = _result_units(kind, composed, shown)
+    if stored is not composed:
+        source, target = source * composed.scale, target * stored.scale
+    return stored, display, source, target
 
 
 @cache
@@ -853,8 +858,8 @@ class Quantity[K, V, S: AnySystem]:
         quotient = keep_storage(raw, operand / raw)
         if self._storage is not None:
             one = reference_unit(numerator)
-            storage = compose("div", kind, one, self._storage)
-            display = compose("div", kind, one, cast("Unit[Any]", self.unit))
+            storage, _, _ = compose("div", kind, one, self._storage)
+            display, _, _ = compose("div", kind, one, cast("Unit[Any]", self.unit))
             return _composite(kind, quotient, storage, display)
         scale = _product_scale(self._system, numerator, self._semantic, kind, "div")
         return _wrap(kind, _rescaled(quotient, scale), self._system)
