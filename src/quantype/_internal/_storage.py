@@ -327,6 +327,17 @@ def unit_conversion(
     return _restore_storage(value, raw)
 
 
+def rescale(value: Any, source: float, target: float) -> Any:
+    """Numbers in a unit of scale ``source`` as numbers in one of scale ``target``.
+
+    The factor is a ratio of at least 1, multiplied or divided by, so an exact
+    ratio such as 10 stays exact both ways: 0.7 nm is 7.0 Å, not 6.999999999999999.
+    """
+    if source >= target:
+        return unit_conversion(value, source / target, 0.0)
+    return unit_conversion(value, target / source, 0.0, inverse=True)
+
+
 def _working_value(value: Any) -> tuple[Any, Any]:
     module = type(value).__module__
     if module.startswith("torch"):

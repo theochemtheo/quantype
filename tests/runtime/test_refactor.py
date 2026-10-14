@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import importlib
 import json
 import subprocess
 import sys
@@ -14,6 +15,7 @@ import pytest
 
 import quantype
 from quantype import Energy, Length, Temperature, u
+from quantype._internal._registry import QUANTITIES
 from quantype.serialization import load_npz, save_npz
 from quantype.systems import Atomistic
 from quantype.testing import assert_allclose
@@ -31,7 +33,7 @@ def test_typed_constructor_converts_storage_and_units() -> None:
     np.testing.assert_array_equal(array.value, [[10, 20, 30]])
     raw = np.ones(3)
     assert Length[npt.NDArray[np.float64]](raw, u.length.nanometer).magnitude() is raw
-    assert Length[npt.NDArray[np.float64], Atomistic].from_value(raw).value is raw
+    assert Length.from_value(raw, Atomistic).value is raw
     unbound = Length[npt.NDArray[np.float32]]([[1, 2, 3]], u.nm)
     assert unbound.dtype == np.float32
     np.testing.assert_array_equal(unbound.magnitude(u.angstrom), [[10, 20, 30]])
@@ -113,3 +115,9 @@ def test_version_matches_the_installed_distribution() -> None:
     assert quantype.__version__ == metadata.version("quantype")
     with pytest.raises(AttributeError, match="no attribute 'missing'"):
         getattr(quantype, "missing")  # noqa: B009
+
+
+def test_each_kind_module_holds_the_runtime_class() -> None:
+    for name in QUANTITIES:
+        module = importlib.import_module(f"quantype._kinds.{name}")
+        assert getattr(module, name) is getattr(quantype, name)

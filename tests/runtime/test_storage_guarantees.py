@@ -37,8 +37,8 @@ def _read_only(shape: tuple[int, ...] = (4, 3)) -> npt.NDArray[np.float64]:
 def test_from_value_keeps_the_array_it_is_given() -> None:
     raw = _read_only()
     for forces in (
-        Force[npt.NDArray[np.float64], Atomistic].from_value(raw),
-        Force[npt.NDArray[np.float64], SI].from_value(raw),
+        Force.from_value(raw, Atomistic),
+        Force.from_value(raw, SI),
     ):
         assert forces.value is raw
         assert not forces.value.flags.writeable
@@ -80,7 +80,7 @@ def test_integer_and_boolean_array_indexing_select_rows() -> None:
 
 
 def test_an_element_is_zero_dimensional_until_item() -> None:
-    forces = Force[npt.NDArray[np.float64], SI].from_value(_read_only())
+    forces = Force.from_value(_read_only(), SI)
     element = forces[1, 2]
     assert isinstance(element.value, np.ndarray)
     assert element.value.shape == ()

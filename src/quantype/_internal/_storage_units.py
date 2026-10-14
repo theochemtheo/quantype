@@ -3,17 +3,17 @@
 Construction keeps the input unit. Products, quotients and powers compose their
 operands' units without converting, and take the name of a catalogue unit of
 the same scale when one exists, so kcal/mol/Å times Å is stored in kcal/mol.
+They show in a named unit chosen from the operands' units (``shown``).
 """
 
 from __future__ import annotations
 
 import math
 from functools import cache
-from typing import TYPE_CHECKING, Any, Literal, cast, override
+from typing import Any, Literal, cast, override
 
-from quantype._internal._semantics import Expression, Kind, Semantic
+from quantype._internal._semantics import Kind, Semantic
 from quantype._internal._systems import (
-    DISPLAY_FALLBACK,
     DISPLAY_SYSTEMS,
     AnySystem,
     Atomistic,
@@ -25,9 +25,6 @@ from quantype._internal._systems import (
 )
 from quantype._internal._unit import Unit, units_of
 
-if TYPE_CHECKING:
-    from collections.abc import Sequence
-
 # A composed scale takes a catalogue unit's name when they agree this closely,
 # which absorbs the rounding of each operand's scale.
 _TOLERANCE = 1e-12
@@ -38,28 +35,24 @@ _COMPOUND = frozenset("/·^ ")
 class ComposedUnit(Unit[Any]):
     """A product, quotient or power of units, which the catalogue doesn't name.
 
-    ``nested`` records that an operand was itself composed. ``systems`` are the
-    built-in systems that store each operand's kind in that operand's unit, in
-    display order, so nested compositions of a named kind can display in one.
-    ``power_of`` is the base and exponent of a power, so a root undoes it.
+    ``systems`` are the display systems that store this unit's kind in it, so
+    products of a quantity shown in it can show in one of them. ``power_of``
+    is the base and exponent of a power, so a root undoes it.
     """
 
-    nested: bool
     systems: tuple[type[UnitSystem], ...]
     power_of: tuple[Unit[Any], float] | None
 
-    def __init__(  # noqa: PLR0913 -- one keyword argument per attribute
+    def __init__(
         self,
         kind: Semantic,
         scale: float,
         symbol: str,
         *,
-        nested: bool,
-        systems: tuple[type[UnitSystem], ...],
+        systems: tuple[type[UnitSystem], ...] = (),
         power_of: tuple[Unit[Any], float] | None = None,
     ) -> None:
         super().__init__(symbol, kind, scale, symbol=symbol)
-        object.__setattr__(self, "nested", nested)
         object.__setattr__(self, "systems", systems)
         object.__setattr__(self, "power_of", power_of)
 
@@ -84,7 +77,7 @@ def _grouped(symbol: str) -> str:
 @cache
 def _catalogue_systems(unit: Unit[Any]) -> tuple[type[UnitSystem], ...]:
     kind = unit.semantic
-    if not isinstance(kind, Kind) or unit.offset:
+    if not isinstance(kind, Kind):
         return ()
     return tuple(
         system
@@ -97,11 +90,6 @@ def _systems(unit: Unit[Any]) -> tuple[type[UnitSystem], ...]:
     if isinstance(unit, ComposedUnit):
         return unit.systems
     return _catalogue_systems(unit)
-
-
-def _shared(*units: Unit[Any]) -> tuple[type[UnitSystem], ...]:
-    first, *rest = (_systems(unit) for unit in units)
-    return tuple(system for system in first if all(system in other for other in rest))
 
 
 def _named(kind: Semantic, scale: float) -> Unit[Any] | None:
@@ -123,20 +111,16 @@ def _unit(
     kind: Semantic,
     scale: float,
     symbol: str,
-    operands: Sequence[Unit[Any]],
     power_of: tuple[Unit[Any], float] | None = None,
 ) -> Unit[Any]:
     named = _named(kind, scale)
     if named is not None:
         return named
-    return ComposedUnit(
-        kind,
-        scale,
-        symbol,
-        nested=any(isinstance(unit, ComposedUnit) for unit in operands),
-        systems=_shared(*operands),
-        power_of=power_of,
-    )
+    return ComposedUnit(kind, scale, symbol, power_of=power_of)
+
+
+def _is_one(unit: Unit[Any]) -> bool:
+    return unit.symbol == "1" and unit.scale == 1
 
 
 @cache
@@ -144,16 +128,16 @@ def compose(
     operation: Literal["mul", "div"], kind: Semantic, left: Unit[Any], right: Unit[Any]
 ) -> Unit[Any]:
     """The unit of a product or quotient of quantities stored in these units."""
-    a, b = _grouped(left.symbol), _grouped(right.symbol)
+    if _is_one(right):
+        return recast(kind, left)
+    if operation == "mul" and _is_one(left):
+        return recast(kind, right)
     if operation == "mul" and left == right:
         return raised(kind, left, 2)
+    a, b = _grouped(left.symbol), _grouped(right.symbol)
     if operation == "mul":
-        scale = left.scale * right.scale
-        symbol = b if a == "1" else a if b == "1" else f"{a}·{b}"
-    else:
-        scale = left.scale / right.scale
-        symbol = a if b == "1" else f"{a}/{b}"
-    return _unit(kind, scale, symbol, (left, right))
+        return _unit(kind, left.scale * right.scale, f"{a}·{b}")
+    return _unit(kind, left.scale / right.scale, f"{a}/{b}")
 
 
 @cache
@@ -165,7 +149,7 @@ def raised(kind: Semantic, unit: Unit[Any], exponent: float) -> Unit[Any]:
         return recast(kind, base) if total == 1 else raised(kind, base, total)
     shown = int(exponent) if float(exponent).is_integer() else exponent
     symbol = f"{_grouped(unit.symbol)}^{shown}"
-    return _unit(kind, unit.scale**exponent, symbol, (unit,), (unit, exponent))
+    return _unit(kind, unit.scale**exponent, symbol, (unit, exponent))
 
 
 @cache
@@ -173,13 +157,7 @@ def recast(kind: Semantic, unit: Unit[Any]) -> Unit[Any]:
     """``unit``'s scale as a unit of another kind: ΔK for K, Pa for J/m³."""
     if unit.semantic == kind:
         return unit
-    named = _named(kind, unit.scale)
-    if named is not None:
-        return named
-    nested = isinstance(unit, ComposedUnit) and unit.nested
-    return ComposedUnit(
-        kind, unit.scale, unit.symbol, nested=nested, systems=_systems(unit)
-    )
+    return _named(kind, unit.scale) or ComposedUnit(kind, unit.scale, unit.symbol)
 
 
 @cache
@@ -204,9 +182,15 @@ def system_unit(system: type[UnitSystem], kind: Semantic) -> Unit[Any]:
         kind,
         factor(system, kind),
         _coherent_symbol(system, kind),
-        nested=isinstance(kind.left, Expression) or isinstance(kind.right, Expression),
         systems=(system,) if system in DISPLAY_SYSTEMS else (),
     )
+
+
+@cache
+def neutral(kind: Semantic) -> Unit[Any]:
+    """A constant's unit, which every display system can show it in."""
+    unit = reference_unit(kind)
+    return ComposedUnit(kind, unit.scale, unit.symbol, systems=DISPLAY_SYSTEMS)
 
 
 def _coherent_symbol(system: type[UnitSystem], kind: Semantic) -> str:
@@ -234,16 +218,28 @@ def storage_map(
     return 1.0, 0.0, unit
 
 
-def presented(unit: Unit[Any], kind: Semantic) -> Unit[Any]:
-    """The unit to show a quantity stored in ``unit`` in; storage is unchanged.
+@cache
+def shown(kind: Semantic, *operands: Unit[Any]) -> Unit[Any]:
+    """The unit a product, quotient or power of quantities shown in ``operands``
+    shows in.
 
-    One product or quotient, such as eV/nm, shows as it is. A nested one of a
-    named kind, such as Da·((Å/fs)^2) for an energy, shows in the kind's unit
-    of the first built-in system that stores each operand in its unit, else SI.
+    It is the kind's unit in the first display system that stores each
+    operand's kind in that operand's unit, else in ``Atomistic``, whose units
+    are the reference units, so eV/nm shows as eV/Å and J/m as N. Operand order
+    doesn't matter.
     """
-    if not isinstance(unit, ComposedUnit) or not unit.nested:
-        return unit
-    if not isinstance(kind, Kind):
-        return unit
-    system = unit.systems[0] if unit.systems else DISPLAY_FALLBACK
-    return system.unit_for(kind)
+    first, *rest = (_systems(unit) for unit in operands)
+    systems = [system for system in first if all(system in other for other in rest)]
+    chosen = systems[0] if systems else Atomistic
+    # mypy reads a class's __hash__ as unbound, so a class isn't Hashable to it.
+    return system_unit(chosen, kind)  # type: ignore[arg-type]
+
+
+def presented(unit: Unit[Any], kind: Semantic) -> Unit[Any]:
+    """The unit to show a quantity stored in ``unit`` in, when nothing chose one.
+
+    A composed unit of a named kind shows in the kind's ``Atomistic`` unit.
+    """
+    if isinstance(unit, ComposedUnit) and isinstance(kind, Kind):
+        return Atomistic.unit_for(kind)
+    return unit

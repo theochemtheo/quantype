@@ -148,12 +148,8 @@ def _is_catalogue_unit(unit: Unit[Any]) -> bool:
 _deferred_validation = False
 
 
-class AnySystem:
-    """What a quantity's system parameter can be: a ``UnitSystem``, or ``NoSystem``.
-
-    Code that accepts quantities with or without a system is generic over
-    ``[S: AnySystem]``; code that reads raw numbers needs ``[S: UnitSystem]``.
-    """
+class _System:
+    """``NoSystem`` and every ``UnitSystem``, which are used as classes."""
 
     name: ClassVar[str]
 
@@ -164,7 +160,7 @@ class AnySystem:
         )
 
 
-class NoSystem(AnySystem):
+class NoSystem(_System):
     """No unit system, the default: each quantity keeps the unit it was given in.
 
     A quantity without a system has no raw numbers (``.value``); read them with
@@ -174,7 +170,7 @@ class NoSystem(AnySystem):
     name = "none"
 
 
-class UnitSystem(AnySystem):
+class UnitSystem(_System):
     """Base class for unit systems.
 
     Subclass it with ``name=`` and a base unit for ``length``, ``energy`` and
@@ -273,6 +269,12 @@ class UnitSystem(AnySystem):
                         )
                     )
         return tuple(issues)
+
+
+# What a quantity's system parameter can be. Code that accepts quantities with
+# or without a system is generic over [S: AnySystem]; code that reads raw
+# numbers needs [S: UnitSystem]. An alias, not a class, so it names no system.
+type AnySystem = UnitSystem | NoSystem
 
 
 @dataclass(frozen=True)
@@ -672,8 +674,8 @@ class Atomic(UnitSystem, name="atomic"):
 
 _deferred_validation = False
 
-# A nested composition without a system displays in the first of these that
-# stores each operand's kind in that operand's unit, else in SI.
+# A product without a system shows in the first of these that stores each
+# operand's kind in that operand's unit, else in Atomistic.
 DISPLAY_SYSTEMS: tuple[type[UnitSystem], ...] = (
     Atomistic,
     Metal,
@@ -682,4 +684,3 @@ DISPLAY_SYSTEMS: tuple[type[UnitSystem], ...] = (
     CGS,
     Atomic,
 )
-DISPLAY_FALLBACK = SI

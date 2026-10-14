@@ -25,11 +25,7 @@ from quantype._internal._storage import (
     reject_booleans,
     unit_conversion,
 )
-from quantype._internal._storage_units import (
-    ComposedUnit,
-    reference_unit,
-    storage_map,
-)
+from quantype._internal._storage_units import ComposedUnit, storage_map
 from quantype._internal._systems import AnySystem, NoSystem
 from quantype.core import Quantity, Unit, _wrap
 from quantype.typing import quantity_type
@@ -50,8 +46,7 @@ def selected_unit(
         raise ValueError("Serialization requires a named quantity")
     selected = unit or quantity.unit
     if selected is None or isinstance(selected, ComposedUnit):
-        # A composed unit such as eV/nm has no name to decode by.
-        selected = reference_unit(quantity._semantic)
+        raise ValueError(f"{selected} has no name to decode by; name a unit")
     quantity._check_unit(selected)
     return selected
 
@@ -151,7 +146,8 @@ def parse_quantity(
         if data._system is not system:
             raise ValueError(
                 f"Expected a quantity in {system.__name__}; received one in "
-                f"{data._system.__name__}. Convert it explicitly with .to_system(...)"
+                f"{data._system.__name__}. Convert it explicitly with "
+                f".to_system({system.__name__})"
             )
         return data
     value, name = _wire_fields(data, cls._kind)

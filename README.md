@@ -61,8 +61,9 @@ To turn one into the other, call `reinterpret`.
 
 ## Unit systems
 
-A quantity keeps its numbers in the unit it was given in. Products compose
-their units, and a sum converts the right operand into the left one's unit.
+A quantity keeps its numbers in the unit it was given in. A sum converts the
+right operand into the left one's unit. Products keep their numbers unconverted
+and show in a named unit.
 
 ```python
 from typing import assert_type
@@ -74,7 +75,7 @@ b = Length[float](20, u.angstrom)
 assert a == b
 assert repr(a + b) == "Length(4.0 nm)"
 force = (3 * u.eV) / a
-assert repr(force) == "Force(1.5 eV/nm)"  # no conversion in the division
+assert repr(force) == "Force(0.15 eV/Å)"  # shown in eV/Å, stored unconverted
 
 x = a.to_system(Atomistic)
 assert_type(x, Length[float, Atomistic])
@@ -93,7 +94,8 @@ and `Real`, or [your own](https://github.com/theochemtheo/quantype/blob/main/doc
 
 `Length[float]` is short for `Length[float, NoSystem]`, which has no `.value`:
 reading it is a type error and a runtime `TypeError`. So is adding an SI length
-to an `Atomistic` one, or to one with no system. `.to_system(...)` converts.
+to an `Atomistic` one. A quantity with no system adopts the system of the one
+it's combined with, so `si + 1 * u.nm` is in `SI`. `.to_system(...)` converts.
 `Metal` and `Real` store each kind in the unit LAMMPS documents for it, so a
 `Metal` pressure is in bar.
 

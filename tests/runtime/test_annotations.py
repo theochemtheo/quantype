@@ -80,7 +80,7 @@ def test_subscripting_the_kind_changes_the_storage() -> None:
     assert quantity_type(batched) == QuantityType(Energy, ARRAY, SI)
     assert quantity_type(kind[ARRAY]) == QuantityType(Energy, ARRAY, NoSystem)
     raw = np.array([1.0, 2.0])
-    assert batched.from_value(raw).value is raw
+    assert batched.from_value(raw, SI).value is raw
 
 
 @pytest.mark.parametrize(

@@ -51,6 +51,15 @@ def test_scalar_roundtrip_and_display_unit() -> None:
     assert Length.parse(wire) == length
 
 
+def test_products_are_written_in_the_unit_they_show() -> None:
+    force = Energy[float](3, u.eV) / Length[float](2, u.nm)
+    wire = {"kind": "Force", "magnitude": 0.15, "unit": "eV_per_angstrom"}
+    assert to_dict(force) == wire
+    assert to_dict(force, u.newton)["unit"] == "newton"
+    assert Force.parse(wire) == force
+    assert Force.parse(str(force)) == force
+
+
 def test_pydantic_roundtrip() -> None:
     model = Simulation.model_validate(
         {
@@ -274,7 +283,7 @@ class _Gromacs(UnitSystem, name="test-validation:gromacs"):
 
 
 def test_system_units_parse_from_their_symbols() -> None:
-    force = Force[float, _Gromacs].from_value(2.0)
+    force = Force.from_value(2.0, _Gromacs)
     assert force.unit is not None
     assert force.unit.symbol == "kJ/mol/nm"
     assert Force[float, _Gromacs].parse(str(force)) == force

@@ -57,9 +57,7 @@ def test_loading_object_arrays_is_rejected(tmp_path: Path) -> None:
 
 
 def test_saving_object_arrays_is_rejected(tmp_path: Path) -> None:
-    quantity = Length[npt.NDArray[Any], Atomistic].from_value(
-        np.array([object()], dtype=object)
-    )
+    quantity = Length.from_value(np.array([object()], dtype=object), Atomistic)
 
     with pytest.raises(ValueError, match="dtype"):
         save_npz(tmp_path / "object.npz", q=quantity)

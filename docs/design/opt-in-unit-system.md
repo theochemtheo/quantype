@@ -6,7 +6,9 @@ copies of quantype 0.2.0 (commit `056c344`), changed by script. They live
 outside the repository, in `/Users/tk/p/quantype-opt-in/`, which git can't
 restore. Timings are best of 7 runs on one Apple-silicon Mac, with float64 data
 and million-element arrays unless stated. The prototypes call the null system
-`Unbound`.
+`Unbound`. The ADR has the rules as decided, which differ from these notes on
+how products display, on `from_value` and `with_value`, and on mixing a
+null-system quantity with a bound one.
 
 ## Round 1: three ways to make the system opt-in
 

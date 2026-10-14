@@ -1,4 +1,4 @@
-"""quantype.testing, and with_value for operations quantype has no rule for."""
+"""quantype.testing, and apply for operations quantype has no rule for."""
 
 from __future__ import annotations
 
@@ -25,8 +25,12 @@ def test_close_quantities_pass_whatever_their_display_units() -> None:
 
 
 def test_differences_name_the_kind_system_and_unit() -> None:
-    with pytest.raises(AssertionError, match="Length in NoSystem, compared in Å"):
+    with pytest.raises(
+        AssertionError, match=r"(?s)compared in nm\n.*ACTUAL: array\(2\.\)"
+    ):
         assert_allclose(2 * u.nm, 3 * u.nm)
+    with pytest.raises(AssertionError, match="Length in NoSystem, compared in Å"):
+        assert_allclose(2 * u.nm, 3 * u.angstrom)
     with pytest.raises(AssertionError, match="Length in SI, compared in m"):
         assert_allclose(Length[float, SI](2, u.nm), Length[float, SI](3, u.nm))
     with pytest.raises(AssertionError, match="Expected Energy; received Length"):
@@ -42,21 +46,6 @@ def test_plain_numbers_and_mismatched_tolerances_are_type_errors() -> None:
         assert_allclose(2 * u.nm, 2 * u.nm, atol=cast("Any", 1 * u.eV))
 
 
-def test_with_value_keeps_kind_system_and_display_unit() -> None:
-    lengths = Length[Array, SI](np.array([3.0, 1.0, 2.0]), u.nm)
-    ordered = lengths.with_value(np.sort(lengths.value))
-    assert isinstance(ordered, Length)
-    assert ordered.system is SI
-    assert ordered.unit is u.nm
-    np.testing.assert_allclose(ordered.magnitude(), [1, 2, 3])
-    product = ((2 * u.nm) * (3 * u.fs)).to_system(Atomistic)
-    assert type(product.with_value(1.0)) is LengthTime
-    with pytest.raises(TypeError, match="with_value takes raw numbers"):
-        lengths.with_value(cast("Any", lengths))
-    with pytest.raises(TypeError, match=r"use \.apply"):
-        Length[Array](np.ones(2), u.nm).with_value(np.zeros(2))
-
-
 def test_apply_keeps_kind_system_storage_and_display_unit() -> None:
     lengths = Length[Array](np.array([3.0, 1.0, 2.0]), u.nm).to(u.angstrom)
     ordered = lengths.apply(np.sort)
@@ -70,9 +59,16 @@ def test_apply_keeps_kind_system_storage_and_display_unit() -> None:
     assert type(product.apply(lambda raw: raw * 2)) is LengthTime
     with pytest.raises(TypeError, match="returns numbers, not a quantity"):
         lengths.apply(lambda _: cast("Any", lengths))
+    with pytest.raises(TypeError, match="numerical array; received str"):
+        lengths.apply(cast("Any", str))
+    with pytest.raises(TypeError, match="received list"):
+        lengths.apply(cast("Any", list))
+    with pytest.raises(TypeError, match="keep numpy storage; received python"):
+        lengths.apply(lambda raw: cast("Any", float(raw[0])))
+    assert (2 * u.nm).apply(np.abs).magnitude() == 2.0
 
 
-def test_temperature_kinds_round_trip_through_with_value() -> None:
+def test_temperature_kinds_round_trip_through_apply() -> None:
     warm = Temperature[float, Atomistic](20, u.celsius)
-    assert warm.with_value(warm.value + 1).magnitude() == pytest.approx(21)
-    assert isinstance(Energy[float, Atomistic](1, u.eV).with_value(2.0), Energy)
+    assert warm.apply(lambda raw: raw + 1).magnitude() == pytest.approx(21)
+    assert isinstance(Energy[float, Atomistic](1, u.eV).apply(abs), Energy)

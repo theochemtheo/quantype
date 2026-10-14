@@ -52,10 +52,10 @@ def test_atomistic_stores_mass_in_daltons() -> None:
     assert Atomistic.unit_for(Momentum) is u.eV_fs_per_angstrom
     assert Mass[float, Atomistic](12, u.Da).value == 12
     assert (12 * u.Da).to_system(Atomistic).value == 12
-    assert Mass[float, Atomistic].from_value(12.0).magnitude(u.Da) == 12
+    assert Mass.from_value(12.0, Atomistic).magnitude(u.Da) == 12
     electron = (1 * u.m_e).to_system(Atomistic)
     assert electron.value == pytest.approx(5.485799090441e-4, rel=1e-9)
-    assert repr(Mass[float, Atomistic].from_value(1.0)) == "Mass(1.0 Da, Atomistic)"
+    assert repr(Mass.from_value(1.0, Atomistic)) == "Mass(1.0 Da, Atomistic)"
 
 
 class Ase(UnitSystem, name="test-physics:ase"):
@@ -90,7 +90,7 @@ def test_a_system_on_ase_time_stores_ase_units() -> None:
     assert Ase.unit_for(Mass) is u.dalton
     assert Ase.unit_for(Velocity) is u.ase_velocity
     assert Ase.unit_for(Momentum) is u.ase_momentum
-    velocities = Velocity[npt.NDArray[np.float64], Ase].from_value(np.full(3, 0.5))
+    velocities = Velocity.from_value(np.full(3, 0.5), Ase)
     momenta = Mass[float, Ase](2, u.Da) * velocities
     np.testing.assert_allclose(momenta.value, np.full(3, 1.0))
 
@@ -199,11 +199,11 @@ def test_structural_results_are_stored_coherently() -> None:
 
 
 def test_overridden_kinds_serialize_in_their_units(tmp_path: Path) -> None:
-    pressure = Pressure[float, Metal].from_value(3.0)
+    pressure = Pressure.from_value(3.0, Metal)
     assert pressure.to_dict() == {"kind": "Pressure", "magnitude": 3.0, "unit": "bar"}
     assert Pressure[float, Metal].parse("3 bar").value == pytest.approx(3.0)
     path = tmp_path / "frame.npz"
-    save_npz(path, p=Pressure[npt.NDArray[np.float64], Metal].from_value(np.ones(2)))
+    save_npz(path, p=Pressure.from_value(np.ones(2), Metal))
     restored = load_npz(path, "p", Pressure[npt.NDArray[np.float64], Real])
     np.testing.assert_allclose(restored.magnitude(u.bar), [1, 1])
 
@@ -254,12 +254,12 @@ def test_derivatives_rescale_through_overridden_kinds() -> None:
 
     def pressure(volume: Volume[Any, Metal]) -> Quantity[Any, Any, Metal]:
         # P(V) = c / V, stored in bar.
-        result: Quantity[Any, Any, Metal] = Pressure[Any, Metal].from_value(2.0) * (
+        result: Quantity[Any, Any, Metal] = Pressure.from_value(2.0, Metal) * (
             Volume[float, Metal](1, u.angstrom_cubed) / volume
         )
         return result
 
-    volume = Volume[Any, Metal].from_value(jax.numpy.asarray(2.0))
+    volume = Volume.from_value(jax.numpy.asarray(2.0), Metal)
     slope = ujax.grad(pressure)(volume)
     # dP/dV = -c / V²: -0.5 bar/Å³, stored coherently as eV/Å⁶.
     expected = -0.5 / LAMMPS_METAL["nktv2p"]
@@ -270,8 +270,8 @@ def test_torch_derivatives_rescale_through_overridden_kinds() -> None:
     torch = pytest.importorskip("torch")
     utorch = pytest.importorskip("quantype.utorch")
     raw = torch.tensor(2.0, dtype=torch.float64, requires_grad=True)
-    volume = Volume[Any, Metal].from_value(raw)
-    pressure = Pressure[Any, Metal].from_value(torch.tensor(2.0, dtype=torch.float64))
+    volume = Volume.from_value(raw, Metal)
+    pressure = Pressure.from_value(torch.tensor(2.0, dtype=torch.float64), Metal)
     output = pressure * (Volume[float, Metal](1, u.angstrom_cubed) / volume)
     slope = utorch.grad(output, volume)
     expected = -0.5 / LAMMPS_METAL["nktv2p"]

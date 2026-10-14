@@ -10,6 +10,7 @@ import torch
 
 import quantype.numpy as qnp
 from quantype import (
+    Angle,
     Area,
     Energy,
     Force,
@@ -22,6 +23,7 @@ from quantype import (
     utorch,
 )
 from quantype import units as u
+from quantype.products import LengthTime
 from quantype.systems import (
     SI,
     AnySystem,
@@ -62,7 +64,7 @@ assert_type(x_si.mean(), Length[float, SI])
 assert_type(x_si.max(), Length[float, SI])
 assert_type(x_si < 2.0 * x_si, bool)
 assert_type(qnp.sqrt(x_si * x_si), Length[float, SI])
-assert_type(Length[float, SI].from_value(2.0), Length[float, SI])
+assert_type(Length.from_value(2.0, SI), Length[float, SI])
 assert_type(Length[float, SI].parse("2 nm"), Length[float, SI])
 point = Temperature[float, SI](20.0, u.celsius)
 assert_type(point - point, TemperatureDifference[float, SI])
@@ -71,7 +73,7 @@ x_default = 2.0 * u.nm
 assert_type(x_default, Length[float])
 assert_type(x_default, Length[float, NoSystem])
 assert_type(Length[float](2, u.nm), Length[float, NoSystem])
-assert_type(Length[float, Atomistic].from_value(2.0), Length[float, Atomistic])
+assert_type(Length.from_value(2.0, Atomistic), Length[float, Atomistic])
 
 # Raw numbers come from choosing a system, and unbinding keeps the type's kind.
 assert_type(x_default.to_system(Real).value, float)
@@ -109,6 +111,33 @@ assert_type(work(f_metal, x_metal), Energy[float, Metal])
 
 assert_type(x_metal.to_system(SI), Length[float, SI])
 assert_type(x_si + x_metal.to_system(SI), Length[float, SI])
+
+# A quantity without a system adopts the other operand's, either side.
+assert_type(x_si + 1.0 * u.nm, Length[float, SI])
+assert_type(1.0 * u.nm + x_si, Length[float, SI])
+assert_type(x_si * (1.0 * u.nm), Area[float, SI])
+assert_type((1.0 * u.nm) * x_si, Area[float, SI])
+assert_type(e_si / (1.0 * u.nm), Force[float, SI])
+assert_type((3.0 * u.eV) / x_si, Force[float, SI])
+assert_type(x_si < 1.0 * u.nm, bool)
+assert_type(1.0 * u.nm < x_si, bool)
+assert_type(x_si * (1.0 * u.fs), LengthTime[float, SI])
+assert_type((1.0 * u.fs) * x_si, LengthTime[float, SI])
+
+
+assert_type(qnp.maximum(x_si, 1.0 * u.nm), Length[float, SI])
+assert_type(qnp.maximum(1.0 * u.nm, x_si), Length[float, SI])
+assert_type(qnp.where(np.array([True]), x_si, 1.0 * u.nm), Length[float, SI])
+assert_type(qnp.clip(x_si, 0.0 * u.nm, None), Length[float, SI])
+assert_type(qnp.arctan2(1.0 * u.nm, x_si), Angle[float, SI])
+assert_type(qnp.linspace(0.0 * u.nm, x_si), Length[npt.NDArray[np.float64], SI])
+
+
+def shifted[S: AnySystem](r: Length[float, S]) -> Length[float, S]:
+    return r + 1.0 * u.angstrom
+
+
+assert_type(shifted(x_metal), Length[float, Metal])
 positions: npt.NDArray[np.float64] = np.zeros(3)
 
 
@@ -123,7 +152,7 @@ cutoff = Length[float, Gromacs](1.2, u.nm)
 assert_type(cutoff + cutoff, Length[float, Gromacs])
 assert_type(cutoff.to_system(GromacsFs), Length[float, GromacsFs])
 raw: npt.NDArray[np.float32] = np.zeros((4, 3), dtype=np.float32)
-forces = Force[npt.NDArray[np.float32], Gromacs].from_value(raw)
+forces = Force.from_value(raw, Gromacs)
 assert_type(forces, Force[npt.NDArray[np.float32], Gromacs])
 assert_type(forces.to_system(Atomistic), Force[npt.NDArray[np.float32], Atomistic])
 assert_type(forces.to_system(NoSystem), Force[npt.NDArray[np.float32]])

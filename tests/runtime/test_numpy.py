@@ -26,7 +26,7 @@ from quantype import (
     u,
 )
 from quantype.products import TemperatureDifferenceSquared
-from quantype.systems import SI, Metal
+from quantype.systems import SI, Atomistic, Metal
 from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
@@ -116,8 +116,11 @@ def test_joining_choosing_and_limiting() -> None:
     mixed: list[Any] = [first, Energy[Array]([1.0, 2.0], u.eV)]
     with pytest.raises(TypeError, match="quantities of one kind"):
         qnp.stack(mixed)
-    with pytest.raises(TypeError, match="Cannot combine NoSystem and SI"):
-        qnp.maximum(first, first.to_system(SI))
+    adopted = qnp.maximum(first, second.to_system(SI))
+    assert adopted.system is SI
+    assert_allclose(adopted, second.to_system(SI))
+    with pytest.raises(TypeError, match="Cannot combine SI and Atomistic"):
+        qnp.maximum(cast("Any", first.to_system(SI)), first.to_system(Atomistic))
 
 
 def test_products_follow_the_algebra() -> None:

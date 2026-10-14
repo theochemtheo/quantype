@@ -37,7 +37,7 @@ from quantype._internal._semantics import (
 from quantype._internal._storage import keep_storage
 from quantype._internal._storage_units import compose, raised, recast
 from quantype._internal._systems import NoSystem, coherence
-from quantype.core import Quantity, _rescaled, _wrap
+from quantype.core import Quantity, _composite, _delta_unit, _rescaled, _wrap
 
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
@@ -292,12 +292,11 @@ def _result(
 
 
 def _composed(
-    kind: Semantic, raw: Any, storage: Any, like: Any, *, display: Any = None
+    kind: Semantic, raw: Any, storage: Any, like: Any, *operands: _Quantity
 ) -> _Quantity:
-    """Wrap numbers stored in ``storage``, keeping the operand's storage type."""
-    return _wrap(
-        kind, keep_storage(like, raw), NoSystem, display=display, storage=storage
-    )
+    """A product or power of ``operands`` stored in ``storage``, keeping the
+    operand's storage type."""
+    return _composite(kind, keep_storage(like, raw), storage, *operands)
 
 
 def _product_storage(first: _Quantity, second: _Quantity, kind: Semantic) -> Any:
@@ -314,7 +313,10 @@ def _respread(quantity: _Quantity, raw: Any) -> _Quantity:
     storage = quantity._storage
     if storage is not None:
         storage = recast(kind, storage)
-    return _wrap(kind, raw, quantity.system, storage=storage)
+    display = quantity._display
+    if display is not None and display.semantic is not kind:
+        display = _delta_unit(display, cast("Kind", kind))
+    return _wrap(kind, raw, quantity.system, display=display, storage=storage)
 
 
 def _require(quantity: _Quantity, name: str, function: str) -> None:
@@ -322,21 +324,26 @@ def _require(quantity: _Quantity, name: str, function: str) -> None:
         raise TypeError(f"{function} expects {name}, received {quantity.kind}")
 
 
-def _same(function: str, first: _Quantity, *others: object) -> None:
-    """Every operand is a quantity of the first's kind and system."""
+def _same(function: str, first: _Quantity, *others: object) -> list[_Quantity]:
+    """The operands, quantities of the first's kind, in one system.
+
+    Those without a system adopt the others'.
+    """
+    quantities = [first]
     for other in others:
         if not _is_quantity(other):
             raise TypeError(
                 f"{function} expects quantities of one kind; "
                 f"received {first.kind} and {type(other).__name__}"
             )
-        quantity = other
-        first._same_system(quantity)
-        if quantity._semantic != first._semantic:
+        if other._semantic != first._semantic:
             raise TypeError(
                 f"{function} expects quantities of one kind; "
-                f"received {first.kind} and {quantity.kind}"
+                f"received {first.kind} and {other.kind}"
             )
+        quantities.append(other)
+    bound = next((q for q in quantities if q._system is not NoSystem), first)
+    return [bound._adopted(q)[1] for q in quantities]
 
 
 def _not_affine(quantity: _Quantity, function: str) -> None:
@@ -402,7 +409,9 @@ def sqrt(x: Any, /) -> Any:
     raw = _raw(quantity) if storage is None else quantity._value
     root = math.sqrt(raw) if isinstance(raw, (int, float)) else _xp(raw).sqrt(raw)
     if storage is not None:
-        return _composed(kind, root, raised(kind, storage, 0.5), quantity._value)
+        return _composed(
+            kind, root, raised(kind, storage, 0.5), quantity._value, quantity
+        )
     return _result(kind, root, quantity.system, quantity._value)
 
 
@@ -419,9 +428,8 @@ def arctan2(y: Any, x: Any, /) -> Any:
     """The angle of (x, y), which share a kind and system."""
     if not _is_quantity(y):
         return _xp(y, x).arctan2(y, x)
-    first = y
-    _same("arctan2", first, x)
-    second = first._aligned(x)
+    first, other = _same("arctan2", y, x)
+    second = first._aligned(other)
     raw = _xp(first._value, second).arctan2(first._value, second)
     angle = named_kind(first._semantic, "Angle")
     return _result(angle, raw, first.system, first._value)
@@ -431,9 +439,8 @@ def _pairwise(name: str) -> Callable[[Any, Any], Any]:
     def function(a: Any, b: Any, /) -> Any:
         if not _is_quantity(a):
             return getattr(_xp(a, b), name)(a, b)
-        first = a
-        _same(name, first, b)
-        second = first._aligned(b)
+        first, other = _same(name, a, b)
+        second = first._aligned(other)
         raw = getattr(_xp(first._value, second), name)(first._value, second)
         return first._with(raw)
 
@@ -450,10 +457,13 @@ def clip(x: Any, a_min: Any, a_max: Any, /) -> Any:
     """Limit values to bounds of the same kind; either bound may be None."""
     if not _is_quantity(x):
         return _xp(x).clip(x, a_min, a_max)
-    quantity = x
     bounds = [bound for bound in (a_min, a_max) if bound is not None]
-    _same("clip", quantity, *bounds)
-    low, high = (None if b is None else quantity._aligned(b) for b in (a_min, a_max))
+    quantity, *joined = _same("clip", x, *bounds)
+    adopted = iter(joined)
+    low, high = (
+        None if bound is None else quantity._aligned(next(adopted))
+        for bound in (a_min, a_max)
+    )
     return quantity._with(_xp(quantity._value).clip(quantity._value, low, high))
 
 
@@ -461,9 +471,8 @@ def where(condition: Any, x: Any, y: Any, /) -> Any:
     """Choose from two quantities of one kind; ``condition`` is plain booleans."""
     if not _is_quantity(x):
         return _xp(condition, x, y).where(condition, x, y)
-    first = x
-    _same("where", first, y)
-    second = first._aligned(y)
+    first, other = _same("where", x, y)
+    second = first._aligned(other)
     raw = _xp(first._value, second).where(condition, first._value, second)
     return first._with(raw)
 
@@ -485,14 +494,13 @@ isinf = _predicate("isinf")
 
 def _tolerances(a: _Quantity, b: object, atol: object) -> tuple[Any, Any, Any]:
     """The compared numbers and the tolerance, under ``==``'s rule for units."""
-    _same("isclose", a, b)
-    other: Any = b  # _same checked that it is a quantity of a's kind
+    tolerance = [atol] if _is_quantity(atol) else []
+    a, other, *bound = _same("isclose", a, b, *tolerance)
     first, second = a._comparable(other)
-    if _is_quantity(atol):
-        _same("isclose", a, atol)
+    if bound:
         if first is a._value:
-            return first, second, a._aligned(atol)
-        return first, second, atol._reference()
+            return first, second, a._aligned(bound[0])
+        return first, second, bound[0]._reference()
     if atol != 0:
         raise TypeError("atol must be a quantity of the compared kind, or 0")
     return first, second, 0.0
@@ -532,13 +540,13 @@ def dot(a: Any, b: Any, /) -> Any:
             raise TypeError("dot of a quantity needs another quantity; use *")
         return _xp(a, b).dot(a, b)
     first, second = a, b
-    first._same_system(second)
+    first, second = first._adopted(second)
     kind = product("mul", first._semantic, second._semantic)
     namespace = _xp(first._value, second._value)
     storage = _product_storage(first, second, kind)
     if storage is not None:
         raw = _as_like(first._value, namespace.dot(first._value, second._value))
-        return _composed(kind, raw, storage, first._value)
+        return _composed(kind, raw, storage, first._value, first, second)
     raw = namespace.dot(_raw(first), _raw(second))
     return _result(kind, _as_like(first._value, raw), first.system, first._value)
 
@@ -550,13 +558,13 @@ def cross(a: Any, b: Any, /, axis: int = -1) -> Any:
             raise TypeError("cross of a quantity needs another quantity")
         return _xp(a, b).cross(a, b, axis=axis)
     first, second = a, b
-    first._same_system(second)
+    first, second = first._adopted(second)
     kind = Expression("mul", first._semantic, second._semantic)
     namespace = _xp(first._value, second._value)
     storage = _product_storage(first, second, kind)
     if storage is not None:
         raw = namespace.cross(first._value, second._value, axis=axis)
-        return _composed(kind, raw, storage, first._value)
+        return _composed(kind, raw, storage, first._value, first, second)
     raw = namespace.cross(_raw(first), _raw(second), axis=axis)
     return _result(kind, raw, first.system, first._value)
 
@@ -588,8 +596,8 @@ def _joined(name: str) -> Callable[..., Any]:
         first = items[0] if items else None
         if not _is_quantity(first):
             return getattr(_xp(*items), name)(items, axis=axis)
-        _same(name, first, *items[1:])
-        raws = [first._aligned(item) for item in items]
+        first, *rest = _same(name, first, *items[1:])
+        raws = [first._aligned(item) for item in (first, *rest)]
         return first._with(getattr(_xp(*raws), name)(raws, axis=axis))
 
     function.__name__ = function.__qualname__ = name
@@ -775,7 +783,7 @@ def _variance(name: str) -> Callable[..., Any]:
         raw = _as_like(x._value, raw)
         if storage is not None:
             squared = raised(kind, recast(spread, storage), 2)
-            return _composed(kind, raw, squared, x._value)
+            return _composed(kind, raw, squared, x._value, x)
         return _result(kind, raw, x.system, x._value)
 
     function.__name__ = function.__qualname__ = name
@@ -797,7 +805,8 @@ def square(x: Any, /) -> Any:
     kind = power(x._semantic, 2)
     if x._storage is not None:
         squared = raised(kind, x._storage, 2)
-        return _composed(kind, _xp(x._value).square(x._value), squared, x._value)
+        raw = _xp(x._value).square(x._value)
+        return _composed(kind, raw, squared, x._value, x)
     return _result(kind, _xp(x._value).square(_raw(x)), x.system, x._value)
 
 
@@ -805,9 +814,9 @@ def hypot(a: Any, b: Any, /) -> Any:
     """``sqrt(a**2 + b**2)`` element-wise, for quantities of one kind."""
     if not _is_quantity(a):
         return _xp(a, b).hypot(a, b)
-    _same("hypot", a, b)
+    a, other = _same("hypot", a, b)
     _not_affine(a, "hypot")
-    second = a._aligned(cast("_Quantity", b))
+    second = a._aligned(other)
     return a._with(_xp(a._value, second).hypot(a._value, second))
 
 
@@ -839,8 +848,8 @@ def linspace(start: Any, stop: Any, num: int = 50, *, endpoint: bool = True) -> 
     """Evenly spaced quantities from ``start`` to ``stop``, of one kind."""
     if not _is_quantity(start):
         return _xp(start, stop).linspace(start, stop, num, endpoint=endpoint)
-    _same("linspace", start, stop)
-    end = start._aligned(cast("_Quantity", stop))
+    start, stop = _same("linspace", start, stop)
+    end = start._aligned(stop)
     namespace = _xp(start._value, end)
     return start._with(namespace.linspace(start._value, end, num, endpoint=endpoint))
 
@@ -862,13 +871,13 @@ def _product_of(name: str) -> Callable[..., Any]:
             )
             raw = call(_xp(first, second), first, second)
             return _kept(quantity, raw)
-        a._same_system(b)
+        a, b = a._adopted(b)
         kind = product("mul", a._semantic, b._semantic)
         namespace = _xp(a._value, b._value)
         storage = _product_storage(a, b, kind)
         if storage is not None:
             raw = _as_like(a._value, call(namespace, a._value, b._value))
-            return _composed(kind, raw, storage, a._value)
+            return _composed(kind, raw, storage, a._value, a, b)
         raw = call(namespace, _raw(a), _raw(b))
         return _result(kind, _as_like(a._value, raw), a.system, a._value)
 
@@ -905,16 +914,20 @@ def trapezoid(y: Any, x: Any = None, dx: Any = 1.0, axis: int = -1) -> Any:
         display = only._display if only is y else None
         raw = _as_like(only._value, raw)
         if stored:
-            return _composed(
-                only._semantic, raw, only._storage, only._value, display=display
+            return _wrap(
+                only._semantic,
+                keep_storage(only._value, raw),
+                NoSystem,
+                display=display,
+                storage=only._storage,
             )
         return _result(only._semantic, raw, only.system, only._value, display=display)
-    y._same_system(step)
+    y, step = y._adopted(step)
     kind = product("mul", y._semantic, step._semantic)
     raw = _as_like(y._value, raw)
     storage = _product_storage(y, step, kind)
     if storage is not None:
-        return _composed(kind, raw, storage, y._value)
+        return _composed(kind, raw, storage, y._value, y, step)
     return _result(kind, raw, y.system, y._value)
 
 

@@ -99,7 +99,7 @@ def test_jax_every_quantity_class_is_a_single_leaf_pytree() -> None:
         if _is_quantity_class(candidate) and candidate is not Quantity
     )
     for cls in classes:
-        quantity = cls[jax.Array, Atomistic].from_value(_jnp.array(2.0))
+        quantity = cls.from_value(_jnp.array(2.0), Atomistic)
         leaves, tree = _trees.tree_flatten(quantity)
         assert len(leaves) == 1
         assert leaves[0] is quantity.value
@@ -158,7 +158,7 @@ def test_jax_raw_model_boundary_and_single_evaluation() -> None:
         return Energy[jax.Array](_jnp.sum(x.magnitude(u.angstrom) ** 2), u.eV)
 
     def bound(x: Length[jax.Array, Atomistic]) -> Energy[jax.Array, Atomistic]:
-        return Energy[jax.Array, Atomistic].from_value(_jnp.sum(x.value**2))
+        return Energy.from_value(_jnp.sum(x.value**2), Atomistic)
 
     x = u.nm(_jnp.array([0.1, 0.2]))
     assert_allclose(ujax.grad(model)(x), u.eV_per_angstrom(np.array([2.0, 4.0])))

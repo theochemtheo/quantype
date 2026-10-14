@@ -29,7 +29,7 @@ from quantype import units as u
 from quantype._internal._registry import POWERS, QUANTITIES, RELATIONS, UNITS
 from quantype._internal._semantics import KINDS, Kind, dimensionless_kind, named_kind
 from quantype.core import _wrap, dimensions, get_unit, result_kind
-from quantype.systems import SI, Atomistic
+from quantype.systems import SI, Atomistic, NoSystem
 from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
@@ -243,7 +243,11 @@ def test_misused_constructors_and_classes_explain_themselves() -> None:
     with pytest.raises(TypeError, match="Construct a named quantity"):
         Quantity(2.0, u.nm)
     with pytest.raises(TypeError, match="from_value requires a named quantity"):
-        Quantity.from_value(1.0)
+        Quantity.from_value(1.0, SI)
+    with pytest.raises(TypeError, match=r"NoSystem has none.*Length\(raw, unit\)"):
+        Length.from_value(1.0, cast("Any", NoSystem))
+    with pytest.raises(TypeError, match="not a quantity"):
+        Length.from_value(cast("Any", 2 * u.nm), SI)
     with pytest.raises(TypeError, match="reinterpret requires a named quantity"):
         Quantity.reinterpret(2 * u.nm)
     with pytest.raises(ValueError, match="Expected Length; received Energy"):
@@ -284,8 +288,10 @@ def test_scalar_storage_hashes_by_value_and_arrays_do_not_hash() -> None:
 
 def test_structural_results_display_their_units() -> None:
     product = (2 * u.nm) * (3 * u.fs) * u.eV(1)
-    assert repr(product**2) == "Quantity(36.0 ((nm·fs)·eV)^2)"
-    assert repr(product - product) == "Quantity(0.0 (nm·fs)·eV)"
+    assert repr(product**2) == "Quantity(3600.0 ((Å·fs)·eV)^2)"
+    assert repr(product - product) == "Quantity(0.0 (Å·fs)·eV)"
+    si = (2 * u.m) * (3 * u.s) * u.J(1)
+    assert repr(si) == "Quantity(6.0 (m·s)·J)"
     bound = product.to_system(Atomistic)
     assert repr(bound**2) == "Quantity(3600.0 (((Å * fs) * eV))^2, Atomistic)"
     assert repr(u.nm) == "nm"
@@ -295,7 +301,7 @@ def test_internal_entry_points_reject_unsupported_requests() -> None:
     with pytest.raises(ValueError, match="Unknown physical operation 'add'"):
         result_kind("add", KINDS["Length"], KINDS["Length"])
     with pytest.raises(TypeError, match="from_value requires a named quantity"):
-        Quantity[Any, float, SI].from_value(1.0)
+        Quantity.from_value(1.0, SI)
     with pytest.raises(TypeError, match="NotImplemented"):
         np.add(cast("Any", u.nm), 1)
 

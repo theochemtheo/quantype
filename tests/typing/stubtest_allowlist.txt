@@ -1,8 +1,8 @@
 # Python 3.12 generic runtime metadata is not represented by mypy's PEP 695 stubs.
 # PEP 695 cannot declare the defaulted unit-system parameter before Python 3.13,
 # so the stubs declare typing_extensions TypeVars that the runtime has no use for.
-^quantype\.(core|_generated)\.(K|V|S)$
-^quantype\._generated\.[A-Za-z]+\.__type_params__$
+^quantype\.(core|_generated|_kinds\.\w+)\.(K|V|S)$
+^quantype\._kinds\.\w+\.\w+\.__type_params__$
 ^quantype\.core\.Quantity\.__type_params__$
 ^quantype\.core\.Constant\.__type_params__$
 ^quantype\._internal\._unit\.Unit\.__type_params__$
@@ -10,6 +10,7 @@
 
 # A type alias has no runtime tuple base class (stubtest treats it as a class).
 ^quantype\._internal\._registry\.Dimensions$
+^quantype\._internal\._systems\.AnySystem$
 ^quantype\._internal\._semantics\.Semantic$
 ^quantype\._internal\._codata\.Edition$
 ^quantype\._internal\._registry\.Relations$
@@ -18,7 +19,7 @@
 
 # functools.cache exposes a variadic checker signature but preserves runtime __wrapped__.
 ^quantype\._internal\._registry\._unit_specs$
-^quantype\._internal\._storage_units\.(_catalogue_systems|compose|raised|recast|reference_unit|system_unit)$
+^quantype\._internal\._storage_units\.(_catalogue_systems|compose|neutral|raised|recast|reference_unit|shown|system_unit)$
 
 # Standard static generics are retained; the runtime alias adds conversion on call.
 ^quantype\.core\.Quantity\.__class_getitem__$
@@ -52,8 +53,8 @@
 ^quantype\.numpy\.linalg$
 
 # Products dispatch through protocol members that exist only in the stubs: each
-# class's _rmul_*/_rtruediv_* members, and the stub-only modules
-# holding one product or constant class each (the runtime defines those classes
-# in quantype.products and quantype._generated).
-^quantype\.(_generated|products)\.\w+\._r(mul|truediv)_\w+$
+# class's _rmul_*/_rtruediv_* members, and the stub-only modules holding one
+# product or constant class each (the runtime defines those classes in
+# quantype.products and quantype._generated).
+^quantype\.(_kinds\.\w+|products)\.\w+\._r(mul|truediv)_\w+$
 ^quantype\.(_products|_constants)(\..*)?$

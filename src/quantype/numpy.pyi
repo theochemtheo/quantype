@@ -117,7 +117,7 @@ from quantype._generated import (
     _RMulVolume,
     _RMulVolumeF,
 )
-from quantype.core import Quantity, _Numerical
+from quantype.core import Quantity, _Numerical, _StructuralQuantity
 from quantype.core import Quantity as _BaseQuantity
 from quantype.kinds import Div, Mul, Pow
 from quantype.products import (
@@ -155,7 +155,7 @@ from quantype.products import (
     VelocitySquared,
     VolumeSquared,
 )
-from quantype.systems import AnySystem
+from quantype.systems import AnySystem, NoSystem, UnitSystem
 
 __all__ = [
     "abs",
@@ -491,36 +491,5838 @@ def arctan2[K, V, S: AnySystem](
     y: _BaseQuantity[K, V, S], x: _BaseQuantity[K, V, S], /
 ) -> Angle[V, S]: ...
 @overload
+def arctan2[K, V, T: UnitSystem](
+    y: _BaseQuantity[K, V, NoSystem], x: _BaseQuantity[K, V, T], /
+) -> Angle[V, T]: ...
+@overload
+def arctan2[K, V, T: UnitSystem](
+    y: _BaseQuantity[K, V, T], x: _BaseQuantity[K, V, NoSystem], /
+) -> Angle[V, T]: ...
+@overload
 def arctan2[A: _Numerical](y: A, x: A, /) -> A: ...
 @overload
 def arctan2(y: float, x: float, /) -> float: ...
 @overload
-def maximum[Q: _BaseQuantity[Any, Any, Any]](a: Q, b: Q, /) -> Q: ...
+def maximum[W, S: AnySystem](
+    a: Dimensionless[float, S], b: Dimensionless[W, S] | Dimensionless[W, NoSystem], /
+) -> Dimensionless[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Dimensionless[V, S],
+    b: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem],
+    /,
+) -> Dimensionless[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Dimensionless[float, NoSystem], b: Dimensionless[W, T], /
+) -> Dimensionless[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Dimensionless[V, NoSystem], b: Dimensionless[V, T] | Dimensionless[float, T], /
+) -> Dimensionless[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Length[float, S], b: Length[W, S] | Length[W, NoSystem], /
+) -> Length[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Length[V, S],
+    b: Length[V, S] | Length[V, NoSystem] | Length[float, S] | Length[float, NoSystem],
+    /,
+) -> Length[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Length[float, NoSystem], b: Length[W, T], /
+) -> Length[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Length[V, NoSystem], b: Length[V, T] | Length[float, T], /
+) -> Length[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Area[float, S], b: Area[W, S] | Area[W, NoSystem], /
+) -> Area[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Area[V, S],
+    b: Area[V, S] | Area[V, NoSystem] | Area[float, S] | Area[float, NoSystem],
+    /,
+) -> Area[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Area[float, NoSystem], b: Area[W, T], /
+) -> Area[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Area[V, NoSystem], b: Area[V, T] | Area[float, T], /
+) -> Area[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Volume[float, S], b: Volume[W, S] | Volume[W, NoSystem], /
+) -> Volume[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Volume[V, S],
+    b: Volume[V, S] | Volume[V, NoSystem] | Volume[float, S] | Volume[float, NoSystem],
+    /,
+) -> Volume[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Volume[float, NoSystem], b: Volume[W, T], /
+) -> Volume[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Volume[V, NoSystem], b: Volume[V, T] | Volume[float, T], /
+) -> Volume[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Time[float, S], b: Time[W, S] | Time[W, NoSystem], /
+) -> Time[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Time[V, S],
+    b: Time[V, S] | Time[V, NoSystem] | Time[float, S] | Time[float, NoSystem],
+    /,
+) -> Time[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Time[float, NoSystem], b: Time[W, T], /
+) -> Time[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Time[V, NoSystem], b: Time[V, T] | Time[float, T], /
+) -> Time[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Velocity[float, S], b: Velocity[W, S] | Velocity[W, NoSystem], /
+) -> Velocity[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Velocity[V, S],
+    b: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem],
+    /,
+) -> Velocity[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Velocity[float, NoSystem], b: Velocity[W, T], /
+) -> Velocity[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Velocity[V, NoSystem], b: Velocity[V, T] | Velocity[float, T], /
+) -> Velocity[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Energy[float, S], b: Energy[W, S] | Energy[W, NoSystem], /
+) -> Energy[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Energy[V, S],
+    b: Energy[V, S] | Energy[V, NoSystem] | Energy[float, S] | Energy[float, NoSystem],
+    /,
+) -> Energy[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Energy[float, NoSystem], b: Energy[W, T], /
+) -> Energy[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Energy[V, NoSystem], b: Energy[V, T] | Energy[float, T], /
+) -> Energy[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: EnergyPerAtom[float, S], b: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem], /
+) -> EnergyPerAtom[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: EnergyPerAtom[V, S],
+    b: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem],
+    /,
+) -> EnergyPerAtom[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: EnergyPerAtom[float, NoSystem], b: EnergyPerAtom[W, T], /
+) -> EnergyPerAtom[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: EnergyPerAtom[V, NoSystem], b: EnergyPerAtom[V, T] | EnergyPerAtom[float, T], /
+) -> EnergyPerAtom[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Force[float, S], b: Force[W, S] | Force[W, NoSystem], /
+) -> Force[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Force[V, S],
+    b: Force[V, S] | Force[V, NoSystem] | Force[float, S] | Force[float, NoSystem],
+    /,
+) -> Force[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Force[float, NoSystem], b: Force[W, T], /
+) -> Force[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Force[V, NoSystem], b: Force[V, T] | Force[float, T], /
+) -> Force[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: ForceConstant[float, S], b: ForceConstant[W, S] | ForceConstant[W, NoSystem], /
+) -> ForceConstant[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: ForceConstant[V, S],
+    b: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem],
+    /,
+) -> ForceConstant[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: ForceConstant[float, NoSystem], b: ForceConstant[W, T], /
+) -> ForceConstant[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: ForceConstant[V, NoSystem], b: ForceConstant[V, T] | ForceConstant[float, T], /
+) -> ForceConstant[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Pressure[float, S], b: Pressure[W, S] | Pressure[W, NoSystem], /
+) -> Pressure[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Pressure[V, S],
+    b: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem],
+    /,
+) -> Pressure[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Pressure[float, NoSystem], b: Pressure[W, T], /
+) -> Pressure[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Pressure[V, NoSystem], b: Pressure[V, T] | Pressure[float, T], /
+) -> Pressure[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: EnergyDensity[float, S], b: EnergyDensity[W, S] | EnergyDensity[W, NoSystem], /
+) -> EnergyDensity[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: EnergyDensity[V, S],
+    b: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem],
+    /,
+) -> EnergyDensity[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: EnergyDensity[float, NoSystem], b: EnergyDensity[W, T], /
+) -> EnergyDensity[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: EnergyDensity[V, NoSystem], b: EnergyDensity[V, T] | EnergyDensity[float, T], /
+) -> EnergyDensity[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: EnergyPerVolume[float, S],
+    b: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem],
+    /,
+) -> EnergyPerVolume[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: EnergyPerVolume[V, S],
+    b: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem],
+    /,
+) -> EnergyPerVolume[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: EnergyPerVolume[float, NoSystem], b: EnergyPerVolume[W, T], /
+) -> EnergyPerVolume[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: EnergyPerVolume[V, NoSystem],
+    b: EnergyPerVolume[V, T] | EnergyPerVolume[float, T],
+    /,
+) -> EnergyPerVolume[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Temperature[float, S], b: Temperature[W, S] | Temperature[W, NoSystem], /
+) -> Temperature[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Temperature[V, S],
+    b: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem],
+    /,
+) -> Temperature[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Temperature[float, NoSystem], b: Temperature[W, T], /
+) -> Temperature[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Temperature[V, NoSystem], b: Temperature[V, T] | Temperature[float, T], /
+) -> Temperature[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: TemperatureDifference[float, S],
+    b: TemperatureDifference[W, S] | TemperatureDifference[W, NoSystem],
+    /,
+) -> TemperatureDifference[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: TemperatureDifference[V, S],
+    b: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem],
+    /,
+) -> TemperatureDifference[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: TemperatureDifference[float, NoSystem], b: TemperatureDifference[W, T], /
+) -> TemperatureDifference[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: TemperatureDifference[V, NoSystem],
+    b: TemperatureDifference[V, T] | TemperatureDifference[float, T],
+    /,
+) -> TemperatureDifference[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: TemperatureRate[float, S],
+    b: TemperatureRate[W, S] | TemperatureRate[W, NoSystem],
+    /,
+) -> TemperatureRate[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: TemperatureRate[V, S],
+    b: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem],
+    /,
+) -> TemperatureRate[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: TemperatureRate[float, NoSystem], b: TemperatureRate[W, T], /
+) -> TemperatureRate[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: TemperatureRate[V, NoSystem],
+    b: TemperatureRate[V, T] | TemperatureRate[float, T],
+    /,
+) -> TemperatureRate[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: MagneticMoment[float, S],
+    b: MagneticMoment[W, S] | MagneticMoment[W, NoSystem],
+    /,
+) -> MagneticMoment[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: MagneticMoment[V, S],
+    b: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem],
+    /,
+) -> MagneticMoment[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: MagneticMoment[float, NoSystem], b: MagneticMoment[W, T], /
+) -> MagneticMoment[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: MagneticMoment[V, NoSystem],
+    b: MagneticMoment[V, T] | MagneticMoment[float, T],
+    /,
+) -> MagneticMoment[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Magnetization[float, S], b: Magnetization[W, S] | Magnetization[W, NoSystem], /
+) -> Magnetization[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Magnetization[V, S],
+    b: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem],
+    /,
+) -> Magnetization[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Magnetization[float, NoSystem], b: Magnetization[W, T], /
+) -> Magnetization[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Magnetization[V, NoSystem], b: Magnetization[V, T] | Magnetization[float, T], /
+) -> Magnetization[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: ParticleDensity[float, S],
+    b: ParticleDensity[W, S] | ParticleDensity[W, NoSystem],
+    /,
+) -> ParticleDensity[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: ParticleDensity[V, S],
+    b: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem],
+    /,
+) -> ParticleDensity[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: ParticleDensity[float, NoSystem], b: ParticleDensity[W, T], /
+) -> ParticleDensity[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: ParticleDensity[V, NoSystem],
+    b: ParticleDensity[V, T] | ParticleDensity[float, T],
+    /,
+) -> ParticleDensity[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: ElectronDensity[float, S],
+    b: ElectronDensity[W, S] | ElectronDensity[W, NoSystem],
+    /,
+) -> ElectronDensity[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: ElectronDensity[V, S],
+    b: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem],
+    /,
+) -> ElectronDensity[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: ElectronDensity[float, NoSystem], b: ElectronDensity[W, T], /
+) -> ElectronDensity[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: ElectronDensity[V, NoSystem],
+    b: ElectronDensity[V, T] | ElectronDensity[float, T],
+    /,
+) -> ElectronDensity[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Angle[float, S], b: Angle[W, S] | Angle[W, NoSystem], /
+) -> Angle[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Angle[V, S],
+    b: Angle[V, S] | Angle[V, NoSystem] | Angle[float, S] | Angle[float, NoSystem],
+    /,
+) -> Angle[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Angle[float, NoSystem], b: Angle[W, T], /
+) -> Angle[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Angle[V, NoSystem], b: Angle[V, T] | Angle[float, T], /
+) -> Angle[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Frequency[float, S], b: Frequency[W, S] | Frequency[W, NoSystem], /
+) -> Frequency[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Frequency[V, S],
+    b: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem],
+    /,
+) -> Frequency[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Frequency[float, NoSystem], b: Frequency[W, T], /
+) -> Frequency[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Frequency[V, NoSystem], b: Frequency[V, T] | Frequency[float, T], /
+) -> Frequency[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: InverseTime[float, S], b: InverseTime[W, S] | InverseTime[W, NoSystem], /
+) -> InverseTime[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: InverseTime[V, S],
+    b: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem],
+    /,
+) -> InverseTime[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: InverseTime[float, NoSystem], b: InverseTime[W, T], /
+) -> InverseTime[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: InverseTime[V, NoSystem], b: InverseTime[V, T] | InverseTime[float, T], /
+) -> InverseTime[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: AtomCount[float, S], b: AtomCount[W, S] | AtomCount[W, NoSystem], /
+) -> AtomCount[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: AtomCount[V, S],
+    b: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem],
+    /,
+) -> AtomCount[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: AtomCount[float, NoSystem], b: AtomCount[W, T], /
+) -> AtomCount[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: AtomCount[V, NoSystem], b: AtomCount[V, T] | AtomCount[float, T], /
+) -> AtomCount[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: ElectronCount[float, S], b: ElectronCount[W, S] | ElectronCount[W, NoSystem], /
+) -> ElectronCount[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: ElectronCount[V, S],
+    b: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem],
+    /,
+) -> ElectronCount[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: ElectronCount[float, NoSystem], b: ElectronCount[W, T], /
+) -> ElectronCount[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: ElectronCount[V, NoSystem], b: ElectronCount[V, T] | ElectronCount[float, T], /
+) -> ElectronCount[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Mass[float, S], b: Mass[W, S] | Mass[W, NoSystem], /
+) -> Mass[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Mass[V, S],
+    b: Mass[V, S] | Mass[V, NoSystem] | Mass[float, S] | Mass[float, NoSystem],
+    /,
+) -> Mass[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Mass[float, NoSystem], b: Mass[W, T], /
+) -> Mass[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Mass[V, NoSystem], b: Mass[V, T] | Mass[float, T], /
+) -> Mass[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: MassDensity[float, S], b: MassDensity[W, S] | MassDensity[W, NoSystem], /
+) -> MassDensity[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: MassDensity[V, S],
+    b: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem],
+    /,
+) -> MassDensity[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: MassDensity[float, NoSystem], b: MassDensity[W, T], /
+) -> MassDensity[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: MassDensity[V, NoSystem], b: MassDensity[V, T] | MassDensity[float, T], /
+) -> MassDensity[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Momentum[float, S], b: Momentum[W, S] | Momentum[W, NoSystem], /
+) -> Momentum[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Momentum[V, S],
+    b: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem],
+    /,
+) -> Momentum[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Momentum[float, NoSystem], b: Momentum[W, T], /
+) -> Momentum[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Momentum[V, NoSystem], b: Momentum[V, T] | Momentum[float, T], /
+) -> Momentum[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Acceleration[float, S], b: Acceleration[W, S] | Acceleration[W, NoSystem], /
+) -> Acceleration[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Acceleration[V, S],
+    b: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem],
+    /,
+) -> Acceleration[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Acceleration[float, NoSystem], b: Acceleration[W, T], /
+) -> Acceleration[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Acceleration[V, NoSystem], b: Acceleration[V, T] | Acceleration[float, T], /
+) -> Acceleration[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Charge[float, S], b: Charge[W, S] | Charge[W, NoSystem], /
+) -> Charge[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Charge[V, S],
+    b: Charge[V, S] | Charge[V, NoSystem] | Charge[float, S] | Charge[float, NoSystem],
+    /,
+) -> Charge[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Charge[float, NoSystem], b: Charge[W, T], /
+) -> Charge[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Charge[V, NoSystem], b: Charge[V, T] | Charge[float, T], /
+) -> Charge[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: ElectricPotential[float, S],
+    b: ElectricPotential[W, S] | ElectricPotential[W, NoSystem],
+    /,
+) -> ElectricPotential[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: ElectricPotential[V, S],
+    b: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem],
+    /,
+) -> ElectricPotential[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: ElectricPotential[float, NoSystem], b: ElectricPotential[W, T], /
+) -> ElectricPotential[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: ElectricPotential[V, NoSystem],
+    b: ElectricPotential[V, T] | ElectricPotential[float, T],
+    /,
+) -> ElectricPotential[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: ElectricField[float, S], b: ElectricField[W, S] | ElectricField[W, NoSystem], /
+) -> ElectricField[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: ElectricField[V, S],
+    b: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem],
+    /,
+) -> ElectricField[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: ElectricField[float, NoSystem], b: ElectricField[W, T], /
+) -> ElectricField[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: ElectricField[V, NoSystem], b: ElectricField[V, T] | ElectricField[float, T], /
+) -> ElectricField[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: DipoleMoment[float, S], b: DipoleMoment[W, S] | DipoleMoment[W, NoSystem], /
+) -> DipoleMoment[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: DipoleMoment[V, S],
+    b: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem],
+    /,
+) -> DipoleMoment[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: DipoleMoment[float, NoSystem], b: DipoleMoment[W, T], /
+) -> DipoleMoment[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: DipoleMoment[V, NoSystem], b: DipoleMoment[V, T] | DipoleMoment[float, T], /
+) -> DipoleMoment[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Entropy[float, S], b: Entropy[W, S] | Entropy[W, NoSystem], /
+) -> Entropy[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Entropy[V, S],
+    b: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem],
+    /,
+) -> Entropy[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Entropy[float, NoSystem], b: Entropy[W, T], /
+) -> Entropy[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Entropy[V, NoSystem], b: Entropy[V, T] | Entropy[float, T], /
+) -> Entropy[V, T]: ...
+@overload
+def maximum[W, S: AnySystem](
+    a: Action[float, S], b: Action[W, S] | Action[W, NoSystem], /
+) -> Action[W, S]: ...
+@overload
+def maximum[V, S: AnySystem](
+    a: Action[V, S],
+    b: Action[V, S] | Action[V, NoSystem] | Action[float, S] | Action[float, NoSystem],
+    /,
+) -> Action[V, S]: ...
+@overload
+def maximum[W, T: UnitSystem](
+    a: Action[float, NoSystem], b: Action[W, T], /
+) -> Action[W, T]: ...
+@overload
+def maximum[V, T: UnitSystem](
+    a: Action[V, NoSystem], b: Action[V, T] | Action[float, T], /
+) -> Action[V, T]: ...
+@overload
+def maximum[Q: _StructuralQuantity[Any, Any, Any, Any]](a: Q, b: Q, /) -> Q: ...
 @overload
 def maximum[A: _Numerical](a: A, b: A, /) -> A: ...
 @overload
-def minimum[Q: _BaseQuantity[Any, Any, Any]](a: Q, b: Q, /) -> Q: ...
+def minimum[W, S: AnySystem](
+    a: Dimensionless[float, S], b: Dimensionless[W, S] | Dimensionless[W, NoSystem], /
+) -> Dimensionless[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Dimensionless[V, S],
+    b: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem],
+    /,
+) -> Dimensionless[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Dimensionless[float, NoSystem], b: Dimensionless[W, T], /
+) -> Dimensionless[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Dimensionless[V, NoSystem], b: Dimensionless[V, T] | Dimensionless[float, T], /
+) -> Dimensionless[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Length[float, S], b: Length[W, S] | Length[W, NoSystem], /
+) -> Length[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Length[V, S],
+    b: Length[V, S] | Length[V, NoSystem] | Length[float, S] | Length[float, NoSystem],
+    /,
+) -> Length[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Length[float, NoSystem], b: Length[W, T], /
+) -> Length[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Length[V, NoSystem], b: Length[V, T] | Length[float, T], /
+) -> Length[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Area[float, S], b: Area[W, S] | Area[W, NoSystem], /
+) -> Area[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Area[V, S],
+    b: Area[V, S] | Area[V, NoSystem] | Area[float, S] | Area[float, NoSystem],
+    /,
+) -> Area[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Area[float, NoSystem], b: Area[W, T], /
+) -> Area[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Area[V, NoSystem], b: Area[V, T] | Area[float, T], /
+) -> Area[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Volume[float, S], b: Volume[W, S] | Volume[W, NoSystem], /
+) -> Volume[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Volume[V, S],
+    b: Volume[V, S] | Volume[V, NoSystem] | Volume[float, S] | Volume[float, NoSystem],
+    /,
+) -> Volume[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Volume[float, NoSystem], b: Volume[W, T], /
+) -> Volume[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Volume[V, NoSystem], b: Volume[V, T] | Volume[float, T], /
+) -> Volume[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Time[float, S], b: Time[W, S] | Time[W, NoSystem], /
+) -> Time[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Time[V, S],
+    b: Time[V, S] | Time[V, NoSystem] | Time[float, S] | Time[float, NoSystem],
+    /,
+) -> Time[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Time[float, NoSystem], b: Time[W, T], /
+) -> Time[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Time[V, NoSystem], b: Time[V, T] | Time[float, T], /
+) -> Time[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Velocity[float, S], b: Velocity[W, S] | Velocity[W, NoSystem], /
+) -> Velocity[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Velocity[V, S],
+    b: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem],
+    /,
+) -> Velocity[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Velocity[float, NoSystem], b: Velocity[W, T], /
+) -> Velocity[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Velocity[V, NoSystem], b: Velocity[V, T] | Velocity[float, T], /
+) -> Velocity[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Energy[float, S], b: Energy[W, S] | Energy[W, NoSystem], /
+) -> Energy[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Energy[V, S],
+    b: Energy[V, S] | Energy[V, NoSystem] | Energy[float, S] | Energy[float, NoSystem],
+    /,
+) -> Energy[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Energy[float, NoSystem], b: Energy[W, T], /
+) -> Energy[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Energy[V, NoSystem], b: Energy[V, T] | Energy[float, T], /
+) -> Energy[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: EnergyPerAtom[float, S], b: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem], /
+) -> EnergyPerAtom[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: EnergyPerAtom[V, S],
+    b: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem],
+    /,
+) -> EnergyPerAtom[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: EnergyPerAtom[float, NoSystem], b: EnergyPerAtom[W, T], /
+) -> EnergyPerAtom[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: EnergyPerAtom[V, NoSystem], b: EnergyPerAtom[V, T] | EnergyPerAtom[float, T], /
+) -> EnergyPerAtom[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Force[float, S], b: Force[W, S] | Force[W, NoSystem], /
+) -> Force[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Force[V, S],
+    b: Force[V, S] | Force[V, NoSystem] | Force[float, S] | Force[float, NoSystem],
+    /,
+) -> Force[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Force[float, NoSystem], b: Force[W, T], /
+) -> Force[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Force[V, NoSystem], b: Force[V, T] | Force[float, T], /
+) -> Force[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: ForceConstant[float, S], b: ForceConstant[W, S] | ForceConstant[W, NoSystem], /
+) -> ForceConstant[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: ForceConstant[V, S],
+    b: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem],
+    /,
+) -> ForceConstant[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: ForceConstant[float, NoSystem], b: ForceConstant[W, T], /
+) -> ForceConstant[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: ForceConstant[V, NoSystem], b: ForceConstant[V, T] | ForceConstant[float, T], /
+) -> ForceConstant[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Pressure[float, S], b: Pressure[W, S] | Pressure[W, NoSystem], /
+) -> Pressure[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Pressure[V, S],
+    b: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem],
+    /,
+) -> Pressure[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Pressure[float, NoSystem], b: Pressure[W, T], /
+) -> Pressure[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Pressure[V, NoSystem], b: Pressure[V, T] | Pressure[float, T], /
+) -> Pressure[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: EnergyDensity[float, S], b: EnergyDensity[W, S] | EnergyDensity[W, NoSystem], /
+) -> EnergyDensity[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: EnergyDensity[V, S],
+    b: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem],
+    /,
+) -> EnergyDensity[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: EnergyDensity[float, NoSystem], b: EnergyDensity[W, T], /
+) -> EnergyDensity[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: EnergyDensity[V, NoSystem], b: EnergyDensity[V, T] | EnergyDensity[float, T], /
+) -> EnergyDensity[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: EnergyPerVolume[float, S],
+    b: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem],
+    /,
+) -> EnergyPerVolume[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: EnergyPerVolume[V, S],
+    b: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem],
+    /,
+) -> EnergyPerVolume[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: EnergyPerVolume[float, NoSystem], b: EnergyPerVolume[W, T], /
+) -> EnergyPerVolume[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: EnergyPerVolume[V, NoSystem],
+    b: EnergyPerVolume[V, T] | EnergyPerVolume[float, T],
+    /,
+) -> EnergyPerVolume[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Temperature[float, S], b: Temperature[W, S] | Temperature[W, NoSystem], /
+) -> Temperature[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Temperature[V, S],
+    b: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem],
+    /,
+) -> Temperature[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Temperature[float, NoSystem], b: Temperature[W, T], /
+) -> Temperature[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Temperature[V, NoSystem], b: Temperature[V, T] | Temperature[float, T], /
+) -> Temperature[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: TemperatureDifference[float, S],
+    b: TemperatureDifference[W, S] | TemperatureDifference[W, NoSystem],
+    /,
+) -> TemperatureDifference[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: TemperatureDifference[V, S],
+    b: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem],
+    /,
+) -> TemperatureDifference[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: TemperatureDifference[float, NoSystem], b: TemperatureDifference[W, T], /
+) -> TemperatureDifference[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: TemperatureDifference[V, NoSystem],
+    b: TemperatureDifference[V, T] | TemperatureDifference[float, T],
+    /,
+) -> TemperatureDifference[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: TemperatureRate[float, S],
+    b: TemperatureRate[W, S] | TemperatureRate[W, NoSystem],
+    /,
+) -> TemperatureRate[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: TemperatureRate[V, S],
+    b: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem],
+    /,
+) -> TemperatureRate[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: TemperatureRate[float, NoSystem], b: TemperatureRate[W, T], /
+) -> TemperatureRate[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: TemperatureRate[V, NoSystem],
+    b: TemperatureRate[V, T] | TemperatureRate[float, T],
+    /,
+) -> TemperatureRate[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: MagneticMoment[float, S],
+    b: MagneticMoment[W, S] | MagneticMoment[W, NoSystem],
+    /,
+) -> MagneticMoment[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: MagneticMoment[V, S],
+    b: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem],
+    /,
+) -> MagneticMoment[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: MagneticMoment[float, NoSystem], b: MagneticMoment[W, T], /
+) -> MagneticMoment[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: MagneticMoment[V, NoSystem],
+    b: MagneticMoment[V, T] | MagneticMoment[float, T],
+    /,
+) -> MagneticMoment[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Magnetization[float, S], b: Magnetization[W, S] | Magnetization[W, NoSystem], /
+) -> Magnetization[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Magnetization[V, S],
+    b: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem],
+    /,
+) -> Magnetization[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Magnetization[float, NoSystem], b: Magnetization[W, T], /
+) -> Magnetization[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Magnetization[V, NoSystem], b: Magnetization[V, T] | Magnetization[float, T], /
+) -> Magnetization[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: ParticleDensity[float, S],
+    b: ParticleDensity[W, S] | ParticleDensity[W, NoSystem],
+    /,
+) -> ParticleDensity[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: ParticleDensity[V, S],
+    b: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem],
+    /,
+) -> ParticleDensity[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: ParticleDensity[float, NoSystem], b: ParticleDensity[W, T], /
+) -> ParticleDensity[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: ParticleDensity[V, NoSystem],
+    b: ParticleDensity[V, T] | ParticleDensity[float, T],
+    /,
+) -> ParticleDensity[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: ElectronDensity[float, S],
+    b: ElectronDensity[W, S] | ElectronDensity[W, NoSystem],
+    /,
+) -> ElectronDensity[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: ElectronDensity[V, S],
+    b: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem],
+    /,
+) -> ElectronDensity[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: ElectronDensity[float, NoSystem], b: ElectronDensity[W, T], /
+) -> ElectronDensity[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: ElectronDensity[V, NoSystem],
+    b: ElectronDensity[V, T] | ElectronDensity[float, T],
+    /,
+) -> ElectronDensity[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Angle[float, S], b: Angle[W, S] | Angle[W, NoSystem], /
+) -> Angle[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Angle[V, S],
+    b: Angle[V, S] | Angle[V, NoSystem] | Angle[float, S] | Angle[float, NoSystem],
+    /,
+) -> Angle[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Angle[float, NoSystem], b: Angle[W, T], /
+) -> Angle[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Angle[V, NoSystem], b: Angle[V, T] | Angle[float, T], /
+) -> Angle[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Frequency[float, S], b: Frequency[W, S] | Frequency[W, NoSystem], /
+) -> Frequency[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Frequency[V, S],
+    b: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem],
+    /,
+) -> Frequency[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Frequency[float, NoSystem], b: Frequency[W, T], /
+) -> Frequency[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Frequency[V, NoSystem], b: Frequency[V, T] | Frequency[float, T], /
+) -> Frequency[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: InverseTime[float, S], b: InverseTime[W, S] | InverseTime[W, NoSystem], /
+) -> InverseTime[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: InverseTime[V, S],
+    b: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem],
+    /,
+) -> InverseTime[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: InverseTime[float, NoSystem], b: InverseTime[W, T], /
+) -> InverseTime[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: InverseTime[V, NoSystem], b: InverseTime[V, T] | InverseTime[float, T], /
+) -> InverseTime[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: AtomCount[float, S], b: AtomCount[W, S] | AtomCount[W, NoSystem], /
+) -> AtomCount[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: AtomCount[V, S],
+    b: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem],
+    /,
+) -> AtomCount[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: AtomCount[float, NoSystem], b: AtomCount[W, T], /
+) -> AtomCount[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: AtomCount[V, NoSystem], b: AtomCount[V, T] | AtomCount[float, T], /
+) -> AtomCount[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: ElectronCount[float, S], b: ElectronCount[W, S] | ElectronCount[W, NoSystem], /
+) -> ElectronCount[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: ElectronCount[V, S],
+    b: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem],
+    /,
+) -> ElectronCount[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: ElectronCount[float, NoSystem], b: ElectronCount[W, T], /
+) -> ElectronCount[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: ElectronCount[V, NoSystem], b: ElectronCount[V, T] | ElectronCount[float, T], /
+) -> ElectronCount[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Mass[float, S], b: Mass[W, S] | Mass[W, NoSystem], /
+) -> Mass[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Mass[V, S],
+    b: Mass[V, S] | Mass[V, NoSystem] | Mass[float, S] | Mass[float, NoSystem],
+    /,
+) -> Mass[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Mass[float, NoSystem], b: Mass[W, T], /
+) -> Mass[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Mass[V, NoSystem], b: Mass[V, T] | Mass[float, T], /
+) -> Mass[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: MassDensity[float, S], b: MassDensity[W, S] | MassDensity[W, NoSystem], /
+) -> MassDensity[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: MassDensity[V, S],
+    b: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem],
+    /,
+) -> MassDensity[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: MassDensity[float, NoSystem], b: MassDensity[W, T], /
+) -> MassDensity[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: MassDensity[V, NoSystem], b: MassDensity[V, T] | MassDensity[float, T], /
+) -> MassDensity[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Momentum[float, S], b: Momentum[W, S] | Momentum[W, NoSystem], /
+) -> Momentum[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Momentum[V, S],
+    b: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem],
+    /,
+) -> Momentum[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Momentum[float, NoSystem], b: Momentum[W, T], /
+) -> Momentum[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Momentum[V, NoSystem], b: Momentum[V, T] | Momentum[float, T], /
+) -> Momentum[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Acceleration[float, S], b: Acceleration[W, S] | Acceleration[W, NoSystem], /
+) -> Acceleration[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Acceleration[V, S],
+    b: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem],
+    /,
+) -> Acceleration[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Acceleration[float, NoSystem], b: Acceleration[W, T], /
+) -> Acceleration[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Acceleration[V, NoSystem], b: Acceleration[V, T] | Acceleration[float, T], /
+) -> Acceleration[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Charge[float, S], b: Charge[W, S] | Charge[W, NoSystem], /
+) -> Charge[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Charge[V, S],
+    b: Charge[V, S] | Charge[V, NoSystem] | Charge[float, S] | Charge[float, NoSystem],
+    /,
+) -> Charge[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Charge[float, NoSystem], b: Charge[W, T], /
+) -> Charge[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Charge[V, NoSystem], b: Charge[V, T] | Charge[float, T], /
+) -> Charge[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: ElectricPotential[float, S],
+    b: ElectricPotential[W, S] | ElectricPotential[W, NoSystem],
+    /,
+) -> ElectricPotential[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: ElectricPotential[V, S],
+    b: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem],
+    /,
+) -> ElectricPotential[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: ElectricPotential[float, NoSystem], b: ElectricPotential[W, T], /
+) -> ElectricPotential[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: ElectricPotential[V, NoSystem],
+    b: ElectricPotential[V, T] | ElectricPotential[float, T],
+    /,
+) -> ElectricPotential[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: ElectricField[float, S], b: ElectricField[W, S] | ElectricField[W, NoSystem], /
+) -> ElectricField[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: ElectricField[V, S],
+    b: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem],
+    /,
+) -> ElectricField[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: ElectricField[float, NoSystem], b: ElectricField[W, T], /
+) -> ElectricField[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: ElectricField[V, NoSystem], b: ElectricField[V, T] | ElectricField[float, T], /
+) -> ElectricField[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: DipoleMoment[float, S], b: DipoleMoment[W, S] | DipoleMoment[W, NoSystem], /
+) -> DipoleMoment[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: DipoleMoment[V, S],
+    b: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem],
+    /,
+) -> DipoleMoment[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: DipoleMoment[float, NoSystem], b: DipoleMoment[W, T], /
+) -> DipoleMoment[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: DipoleMoment[V, NoSystem], b: DipoleMoment[V, T] | DipoleMoment[float, T], /
+) -> DipoleMoment[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Entropy[float, S], b: Entropy[W, S] | Entropy[W, NoSystem], /
+) -> Entropy[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Entropy[V, S],
+    b: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem],
+    /,
+) -> Entropy[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Entropy[float, NoSystem], b: Entropy[W, T], /
+) -> Entropy[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Entropy[V, NoSystem], b: Entropy[V, T] | Entropy[float, T], /
+) -> Entropy[V, T]: ...
+@overload
+def minimum[W, S: AnySystem](
+    a: Action[float, S], b: Action[W, S] | Action[W, NoSystem], /
+) -> Action[W, S]: ...
+@overload
+def minimum[V, S: AnySystem](
+    a: Action[V, S],
+    b: Action[V, S] | Action[V, NoSystem] | Action[float, S] | Action[float, NoSystem],
+    /,
+) -> Action[V, S]: ...
+@overload
+def minimum[W, T: UnitSystem](
+    a: Action[float, NoSystem], b: Action[W, T], /
+) -> Action[W, T]: ...
+@overload
+def minimum[V, T: UnitSystem](
+    a: Action[V, NoSystem], b: Action[V, T] | Action[float, T], /
+) -> Action[V, T]: ...
+@overload
+def minimum[Q: _StructuralQuantity[Any, Any, Any, Any]](a: Q, b: Q, /) -> Q: ...
 @overload
 def minimum[A: _Numerical](a: A, b: A, /) -> A: ...
 @overload
-def hypot[Q: _BaseQuantity[Any, Any, Any]](a: Q, b: Q, /) -> Q: ...
+def hypot[W, S: AnySystem](
+    a: Dimensionless[float, S], b: Dimensionless[W, S] | Dimensionless[W, NoSystem], /
+) -> Dimensionless[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Dimensionless[V, S],
+    b: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem],
+    /,
+) -> Dimensionless[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Dimensionless[float, NoSystem], b: Dimensionless[W, T], /
+) -> Dimensionless[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Dimensionless[V, NoSystem], b: Dimensionless[V, T] | Dimensionless[float, T], /
+) -> Dimensionless[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Length[float, S], b: Length[W, S] | Length[W, NoSystem], /
+) -> Length[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Length[V, S],
+    b: Length[V, S] | Length[V, NoSystem] | Length[float, S] | Length[float, NoSystem],
+    /,
+) -> Length[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Length[float, NoSystem], b: Length[W, T], /
+) -> Length[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Length[V, NoSystem], b: Length[V, T] | Length[float, T], /
+) -> Length[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Area[float, S], b: Area[W, S] | Area[W, NoSystem], /
+) -> Area[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Area[V, S],
+    b: Area[V, S] | Area[V, NoSystem] | Area[float, S] | Area[float, NoSystem],
+    /,
+) -> Area[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Area[float, NoSystem], b: Area[W, T], /
+) -> Area[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Area[V, NoSystem], b: Area[V, T] | Area[float, T], /
+) -> Area[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Volume[float, S], b: Volume[W, S] | Volume[W, NoSystem], /
+) -> Volume[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Volume[V, S],
+    b: Volume[V, S] | Volume[V, NoSystem] | Volume[float, S] | Volume[float, NoSystem],
+    /,
+) -> Volume[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Volume[float, NoSystem], b: Volume[W, T], /
+) -> Volume[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Volume[V, NoSystem], b: Volume[V, T] | Volume[float, T], /
+) -> Volume[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Time[float, S], b: Time[W, S] | Time[W, NoSystem], /
+) -> Time[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Time[V, S],
+    b: Time[V, S] | Time[V, NoSystem] | Time[float, S] | Time[float, NoSystem],
+    /,
+) -> Time[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Time[float, NoSystem], b: Time[W, T], /
+) -> Time[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Time[V, NoSystem], b: Time[V, T] | Time[float, T], /
+) -> Time[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Velocity[float, S], b: Velocity[W, S] | Velocity[W, NoSystem], /
+) -> Velocity[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Velocity[V, S],
+    b: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem],
+    /,
+) -> Velocity[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Velocity[float, NoSystem], b: Velocity[W, T], /
+) -> Velocity[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Velocity[V, NoSystem], b: Velocity[V, T] | Velocity[float, T], /
+) -> Velocity[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Energy[float, S], b: Energy[W, S] | Energy[W, NoSystem], /
+) -> Energy[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Energy[V, S],
+    b: Energy[V, S] | Energy[V, NoSystem] | Energy[float, S] | Energy[float, NoSystem],
+    /,
+) -> Energy[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Energy[float, NoSystem], b: Energy[W, T], /
+) -> Energy[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Energy[V, NoSystem], b: Energy[V, T] | Energy[float, T], /
+) -> Energy[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: EnergyPerAtom[float, S], b: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem], /
+) -> EnergyPerAtom[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: EnergyPerAtom[V, S],
+    b: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem],
+    /,
+) -> EnergyPerAtom[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: EnergyPerAtom[float, NoSystem], b: EnergyPerAtom[W, T], /
+) -> EnergyPerAtom[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: EnergyPerAtom[V, NoSystem], b: EnergyPerAtom[V, T] | EnergyPerAtom[float, T], /
+) -> EnergyPerAtom[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Force[float, S], b: Force[W, S] | Force[W, NoSystem], /
+) -> Force[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Force[V, S],
+    b: Force[V, S] | Force[V, NoSystem] | Force[float, S] | Force[float, NoSystem],
+    /,
+) -> Force[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Force[float, NoSystem], b: Force[W, T], /
+) -> Force[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Force[V, NoSystem], b: Force[V, T] | Force[float, T], /
+) -> Force[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: ForceConstant[float, S], b: ForceConstant[W, S] | ForceConstant[W, NoSystem], /
+) -> ForceConstant[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: ForceConstant[V, S],
+    b: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem],
+    /,
+) -> ForceConstant[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: ForceConstant[float, NoSystem], b: ForceConstant[W, T], /
+) -> ForceConstant[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: ForceConstant[V, NoSystem], b: ForceConstant[V, T] | ForceConstant[float, T], /
+) -> ForceConstant[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Pressure[float, S], b: Pressure[W, S] | Pressure[W, NoSystem], /
+) -> Pressure[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Pressure[V, S],
+    b: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem],
+    /,
+) -> Pressure[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Pressure[float, NoSystem], b: Pressure[W, T], /
+) -> Pressure[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Pressure[V, NoSystem], b: Pressure[V, T] | Pressure[float, T], /
+) -> Pressure[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: EnergyDensity[float, S], b: EnergyDensity[W, S] | EnergyDensity[W, NoSystem], /
+) -> EnergyDensity[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: EnergyDensity[V, S],
+    b: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem],
+    /,
+) -> EnergyDensity[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: EnergyDensity[float, NoSystem], b: EnergyDensity[W, T], /
+) -> EnergyDensity[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: EnergyDensity[V, NoSystem], b: EnergyDensity[V, T] | EnergyDensity[float, T], /
+) -> EnergyDensity[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: EnergyPerVolume[float, S],
+    b: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem],
+    /,
+) -> EnergyPerVolume[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: EnergyPerVolume[V, S],
+    b: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem],
+    /,
+) -> EnergyPerVolume[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: EnergyPerVolume[float, NoSystem], b: EnergyPerVolume[W, T], /
+) -> EnergyPerVolume[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: EnergyPerVolume[V, NoSystem],
+    b: EnergyPerVolume[V, T] | EnergyPerVolume[float, T],
+    /,
+) -> EnergyPerVolume[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Temperature[float, S], b: Temperature[W, S] | Temperature[W, NoSystem], /
+) -> Temperature[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Temperature[V, S],
+    b: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem],
+    /,
+) -> Temperature[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Temperature[float, NoSystem], b: Temperature[W, T], /
+) -> Temperature[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Temperature[V, NoSystem], b: Temperature[V, T] | Temperature[float, T], /
+) -> Temperature[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: TemperatureDifference[float, S],
+    b: TemperatureDifference[W, S] | TemperatureDifference[W, NoSystem],
+    /,
+) -> TemperatureDifference[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: TemperatureDifference[V, S],
+    b: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem],
+    /,
+) -> TemperatureDifference[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: TemperatureDifference[float, NoSystem], b: TemperatureDifference[W, T], /
+) -> TemperatureDifference[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: TemperatureDifference[V, NoSystem],
+    b: TemperatureDifference[V, T] | TemperatureDifference[float, T],
+    /,
+) -> TemperatureDifference[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: TemperatureRate[float, S],
+    b: TemperatureRate[W, S] | TemperatureRate[W, NoSystem],
+    /,
+) -> TemperatureRate[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: TemperatureRate[V, S],
+    b: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem],
+    /,
+) -> TemperatureRate[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: TemperatureRate[float, NoSystem], b: TemperatureRate[W, T], /
+) -> TemperatureRate[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: TemperatureRate[V, NoSystem],
+    b: TemperatureRate[V, T] | TemperatureRate[float, T],
+    /,
+) -> TemperatureRate[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: MagneticMoment[float, S],
+    b: MagneticMoment[W, S] | MagneticMoment[W, NoSystem],
+    /,
+) -> MagneticMoment[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: MagneticMoment[V, S],
+    b: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem],
+    /,
+) -> MagneticMoment[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: MagneticMoment[float, NoSystem], b: MagneticMoment[W, T], /
+) -> MagneticMoment[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: MagneticMoment[V, NoSystem],
+    b: MagneticMoment[V, T] | MagneticMoment[float, T],
+    /,
+) -> MagneticMoment[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Magnetization[float, S], b: Magnetization[W, S] | Magnetization[W, NoSystem], /
+) -> Magnetization[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Magnetization[V, S],
+    b: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem],
+    /,
+) -> Magnetization[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Magnetization[float, NoSystem], b: Magnetization[W, T], /
+) -> Magnetization[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Magnetization[V, NoSystem], b: Magnetization[V, T] | Magnetization[float, T], /
+) -> Magnetization[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: ParticleDensity[float, S],
+    b: ParticleDensity[W, S] | ParticleDensity[W, NoSystem],
+    /,
+) -> ParticleDensity[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: ParticleDensity[V, S],
+    b: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem],
+    /,
+) -> ParticleDensity[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: ParticleDensity[float, NoSystem], b: ParticleDensity[W, T], /
+) -> ParticleDensity[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: ParticleDensity[V, NoSystem],
+    b: ParticleDensity[V, T] | ParticleDensity[float, T],
+    /,
+) -> ParticleDensity[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: ElectronDensity[float, S],
+    b: ElectronDensity[W, S] | ElectronDensity[W, NoSystem],
+    /,
+) -> ElectronDensity[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: ElectronDensity[V, S],
+    b: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem],
+    /,
+) -> ElectronDensity[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: ElectronDensity[float, NoSystem], b: ElectronDensity[W, T], /
+) -> ElectronDensity[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: ElectronDensity[V, NoSystem],
+    b: ElectronDensity[V, T] | ElectronDensity[float, T],
+    /,
+) -> ElectronDensity[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Angle[float, S], b: Angle[W, S] | Angle[W, NoSystem], /
+) -> Angle[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Angle[V, S],
+    b: Angle[V, S] | Angle[V, NoSystem] | Angle[float, S] | Angle[float, NoSystem],
+    /,
+) -> Angle[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Angle[float, NoSystem], b: Angle[W, T], /
+) -> Angle[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Angle[V, NoSystem], b: Angle[V, T] | Angle[float, T], /
+) -> Angle[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Frequency[float, S], b: Frequency[W, S] | Frequency[W, NoSystem], /
+) -> Frequency[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Frequency[V, S],
+    b: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem],
+    /,
+) -> Frequency[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Frequency[float, NoSystem], b: Frequency[W, T], /
+) -> Frequency[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Frequency[V, NoSystem], b: Frequency[V, T] | Frequency[float, T], /
+) -> Frequency[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: InverseTime[float, S], b: InverseTime[W, S] | InverseTime[W, NoSystem], /
+) -> InverseTime[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: InverseTime[V, S],
+    b: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem],
+    /,
+) -> InverseTime[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: InverseTime[float, NoSystem], b: InverseTime[W, T], /
+) -> InverseTime[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: InverseTime[V, NoSystem], b: InverseTime[V, T] | InverseTime[float, T], /
+) -> InverseTime[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: AtomCount[float, S], b: AtomCount[W, S] | AtomCount[W, NoSystem], /
+) -> AtomCount[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: AtomCount[V, S],
+    b: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem],
+    /,
+) -> AtomCount[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: AtomCount[float, NoSystem], b: AtomCount[W, T], /
+) -> AtomCount[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: AtomCount[V, NoSystem], b: AtomCount[V, T] | AtomCount[float, T], /
+) -> AtomCount[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: ElectronCount[float, S], b: ElectronCount[W, S] | ElectronCount[W, NoSystem], /
+) -> ElectronCount[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: ElectronCount[V, S],
+    b: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem],
+    /,
+) -> ElectronCount[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: ElectronCount[float, NoSystem], b: ElectronCount[W, T], /
+) -> ElectronCount[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: ElectronCount[V, NoSystem], b: ElectronCount[V, T] | ElectronCount[float, T], /
+) -> ElectronCount[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Mass[float, S], b: Mass[W, S] | Mass[W, NoSystem], /
+) -> Mass[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Mass[V, S],
+    b: Mass[V, S] | Mass[V, NoSystem] | Mass[float, S] | Mass[float, NoSystem],
+    /,
+) -> Mass[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Mass[float, NoSystem], b: Mass[W, T], /
+) -> Mass[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Mass[V, NoSystem], b: Mass[V, T] | Mass[float, T], /
+) -> Mass[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: MassDensity[float, S], b: MassDensity[W, S] | MassDensity[W, NoSystem], /
+) -> MassDensity[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: MassDensity[V, S],
+    b: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem],
+    /,
+) -> MassDensity[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: MassDensity[float, NoSystem], b: MassDensity[W, T], /
+) -> MassDensity[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: MassDensity[V, NoSystem], b: MassDensity[V, T] | MassDensity[float, T], /
+) -> MassDensity[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Momentum[float, S], b: Momentum[W, S] | Momentum[W, NoSystem], /
+) -> Momentum[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Momentum[V, S],
+    b: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem],
+    /,
+) -> Momentum[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Momentum[float, NoSystem], b: Momentum[W, T], /
+) -> Momentum[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Momentum[V, NoSystem], b: Momentum[V, T] | Momentum[float, T], /
+) -> Momentum[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Acceleration[float, S], b: Acceleration[W, S] | Acceleration[W, NoSystem], /
+) -> Acceleration[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Acceleration[V, S],
+    b: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem],
+    /,
+) -> Acceleration[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Acceleration[float, NoSystem], b: Acceleration[W, T], /
+) -> Acceleration[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Acceleration[V, NoSystem], b: Acceleration[V, T] | Acceleration[float, T], /
+) -> Acceleration[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Charge[float, S], b: Charge[W, S] | Charge[W, NoSystem], /
+) -> Charge[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Charge[V, S],
+    b: Charge[V, S] | Charge[V, NoSystem] | Charge[float, S] | Charge[float, NoSystem],
+    /,
+) -> Charge[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Charge[float, NoSystem], b: Charge[W, T], /
+) -> Charge[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Charge[V, NoSystem], b: Charge[V, T] | Charge[float, T], /
+) -> Charge[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: ElectricPotential[float, S],
+    b: ElectricPotential[W, S] | ElectricPotential[W, NoSystem],
+    /,
+) -> ElectricPotential[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: ElectricPotential[V, S],
+    b: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem],
+    /,
+) -> ElectricPotential[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: ElectricPotential[float, NoSystem], b: ElectricPotential[W, T], /
+) -> ElectricPotential[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: ElectricPotential[V, NoSystem],
+    b: ElectricPotential[V, T] | ElectricPotential[float, T],
+    /,
+) -> ElectricPotential[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: ElectricField[float, S], b: ElectricField[W, S] | ElectricField[W, NoSystem], /
+) -> ElectricField[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: ElectricField[V, S],
+    b: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem],
+    /,
+) -> ElectricField[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: ElectricField[float, NoSystem], b: ElectricField[W, T], /
+) -> ElectricField[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: ElectricField[V, NoSystem], b: ElectricField[V, T] | ElectricField[float, T], /
+) -> ElectricField[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: DipoleMoment[float, S], b: DipoleMoment[W, S] | DipoleMoment[W, NoSystem], /
+) -> DipoleMoment[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: DipoleMoment[V, S],
+    b: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem],
+    /,
+) -> DipoleMoment[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: DipoleMoment[float, NoSystem], b: DipoleMoment[W, T], /
+) -> DipoleMoment[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: DipoleMoment[V, NoSystem], b: DipoleMoment[V, T] | DipoleMoment[float, T], /
+) -> DipoleMoment[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Entropy[float, S], b: Entropy[W, S] | Entropy[W, NoSystem], /
+) -> Entropy[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Entropy[V, S],
+    b: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem],
+    /,
+) -> Entropy[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Entropy[float, NoSystem], b: Entropy[W, T], /
+) -> Entropy[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Entropy[V, NoSystem], b: Entropy[V, T] | Entropy[float, T], /
+) -> Entropy[V, T]: ...
+@overload
+def hypot[W, S: AnySystem](
+    a: Action[float, S], b: Action[W, S] | Action[W, NoSystem], /
+) -> Action[W, S]: ...
+@overload
+def hypot[V, S: AnySystem](
+    a: Action[V, S],
+    b: Action[V, S] | Action[V, NoSystem] | Action[float, S] | Action[float, NoSystem],
+    /,
+) -> Action[V, S]: ...
+@overload
+def hypot[W, T: UnitSystem](
+    a: Action[float, NoSystem], b: Action[W, T], /
+) -> Action[W, T]: ...
+@overload
+def hypot[V, T: UnitSystem](
+    a: Action[V, NoSystem], b: Action[V, T] | Action[float, T], /
+) -> Action[V, T]: ...
+@overload
+def hypot[Q: _StructuralQuantity[Any, Any, Any, Any]](a: Q, b: Q, /) -> Q: ...
 @overload
 def hypot[A: _Numerical](a: A, b: A, /) -> A: ...
 @overload
-def clip[Q: _BaseQuantity[Any, Any, Any]](
+def clip[W, S: AnySystem](
+    x: Dimensionless[float, S],
+    a_min: Dimensionless[W, S] | Dimensionless[W, NoSystem] | None,
+    a_max: Dimensionless[W, S] | Dimensionless[W, NoSystem] | None,
+    /,
+) -> Dimensionless[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Dimensionless[V, S],
+    a_min: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem]
+    | None,
+    a_max: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem]
+    | None,
+    /,
+) -> Dimensionless[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Dimensionless[float, NoSystem],
+    a_min: Dimensionless[W, T] | None,
+    a_max: Dimensionless[W, T] | None,
+    /,
+) -> Dimensionless[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Dimensionless[V, NoSystem],
+    a_min: Dimensionless[V, T] | Dimensionless[float, T] | None,
+    a_max: Dimensionless[V, T] | Dimensionless[float, T] | None,
+    /,
+) -> Dimensionless[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Length[float, S],
+    a_min: Length[W, S] | Length[W, NoSystem] | None,
+    a_max: Length[W, S] | Length[W, NoSystem] | None,
+    /,
+) -> Length[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Length[V, S],
+    a_min: Length[V, S]
+    | Length[V, NoSystem]
+    | Length[float, S]
+    | Length[float, NoSystem]
+    | None,
+    a_max: Length[V, S]
+    | Length[V, NoSystem]
+    | Length[float, S]
+    | Length[float, NoSystem]
+    | None,
+    /,
+) -> Length[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Length[float, NoSystem],
+    a_min: Length[W, T] | None,
+    a_max: Length[W, T] | None,
+    /,
+) -> Length[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Length[V, NoSystem],
+    a_min: Length[V, T] | Length[float, T] | None,
+    a_max: Length[V, T] | Length[float, T] | None,
+    /,
+) -> Length[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Area[float, S],
+    a_min: Area[W, S] | Area[W, NoSystem] | None,
+    a_max: Area[W, S] | Area[W, NoSystem] | None,
+    /,
+) -> Area[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Area[V, S],
+    a_min: Area[V, S]
+    | Area[V, NoSystem]
+    | Area[float, S]
+    | Area[float, NoSystem]
+    | None,
+    a_max: Area[V, S]
+    | Area[V, NoSystem]
+    | Area[float, S]
+    | Area[float, NoSystem]
+    | None,
+    /,
+) -> Area[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Area[float, NoSystem], a_min: Area[W, T] | None, a_max: Area[W, T] | None, /
+) -> Area[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Area[V, NoSystem],
+    a_min: Area[V, T] | Area[float, T] | None,
+    a_max: Area[V, T] | Area[float, T] | None,
+    /,
+) -> Area[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Volume[float, S],
+    a_min: Volume[W, S] | Volume[W, NoSystem] | None,
+    a_max: Volume[W, S] | Volume[W, NoSystem] | None,
+    /,
+) -> Volume[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Volume[V, S],
+    a_min: Volume[V, S]
+    | Volume[V, NoSystem]
+    | Volume[float, S]
+    | Volume[float, NoSystem]
+    | None,
+    a_max: Volume[V, S]
+    | Volume[V, NoSystem]
+    | Volume[float, S]
+    | Volume[float, NoSystem]
+    | None,
+    /,
+) -> Volume[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Volume[float, NoSystem],
+    a_min: Volume[W, T] | None,
+    a_max: Volume[W, T] | None,
+    /,
+) -> Volume[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Volume[V, NoSystem],
+    a_min: Volume[V, T] | Volume[float, T] | None,
+    a_max: Volume[V, T] | Volume[float, T] | None,
+    /,
+) -> Volume[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Time[float, S],
+    a_min: Time[W, S] | Time[W, NoSystem] | None,
+    a_max: Time[W, S] | Time[W, NoSystem] | None,
+    /,
+) -> Time[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Time[V, S],
+    a_min: Time[V, S]
+    | Time[V, NoSystem]
+    | Time[float, S]
+    | Time[float, NoSystem]
+    | None,
+    a_max: Time[V, S]
+    | Time[V, NoSystem]
+    | Time[float, S]
+    | Time[float, NoSystem]
+    | None,
+    /,
+) -> Time[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Time[float, NoSystem], a_min: Time[W, T] | None, a_max: Time[W, T] | None, /
+) -> Time[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Time[V, NoSystem],
+    a_min: Time[V, T] | Time[float, T] | None,
+    a_max: Time[V, T] | Time[float, T] | None,
+    /,
+) -> Time[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Velocity[float, S],
+    a_min: Velocity[W, S] | Velocity[W, NoSystem] | None,
+    a_max: Velocity[W, S] | Velocity[W, NoSystem] | None,
+    /,
+) -> Velocity[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Velocity[V, S],
+    a_min: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem]
+    | None,
+    a_max: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem]
+    | None,
+    /,
+) -> Velocity[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Velocity[float, NoSystem],
+    a_min: Velocity[W, T] | None,
+    a_max: Velocity[W, T] | None,
+    /,
+) -> Velocity[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Velocity[V, NoSystem],
+    a_min: Velocity[V, T] | Velocity[float, T] | None,
+    a_max: Velocity[V, T] | Velocity[float, T] | None,
+    /,
+) -> Velocity[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Energy[float, S],
+    a_min: Energy[W, S] | Energy[W, NoSystem] | None,
+    a_max: Energy[W, S] | Energy[W, NoSystem] | None,
+    /,
+) -> Energy[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Energy[V, S],
+    a_min: Energy[V, S]
+    | Energy[V, NoSystem]
+    | Energy[float, S]
+    | Energy[float, NoSystem]
+    | None,
+    a_max: Energy[V, S]
+    | Energy[V, NoSystem]
+    | Energy[float, S]
+    | Energy[float, NoSystem]
+    | None,
+    /,
+) -> Energy[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Energy[float, NoSystem],
+    a_min: Energy[W, T] | None,
+    a_max: Energy[W, T] | None,
+    /,
+) -> Energy[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Energy[V, NoSystem],
+    a_min: Energy[V, T] | Energy[float, T] | None,
+    a_max: Energy[V, T] | Energy[float, T] | None,
+    /,
+) -> Energy[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: EnergyPerAtom[float, S],
+    a_min: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem] | None,
+    a_max: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem] | None,
+    /,
+) -> EnergyPerAtom[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: EnergyPerAtom[V, S],
+    a_min: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem]
+    | None,
+    a_max: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem]
+    | None,
+    /,
+) -> EnergyPerAtom[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: EnergyPerAtom[float, NoSystem],
+    a_min: EnergyPerAtom[W, T] | None,
+    a_max: EnergyPerAtom[W, T] | None,
+    /,
+) -> EnergyPerAtom[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: EnergyPerAtom[V, NoSystem],
+    a_min: EnergyPerAtom[V, T] | EnergyPerAtom[float, T] | None,
+    a_max: EnergyPerAtom[V, T] | EnergyPerAtom[float, T] | None,
+    /,
+) -> EnergyPerAtom[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Force[float, S],
+    a_min: Force[W, S] | Force[W, NoSystem] | None,
+    a_max: Force[W, S] | Force[W, NoSystem] | None,
+    /,
+) -> Force[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Force[V, S],
+    a_min: Force[V, S]
+    | Force[V, NoSystem]
+    | Force[float, S]
+    | Force[float, NoSystem]
+    | None,
+    a_max: Force[V, S]
+    | Force[V, NoSystem]
+    | Force[float, S]
+    | Force[float, NoSystem]
+    | None,
+    /,
+) -> Force[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Force[float, NoSystem], a_min: Force[W, T] | None, a_max: Force[W, T] | None, /
+) -> Force[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Force[V, NoSystem],
+    a_min: Force[V, T] | Force[float, T] | None,
+    a_max: Force[V, T] | Force[float, T] | None,
+    /,
+) -> Force[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: ForceConstant[float, S],
+    a_min: ForceConstant[W, S] | ForceConstant[W, NoSystem] | None,
+    a_max: ForceConstant[W, S] | ForceConstant[W, NoSystem] | None,
+    /,
+) -> ForceConstant[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: ForceConstant[V, S],
+    a_min: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem]
+    | None,
+    a_max: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem]
+    | None,
+    /,
+) -> ForceConstant[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: ForceConstant[float, NoSystem],
+    a_min: ForceConstant[W, T] | None,
+    a_max: ForceConstant[W, T] | None,
+    /,
+) -> ForceConstant[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: ForceConstant[V, NoSystem],
+    a_min: ForceConstant[V, T] | ForceConstant[float, T] | None,
+    a_max: ForceConstant[V, T] | ForceConstant[float, T] | None,
+    /,
+) -> ForceConstant[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Pressure[float, S],
+    a_min: Pressure[W, S] | Pressure[W, NoSystem] | None,
+    a_max: Pressure[W, S] | Pressure[W, NoSystem] | None,
+    /,
+) -> Pressure[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Pressure[V, S],
+    a_min: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem]
+    | None,
+    a_max: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem]
+    | None,
+    /,
+) -> Pressure[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Pressure[float, NoSystem],
+    a_min: Pressure[W, T] | None,
+    a_max: Pressure[W, T] | None,
+    /,
+) -> Pressure[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Pressure[V, NoSystem],
+    a_min: Pressure[V, T] | Pressure[float, T] | None,
+    a_max: Pressure[V, T] | Pressure[float, T] | None,
+    /,
+) -> Pressure[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: EnergyDensity[float, S],
+    a_min: EnergyDensity[W, S] | EnergyDensity[W, NoSystem] | None,
+    a_max: EnergyDensity[W, S] | EnergyDensity[W, NoSystem] | None,
+    /,
+) -> EnergyDensity[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: EnergyDensity[V, S],
+    a_min: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem]
+    | None,
+    a_max: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem]
+    | None,
+    /,
+) -> EnergyDensity[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: EnergyDensity[float, NoSystem],
+    a_min: EnergyDensity[W, T] | None,
+    a_max: EnergyDensity[W, T] | None,
+    /,
+) -> EnergyDensity[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: EnergyDensity[V, NoSystem],
+    a_min: EnergyDensity[V, T] | EnergyDensity[float, T] | None,
+    a_max: EnergyDensity[V, T] | EnergyDensity[float, T] | None,
+    /,
+) -> EnergyDensity[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: EnergyPerVolume[float, S],
+    a_min: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem] | None,
+    a_max: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem] | None,
+    /,
+) -> EnergyPerVolume[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: EnergyPerVolume[V, S],
+    a_min: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem]
+    | None,
+    a_max: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem]
+    | None,
+    /,
+) -> EnergyPerVolume[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: EnergyPerVolume[float, NoSystem],
+    a_min: EnergyPerVolume[W, T] | None,
+    a_max: EnergyPerVolume[W, T] | None,
+    /,
+) -> EnergyPerVolume[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: EnergyPerVolume[V, NoSystem],
+    a_min: EnergyPerVolume[V, T] | EnergyPerVolume[float, T] | None,
+    a_max: EnergyPerVolume[V, T] | EnergyPerVolume[float, T] | None,
+    /,
+) -> EnergyPerVolume[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Temperature[float, S],
+    a_min: Temperature[W, S] | Temperature[W, NoSystem] | None,
+    a_max: Temperature[W, S] | Temperature[W, NoSystem] | None,
+    /,
+) -> Temperature[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Temperature[V, S],
+    a_min: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem]
+    | None,
+    a_max: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem]
+    | None,
+    /,
+) -> Temperature[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Temperature[float, NoSystem],
+    a_min: Temperature[W, T] | None,
+    a_max: Temperature[W, T] | None,
+    /,
+) -> Temperature[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Temperature[V, NoSystem],
+    a_min: Temperature[V, T] | Temperature[float, T] | None,
+    a_max: Temperature[V, T] | Temperature[float, T] | None,
+    /,
+) -> Temperature[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: TemperatureDifference[float, S],
+    a_min: TemperatureDifference[W, S] | TemperatureDifference[W, NoSystem] | None,
+    a_max: TemperatureDifference[W, S] | TemperatureDifference[W, NoSystem] | None,
+    /,
+) -> TemperatureDifference[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: TemperatureDifference[V, S],
+    a_min: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem]
+    | None,
+    a_max: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem]
+    | None,
+    /,
+) -> TemperatureDifference[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: TemperatureDifference[float, NoSystem],
+    a_min: TemperatureDifference[W, T] | None,
+    a_max: TemperatureDifference[W, T] | None,
+    /,
+) -> TemperatureDifference[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: TemperatureDifference[V, NoSystem],
+    a_min: TemperatureDifference[V, T] | TemperatureDifference[float, T] | None,
+    a_max: TemperatureDifference[V, T] | TemperatureDifference[float, T] | None,
+    /,
+) -> TemperatureDifference[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: TemperatureRate[float, S],
+    a_min: TemperatureRate[W, S] | TemperatureRate[W, NoSystem] | None,
+    a_max: TemperatureRate[W, S] | TemperatureRate[W, NoSystem] | None,
+    /,
+) -> TemperatureRate[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: TemperatureRate[V, S],
+    a_min: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem]
+    | None,
+    a_max: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem]
+    | None,
+    /,
+) -> TemperatureRate[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: TemperatureRate[float, NoSystem],
+    a_min: TemperatureRate[W, T] | None,
+    a_max: TemperatureRate[W, T] | None,
+    /,
+) -> TemperatureRate[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: TemperatureRate[V, NoSystem],
+    a_min: TemperatureRate[V, T] | TemperatureRate[float, T] | None,
+    a_max: TemperatureRate[V, T] | TemperatureRate[float, T] | None,
+    /,
+) -> TemperatureRate[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: MagneticMoment[float, S],
+    a_min: MagneticMoment[W, S] | MagneticMoment[W, NoSystem] | None,
+    a_max: MagneticMoment[W, S] | MagneticMoment[W, NoSystem] | None,
+    /,
+) -> MagneticMoment[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: MagneticMoment[V, S],
+    a_min: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem]
+    | None,
+    a_max: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem]
+    | None,
+    /,
+) -> MagneticMoment[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: MagneticMoment[float, NoSystem],
+    a_min: MagneticMoment[W, T] | None,
+    a_max: MagneticMoment[W, T] | None,
+    /,
+) -> MagneticMoment[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: MagneticMoment[V, NoSystem],
+    a_min: MagneticMoment[V, T] | MagneticMoment[float, T] | None,
+    a_max: MagneticMoment[V, T] | MagneticMoment[float, T] | None,
+    /,
+) -> MagneticMoment[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Magnetization[float, S],
+    a_min: Magnetization[W, S] | Magnetization[W, NoSystem] | None,
+    a_max: Magnetization[W, S] | Magnetization[W, NoSystem] | None,
+    /,
+) -> Magnetization[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Magnetization[V, S],
+    a_min: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem]
+    | None,
+    a_max: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem]
+    | None,
+    /,
+) -> Magnetization[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Magnetization[float, NoSystem],
+    a_min: Magnetization[W, T] | None,
+    a_max: Magnetization[W, T] | None,
+    /,
+) -> Magnetization[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Magnetization[V, NoSystem],
+    a_min: Magnetization[V, T] | Magnetization[float, T] | None,
+    a_max: Magnetization[V, T] | Magnetization[float, T] | None,
+    /,
+) -> Magnetization[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: ParticleDensity[float, S],
+    a_min: ParticleDensity[W, S] | ParticleDensity[W, NoSystem] | None,
+    a_max: ParticleDensity[W, S] | ParticleDensity[W, NoSystem] | None,
+    /,
+) -> ParticleDensity[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: ParticleDensity[V, S],
+    a_min: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem]
+    | None,
+    a_max: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem]
+    | None,
+    /,
+) -> ParticleDensity[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: ParticleDensity[float, NoSystem],
+    a_min: ParticleDensity[W, T] | None,
+    a_max: ParticleDensity[W, T] | None,
+    /,
+) -> ParticleDensity[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: ParticleDensity[V, NoSystem],
+    a_min: ParticleDensity[V, T] | ParticleDensity[float, T] | None,
+    a_max: ParticleDensity[V, T] | ParticleDensity[float, T] | None,
+    /,
+) -> ParticleDensity[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: ElectronDensity[float, S],
+    a_min: ElectronDensity[W, S] | ElectronDensity[W, NoSystem] | None,
+    a_max: ElectronDensity[W, S] | ElectronDensity[W, NoSystem] | None,
+    /,
+) -> ElectronDensity[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: ElectronDensity[V, S],
+    a_min: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem]
+    | None,
+    a_max: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem]
+    | None,
+    /,
+) -> ElectronDensity[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: ElectronDensity[float, NoSystem],
+    a_min: ElectronDensity[W, T] | None,
+    a_max: ElectronDensity[W, T] | None,
+    /,
+) -> ElectronDensity[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: ElectronDensity[V, NoSystem],
+    a_min: ElectronDensity[V, T] | ElectronDensity[float, T] | None,
+    a_max: ElectronDensity[V, T] | ElectronDensity[float, T] | None,
+    /,
+) -> ElectronDensity[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Angle[float, S],
+    a_min: Angle[W, S] | Angle[W, NoSystem] | None,
+    a_max: Angle[W, S] | Angle[W, NoSystem] | None,
+    /,
+) -> Angle[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Angle[V, S],
+    a_min: Angle[V, S]
+    | Angle[V, NoSystem]
+    | Angle[float, S]
+    | Angle[float, NoSystem]
+    | None,
+    a_max: Angle[V, S]
+    | Angle[V, NoSystem]
+    | Angle[float, S]
+    | Angle[float, NoSystem]
+    | None,
+    /,
+) -> Angle[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Angle[float, NoSystem], a_min: Angle[W, T] | None, a_max: Angle[W, T] | None, /
+) -> Angle[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Angle[V, NoSystem],
+    a_min: Angle[V, T] | Angle[float, T] | None,
+    a_max: Angle[V, T] | Angle[float, T] | None,
+    /,
+) -> Angle[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Frequency[float, S],
+    a_min: Frequency[W, S] | Frequency[W, NoSystem] | None,
+    a_max: Frequency[W, S] | Frequency[W, NoSystem] | None,
+    /,
+) -> Frequency[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Frequency[V, S],
+    a_min: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem]
+    | None,
+    a_max: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem]
+    | None,
+    /,
+) -> Frequency[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Frequency[float, NoSystem],
+    a_min: Frequency[W, T] | None,
+    a_max: Frequency[W, T] | None,
+    /,
+) -> Frequency[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Frequency[V, NoSystem],
+    a_min: Frequency[V, T] | Frequency[float, T] | None,
+    a_max: Frequency[V, T] | Frequency[float, T] | None,
+    /,
+) -> Frequency[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: InverseTime[float, S],
+    a_min: InverseTime[W, S] | InverseTime[W, NoSystem] | None,
+    a_max: InverseTime[W, S] | InverseTime[W, NoSystem] | None,
+    /,
+) -> InverseTime[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: InverseTime[V, S],
+    a_min: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem]
+    | None,
+    a_max: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem]
+    | None,
+    /,
+) -> InverseTime[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: InverseTime[float, NoSystem],
+    a_min: InverseTime[W, T] | None,
+    a_max: InverseTime[W, T] | None,
+    /,
+) -> InverseTime[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: InverseTime[V, NoSystem],
+    a_min: InverseTime[V, T] | InverseTime[float, T] | None,
+    a_max: InverseTime[V, T] | InverseTime[float, T] | None,
+    /,
+) -> InverseTime[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: AtomCount[float, S],
+    a_min: AtomCount[W, S] | AtomCount[W, NoSystem] | None,
+    a_max: AtomCount[W, S] | AtomCount[W, NoSystem] | None,
+    /,
+) -> AtomCount[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: AtomCount[V, S],
+    a_min: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem]
+    | None,
+    a_max: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem]
+    | None,
+    /,
+) -> AtomCount[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: AtomCount[float, NoSystem],
+    a_min: AtomCount[W, T] | None,
+    a_max: AtomCount[W, T] | None,
+    /,
+) -> AtomCount[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: AtomCount[V, NoSystem],
+    a_min: AtomCount[V, T] | AtomCount[float, T] | None,
+    a_max: AtomCount[V, T] | AtomCount[float, T] | None,
+    /,
+) -> AtomCount[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: ElectronCount[float, S],
+    a_min: ElectronCount[W, S] | ElectronCount[W, NoSystem] | None,
+    a_max: ElectronCount[W, S] | ElectronCount[W, NoSystem] | None,
+    /,
+) -> ElectronCount[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: ElectronCount[V, S],
+    a_min: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem]
+    | None,
+    a_max: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem]
+    | None,
+    /,
+) -> ElectronCount[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: ElectronCount[float, NoSystem],
+    a_min: ElectronCount[W, T] | None,
+    a_max: ElectronCount[W, T] | None,
+    /,
+) -> ElectronCount[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: ElectronCount[V, NoSystem],
+    a_min: ElectronCount[V, T] | ElectronCount[float, T] | None,
+    a_max: ElectronCount[V, T] | ElectronCount[float, T] | None,
+    /,
+) -> ElectronCount[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Mass[float, S],
+    a_min: Mass[W, S] | Mass[W, NoSystem] | None,
+    a_max: Mass[W, S] | Mass[W, NoSystem] | None,
+    /,
+) -> Mass[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Mass[V, S],
+    a_min: Mass[V, S]
+    | Mass[V, NoSystem]
+    | Mass[float, S]
+    | Mass[float, NoSystem]
+    | None,
+    a_max: Mass[V, S]
+    | Mass[V, NoSystem]
+    | Mass[float, S]
+    | Mass[float, NoSystem]
+    | None,
+    /,
+) -> Mass[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Mass[float, NoSystem], a_min: Mass[W, T] | None, a_max: Mass[W, T] | None, /
+) -> Mass[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Mass[V, NoSystem],
+    a_min: Mass[V, T] | Mass[float, T] | None,
+    a_max: Mass[V, T] | Mass[float, T] | None,
+    /,
+) -> Mass[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: MassDensity[float, S],
+    a_min: MassDensity[W, S] | MassDensity[W, NoSystem] | None,
+    a_max: MassDensity[W, S] | MassDensity[W, NoSystem] | None,
+    /,
+) -> MassDensity[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: MassDensity[V, S],
+    a_min: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem]
+    | None,
+    a_max: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem]
+    | None,
+    /,
+) -> MassDensity[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: MassDensity[float, NoSystem],
+    a_min: MassDensity[W, T] | None,
+    a_max: MassDensity[W, T] | None,
+    /,
+) -> MassDensity[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: MassDensity[V, NoSystem],
+    a_min: MassDensity[V, T] | MassDensity[float, T] | None,
+    a_max: MassDensity[V, T] | MassDensity[float, T] | None,
+    /,
+) -> MassDensity[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Momentum[float, S],
+    a_min: Momentum[W, S] | Momentum[W, NoSystem] | None,
+    a_max: Momentum[W, S] | Momentum[W, NoSystem] | None,
+    /,
+) -> Momentum[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Momentum[V, S],
+    a_min: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem]
+    | None,
+    a_max: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem]
+    | None,
+    /,
+) -> Momentum[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Momentum[float, NoSystem],
+    a_min: Momentum[W, T] | None,
+    a_max: Momentum[W, T] | None,
+    /,
+) -> Momentum[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Momentum[V, NoSystem],
+    a_min: Momentum[V, T] | Momentum[float, T] | None,
+    a_max: Momentum[V, T] | Momentum[float, T] | None,
+    /,
+) -> Momentum[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Acceleration[float, S],
+    a_min: Acceleration[W, S] | Acceleration[W, NoSystem] | None,
+    a_max: Acceleration[W, S] | Acceleration[W, NoSystem] | None,
+    /,
+) -> Acceleration[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Acceleration[V, S],
+    a_min: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem]
+    | None,
+    a_max: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem]
+    | None,
+    /,
+) -> Acceleration[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Acceleration[float, NoSystem],
+    a_min: Acceleration[W, T] | None,
+    a_max: Acceleration[W, T] | None,
+    /,
+) -> Acceleration[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Acceleration[V, NoSystem],
+    a_min: Acceleration[V, T] | Acceleration[float, T] | None,
+    a_max: Acceleration[V, T] | Acceleration[float, T] | None,
+    /,
+) -> Acceleration[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Charge[float, S],
+    a_min: Charge[W, S] | Charge[W, NoSystem] | None,
+    a_max: Charge[W, S] | Charge[W, NoSystem] | None,
+    /,
+) -> Charge[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Charge[V, S],
+    a_min: Charge[V, S]
+    | Charge[V, NoSystem]
+    | Charge[float, S]
+    | Charge[float, NoSystem]
+    | None,
+    a_max: Charge[V, S]
+    | Charge[V, NoSystem]
+    | Charge[float, S]
+    | Charge[float, NoSystem]
+    | None,
+    /,
+) -> Charge[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Charge[float, NoSystem],
+    a_min: Charge[W, T] | None,
+    a_max: Charge[W, T] | None,
+    /,
+) -> Charge[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Charge[V, NoSystem],
+    a_min: Charge[V, T] | Charge[float, T] | None,
+    a_max: Charge[V, T] | Charge[float, T] | None,
+    /,
+) -> Charge[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: ElectricPotential[float, S],
+    a_min: ElectricPotential[W, S] | ElectricPotential[W, NoSystem] | None,
+    a_max: ElectricPotential[W, S] | ElectricPotential[W, NoSystem] | None,
+    /,
+) -> ElectricPotential[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: ElectricPotential[V, S],
+    a_min: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem]
+    | None,
+    a_max: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem]
+    | None,
+    /,
+) -> ElectricPotential[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: ElectricPotential[float, NoSystem],
+    a_min: ElectricPotential[W, T] | None,
+    a_max: ElectricPotential[W, T] | None,
+    /,
+) -> ElectricPotential[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: ElectricPotential[V, NoSystem],
+    a_min: ElectricPotential[V, T] | ElectricPotential[float, T] | None,
+    a_max: ElectricPotential[V, T] | ElectricPotential[float, T] | None,
+    /,
+) -> ElectricPotential[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: ElectricField[float, S],
+    a_min: ElectricField[W, S] | ElectricField[W, NoSystem] | None,
+    a_max: ElectricField[W, S] | ElectricField[W, NoSystem] | None,
+    /,
+) -> ElectricField[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: ElectricField[V, S],
+    a_min: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem]
+    | None,
+    a_max: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem]
+    | None,
+    /,
+) -> ElectricField[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: ElectricField[float, NoSystem],
+    a_min: ElectricField[W, T] | None,
+    a_max: ElectricField[W, T] | None,
+    /,
+) -> ElectricField[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: ElectricField[V, NoSystem],
+    a_min: ElectricField[V, T] | ElectricField[float, T] | None,
+    a_max: ElectricField[V, T] | ElectricField[float, T] | None,
+    /,
+) -> ElectricField[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: DipoleMoment[float, S],
+    a_min: DipoleMoment[W, S] | DipoleMoment[W, NoSystem] | None,
+    a_max: DipoleMoment[W, S] | DipoleMoment[W, NoSystem] | None,
+    /,
+) -> DipoleMoment[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: DipoleMoment[V, S],
+    a_min: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem]
+    | None,
+    a_max: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem]
+    | None,
+    /,
+) -> DipoleMoment[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: DipoleMoment[float, NoSystem],
+    a_min: DipoleMoment[W, T] | None,
+    a_max: DipoleMoment[W, T] | None,
+    /,
+) -> DipoleMoment[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: DipoleMoment[V, NoSystem],
+    a_min: DipoleMoment[V, T] | DipoleMoment[float, T] | None,
+    a_max: DipoleMoment[V, T] | DipoleMoment[float, T] | None,
+    /,
+) -> DipoleMoment[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Entropy[float, S],
+    a_min: Entropy[W, S] | Entropy[W, NoSystem] | None,
+    a_max: Entropy[W, S] | Entropy[W, NoSystem] | None,
+    /,
+) -> Entropy[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Entropy[V, S],
+    a_min: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem]
+    | None,
+    a_max: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem]
+    | None,
+    /,
+) -> Entropy[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Entropy[float, NoSystem],
+    a_min: Entropy[W, T] | None,
+    a_max: Entropy[W, T] | None,
+    /,
+) -> Entropy[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Entropy[V, NoSystem],
+    a_min: Entropy[V, T] | Entropy[float, T] | None,
+    a_max: Entropy[V, T] | Entropy[float, T] | None,
+    /,
+) -> Entropy[V, T]: ...
+@overload
+def clip[W, S: AnySystem](
+    x: Action[float, S],
+    a_min: Action[W, S] | Action[W, NoSystem] | None,
+    a_max: Action[W, S] | Action[W, NoSystem] | None,
+    /,
+) -> Action[W, S]: ...
+@overload
+def clip[V, S: AnySystem](
+    x: Action[V, S],
+    a_min: Action[V, S]
+    | Action[V, NoSystem]
+    | Action[float, S]
+    | Action[float, NoSystem]
+    | None,
+    a_max: Action[V, S]
+    | Action[V, NoSystem]
+    | Action[float, S]
+    | Action[float, NoSystem]
+    | None,
+    /,
+) -> Action[V, S]: ...
+@overload
+def clip[W, T: UnitSystem](
+    x: Action[float, NoSystem],
+    a_min: Action[W, T] | None,
+    a_max: Action[W, T] | None,
+    /,
+) -> Action[W, T]: ...
+@overload
+def clip[V, T: UnitSystem](
+    x: Action[V, NoSystem],
+    a_min: Action[V, T] | Action[float, T] | None,
+    a_max: Action[V, T] | Action[float, T] | None,
+    /,
+) -> Action[V, T]: ...
+@overload
+def clip[Q: _StructuralQuantity[Any, Any, Any, Any]](
     x: Q, a_min: Q | None, a_max: Q | None, /
 ) -> Q: ...
 @overload
 def clip[A: _Numerical](x: A, a_min: Any, a_max: Any, /) -> A: ...
 @overload
-def where[Q: _BaseQuantity[Any, Any, Any]](condition: Any, x: Q, y: Q, /) -> Q: ...
+def where[W, S: AnySystem](
+    condition: Any,
+    x: Dimensionless[float, S],
+    y: Dimensionless[W, S] | Dimensionless[W, NoSystem],
+    /,
+) -> Dimensionless[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Dimensionless[V, S],
+    y: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem],
+    /,
+) -> Dimensionless[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Dimensionless[float, NoSystem], y: Dimensionless[W, T], /
+) -> Dimensionless[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: Dimensionless[V, NoSystem],
+    y: Dimensionless[V, T] | Dimensionless[float, T],
+    /,
+) -> Dimensionless[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Length[float, S], y: Length[W, S] | Length[W, NoSystem], /
+) -> Length[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Length[V, S],
+    y: Length[V, S] | Length[V, NoSystem] | Length[float, S] | Length[float, NoSystem],
+    /,
+) -> Length[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Length[float, NoSystem], y: Length[W, T], /
+) -> Length[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Length[V, NoSystem], y: Length[V, T] | Length[float, T], /
+) -> Length[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Area[float, S], y: Area[W, S] | Area[W, NoSystem], /
+) -> Area[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Area[V, S],
+    y: Area[V, S] | Area[V, NoSystem] | Area[float, S] | Area[float, NoSystem],
+    /,
+) -> Area[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Area[float, NoSystem], y: Area[W, T], /
+) -> Area[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Area[V, NoSystem], y: Area[V, T] | Area[float, T], /
+) -> Area[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Volume[float, S], y: Volume[W, S] | Volume[W, NoSystem], /
+) -> Volume[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Volume[V, S],
+    y: Volume[V, S] | Volume[V, NoSystem] | Volume[float, S] | Volume[float, NoSystem],
+    /,
+) -> Volume[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Volume[float, NoSystem], y: Volume[W, T], /
+) -> Volume[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Volume[V, NoSystem], y: Volume[V, T] | Volume[float, T], /
+) -> Volume[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Time[float, S], y: Time[W, S] | Time[W, NoSystem], /
+) -> Time[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Time[V, S],
+    y: Time[V, S] | Time[V, NoSystem] | Time[float, S] | Time[float, NoSystem],
+    /,
+) -> Time[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Time[float, NoSystem], y: Time[W, T], /
+) -> Time[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Time[V, NoSystem], y: Time[V, T] | Time[float, T], /
+) -> Time[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Velocity[float, S], y: Velocity[W, S] | Velocity[W, NoSystem], /
+) -> Velocity[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Velocity[V, S],
+    y: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem],
+    /,
+) -> Velocity[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Velocity[float, NoSystem], y: Velocity[W, T], /
+) -> Velocity[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Velocity[V, NoSystem], y: Velocity[V, T] | Velocity[float, T], /
+) -> Velocity[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Energy[float, S], y: Energy[W, S] | Energy[W, NoSystem], /
+) -> Energy[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Energy[V, S],
+    y: Energy[V, S] | Energy[V, NoSystem] | Energy[float, S] | Energy[float, NoSystem],
+    /,
+) -> Energy[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Energy[float, NoSystem], y: Energy[W, T], /
+) -> Energy[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Energy[V, NoSystem], y: Energy[V, T] | Energy[float, T], /
+) -> Energy[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: EnergyPerAtom[float, S],
+    y: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem],
+    /,
+) -> EnergyPerAtom[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: EnergyPerAtom[V, S],
+    y: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem],
+    /,
+) -> EnergyPerAtom[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: EnergyPerAtom[float, NoSystem], y: EnergyPerAtom[W, T], /
+) -> EnergyPerAtom[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: EnergyPerAtom[V, NoSystem],
+    y: EnergyPerAtom[V, T] | EnergyPerAtom[float, T],
+    /,
+) -> EnergyPerAtom[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Force[float, S], y: Force[W, S] | Force[W, NoSystem], /
+) -> Force[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Force[V, S],
+    y: Force[V, S] | Force[V, NoSystem] | Force[float, S] | Force[float, NoSystem],
+    /,
+) -> Force[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Force[float, NoSystem], y: Force[W, T], /
+) -> Force[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Force[V, NoSystem], y: Force[V, T] | Force[float, T], /
+) -> Force[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: ForceConstant[float, S],
+    y: ForceConstant[W, S] | ForceConstant[W, NoSystem],
+    /,
+) -> ForceConstant[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: ForceConstant[V, S],
+    y: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem],
+    /,
+) -> ForceConstant[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: ForceConstant[float, NoSystem], y: ForceConstant[W, T], /
+) -> ForceConstant[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: ForceConstant[V, NoSystem],
+    y: ForceConstant[V, T] | ForceConstant[float, T],
+    /,
+) -> ForceConstant[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Pressure[float, S], y: Pressure[W, S] | Pressure[W, NoSystem], /
+) -> Pressure[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Pressure[V, S],
+    y: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem],
+    /,
+) -> Pressure[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Pressure[float, NoSystem], y: Pressure[W, T], /
+) -> Pressure[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Pressure[V, NoSystem], y: Pressure[V, T] | Pressure[float, T], /
+) -> Pressure[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: EnergyDensity[float, S],
+    y: EnergyDensity[W, S] | EnergyDensity[W, NoSystem],
+    /,
+) -> EnergyDensity[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: EnergyDensity[V, S],
+    y: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem],
+    /,
+) -> EnergyDensity[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: EnergyDensity[float, NoSystem], y: EnergyDensity[W, T], /
+) -> EnergyDensity[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: EnergyDensity[V, NoSystem],
+    y: EnergyDensity[V, T] | EnergyDensity[float, T],
+    /,
+) -> EnergyDensity[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: EnergyPerVolume[float, S],
+    y: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem],
+    /,
+) -> EnergyPerVolume[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: EnergyPerVolume[V, S],
+    y: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem],
+    /,
+) -> EnergyPerVolume[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: EnergyPerVolume[float, NoSystem], y: EnergyPerVolume[W, T], /
+) -> EnergyPerVolume[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: EnergyPerVolume[V, NoSystem],
+    y: EnergyPerVolume[V, T] | EnergyPerVolume[float, T],
+    /,
+) -> EnergyPerVolume[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: Temperature[float, S],
+    y: Temperature[W, S] | Temperature[W, NoSystem],
+    /,
+) -> Temperature[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Temperature[V, S],
+    y: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem],
+    /,
+) -> Temperature[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Temperature[float, NoSystem], y: Temperature[W, T], /
+) -> Temperature[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: Temperature[V, NoSystem],
+    y: Temperature[V, T] | Temperature[float, T],
+    /,
+) -> Temperature[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: TemperatureDifference[float, S],
+    y: TemperatureDifference[W, S] | TemperatureDifference[W, NoSystem],
+    /,
+) -> TemperatureDifference[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: TemperatureDifference[V, S],
+    y: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem],
+    /,
+) -> TemperatureDifference[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any,
+    x: TemperatureDifference[float, NoSystem],
+    y: TemperatureDifference[W, T],
+    /,
+) -> TemperatureDifference[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: TemperatureDifference[V, NoSystem],
+    y: TemperatureDifference[V, T] | TemperatureDifference[float, T],
+    /,
+) -> TemperatureDifference[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: TemperatureRate[float, S],
+    y: TemperatureRate[W, S] | TemperatureRate[W, NoSystem],
+    /,
+) -> TemperatureRate[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: TemperatureRate[V, S],
+    y: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem],
+    /,
+) -> TemperatureRate[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: TemperatureRate[float, NoSystem], y: TemperatureRate[W, T], /
+) -> TemperatureRate[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: TemperatureRate[V, NoSystem],
+    y: TemperatureRate[V, T] | TemperatureRate[float, T],
+    /,
+) -> TemperatureRate[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: MagneticMoment[float, S],
+    y: MagneticMoment[W, S] | MagneticMoment[W, NoSystem],
+    /,
+) -> MagneticMoment[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: MagneticMoment[V, S],
+    y: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem],
+    /,
+) -> MagneticMoment[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: MagneticMoment[float, NoSystem], y: MagneticMoment[W, T], /
+) -> MagneticMoment[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: MagneticMoment[V, NoSystem],
+    y: MagneticMoment[V, T] | MagneticMoment[float, T],
+    /,
+) -> MagneticMoment[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: Magnetization[float, S],
+    y: Magnetization[W, S] | Magnetization[W, NoSystem],
+    /,
+) -> Magnetization[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Magnetization[V, S],
+    y: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem],
+    /,
+) -> Magnetization[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Magnetization[float, NoSystem], y: Magnetization[W, T], /
+) -> Magnetization[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: Magnetization[V, NoSystem],
+    y: Magnetization[V, T] | Magnetization[float, T],
+    /,
+) -> Magnetization[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: ParticleDensity[float, S],
+    y: ParticleDensity[W, S] | ParticleDensity[W, NoSystem],
+    /,
+) -> ParticleDensity[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: ParticleDensity[V, S],
+    y: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem],
+    /,
+) -> ParticleDensity[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: ParticleDensity[float, NoSystem], y: ParticleDensity[W, T], /
+) -> ParticleDensity[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: ParticleDensity[V, NoSystem],
+    y: ParticleDensity[V, T] | ParticleDensity[float, T],
+    /,
+) -> ParticleDensity[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: ElectronDensity[float, S],
+    y: ElectronDensity[W, S] | ElectronDensity[W, NoSystem],
+    /,
+) -> ElectronDensity[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: ElectronDensity[V, S],
+    y: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem],
+    /,
+) -> ElectronDensity[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: ElectronDensity[float, NoSystem], y: ElectronDensity[W, T], /
+) -> ElectronDensity[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: ElectronDensity[V, NoSystem],
+    y: ElectronDensity[V, T] | ElectronDensity[float, T],
+    /,
+) -> ElectronDensity[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Angle[float, S], y: Angle[W, S] | Angle[W, NoSystem], /
+) -> Angle[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Angle[V, S],
+    y: Angle[V, S] | Angle[V, NoSystem] | Angle[float, S] | Angle[float, NoSystem],
+    /,
+) -> Angle[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Angle[float, NoSystem], y: Angle[W, T], /
+) -> Angle[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Angle[V, NoSystem], y: Angle[V, T] | Angle[float, T], /
+) -> Angle[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: Frequency[float, S],
+    y: Frequency[W, S] | Frequency[W, NoSystem],
+    /,
+) -> Frequency[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Frequency[V, S],
+    y: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem],
+    /,
+) -> Frequency[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Frequency[float, NoSystem], y: Frequency[W, T], /
+) -> Frequency[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: Frequency[V, NoSystem],
+    y: Frequency[V, T] | Frequency[float, T],
+    /,
+) -> Frequency[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: InverseTime[float, S],
+    y: InverseTime[W, S] | InverseTime[W, NoSystem],
+    /,
+) -> InverseTime[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: InverseTime[V, S],
+    y: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem],
+    /,
+) -> InverseTime[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: InverseTime[float, NoSystem], y: InverseTime[W, T], /
+) -> InverseTime[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: InverseTime[V, NoSystem],
+    y: InverseTime[V, T] | InverseTime[float, T],
+    /,
+) -> InverseTime[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: AtomCount[float, S],
+    y: AtomCount[W, S] | AtomCount[W, NoSystem],
+    /,
+) -> AtomCount[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: AtomCount[V, S],
+    y: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem],
+    /,
+) -> AtomCount[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: AtomCount[float, NoSystem], y: AtomCount[W, T], /
+) -> AtomCount[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: AtomCount[V, NoSystem],
+    y: AtomCount[V, T] | AtomCount[float, T],
+    /,
+) -> AtomCount[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: ElectronCount[float, S],
+    y: ElectronCount[W, S] | ElectronCount[W, NoSystem],
+    /,
+) -> ElectronCount[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: ElectronCount[V, S],
+    y: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem],
+    /,
+) -> ElectronCount[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: ElectronCount[float, NoSystem], y: ElectronCount[W, T], /
+) -> ElectronCount[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: ElectronCount[V, NoSystem],
+    y: ElectronCount[V, T] | ElectronCount[float, T],
+    /,
+) -> ElectronCount[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Mass[float, S], y: Mass[W, S] | Mass[W, NoSystem], /
+) -> Mass[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Mass[V, S],
+    y: Mass[V, S] | Mass[V, NoSystem] | Mass[float, S] | Mass[float, NoSystem],
+    /,
+) -> Mass[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Mass[float, NoSystem], y: Mass[W, T], /
+) -> Mass[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Mass[V, NoSystem], y: Mass[V, T] | Mass[float, T], /
+) -> Mass[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: MassDensity[float, S],
+    y: MassDensity[W, S] | MassDensity[W, NoSystem],
+    /,
+) -> MassDensity[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: MassDensity[V, S],
+    y: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem],
+    /,
+) -> MassDensity[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: MassDensity[float, NoSystem], y: MassDensity[W, T], /
+) -> MassDensity[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: MassDensity[V, NoSystem],
+    y: MassDensity[V, T] | MassDensity[float, T],
+    /,
+) -> MassDensity[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Momentum[float, S], y: Momentum[W, S] | Momentum[W, NoSystem], /
+) -> Momentum[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Momentum[V, S],
+    y: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem],
+    /,
+) -> Momentum[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Momentum[float, NoSystem], y: Momentum[W, T], /
+) -> Momentum[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Momentum[V, NoSystem], y: Momentum[V, T] | Momentum[float, T], /
+) -> Momentum[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: Acceleration[float, S],
+    y: Acceleration[W, S] | Acceleration[W, NoSystem],
+    /,
+) -> Acceleration[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Acceleration[V, S],
+    y: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem],
+    /,
+) -> Acceleration[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Acceleration[float, NoSystem], y: Acceleration[W, T], /
+) -> Acceleration[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: Acceleration[V, NoSystem],
+    y: Acceleration[V, T] | Acceleration[float, T],
+    /,
+) -> Acceleration[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Charge[float, S], y: Charge[W, S] | Charge[W, NoSystem], /
+) -> Charge[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Charge[V, S],
+    y: Charge[V, S] | Charge[V, NoSystem] | Charge[float, S] | Charge[float, NoSystem],
+    /,
+) -> Charge[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Charge[float, NoSystem], y: Charge[W, T], /
+) -> Charge[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Charge[V, NoSystem], y: Charge[V, T] | Charge[float, T], /
+) -> Charge[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: ElectricPotential[float, S],
+    y: ElectricPotential[W, S] | ElectricPotential[W, NoSystem],
+    /,
+) -> ElectricPotential[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: ElectricPotential[V, S],
+    y: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem],
+    /,
+) -> ElectricPotential[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: ElectricPotential[float, NoSystem], y: ElectricPotential[W, T], /
+) -> ElectricPotential[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: ElectricPotential[V, NoSystem],
+    y: ElectricPotential[V, T] | ElectricPotential[float, T],
+    /,
+) -> ElectricPotential[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: ElectricField[float, S],
+    y: ElectricField[W, S] | ElectricField[W, NoSystem],
+    /,
+) -> ElectricField[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: ElectricField[V, S],
+    y: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem],
+    /,
+) -> ElectricField[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: ElectricField[float, NoSystem], y: ElectricField[W, T], /
+) -> ElectricField[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: ElectricField[V, NoSystem],
+    y: ElectricField[V, T] | ElectricField[float, T],
+    /,
+) -> ElectricField[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any,
+    x: DipoleMoment[float, S],
+    y: DipoleMoment[W, S] | DipoleMoment[W, NoSystem],
+    /,
+) -> DipoleMoment[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: DipoleMoment[V, S],
+    y: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem],
+    /,
+) -> DipoleMoment[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: DipoleMoment[float, NoSystem], y: DipoleMoment[W, T], /
+) -> DipoleMoment[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any,
+    x: DipoleMoment[V, NoSystem],
+    y: DipoleMoment[V, T] | DipoleMoment[float, T],
+    /,
+) -> DipoleMoment[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Entropy[float, S], y: Entropy[W, S] | Entropy[W, NoSystem], /
+) -> Entropy[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Entropy[V, S],
+    y: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem],
+    /,
+) -> Entropy[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Entropy[float, NoSystem], y: Entropy[W, T], /
+) -> Entropy[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Entropy[V, NoSystem], y: Entropy[V, T] | Entropy[float, T], /
+) -> Entropy[V, T]: ...
+@overload
+def where[W, S: AnySystem](
+    condition: Any, x: Action[float, S], y: Action[W, S] | Action[W, NoSystem], /
+) -> Action[W, S]: ...
+@overload
+def where[V, S: AnySystem](
+    condition: Any,
+    x: Action[V, S],
+    y: Action[V, S] | Action[V, NoSystem] | Action[float, S] | Action[float, NoSystem],
+    /,
+) -> Action[V, S]: ...
+@overload
+def where[W, T: UnitSystem](
+    condition: Any, x: Action[float, NoSystem], y: Action[W, T], /
+) -> Action[W, T]: ...
+@overload
+def where[V, T: UnitSystem](
+    condition: Any, x: Action[V, NoSystem], y: Action[V, T] | Action[float, T], /
+) -> Action[V, T]: ...
+@overload
+def where[Q: _StructuralQuantity[Any, Any, Any, Any]](
+    condition: Any, x: Q, y: Q, /
+) -> Q: ...
 @overload
 def where[A: _Numerical](condition: Any, x: A, y: A, /) -> A: ...
 def isnan(x: Any, /) -> Any: ...
 def isfinite(x: Any, /) -> Any: ...
 def isinf(x: Any, /) -> Any: ...
 @overload
-def isclose[Q: _BaseQuantity[Any, Any, Any]](
+def isclose[W, S: AnySystem](
+    a: Dimensionless[float, S],
+    b: Dimensionless[W, S] | Dimensionless[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Dimensionless[W, S] | Dimensionless[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Dimensionless[V, S],
+    b: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Dimensionless[float, NoSystem],
+    b: Dimensionless[W, T],
+    *,
+    rtol: float = ...,
+    atol: Dimensionless[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Dimensionless[V, NoSystem],
+    b: Dimensionless[V, T] | Dimensionless[float, T],
+    *,
+    rtol: float = ...,
+    atol: Dimensionless[V, T] | Dimensionless[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Length[float, S],
+    b: Length[W, S] | Length[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Length[W, S] | Length[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Length[V, S],
+    b: Length[V, S] | Length[V, NoSystem] | Length[float, S] | Length[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Length[V, S]
+    | Length[V, NoSystem]
+    | Length[float, S]
+    | Length[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Length[float, NoSystem],
+    b: Length[W, T],
+    *,
+    rtol: float = ...,
+    atol: Length[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Length[V, NoSystem],
+    b: Length[V, T] | Length[float, T],
+    *,
+    rtol: float = ...,
+    atol: Length[V, T] | Length[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Area[float, S],
+    b: Area[W, S] | Area[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Area[W, S] | Area[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Area[V, S],
+    b: Area[V, S] | Area[V, NoSystem] | Area[float, S] | Area[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Area[V, S]
+    | Area[V, NoSystem]
+    | Area[float, S]
+    | Area[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Area[float, NoSystem],
+    b: Area[W, T],
+    *,
+    rtol: float = ...,
+    atol: Area[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Area[V, NoSystem],
+    b: Area[V, T] | Area[float, T],
+    *,
+    rtol: float = ...,
+    atol: Area[V, T] | Area[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Volume[float, S],
+    b: Volume[W, S] | Volume[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Volume[W, S] | Volume[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Volume[V, S],
+    b: Volume[V, S] | Volume[V, NoSystem] | Volume[float, S] | Volume[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Volume[V, S]
+    | Volume[V, NoSystem]
+    | Volume[float, S]
+    | Volume[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Volume[float, NoSystem],
+    b: Volume[W, T],
+    *,
+    rtol: float = ...,
+    atol: Volume[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Volume[V, NoSystem],
+    b: Volume[V, T] | Volume[float, T],
+    *,
+    rtol: float = ...,
+    atol: Volume[V, T] | Volume[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Time[float, S],
+    b: Time[W, S] | Time[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Time[W, S] | Time[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Time[V, S],
+    b: Time[V, S] | Time[V, NoSystem] | Time[float, S] | Time[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Time[V, S]
+    | Time[V, NoSystem]
+    | Time[float, S]
+    | Time[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Time[float, NoSystem],
+    b: Time[W, T],
+    *,
+    rtol: float = ...,
+    atol: Time[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Time[V, NoSystem],
+    b: Time[V, T] | Time[float, T],
+    *,
+    rtol: float = ...,
+    atol: Time[V, T] | Time[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Velocity[float, S],
+    b: Velocity[W, S] | Velocity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Velocity[W, S] | Velocity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Velocity[V, S],
+    b: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Velocity[float, NoSystem],
+    b: Velocity[W, T],
+    *,
+    rtol: float = ...,
+    atol: Velocity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Velocity[V, NoSystem],
+    b: Velocity[V, T] | Velocity[float, T],
+    *,
+    rtol: float = ...,
+    atol: Velocity[V, T] | Velocity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Energy[float, S],
+    b: Energy[W, S] | Energy[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Energy[W, S] | Energy[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Energy[V, S],
+    b: Energy[V, S] | Energy[V, NoSystem] | Energy[float, S] | Energy[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Energy[V, S]
+    | Energy[V, NoSystem]
+    | Energy[float, S]
+    | Energy[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Energy[float, NoSystem],
+    b: Energy[W, T],
+    *,
+    rtol: float = ...,
+    atol: Energy[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Energy[V, NoSystem],
+    b: Energy[V, T] | Energy[float, T],
+    *,
+    rtol: float = ...,
+    atol: Energy[V, T] | Energy[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: EnergyPerAtom[float, S],
+    b: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: EnergyPerAtom[V, S],
+    b: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: EnergyPerAtom[float, NoSystem],
+    b: EnergyPerAtom[W, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerAtom[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: EnergyPerAtom[V, NoSystem],
+    b: EnergyPerAtom[V, T] | EnergyPerAtom[float, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerAtom[V, T] | EnergyPerAtom[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Force[float, S],
+    b: Force[W, S] | Force[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Force[W, S] | Force[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Force[V, S],
+    b: Force[V, S] | Force[V, NoSystem] | Force[float, S] | Force[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Force[V, S]
+    | Force[V, NoSystem]
+    | Force[float, S]
+    | Force[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Force[float, NoSystem],
+    b: Force[W, T],
+    *,
+    rtol: float = ...,
+    atol: Force[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Force[V, NoSystem],
+    b: Force[V, T] | Force[float, T],
+    *,
+    rtol: float = ...,
+    atol: Force[V, T] | Force[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: ForceConstant[float, S],
+    b: ForceConstant[W, S] | ForceConstant[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ForceConstant[W, S] | ForceConstant[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: ForceConstant[V, S],
+    b: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: ForceConstant[float, NoSystem],
+    b: ForceConstant[W, T],
+    *,
+    rtol: float = ...,
+    atol: ForceConstant[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: ForceConstant[V, NoSystem],
+    b: ForceConstant[V, T] | ForceConstant[float, T],
+    *,
+    rtol: float = ...,
+    atol: ForceConstant[V, T] | ForceConstant[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Pressure[float, S],
+    b: Pressure[W, S] | Pressure[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Pressure[W, S] | Pressure[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Pressure[V, S],
+    b: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Pressure[float, NoSystem],
+    b: Pressure[W, T],
+    *,
+    rtol: float = ...,
+    atol: Pressure[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Pressure[V, NoSystem],
+    b: Pressure[V, T] | Pressure[float, T],
+    *,
+    rtol: float = ...,
+    atol: Pressure[V, T] | Pressure[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: EnergyDensity[float, S],
+    b: EnergyDensity[W, S] | EnergyDensity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyDensity[W, S] | EnergyDensity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: EnergyDensity[V, S],
+    b: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: EnergyDensity[float, NoSystem],
+    b: EnergyDensity[W, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyDensity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: EnergyDensity[V, NoSystem],
+    b: EnergyDensity[V, T] | EnergyDensity[float, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyDensity[V, T] | EnergyDensity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: EnergyPerVolume[float, S],
+    b: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: EnergyPerVolume[V, S],
+    b: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: EnergyPerVolume[float, NoSystem],
+    b: EnergyPerVolume[W, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerVolume[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: EnergyPerVolume[V, NoSystem],
+    b: EnergyPerVolume[V, T] | EnergyPerVolume[float, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerVolume[V, T] | EnergyPerVolume[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Temperature[float, S],
+    b: Temperature[W, S] | Temperature[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Temperature[W, S] | Temperature[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Temperature[V, S],
+    b: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Temperature[float, NoSystem],
+    b: Temperature[W, T],
+    *,
+    rtol: float = ...,
+    atol: Temperature[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Temperature[V, NoSystem],
+    b: Temperature[V, T] | Temperature[float, T],
+    *,
+    rtol: float = ...,
+    atol: Temperature[V, T] | Temperature[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: TemperatureDifference[float, S],
+    b: TemperatureDifference[W, S] | TemperatureDifference[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: TemperatureDifference[W, S]
+    | TemperatureDifference[W, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: TemperatureDifference[V, S],
+    b: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: TemperatureDifference[float, NoSystem],
+    b: TemperatureDifference[W, T],
+    *,
+    rtol: float = ...,
+    atol: TemperatureDifference[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: TemperatureDifference[V, NoSystem],
+    b: TemperatureDifference[V, T] | TemperatureDifference[float, T],
+    *,
+    rtol: float = ...,
+    atol: TemperatureDifference[V, T]
+    | TemperatureDifference[float, T]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: TemperatureRate[float, S],
+    b: TemperatureRate[W, S] | TemperatureRate[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: TemperatureRate[W, S] | TemperatureRate[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: TemperatureRate[V, S],
+    b: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: TemperatureRate[float, NoSystem],
+    b: TemperatureRate[W, T],
+    *,
+    rtol: float = ...,
+    atol: TemperatureRate[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: TemperatureRate[V, NoSystem],
+    b: TemperatureRate[V, T] | TemperatureRate[float, T],
+    *,
+    rtol: float = ...,
+    atol: TemperatureRate[V, T] | TemperatureRate[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: MagneticMoment[float, S],
+    b: MagneticMoment[W, S] | MagneticMoment[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: MagneticMoment[W, S] | MagneticMoment[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: MagneticMoment[V, S],
+    b: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: MagneticMoment[float, NoSystem],
+    b: MagneticMoment[W, T],
+    *,
+    rtol: float = ...,
+    atol: MagneticMoment[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: MagneticMoment[V, NoSystem],
+    b: MagneticMoment[V, T] | MagneticMoment[float, T],
+    *,
+    rtol: float = ...,
+    atol: MagneticMoment[V, T] | MagneticMoment[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Magnetization[float, S],
+    b: Magnetization[W, S] | Magnetization[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Magnetization[W, S] | Magnetization[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Magnetization[V, S],
+    b: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Magnetization[float, NoSystem],
+    b: Magnetization[W, T],
+    *,
+    rtol: float = ...,
+    atol: Magnetization[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Magnetization[V, NoSystem],
+    b: Magnetization[V, T] | Magnetization[float, T],
+    *,
+    rtol: float = ...,
+    atol: Magnetization[V, T] | Magnetization[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: ParticleDensity[float, S],
+    b: ParticleDensity[W, S] | ParticleDensity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ParticleDensity[W, S] | ParticleDensity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: ParticleDensity[V, S],
+    b: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: ParticleDensity[float, NoSystem],
+    b: ParticleDensity[W, T],
+    *,
+    rtol: float = ...,
+    atol: ParticleDensity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: ParticleDensity[V, NoSystem],
+    b: ParticleDensity[V, T] | ParticleDensity[float, T],
+    *,
+    rtol: float = ...,
+    atol: ParticleDensity[V, T] | ParticleDensity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: ElectronDensity[float, S],
+    b: ElectronDensity[W, S] | ElectronDensity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectronDensity[W, S] | ElectronDensity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: ElectronDensity[V, S],
+    b: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: ElectronDensity[float, NoSystem],
+    b: ElectronDensity[W, T],
+    *,
+    rtol: float = ...,
+    atol: ElectronDensity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: ElectronDensity[V, NoSystem],
+    b: ElectronDensity[V, T] | ElectronDensity[float, T],
+    *,
+    rtol: float = ...,
+    atol: ElectronDensity[V, T] | ElectronDensity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Angle[float, S],
+    b: Angle[W, S] | Angle[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Angle[W, S] | Angle[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Angle[V, S],
+    b: Angle[V, S] | Angle[V, NoSystem] | Angle[float, S] | Angle[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Angle[V, S]
+    | Angle[V, NoSystem]
+    | Angle[float, S]
+    | Angle[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Angle[float, NoSystem],
+    b: Angle[W, T],
+    *,
+    rtol: float = ...,
+    atol: Angle[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Angle[V, NoSystem],
+    b: Angle[V, T] | Angle[float, T],
+    *,
+    rtol: float = ...,
+    atol: Angle[V, T] | Angle[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Frequency[float, S],
+    b: Frequency[W, S] | Frequency[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Frequency[W, S] | Frequency[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Frequency[V, S],
+    b: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Frequency[float, NoSystem],
+    b: Frequency[W, T],
+    *,
+    rtol: float = ...,
+    atol: Frequency[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Frequency[V, NoSystem],
+    b: Frequency[V, T] | Frequency[float, T],
+    *,
+    rtol: float = ...,
+    atol: Frequency[V, T] | Frequency[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: InverseTime[float, S],
+    b: InverseTime[W, S] | InverseTime[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: InverseTime[W, S] | InverseTime[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: InverseTime[V, S],
+    b: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: InverseTime[float, NoSystem],
+    b: InverseTime[W, T],
+    *,
+    rtol: float = ...,
+    atol: InverseTime[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: InverseTime[V, NoSystem],
+    b: InverseTime[V, T] | InverseTime[float, T],
+    *,
+    rtol: float = ...,
+    atol: InverseTime[V, T] | InverseTime[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: AtomCount[float, S],
+    b: AtomCount[W, S] | AtomCount[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: AtomCount[W, S] | AtomCount[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: AtomCount[V, S],
+    b: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: AtomCount[float, NoSystem],
+    b: AtomCount[W, T],
+    *,
+    rtol: float = ...,
+    atol: AtomCount[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: AtomCount[V, NoSystem],
+    b: AtomCount[V, T] | AtomCount[float, T],
+    *,
+    rtol: float = ...,
+    atol: AtomCount[V, T] | AtomCount[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: ElectronCount[float, S],
+    b: ElectronCount[W, S] | ElectronCount[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectronCount[W, S] | ElectronCount[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: ElectronCount[V, S],
+    b: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: ElectronCount[float, NoSystem],
+    b: ElectronCount[W, T],
+    *,
+    rtol: float = ...,
+    atol: ElectronCount[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: ElectronCount[V, NoSystem],
+    b: ElectronCount[V, T] | ElectronCount[float, T],
+    *,
+    rtol: float = ...,
+    atol: ElectronCount[V, T] | ElectronCount[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Mass[float, S],
+    b: Mass[W, S] | Mass[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Mass[W, S] | Mass[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Mass[V, S],
+    b: Mass[V, S] | Mass[V, NoSystem] | Mass[float, S] | Mass[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Mass[V, S]
+    | Mass[V, NoSystem]
+    | Mass[float, S]
+    | Mass[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Mass[float, NoSystem],
+    b: Mass[W, T],
+    *,
+    rtol: float = ...,
+    atol: Mass[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Mass[V, NoSystem],
+    b: Mass[V, T] | Mass[float, T],
+    *,
+    rtol: float = ...,
+    atol: Mass[V, T] | Mass[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: MassDensity[float, S],
+    b: MassDensity[W, S] | MassDensity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: MassDensity[W, S] | MassDensity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: MassDensity[V, S],
+    b: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: MassDensity[float, NoSystem],
+    b: MassDensity[W, T],
+    *,
+    rtol: float = ...,
+    atol: MassDensity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: MassDensity[V, NoSystem],
+    b: MassDensity[V, T] | MassDensity[float, T],
+    *,
+    rtol: float = ...,
+    atol: MassDensity[V, T] | MassDensity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Momentum[float, S],
+    b: Momentum[W, S] | Momentum[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Momentum[W, S] | Momentum[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Momentum[V, S],
+    b: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Momentum[float, NoSystem],
+    b: Momentum[W, T],
+    *,
+    rtol: float = ...,
+    atol: Momentum[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Momentum[V, NoSystem],
+    b: Momentum[V, T] | Momentum[float, T],
+    *,
+    rtol: float = ...,
+    atol: Momentum[V, T] | Momentum[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Acceleration[float, S],
+    b: Acceleration[W, S] | Acceleration[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Acceleration[W, S] | Acceleration[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Acceleration[V, S],
+    b: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Acceleration[float, NoSystem],
+    b: Acceleration[W, T],
+    *,
+    rtol: float = ...,
+    atol: Acceleration[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Acceleration[V, NoSystem],
+    b: Acceleration[V, T] | Acceleration[float, T],
+    *,
+    rtol: float = ...,
+    atol: Acceleration[V, T] | Acceleration[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Charge[float, S],
+    b: Charge[W, S] | Charge[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Charge[W, S] | Charge[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Charge[V, S],
+    b: Charge[V, S] | Charge[V, NoSystem] | Charge[float, S] | Charge[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Charge[V, S]
+    | Charge[V, NoSystem]
+    | Charge[float, S]
+    | Charge[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Charge[float, NoSystem],
+    b: Charge[W, T],
+    *,
+    rtol: float = ...,
+    atol: Charge[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Charge[V, NoSystem],
+    b: Charge[V, T] | Charge[float, T],
+    *,
+    rtol: float = ...,
+    atol: Charge[V, T] | Charge[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: ElectricPotential[float, S],
+    b: ElectricPotential[W, S] | ElectricPotential[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectricPotential[W, S] | ElectricPotential[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: ElectricPotential[V, S],
+    b: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: ElectricPotential[float, NoSystem],
+    b: ElectricPotential[W, T],
+    *,
+    rtol: float = ...,
+    atol: ElectricPotential[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: ElectricPotential[V, NoSystem],
+    b: ElectricPotential[V, T] | ElectricPotential[float, T],
+    *,
+    rtol: float = ...,
+    atol: ElectricPotential[V, T] | ElectricPotential[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: ElectricField[float, S],
+    b: ElectricField[W, S] | ElectricField[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectricField[W, S] | ElectricField[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: ElectricField[V, S],
+    b: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: ElectricField[float, NoSystem],
+    b: ElectricField[W, T],
+    *,
+    rtol: float = ...,
+    atol: ElectricField[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: ElectricField[V, NoSystem],
+    b: ElectricField[V, T] | ElectricField[float, T],
+    *,
+    rtol: float = ...,
+    atol: ElectricField[V, T] | ElectricField[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: DipoleMoment[float, S],
+    b: DipoleMoment[W, S] | DipoleMoment[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: DipoleMoment[W, S] | DipoleMoment[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: DipoleMoment[V, S],
+    b: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: DipoleMoment[float, NoSystem],
+    b: DipoleMoment[W, T],
+    *,
+    rtol: float = ...,
+    atol: DipoleMoment[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: DipoleMoment[V, NoSystem],
+    b: DipoleMoment[V, T] | DipoleMoment[float, T],
+    *,
+    rtol: float = ...,
+    atol: DipoleMoment[V, T] | DipoleMoment[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Entropy[float, S],
+    b: Entropy[W, S] | Entropy[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Entropy[W, S] | Entropy[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Entropy[V, S],
+    b: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Entropy[float, NoSystem],
+    b: Entropy[W, T],
+    *,
+    rtol: float = ...,
+    atol: Entropy[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Entropy[V, NoSystem],
+    b: Entropy[V, T] | Entropy[float, T],
+    *,
+    rtol: float = ...,
+    atol: Entropy[V, T] | Entropy[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, S: AnySystem](
+    a: Action[float, S],
+    b: Action[W, S] | Action[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Action[W, S] | Action[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, S: AnySystem](
+    a: Action[V, S],
+    b: Action[V, S] | Action[V, NoSystem] | Action[float, S] | Action[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Action[V, S]
+    | Action[V, NoSystem]
+    | Action[float, S]
+    | Action[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[W, T: UnitSystem](
+    a: Action[float, NoSystem],
+    b: Action[W, T],
+    *,
+    rtol: float = ...,
+    atol: Action[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[V, T: UnitSystem](
+    a: Action[V, NoSystem],
+    b: Action[V, T] | Action[float, T],
+    *,
+    rtol: float = ...,
+    atol: Action[V, T] | Action[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> Any: ...
+@overload
+def isclose[Q: _StructuralQuantity[Any, Any, Any, Any]](
     a: Q, b: Q, *, rtol: float = ..., atol: Q | Literal[0] = ..., equal_nan: bool = ...
 ) -> Any: ...
 @overload
@@ -528,7 +6330,1486 @@ def isclose[A: _Numerical](
     a: A, b: A, *, rtol: float = ..., atol: float = ..., equal_nan: bool = ...
 ) -> Any: ...
 @overload
-def allclose[Q: _BaseQuantity[Any, Any, Any]](
+def allclose[W, S: AnySystem](
+    a: Dimensionless[float, S],
+    b: Dimensionless[W, S] | Dimensionless[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Dimensionless[W, S] | Dimensionless[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Dimensionless[V, S],
+    b: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Dimensionless[V, S]
+    | Dimensionless[V, NoSystem]
+    | Dimensionless[float, S]
+    | Dimensionless[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Dimensionless[float, NoSystem],
+    b: Dimensionless[W, T],
+    *,
+    rtol: float = ...,
+    atol: Dimensionless[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Dimensionless[V, NoSystem],
+    b: Dimensionless[V, T] | Dimensionless[float, T],
+    *,
+    rtol: float = ...,
+    atol: Dimensionless[V, T] | Dimensionless[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Length[float, S],
+    b: Length[W, S] | Length[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Length[W, S] | Length[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Length[V, S],
+    b: Length[V, S] | Length[V, NoSystem] | Length[float, S] | Length[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Length[V, S]
+    | Length[V, NoSystem]
+    | Length[float, S]
+    | Length[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Length[float, NoSystem],
+    b: Length[W, T],
+    *,
+    rtol: float = ...,
+    atol: Length[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Length[V, NoSystem],
+    b: Length[V, T] | Length[float, T],
+    *,
+    rtol: float = ...,
+    atol: Length[V, T] | Length[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Area[float, S],
+    b: Area[W, S] | Area[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Area[W, S] | Area[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Area[V, S],
+    b: Area[V, S] | Area[V, NoSystem] | Area[float, S] | Area[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Area[V, S]
+    | Area[V, NoSystem]
+    | Area[float, S]
+    | Area[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Area[float, NoSystem],
+    b: Area[W, T],
+    *,
+    rtol: float = ...,
+    atol: Area[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Area[V, NoSystem],
+    b: Area[V, T] | Area[float, T],
+    *,
+    rtol: float = ...,
+    atol: Area[V, T] | Area[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Volume[float, S],
+    b: Volume[W, S] | Volume[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Volume[W, S] | Volume[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Volume[V, S],
+    b: Volume[V, S] | Volume[V, NoSystem] | Volume[float, S] | Volume[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Volume[V, S]
+    | Volume[V, NoSystem]
+    | Volume[float, S]
+    | Volume[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Volume[float, NoSystem],
+    b: Volume[W, T],
+    *,
+    rtol: float = ...,
+    atol: Volume[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Volume[V, NoSystem],
+    b: Volume[V, T] | Volume[float, T],
+    *,
+    rtol: float = ...,
+    atol: Volume[V, T] | Volume[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Time[float, S],
+    b: Time[W, S] | Time[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Time[W, S] | Time[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Time[V, S],
+    b: Time[V, S] | Time[V, NoSystem] | Time[float, S] | Time[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Time[V, S]
+    | Time[V, NoSystem]
+    | Time[float, S]
+    | Time[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Time[float, NoSystem],
+    b: Time[W, T],
+    *,
+    rtol: float = ...,
+    atol: Time[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Time[V, NoSystem],
+    b: Time[V, T] | Time[float, T],
+    *,
+    rtol: float = ...,
+    atol: Time[V, T] | Time[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Velocity[float, S],
+    b: Velocity[W, S] | Velocity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Velocity[W, S] | Velocity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Velocity[V, S],
+    b: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Velocity[V, S]
+    | Velocity[V, NoSystem]
+    | Velocity[float, S]
+    | Velocity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Velocity[float, NoSystem],
+    b: Velocity[W, T],
+    *,
+    rtol: float = ...,
+    atol: Velocity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Velocity[V, NoSystem],
+    b: Velocity[V, T] | Velocity[float, T],
+    *,
+    rtol: float = ...,
+    atol: Velocity[V, T] | Velocity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Energy[float, S],
+    b: Energy[W, S] | Energy[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Energy[W, S] | Energy[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Energy[V, S],
+    b: Energy[V, S] | Energy[V, NoSystem] | Energy[float, S] | Energy[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Energy[V, S]
+    | Energy[V, NoSystem]
+    | Energy[float, S]
+    | Energy[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Energy[float, NoSystem],
+    b: Energy[W, T],
+    *,
+    rtol: float = ...,
+    atol: Energy[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Energy[V, NoSystem],
+    b: Energy[V, T] | Energy[float, T],
+    *,
+    rtol: float = ...,
+    atol: Energy[V, T] | Energy[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: EnergyPerAtom[float, S],
+    b: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerAtom[W, S] | EnergyPerAtom[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: EnergyPerAtom[V, S],
+    b: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerAtom[V, S]
+    | EnergyPerAtom[V, NoSystem]
+    | EnergyPerAtom[float, S]
+    | EnergyPerAtom[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: EnergyPerAtom[float, NoSystem],
+    b: EnergyPerAtom[W, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerAtom[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: EnergyPerAtom[V, NoSystem],
+    b: EnergyPerAtom[V, T] | EnergyPerAtom[float, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerAtom[V, T] | EnergyPerAtom[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Force[float, S],
+    b: Force[W, S] | Force[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Force[W, S] | Force[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Force[V, S],
+    b: Force[V, S] | Force[V, NoSystem] | Force[float, S] | Force[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Force[V, S]
+    | Force[V, NoSystem]
+    | Force[float, S]
+    | Force[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Force[float, NoSystem],
+    b: Force[W, T],
+    *,
+    rtol: float = ...,
+    atol: Force[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Force[V, NoSystem],
+    b: Force[V, T] | Force[float, T],
+    *,
+    rtol: float = ...,
+    atol: Force[V, T] | Force[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: ForceConstant[float, S],
+    b: ForceConstant[W, S] | ForceConstant[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ForceConstant[W, S] | ForceConstant[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: ForceConstant[V, S],
+    b: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ForceConstant[V, S]
+    | ForceConstant[V, NoSystem]
+    | ForceConstant[float, S]
+    | ForceConstant[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: ForceConstant[float, NoSystem],
+    b: ForceConstant[W, T],
+    *,
+    rtol: float = ...,
+    atol: ForceConstant[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: ForceConstant[V, NoSystem],
+    b: ForceConstant[V, T] | ForceConstant[float, T],
+    *,
+    rtol: float = ...,
+    atol: ForceConstant[V, T] | ForceConstant[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Pressure[float, S],
+    b: Pressure[W, S] | Pressure[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Pressure[W, S] | Pressure[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Pressure[V, S],
+    b: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Pressure[V, S]
+    | Pressure[V, NoSystem]
+    | Pressure[float, S]
+    | Pressure[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Pressure[float, NoSystem],
+    b: Pressure[W, T],
+    *,
+    rtol: float = ...,
+    atol: Pressure[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Pressure[V, NoSystem],
+    b: Pressure[V, T] | Pressure[float, T],
+    *,
+    rtol: float = ...,
+    atol: Pressure[V, T] | Pressure[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: EnergyDensity[float, S],
+    b: EnergyDensity[W, S] | EnergyDensity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyDensity[W, S] | EnergyDensity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: EnergyDensity[V, S],
+    b: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyDensity[V, S]
+    | EnergyDensity[V, NoSystem]
+    | EnergyDensity[float, S]
+    | EnergyDensity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: EnergyDensity[float, NoSystem],
+    b: EnergyDensity[W, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyDensity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: EnergyDensity[V, NoSystem],
+    b: EnergyDensity[V, T] | EnergyDensity[float, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyDensity[V, T] | EnergyDensity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: EnergyPerVolume[float, S],
+    b: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerVolume[W, S] | EnergyPerVolume[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: EnergyPerVolume[V, S],
+    b: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerVolume[V, S]
+    | EnergyPerVolume[V, NoSystem]
+    | EnergyPerVolume[float, S]
+    | EnergyPerVolume[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: EnergyPerVolume[float, NoSystem],
+    b: EnergyPerVolume[W, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerVolume[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: EnergyPerVolume[V, NoSystem],
+    b: EnergyPerVolume[V, T] | EnergyPerVolume[float, T],
+    *,
+    rtol: float = ...,
+    atol: EnergyPerVolume[V, T] | EnergyPerVolume[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Temperature[float, S],
+    b: Temperature[W, S] | Temperature[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Temperature[W, S] | Temperature[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Temperature[V, S],
+    b: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Temperature[V, S]
+    | Temperature[V, NoSystem]
+    | Temperature[float, S]
+    | Temperature[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Temperature[float, NoSystem],
+    b: Temperature[W, T],
+    *,
+    rtol: float = ...,
+    atol: Temperature[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Temperature[V, NoSystem],
+    b: Temperature[V, T] | Temperature[float, T],
+    *,
+    rtol: float = ...,
+    atol: Temperature[V, T] | Temperature[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: TemperatureDifference[float, S],
+    b: TemperatureDifference[W, S] | TemperatureDifference[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: TemperatureDifference[W, S]
+    | TemperatureDifference[W, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: TemperatureDifference[V, S],
+    b: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: TemperatureDifference[V, S]
+    | TemperatureDifference[V, NoSystem]
+    | TemperatureDifference[float, S]
+    | TemperatureDifference[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: TemperatureDifference[float, NoSystem],
+    b: TemperatureDifference[W, T],
+    *,
+    rtol: float = ...,
+    atol: TemperatureDifference[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: TemperatureDifference[V, NoSystem],
+    b: TemperatureDifference[V, T] | TemperatureDifference[float, T],
+    *,
+    rtol: float = ...,
+    atol: TemperatureDifference[V, T]
+    | TemperatureDifference[float, T]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: TemperatureRate[float, S],
+    b: TemperatureRate[W, S] | TemperatureRate[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: TemperatureRate[W, S] | TemperatureRate[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: TemperatureRate[V, S],
+    b: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: TemperatureRate[V, S]
+    | TemperatureRate[V, NoSystem]
+    | TemperatureRate[float, S]
+    | TemperatureRate[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: TemperatureRate[float, NoSystem],
+    b: TemperatureRate[W, T],
+    *,
+    rtol: float = ...,
+    atol: TemperatureRate[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: TemperatureRate[V, NoSystem],
+    b: TemperatureRate[V, T] | TemperatureRate[float, T],
+    *,
+    rtol: float = ...,
+    atol: TemperatureRate[V, T] | TemperatureRate[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: MagneticMoment[float, S],
+    b: MagneticMoment[W, S] | MagneticMoment[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: MagneticMoment[W, S] | MagneticMoment[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: MagneticMoment[V, S],
+    b: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: MagneticMoment[V, S]
+    | MagneticMoment[V, NoSystem]
+    | MagneticMoment[float, S]
+    | MagneticMoment[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: MagneticMoment[float, NoSystem],
+    b: MagneticMoment[W, T],
+    *,
+    rtol: float = ...,
+    atol: MagneticMoment[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: MagneticMoment[V, NoSystem],
+    b: MagneticMoment[V, T] | MagneticMoment[float, T],
+    *,
+    rtol: float = ...,
+    atol: MagneticMoment[V, T] | MagneticMoment[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Magnetization[float, S],
+    b: Magnetization[W, S] | Magnetization[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Magnetization[W, S] | Magnetization[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Magnetization[V, S],
+    b: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Magnetization[V, S]
+    | Magnetization[V, NoSystem]
+    | Magnetization[float, S]
+    | Magnetization[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Magnetization[float, NoSystem],
+    b: Magnetization[W, T],
+    *,
+    rtol: float = ...,
+    atol: Magnetization[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Magnetization[V, NoSystem],
+    b: Magnetization[V, T] | Magnetization[float, T],
+    *,
+    rtol: float = ...,
+    atol: Magnetization[V, T] | Magnetization[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: ParticleDensity[float, S],
+    b: ParticleDensity[W, S] | ParticleDensity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ParticleDensity[W, S] | ParticleDensity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: ParticleDensity[V, S],
+    b: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ParticleDensity[V, S]
+    | ParticleDensity[V, NoSystem]
+    | ParticleDensity[float, S]
+    | ParticleDensity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: ParticleDensity[float, NoSystem],
+    b: ParticleDensity[W, T],
+    *,
+    rtol: float = ...,
+    atol: ParticleDensity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: ParticleDensity[V, NoSystem],
+    b: ParticleDensity[V, T] | ParticleDensity[float, T],
+    *,
+    rtol: float = ...,
+    atol: ParticleDensity[V, T] | ParticleDensity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: ElectronDensity[float, S],
+    b: ElectronDensity[W, S] | ElectronDensity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectronDensity[W, S] | ElectronDensity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: ElectronDensity[V, S],
+    b: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectronDensity[V, S]
+    | ElectronDensity[V, NoSystem]
+    | ElectronDensity[float, S]
+    | ElectronDensity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: ElectronDensity[float, NoSystem],
+    b: ElectronDensity[W, T],
+    *,
+    rtol: float = ...,
+    atol: ElectronDensity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: ElectronDensity[V, NoSystem],
+    b: ElectronDensity[V, T] | ElectronDensity[float, T],
+    *,
+    rtol: float = ...,
+    atol: ElectronDensity[V, T] | ElectronDensity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Angle[float, S],
+    b: Angle[W, S] | Angle[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Angle[W, S] | Angle[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Angle[V, S],
+    b: Angle[V, S] | Angle[V, NoSystem] | Angle[float, S] | Angle[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Angle[V, S]
+    | Angle[V, NoSystem]
+    | Angle[float, S]
+    | Angle[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Angle[float, NoSystem],
+    b: Angle[W, T],
+    *,
+    rtol: float = ...,
+    atol: Angle[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Angle[V, NoSystem],
+    b: Angle[V, T] | Angle[float, T],
+    *,
+    rtol: float = ...,
+    atol: Angle[V, T] | Angle[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Frequency[float, S],
+    b: Frequency[W, S] | Frequency[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Frequency[W, S] | Frequency[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Frequency[V, S],
+    b: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Frequency[V, S]
+    | Frequency[V, NoSystem]
+    | Frequency[float, S]
+    | Frequency[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Frequency[float, NoSystem],
+    b: Frequency[W, T],
+    *,
+    rtol: float = ...,
+    atol: Frequency[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Frequency[V, NoSystem],
+    b: Frequency[V, T] | Frequency[float, T],
+    *,
+    rtol: float = ...,
+    atol: Frequency[V, T] | Frequency[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: InverseTime[float, S],
+    b: InverseTime[W, S] | InverseTime[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: InverseTime[W, S] | InverseTime[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: InverseTime[V, S],
+    b: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: InverseTime[V, S]
+    | InverseTime[V, NoSystem]
+    | InverseTime[float, S]
+    | InverseTime[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: InverseTime[float, NoSystem],
+    b: InverseTime[W, T],
+    *,
+    rtol: float = ...,
+    atol: InverseTime[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: InverseTime[V, NoSystem],
+    b: InverseTime[V, T] | InverseTime[float, T],
+    *,
+    rtol: float = ...,
+    atol: InverseTime[V, T] | InverseTime[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: AtomCount[float, S],
+    b: AtomCount[W, S] | AtomCount[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: AtomCount[W, S] | AtomCount[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: AtomCount[V, S],
+    b: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: AtomCount[V, S]
+    | AtomCount[V, NoSystem]
+    | AtomCount[float, S]
+    | AtomCount[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: AtomCount[float, NoSystem],
+    b: AtomCount[W, T],
+    *,
+    rtol: float = ...,
+    atol: AtomCount[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: AtomCount[V, NoSystem],
+    b: AtomCount[V, T] | AtomCount[float, T],
+    *,
+    rtol: float = ...,
+    atol: AtomCount[V, T] | AtomCount[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: ElectronCount[float, S],
+    b: ElectronCount[W, S] | ElectronCount[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectronCount[W, S] | ElectronCount[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: ElectronCount[V, S],
+    b: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectronCount[V, S]
+    | ElectronCount[V, NoSystem]
+    | ElectronCount[float, S]
+    | ElectronCount[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: ElectronCount[float, NoSystem],
+    b: ElectronCount[W, T],
+    *,
+    rtol: float = ...,
+    atol: ElectronCount[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: ElectronCount[V, NoSystem],
+    b: ElectronCount[V, T] | ElectronCount[float, T],
+    *,
+    rtol: float = ...,
+    atol: ElectronCount[V, T] | ElectronCount[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Mass[float, S],
+    b: Mass[W, S] | Mass[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Mass[W, S] | Mass[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Mass[V, S],
+    b: Mass[V, S] | Mass[V, NoSystem] | Mass[float, S] | Mass[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Mass[V, S]
+    | Mass[V, NoSystem]
+    | Mass[float, S]
+    | Mass[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Mass[float, NoSystem],
+    b: Mass[W, T],
+    *,
+    rtol: float = ...,
+    atol: Mass[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Mass[V, NoSystem],
+    b: Mass[V, T] | Mass[float, T],
+    *,
+    rtol: float = ...,
+    atol: Mass[V, T] | Mass[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: MassDensity[float, S],
+    b: MassDensity[W, S] | MassDensity[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: MassDensity[W, S] | MassDensity[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: MassDensity[V, S],
+    b: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: MassDensity[V, S]
+    | MassDensity[V, NoSystem]
+    | MassDensity[float, S]
+    | MassDensity[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: MassDensity[float, NoSystem],
+    b: MassDensity[W, T],
+    *,
+    rtol: float = ...,
+    atol: MassDensity[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: MassDensity[V, NoSystem],
+    b: MassDensity[V, T] | MassDensity[float, T],
+    *,
+    rtol: float = ...,
+    atol: MassDensity[V, T] | MassDensity[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Momentum[float, S],
+    b: Momentum[W, S] | Momentum[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Momentum[W, S] | Momentum[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Momentum[V, S],
+    b: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Momentum[V, S]
+    | Momentum[V, NoSystem]
+    | Momentum[float, S]
+    | Momentum[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Momentum[float, NoSystem],
+    b: Momentum[W, T],
+    *,
+    rtol: float = ...,
+    atol: Momentum[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Momentum[V, NoSystem],
+    b: Momentum[V, T] | Momentum[float, T],
+    *,
+    rtol: float = ...,
+    atol: Momentum[V, T] | Momentum[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Acceleration[float, S],
+    b: Acceleration[W, S] | Acceleration[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Acceleration[W, S] | Acceleration[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Acceleration[V, S],
+    b: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Acceleration[V, S]
+    | Acceleration[V, NoSystem]
+    | Acceleration[float, S]
+    | Acceleration[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Acceleration[float, NoSystem],
+    b: Acceleration[W, T],
+    *,
+    rtol: float = ...,
+    atol: Acceleration[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Acceleration[V, NoSystem],
+    b: Acceleration[V, T] | Acceleration[float, T],
+    *,
+    rtol: float = ...,
+    atol: Acceleration[V, T] | Acceleration[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Charge[float, S],
+    b: Charge[W, S] | Charge[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Charge[W, S] | Charge[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Charge[V, S],
+    b: Charge[V, S] | Charge[V, NoSystem] | Charge[float, S] | Charge[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Charge[V, S]
+    | Charge[V, NoSystem]
+    | Charge[float, S]
+    | Charge[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Charge[float, NoSystem],
+    b: Charge[W, T],
+    *,
+    rtol: float = ...,
+    atol: Charge[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Charge[V, NoSystem],
+    b: Charge[V, T] | Charge[float, T],
+    *,
+    rtol: float = ...,
+    atol: Charge[V, T] | Charge[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: ElectricPotential[float, S],
+    b: ElectricPotential[W, S] | ElectricPotential[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectricPotential[W, S] | ElectricPotential[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: ElectricPotential[V, S],
+    b: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectricPotential[V, S]
+    | ElectricPotential[V, NoSystem]
+    | ElectricPotential[float, S]
+    | ElectricPotential[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: ElectricPotential[float, NoSystem],
+    b: ElectricPotential[W, T],
+    *,
+    rtol: float = ...,
+    atol: ElectricPotential[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: ElectricPotential[V, NoSystem],
+    b: ElectricPotential[V, T] | ElectricPotential[float, T],
+    *,
+    rtol: float = ...,
+    atol: ElectricPotential[V, T] | ElectricPotential[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: ElectricField[float, S],
+    b: ElectricField[W, S] | ElectricField[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectricField[W, S] | ElectricField[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: ElectricField[V, S],
+    b: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: ElectricField[V, S]
+    | ElectricField[V, NoSystem]
+    | ElectricField[float, S]
+    | ElectricField[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: ElectricField[float, NoSystem],
+    b: ElectricField[W, T],
+    *,
+    rtol: float = ...,
+    atol: ElectricField[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: ElectricField[V, NoSystem],
+    b: ElectricField[V, T] | ElectricField[float, T],
+    *,
+    rtol: float = ...,
+    atol: ElectricField[V, T] | ElectricField[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: DipoleMoment[float, S],
+    b: DipoleMoment[W, S] | DipoleMoment[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: DipoleMoment[W, S] | DipoleMoment[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: DipoleMoment[V, S],
+    b: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: DipoleMoment[V, S]
+    | DipoleMoment[V, NoSystem]
+    | DipoleMoment[float, S]
+    | DipoleMoment[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: DipoleMoment[float, NoSystem],
+    b: DipoleMoment[W, T],
+    *,
+    rtol: float = ...,
+    atol: DipoleMoment[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: DipoleMoment[V, NoSystem],
+    b: DipoleMoment[V, T] | DipoleMoment[float, T],
+    *,
+    rtol: float = ...,
+    atol: DipoleMoment[V, T] | DipoleMoment[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Entropy[float, S],
+    b: Entropy[W, S] | Entropy[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Entropy[W, S] | Entropy[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Entropy[V, S],
+    b: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Entropy[V, S]
+    | Entropy[V, NoSystem]
+    | Entropy[float, S]
+    | Entropy[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Entropy[float, NoSystem],
+    b: Entropy[W, T],
+    *,
+    rtol: float = ...,
+    atol: Entropy[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Entropy[V, NoSystem],
+    b: Entropy[V, T] | Entropy[float, T],
+    *,
+    rtol: float = ...,
+    atol: Entropy[V, T] | Entropy[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, S: AnySystem](
+    a: Action[float, S],
+    b: Action[W, S] | Action[W, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Action[W, S] | Action[W, NoSystem] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, S: AnySystem](
+    a: Action[V, S],
+    b: Action[V, S] | Action[V, NoSystem] | Action[float, S] | Action[float, NoSystem],
+    *,
+    rtol: float = ...,
+    atol: Action[V, S]
+    | Action[V, NoSystem]
+    | Action[float, S]
+    | Action[float, NoSystem]
+    | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[W, T: UnitSystem](
+    a: Action[float, NoSystem],
+    b: Action[W, T],
+    *,
+    rtol: float = ...,
+    atol: Action[W, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[V, T: UnitSystem](
+    a: Action[V, NoSystem],
+    b: Action[V, T] | Action[float, T],
+    *,
+    rtol: float = ...,
+    atol: Action[V, T] | Action[float, T] | Literal[0] = ...,
+    equal_nan: bool = ...,
+) -> bool: ...
+@overload
+def allclose[Q: _StructuralQuantity[Any, Any, Any, Any]](
     a: Q, b: Q, *, rtol: float = ..., atol: Q | Literal[0] = ..., equal_nan: bool = ...
 ) -> bool: ...
 @overload
@@ -2599,271 +9880,563 @@ def sign[A: _Numerical](x: A, /) -> A: ...
 @overload
 def linspace[S: AnySystem](
     start: Dimensionless[float, S],
-    stop: Dimensionless[float, S],
+    stop: Dimensionless[float, S] | Dimensionless[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Dimensionless[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Dimensionless[float, NoSystem],
+    stop: Dimensionless[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Dimensionless[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Length[float, S],
-    stop: Length[float, S],
+    stop: Length[float, S] | Length[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Length[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Length[float, NoSystem],
+    stop: Length[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Length[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
-    start: Area[float, S], stop: Area[float, S], num: int = ..., *, endpoint: bool = ...
+    start: Area[float, S],
+    stop: Area[float, S] | Area[float, NoSystem],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
 ) -> Area[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[T: UnitSystem](
+    start: Area[float, NoSystem],
+    stop: Area[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Area[npt.NDArray[np.float64], T]: ...
 @overload
 def linspace[S: AnySystem](
     start: Volume[float, S],
-    stop: Volume[float, S],
+    stop: Volume[float, S] | Volume[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Volume[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Volume[float, NoSystem],
+    stop: Volume[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Volume[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
-    start: Time[float, S], stop: Time[float, S], num: int = ..., *, endpoint: bool = ...
+    start: Time[float, S],
+    stop: Time[float, S] | Time[float, NoSystem],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
 ) -> Time[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[T: UnitSystem](
+    start: Time[float, NoSystem],
+    stop: Time[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Time[npt.NDArray[np.float64], T]: ...
 @overload
 def linspace[S: AnySystem](
     start: Velocity[float, S],
-    stop: Velocity[float, S],
+    stop: Velocity[float, S] | Velocity[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Velocity[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Velocity[float, NoSystem],
+    stop: Velocity[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Velocity[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Energy[float, S],
-    stop: Energy[float, S],
+    stop: Energy[float, S] | Energy[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Energy[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Energy[float, NoSystem],
+    stop: Energy[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Energy[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: EnergyPerAtom[float, S],
-    stop: EnergyPerAtom[float, S],
+    stop: EnergyPerAtom[float, S] | EnergyPerAtom[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> EnergyPerAtom[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: EnergyPerAtom[float, NoSystem],
+    stop: EnergyPerAtom[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> EnergyPerAtom[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Force[float, S],
-    stop: Force[float, S],
+    stop: Force[float, S] | Force[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Force[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Force[float, NoSystem],
+    stop: Force[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Force[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: ForceConstant[float, S],
-    stop: ForceConstant[float, S],
+    stop: ForceConstant[float, S] | ForceConstant[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> ForceConstant[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: ForceConstant[float, NoSystem],
+    stop: ForceConstant[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ForceConstant[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Pressure[float, S],
-    stop: Pressure[float, S],
+    stop: Pressure[float, S] | Pressure[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Pressure[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Pressure[float, NoSystem],
+    stop: Pressure[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Pressure[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: EnergyDensity[float, S],
-    stop: EnergyDensity[float, S],
+    stop: EnergyDensity[float, S] | EnergyDensity[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> EnergyDensity[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: EnergyDensity[float, NoSystem],
+    stop: EnergyDensity[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> EnergyDensity[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: EnergyPerVolume[float, S],
-    stop: EnergyPerVolume[float, S],
+    stop: EnergyPerVolume[float, S] | EnergyPerVolume[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> EnergyPerVolume[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: EnergyPerVolume[float, NoSystem],
+    stop: EnergyPerVolume[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> EnergyPerVolume[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Temperature[float, S],
-    stop: Temperature[float, S],
+    stop: Temperature[float, S] | Temperature[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Temperature[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Temperature[float, NoSystem],
+    stop: Temperature[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Temperature[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: TemperatureDifference[float, S],
-    stop: TemperatureDifference[float, S],
+    stop: TemperatureDifference[float, S] | TemperatureDifference[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> TemperatureDifference[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: TemperatureDifference[float, NoSystem],
+    stop: TemperatureDifference[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> TemperatureDifference[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: TemperatureRate[float, S],
-    stop: TemperatureRate[float, S],
+    stop: TemperatureRate[float, S] | TemperatureRate[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> TemperatureRate[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: TemperatureRate[float, NoSystem],
+    stop: TemperatureRate[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> TemperatureRate[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: MagneticMoment[float, S],
-    stop: MagneticMoment[float, S],
+    stop: MagneticMoment[float, S] | MagneticMoment[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> MagneticMoment[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: MagneticMoment[float, NoSystem],
+    stop: MagneticMoment[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> MagneticMoment[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Magnetization[float, S],
-    stop: Magnetization[float, S],
+    stop: Magnetization[float, S] | Magnetization[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Magnetization[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Magnetization[float, NoSystem],
+    stop: Magnetization[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Magnetization[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: ParticleDensity[float, S],
-    stop: ParticleDensity[float, S],
+    stop: ParticleDensity[float, S] | ParticleDensity[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> ParticleDensity[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: ParticleDensity[float, NoSystem],
+    stop: ParticleDensity[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ParticleDensity[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: ElectronDensity[float, S],
-    stop: ElectronDensity[float, S],
+    stop: ElectronDensity[float, S] | ElectronDensity[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> ElectronDensity[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: ElectronDensity[float, NoSystem],
+    stop: ElectronDensity[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ElectronDensity[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Angle[float, S],
-    stop: Angle[float, S],
+    stop: Angle[float, S] | Angle[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Angle[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Angle[float, NoSystem],
+    stop: Angle[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Angle[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Frequency[float, S],
-    stop: Frequency[float, S],
+    stop: Frequency[float, S] | Frequency[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Frequency[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Frequency[float, NoSystem],
+    stop: Frequency[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Frequency[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: InverseTime[float, S],
-    stop: InverseTime[float, S],
+    stop: InverseTime[float, S] | InverseTime[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> InverseTime[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: InverseTime[float, NoSystem],
+    stop: InverseTime[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> InverseTime[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: AtomCount[float, S],
-    stop: AtomCount[float, S],
+    stop: AtomCount[float, S] | AtomCount[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> AtomCount[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: AtomCount[float, NoSystem],
+    stop: AtomCount[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> AtomCount[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: ElectronCount[float, S],
-    stop: ElectronCount[float, S],
+    stop: ElectronCount[float, S] | ElectronCount[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> ElectronCount[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: ElectronCount[float, NoSystem],
+    stop: ElectronCount[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ElectronCount[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
-    start: Mass[float, S], stop: Mass[float, S], num: int = ..., *, endpoint: bool = ...
+    start: Mass[float, S],
+    stop: Mass[float, S] | Mass[float, NoSystem],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
 ) -> Mass[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[T: UnitSystem](
+    start: Mass[float, NoSystem],
+    stop: Mass[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Mass[npt.NDArray[np.float64], T]: ...
 @overload
 def linspace[S: AnySystem](
     start: MassDensity[float, S],
-    stop: MassDensity[float, S],
+    stop: MassDensity[float, S] | MassDensity[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> MassDensity[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: MassDensity[float, NoSystem],
+    stop: MassDensity[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> MassDensity[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Momentum[float, S],
-    stop: Momentum[float, S],
+    stop: Momentum[float, S] | Momentum[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Momentum[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Momentum[float, NoSystem],
+    stop: Momentum[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Momentum[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Acceleration[float, S],
-    stop: Acceleration[float, S],
+    stop: Acceleration[float, S] | Acceleration[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Acceleration[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Acceleration[float, NoSystem],
+    stop: Acceleration[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Acceleration[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Charge[float, S],
-    stop: Charge[float, S],
+    stop: Charge[float, S] | Charge[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Charge[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Charge[float, NoSystem],
+    stop: Charge[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Charge[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: ElectricPotential[float, S],
-    stop: ElectricPotential[float, S],
+    stop: ElectricPotential[float, S] | ElectricPotential[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> ElectricPotential[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: ElectricPotential[float, NoSystem],
+    stop: ElectricPotential[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ElectricPotential[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: ElectricField[float, S],
-    stop: ElectricField[float, S],
+    stop: ElectricField[float, S] | ElectricField[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> ElectricField[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: ElectricField[float, NoSystem],
+    stop: ElectricField[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> ElectricField[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: DipoleMoment[float, S],
-    stop: DipoleMoment[float, S],
+    stop: DipoleMoment[float, S] | DipoleMoment[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> DipoleMoment[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: DipoleMoment[float, NoSystem],
+    stop: DipoleMoment[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> DipoleMoment[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Entropy[float, S],
-    stop: Entropy[float, S],
+    stop: Entropy[float, S] | Entropy[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Entropy[npt.NDArray[np.float64], S]: ...
 @overload
+def linspace[T: UnitSystem](
+    start: Entropy[float, NoSystem],
+    stop: Entropy[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Entropy[npt.NDArray[np.float64], T]: ...
+@overload
 def linspace[S: AnySystem](
     start: Action[float, S],
-    stop: Action[float, S],
+    stop: Action[float, S] | Action[float, NoSystem],
     num: int = ...,
     *,
     endpoint: bool = ...,
 ) -> Action[npt.NDArray[np.float64], S]: ...
+@overload
+def linspace[T: UnitSystem](
+    start: Action[float, NoSystem],
+    stop: Action[float, T],
+    num: int = ...,
+    *,
+    endpoint: bool = ...,
+) -> Action[npt.NDArray[np.float64], T]: ...
 @overload
 def linspace[K, S: AnySystem](
     start: _BaseQuantity[K, float, S],

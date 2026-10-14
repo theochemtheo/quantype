@@ -89,7 +89,7 @@ tx = u.angstrom(torch.tensor([1.0, 2.0, 3.0], requires_grad=True))
 assert_type(tx, Length[torch.Tensor])
 assert_type(utorch.grad(harmonic_torch(tx), tx), Force[torch.Tensor])
 assert_type(
-    Energy[npt.NDArray[np.float64], Atomistic].from_value(array),
+    Energy.from_value(array, Atomistic),
     Energy[npt.NDArray[np.float64], Atomistic],
 )
 assert_type(

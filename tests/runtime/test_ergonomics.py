@@ -116,17 +116,19 @@ def test_truthiness_is_ambiguous() -> None:
             bool(quantity)
 
 
-def test_quantities_from_different_systems_are_unequal() -> None:
+def test_quantities_from_two_unit_systems_are_unequal() -> None:
     unbound = 2 * u.nm
     si: Any = unbound.to_system(SI)
-    assert unbound != si
-    assert unbound not in [si, 3 * u.nm]
-    assert len({unbound, si}) == 2
-    with pytest.raises(TypeError, match="Cannot combine NoSystem and SI"):
-        _ = unbound < si
     atomistic: Any = unbound.to_system(Atomistic)
+    assert atomistic != si
+    assert atomistic not in [si, 3 * u.nm]
     with pytest.raises(TypeError, match="Cannot combine Atomistic and SI"):
         _ = atomistic < si
+    # Without a system, a quantity adopts the other's.
+    assert unbound == si
+    assert unbound == atomistic
+    assert len({unbound, si}) == 1
+    assert unbound < si + 1 * u.nm
 
 
 def test_format_specs_apply_to_the_magnitude() -> None:
@@ -141,12 +143,15 @@ def test_format_specs_apply_to_the_magnitude() -> None:
 
 def test_unit_names_the_presented_unit() -> None:
     assert (2 * u.nm).unit is u.nanometer
-    assert Length[float, Atomistic].from_value(1.0).unit is u.angstrom
-    assert Length[float, SI].from_value(1.0).unit is u.meter
-    assert Pressure[float, Metal].from_value(1.0).unit is u.bar
+    assert Length.from_value(1.0, Atomistic).unit is u.angstrom
+    assert Length.from_value(1.0, SI).unit is u.meter
+    assert Pressure.from_value(1.0, Metal).unit is u.bar
     product = (1 * u.nm) * (1 * u.fs)
     assert product.unit is not None
-    assert product.unit.symbol == "nm·fs"
+    assert product.unit.symbol == "Å·fs"
+    si_unit = ((1 * u.m) * (1 * u.s)).unit
+    assert si_unit is not None
+    assert si_unit.symbol == "m·s"
     assert product.to_system(Atomistic).unit is None
 
 
@@ -212,11 +217,26 @@ def test_a_device_passed_to_to_explains_display_units() -> None:
 def test_comparing_with_a_plain_number_needs_a_unit(number: object) -> None:
     length: Any = 2 * u.nm
     other: Any = number
-    for compare in (operator.eq, operator.ne, operator.lt, operator.ge):
+    # Only zero means the same in every unit, so only it is equal or not.
+    unequal = type(number) is int and number == 0
+    for compare in (
+        (operator.lt, operator.ge)
+        if unequal
+        else (
+            operator.eq,
+            operator.ne,
+            operator.lt,
+            operator.ge,
+        )
+    ):
         with pytest.raises(TypeError, match=r"Cannot compare Length and .*; give it a"):
             compare(length, other)
-    with pytest.raises(TypeError, match="give it a unit"):
-        operator.eq(other, length)
+    if unequal:
+        assert length != other
+        assert other != length
+    else:
+        with pytest.raises(TypeError, match="give it a unit"):
+            operator.eq(other, length)
 
 
 def test_non_numbers_are_unequal_and_dimensionless_values_take_numbers() -> None:

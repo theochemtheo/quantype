@@ -64,7 +64,9 @@ Importing `ujax` registers quantities as single-leaf pytrees, so `jit` and
 not its display unit. A function compiles once whether its inputs were given in
 nm, Å, or bohr, and `lax.cond` and `lax.scan` accept branches in different
 units. Without a system, the pytree holds the numbers in the reference units (Å,
-eV, and fs), and results come back stored and shown in them. In a system,
+eV, and fs), and results come back stored and shown in them. A quantity stored
+in another unit is rescaled when it is flattened, outside `jit`: the numbers
+round on the way, and donating it donates the rescaled copy. In a system,
 results come back shown in the system's unit. Quantities in different
 systems have different pytree structures, just as they have different static
 types.
@@ -129,7 +131,7 @@ or `x.apply(lambda t: t.detach())`. A training loop calls
 
 To wrap a raw model's output, give it its unit: `Energy[torch.Tensor](raw, u.eV)`
 keeps the tensor and its graph. In a unit system, `from_value` trusts its input:
-`Energy[torch.Tensor, Atomistic].from_value(raw)` asserts that `raw` is an
+`Energy.from_value(raw, Atomistic)` asserts that `raw` is an
 energy in the system's units. A model written with quantities throughout, as
 above, needs neither.
 

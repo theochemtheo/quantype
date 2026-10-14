@@ -209,7 +209,7 @@ def test_gromacs_storage_and_bridge() -> None:
     assert cutoff.value == 1.2
     assert repr(cutoff) == "Length(1.2 nm, Gromacs)"
     raw = np.ones((4, 3), dtype=np.float32)
-    forces = Force[npt.NDArray[np.float32], Gromacs].from_value(raw)
+    forces = Force.from_value(raw, Gromacs)
     assert forces.value is raw
     assert forces.system is Gromacs
     assert Gromacs.unit_for(Force).name == "gromacs:Force"
@@ -222,9 +222,7 @@ def test_gromacs_storage_and_bridge() -> None:
     with pytest.raises(TypeError, match=r"Cannot combine Gromacs and Atomistic"):
         _ = mixed + atomistic
     distance = np.asarray(2, dtype=np.float32)
-    energy = forces[0, 0] * Length[npt.NDArray[np.float32], Gromacs].from_value(
-        distance
-    )
+    energy = forces[0, 0] * Length.from_value(distance, Gromacs)
     assert type(energy) is Energy
     assert energy.magnitude(kilojoule_per_mole) == 2
 
@@ -244,7 +242,7 @@ def test_gromacs_units_decode_at_the_boundary(tmp_path: Path) -> None:
     force_unit = Gromacs.unit_for(Force)
     assert force_unit in Gromacs.units
     assert u.nanometer not in Gromacs.units
-    force = Force[float, Gromacs].from_value(3.0)
+    force = Force.from_value(3.0, Gromacs)
     wire = force.to_dict()
     assert wire == {"kind": "Force", "magnitude": 3.0, "unit": "gromacs:Force"}
     # Untyped entry points need the definitions; any system can decode them.
@@ -261,9 +259,7 @@ def test_gromacs_units_decode_at_the_boundary(tmp_path: Path) -> None:
     assert adapter.validate_python(wire, context={"units": Gromacs.units}).value == 3
     assert Force[float, Gromacs].parse(wire).value == 3.0
     path = tmp_path / "frame.npz"
-    save_npz(
-        path, forces=Force[npt.NDArray[np.float64], Gromacs].from_value(np.ones(2))
-    )
+    save_npz(path, forces=Force.from_value(np.ones(2), Gromacs))
     restored = load_npz(path, "forces", Force[npt.NDArray[np.float64], Gromacs])
     np.testing.assert_array_equal(restored.value, [1, 1])
     in_si = load_npz(
@@ -345,7 +341,7 @@ def test_pydantic_fields_choose_their_system() -> None:
     assert dumped["cutoff"] == {"kind": "Length", "magnitude": 0.5, "unit": "nanometer"}
     assert SIConfig.model_validate_json(config.model_dump_json()) == config
     with pytest.raises(
-        ValueError, match=r"Expected a quantity in SI; received one in NoSystem"
+        ValueError, match=r"received one in NoSystem\. .*\.to_system\(SI\)"
     ):
         SIConfig(cutoff=u.nm(1.0), timestep=Time[float, Metal](1, u.fs))  # type: ignore[arg-type]  # pyright: ignore[reportArgumentType]
 

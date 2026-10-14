@@ -35,17 +35,17 @@ keep their current behavior.
 Chosen option: "a null system that keeps each value in its input unit",
 because it is the only option where nothing converts unless units differ or a
 system is chosen, while bound systems keep every guarantee of ADR-003 and all
-four checkers enforce the null system's rules with no change in stub size or
-checking time. The prototypes and measurements are in
-[opt-in unit systems](../design/opt-in-unit-system.md).
+four checkers enforce the null system's rules. The prototypes and measurements
+are in [opt-in unit systems](../design/opt-in-unit-system.md).
 
 ```python notest
 x = Length[float](2, u.nm)  # Length[float, NoSystem]; stores 2.0 in nm
-f = Energy[float](3, u.eV) / x  # Force; stores 1.5 in eV/nm, no conversion
+f = Energy[float](3, u.eV) / x  # Force; stores 1.5 in eV/nm, shows 0.15 eV/Å
 x + Length[float](3, u.angstrom)  # 2.3 nm: the right operand converts to nm
 x.value  # type error, and a TypeError at runtime
 x.to_system(Real).value  # 20.0: choosing a system converts once
-x + Length[float, SI](1, u.m)  # type error, and a TypeError at runtime
+x + Length[float, SI](1, u.m)  # Length[float, SI]: x adopts SI
+Length[float, SI](1, u.m) + Length[float, Real](1, u.m)  # type error, and a TypeError
 ```
 
 The rules for null-system quantities:
@@ -57,17 +57,23 @@ The rules for null-system quantities:
 * Products, quotients, and powers compose their units and never convert. A
   catalogue unit with the same scale is used when one exists, so
   kcal/mol/Å × Å stores kcal/mol. Unnamed products, such as nm × ps, store a
-  composed unit too.
+  composed unit too. A dimensionless result stores plain numbers, so ns/fs is
+  1e6, and it composes with nothing.
 * `==`, ordering, and `__hash__` compare stored numbers when both sides share a
   storage unit, and values in the reference units otherwise.
-* A single product or quotient displays its own symbol (`1.5 eV/nm`,
-  `6.0 nm·ps`). A nested one of a named kind, such as Da·((Å/fs)^2) for an
-  energy, displays in the kind's unit in a system that stores every operand's
-  kind in the operand's unit (`207.29 eV`). When several systems do, the first
-  in a fixed order wins; when none does, as for g × (m/s)², a fixed fallback
-  system does. Neither depends on operand order, so `a * b` and `b * a`
-  display alike. Storage is unchanged.
-* `.value`, `from_value`, and `with_value` exist only in a bound system.
+* A product, quotient, or power displays in a named unit: the kind's unit in
+  the first of a fixed list of systems that stores each operand's kind in the
+  operand's displayed unit, else in `Atomistic`'s, the reference units.
+  Constants fit every system. So eV/nm shows as eV/Å, J/m as N, and
+  kcal/mol/Å × Å as kcal/mol, whatever the operand order. Storage is
+  unchanged.
+* Combined with a quantity in a unit system, a null-system quantity adopts
+  that system, as constants do: arithmetic, comparisons, and the
+  `quantype.numpy` functions convert it into the system first. Two unit systems
+  still don't mix, and parameters don't adopt: a function typed
+  `Length[float, SI]` rejects a null-system length.
+* `.value` and `from_value(raw, system)` exist only for a unit system.
+  `apply(function)` replaces `with_value` on every quantity.
   `x.to_system(S)` converts once. `q.to_system(NoSystem)` records `S`'s unit
   instead of converting.
 * `quantype.numpy` rules work on stored numbers. Only functions that need
@@ -78,14 +84,20 @@ The rules for null-system quantities:
   values coming out of a transformation display in reference units.
 
 Statically, `NoSystem` is the default system parameter and is not a
-`UnitSystem`. `.value` is a descriptor whose `__get__` only accepts
-`Quantity[Any, W, T]` with `T: UnitSystem`. Code that accepts both bound and
-null quantities is generic over `[S: AnySystem]`.
+`UnitSystem`. `AnySystem` is the alias `UnitSystem | NoSystem`, the bound of
+the system parameter, so it names no system of its own. `.value` is a
+descriptor whose `__get__` only accepts `Quantity[Any, W, T]` with
+`T: UnitSystem`, and `from_value` takes `type[T]` with `T: UnitSystem`. Code
+that accepts both bound and null quantities is generic over `[S: AnySystem]`.
+Each operator, and each protocol member that names a product, takes an operand
+in its receiver's system or in none, and has an overload for a null-system
+receiver whose result takes the operand's system. The `quantype.numpy`
+functions of operands of one kind have per-kind overloads that do the same.
 
 This supersedes ADR-003, whose system type parameter carries over unchanged,
 and replaces one rule of [ADR-004](ADR-004-display-unit-is-presentation.md): products,
-ratios, and powers of null-system quantities show their composed unit instead
-of the system's unit.
+ratios, and powers of null-system quantities show in a unit chosen from their
+operands' units instead of the system's unit.
 
 ### Consequences
 
@@ -93,51 +105,72 @@ of the system's unit.
   million-element array from nm took 3 µs instead of 395 µs, reading it back in
   nm 0.5 µs instead of 382 µs, and unbinding a `Real` force 2 µs instead of
   961 µs.
-* Good, because data round-trips exactly through construction,
-  `.magnitude(unit)`, and `to_dict`.
+* Good, because data given in a unit round-trips exactly through
+  construction, `.magnitude(unit)`, and `to_dict`, and every unit a product
+  shows in parses back.
 * Good, because `.value` exists only where a system is named, so it still has
   one meaning for each static type.
-* Good, because stubs and checking time are unchanged, and mypy, Pyright,
-  Pyrefly, and ty all reject `.value` on a null-system quantity and mixing it
-  with a bound one.
+* Good, because mypy, Pyright, Pyrefly, and ty all reject `.value` and
+  `from_value` without a system, and mixing two unit systems.
+* Good, because a literal such as `1.0 * u.nm` works in code that chose a
+  system: it adopts that system.
 * Good, because equality across units is symmetric and agrees with `__hash__`:
   `{Length(1, u.nm), Length(10, u.angstrom)}` has one element.
 * Bad, because operations across units convert: adding a million nm values to
-  Å values took 1,013 µs instead of 513 µs. Scalar products cost 0.64 µs
-  instead of 0.53 µs.
+  Å values took 1,013 µs instead of 513 µs. Scalar products cost 0.72 µs
+  instead of 0.58 µs, mostly to choose the unit a product shows in.
+* Bad, because products show in `Atomistic`'s units unless one display system
+  holds every operand's unit, so work in nm shows products in Å, and GROMACS
+  units (nm, kJ/mol, ps) show in Å, eV, and fs. `.to(unit)` shows another.
+* Bad, because adoption needs a second overload for each operator and product
+  relation: the stubs grew from 17 MB to 27 MB. Each named kind moved into its
+  own stub module to stay under Pyright's per-module complexity limit, which
+  left ty and Pyrefly faster on a user file than before (0.10 s and 0.26 s,
+  from 0.25 s and 0.39 s) and Pyright and mypy about as fast. Pyright checking
+  the whole repository needs a 12 GB heap.
 * Bad, because equality across units is floating-point equality in reference
   units. Two distinct nm values can each equal the same Å value, and `a == b`
   can hold while `a - b != 0`.
 * Bad, because it breaks existing code, with no deprecation period while
-  quantype is before 1.0: `.value` and `from_value` on default quantities, and
-  annotations that assume `Atomistic`. `Length[float]` changes meaning in
-  place. 177 of 1,085 runtime
-  tests fail in the prototype for these reasons, and the docs use `.value` 45
-  times and `from_value` 12 times.
+  quantype is before 1.0: `.value` on default quantities, `from_value`, which
+  now takes the system, `with_value`, which is gone, `.magnitude()` of a
+  product, and annotations that assume `Atomistic`. `Length[float]` changes
+  meaning in place. 177 of 1,085 runtime tests fail in the prototype for these
+  reasons, and the docs use `.value` 45 times and `from_value` 12 times.
 * Bad, because generic code chooses between two bounds: `UnitSystem` when it
   reads raw numbers, `AnySystem` when it accepts anything.
-* Bad, because `with_value` trusts raw numbers in a system, so a
-  null-system quantity needs another escape hatch for operations quantype has
-  no rule for; see [replacing `with_value`](#replacing-with_value).
+* Bad, because `apply` can't change backend, so moving NumPy numbers into Torch
+  means constructing a new quantity from `.magnitude(unit)`; see
+  [replacing `with_value`](#replacing-with_value).
 * Bad, because checker messages for `.value` on a null-system quantity name a
   descriptor, not the fix. mypy says `Value of type variable "T" of "__get__"
-  of "_Value" cannot be "NoSystem"`.
+  of "_Value" cannot be "NoSystem"`, and Pyright that the argument isn't
+  assignable to `None`.
 * Bad, because arrays share memory with their input in more cases: today only
   when the input unit is the system's unit, afterwards for any unit.
+  `.magnitude(unit)` in the stored unit returns the stored array itself.
 * Bad, because arrays in offset units still convert to kelvin.
-* Bad, because only `.value` is rejected statically. `from_value` and
-  `with_value` raise `TypeError` at runtime without a system, but their stubs
-  are unchanged, so checkers accept those calls.
+* Bad, because crossing into a JAX transformation rescales numbers stored in
+  another unit, outside `jit`: they round on the way, and a donated input
+  donates the rescaled copy.
+* Bad, because ty solves a function's system parameter as a union, such as
+  `SI | Real`, where the other checkers reject the call, so
+  `qnp.maximum(si, real)` passes ty. It does so before this decision too.
 
 ### Catalogue scales round once
 
 Catalogue scales were computed in floating point from exact definitions, and 46
-of 156 were not the nearest float to their exact value (1 to 5 ulp). The
-picosecond was `999.9999999999999` fs, so 3 ps was stored as
+of the 156 exact ones were not the nearest float to their exact value (1 to 5
+ulp). The picosecond was `999.9999999999999` fs, so 3 ps was stored as
 `2999.9999999999995` fs. Null-system quantities compose and compare through
 these scales, so the errors would reach users more often. Each scale, and each
 physical constant, is now computed exactly and rounded once. That fixes all 46
-and makes N = kg·m/s², Pa = N/m², ns = 1000 ps, and s = 1000 ms hold.
+and makes N = kg·m/s², Pa = N/m², ns = 1000 ps, and s = 1000 ms hold. Atomic
+momentum, which uses ħ, changed too, so 47 of the 162 scales differ.
+
+Conversions apply the ratio of two scales as a factor of at least 1,
+multiplying or dividing, so an exact ratio such as 10 stays exact both ways:
+0.7 nm is 7.0 Å, not 6.999999999999999.
 
 ### Not addressed here
 
@@ -153,8 +186,8 @@ a float scale. This is a separate refactor of `Unit` and the catalogue.
 
 `with_value` is the escape hatch for operations quantype has no rule for:
 `x.with_value(np.sort(x.value))`, `x.with_value(x.value.detach())`. It trusts
-the new numbers to be in the quantity's system, so bound quantities keep it.
-For null-system quantities the options are:
+the new numbers to be in the quantity's system, so it can't work without one.
+The options are:
 
 * `x.apply(function)`: apply a function to the stored numbers, keeping the
   kind, storage unit, and display unit, as in `x.apply(np.sort)` or
@@ -174,16 +207,22 @@ For null-system quantities the options are:
   `quantype.numpy` covering the rest. That shrinks the need for an escape
   hatch without removing it.
 
-Chosen: `apply`, on every quantity, documented with its contract.
-`with_magnitude` can follow if code turns up that has its numbers in a unit it
-can name.
+Chosen: `apply`, on every quantity, documented with its contract, in place
+of `with_value` everywhere. Its function returns numbers of the same backend,
+which every checker can express as `Callable[[V], V]`; a generic result type
+made ty and Pyrefly infer unions for overloaded functions such as `np.sort`.
+`from_value(raw, system)` takes the system as an argument, so a bound on its
+type parameter rejects `NoSystem` in every checker. `with_magnitude` can
+follow if code turns up that has its numbers in a unit it can name.
 
 ### Names and display order
 
 * The null system is `NoSystem`, which reads clearly in every message
-  (`Cannot combine NoSystem and SI quantities`). `Unspecified` and `Portable`
+  (`Length has no raw numbers without a unit system`). `Unspecified` and `Portable`
   were alternatives. The prototype used `Unbound`, which collides with
   "unbound type variable" in checker output. `Free` was rejected.
-* Nested compositions display in the first of `Atomistic`, `Metal`, `Real`,
-  `SI`, `CGS`, and `Atomic` that stores each operand's kind in the operand's
-  unit, with `SI` as the fallback, so g × (m/s)² displays in J.
+* Products display in the first of `Atomistic`, `Metal`, `Real`, `SI`, `CGS`,
+  and `Atomic` that stores each operand's kind in the operand's unit, with
+  `Atomistic` as the fallback, so g × (m/s)² displays in eV, as JAX results
+  without a system do. A composed symbol such as `eV/nm` read naturally but
+  didn't parse or serialize, and left ratios such as `0.5 ns/fs` unreduced.

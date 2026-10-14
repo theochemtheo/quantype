@@ -51,7 +51,7 @@ cutoff = Length[float, Gromacs](1.2, u.nm)
 assert cutoff.value == 1.2  # raw numbers are in nanometers
 
 raw = np.zeros((100, 3), dtype=np.float32)  # from a GROMACS kernel
-forces = Force[npt.NDArray[np.float32], Gromacs].from_value(raw)  # kJ/mol/nm
+forces = Force.from_value(raw, Gromacs)  # kJ/mol/nm
 in_ev_per_angstrom = forces.to_system(Atomistic)  # the explicit bridge
 ```
 
@@ -171,15 +171,21 @@ assert raw_cutoff(Length[float, Metal](2, u.nm)) == 20.0
 
 The checker accepts SI pairs, metal pairs, and pairs without a system, and
 rejects a mixed pair. Inside `work`, arithmetic needs no conversion in a
-system, because every operand is in `S`. `raw_cutoff` rejects a length without a
+system, because every operand is in `S`, and a literal such as `1.0 * u.nm`
+has no system, so it adopts `S`. `raw_cutoff` rejects a length without a
 system, because `.value` needs a `UnitSystem`. Checker messages for that name
 the descriptor behind `.value`: mypy says
-``Value of type variable "T" of "__get__" of "_Value" cannot be "NoSystem"``.
+``Value of type variable "T" of "__get__" of "_Value" cannot be "NoSystem"``,
+and Pyrefly says ``NoSystem`` "is not assignable to upper bound `UnitSystem`".
+`AnySystem` is `UnitSystem | NoSystem`, a bound for type parameters: no
+quantity is a `Length[float, AnySystem]`, and `.to_system(AnySystem)` is a type
+error.
 
-Annotations without a system, such as `Length[float]`, mean `NoSystem`. A
-function typed `Length[float]` rejects SI quantities, and one typed
-`Length[float, SI]` rejects quantities without a system; the runtime error
-message names `.to_system(...)` as the fix. Prefer the generic form in shared libraries, and
+Annotations without a system, such as `Length[float]`, mean `NoSystem`.
+Arithmetic adopts a system, and parameters don't: a function typed
+`Length[float]` rejects SI quantities, and one typed `Length[float, SI]` rejects
+quantities without a system. The runtime error message names `.to_system(...)`
+as the fix. Prefer the generic form in shared libraries, and
 the explicit form (`Length[npt.NDArray[np.float64], Real]`) for kernels whose raw
 numbers must be in particular units.
 
@@ -211,7 +217,7 @@ A kind parameter shared by both arguments works for named kinds and for
 variables:
 
 ```python notest
-def larger[K, S: UnitSystem](
+def larger[K, S: AnySystem](
     a: Quantity[K, Any, S], b: Quantity[K, Any, S]
 ) -> Quantity[K, Any, S]: ...
 ```

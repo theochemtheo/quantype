@@ -17,9 +17,10 @@ A serialized quantity names its kind:
 {"kind": "Length", "magnitude": 0.5, "unit": "nanometer"}
 ```
 
-`to_dict` writes the value in its display unit: the unit it was given in, or
-the one chosen with `.to(unit)`. A value with no display unit is written in its
-system's unit for the kind. That is a catalogue name for built-in systems, or a
+`to_dict` writes the value in its display unit: the unit it was given in, the
+one chosen with `.to(unit)`, or for a product the named unit it shows in, as
+eV/Å for eV ÷ nm. A value with no display unit is written in its system's unit
+for the kind. That is a catalogue name for built-in systems, or a
 system-qualified identifier such as `gromacs:Force` for
 [custom systems](unit-systems.md#decoding). A configuration's `"0.5 nm"` is
 written back as `0.5 nanometer` in every system, and `"20.1 degC"` as exactly

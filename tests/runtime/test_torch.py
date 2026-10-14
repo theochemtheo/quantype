@@ -66,7 +66,7 @@ def test_torch_raw_model_boundary() -> None:
     x = Length[torch.Tensor, Atomistic](
         torch.tensor([1.0, 2.0], requires_grad=True), u.angstrom
     )
-    energy = Energy[torch.Tensor, Atomistic].from_value(torch.sum(x.value**2))
+    energy = Energy.from_value(torch.sum(x.value**2), Atomistic)
     torch.testing.assert_close(utorch.grad(energy, x).value, 2.0 * x.value)
 
 
@@ -91,7 +91,7 @@ def test_torch_grad_in_another_system() -> None:
     with pytest.raises(
         TypeError, match="output in Atomistic with respect to an input in SI"
     ):
-        untyped(Energy[torch.Tensor, Atomistic].from_value(x.value.sum()), x)
+        untyped(Energy.from_value(x.value.sum(), Atomistic), x)
 
 
 def test_torch_grad_rescales_atomistic_masses() -> None:

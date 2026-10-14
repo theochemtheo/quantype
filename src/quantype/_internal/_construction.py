@@ -20,9 +20,7 @@ if TYPE_CHECKING:
 # pyright: reportPrivateUsage=false
 
 # GenericAlias forwards every other attribute to the unparameterized class.
-_OWN_ATTRIBUTES = frozenset(
-    {"from_value", "parse", "storage", "unit_named", "unit_system"}
-)
+_OWN_ATTRIBUTES = frozenset({"parse", "storage", "unit_named", "unit_system"})
 
 
 class StorageAlias(GenericAlias):
@@ -39,13 +37,13 @@ class StorageAlias(GenericAlias):
     @property
     def unit_system(self) -> type[AnySystem]:
         from quantype._internal._systems import (
-            AnySystem,
             NoSystem,
+            UnitSystem,
             require_any_system,
         )
 
         storage, *rest = self.__args__
-        if isinstance(storage, type) and issubclass(storage, AnySystem):
+        if isinstance(storage, type) and issubclass(storage, (UnitSystem, NoSystem)):
             raise TypeError(
                 "Name the storage type first and the unit system second, "
                 "for example Length[float, SI]"
@@ -91,21 +89,6 @@ class StorageAlias(GenericAlias):
         return _wrap(
             cls._semantic, raw, system, display=unit, echo=echo, storage=stored
         )
-
-    def from_value(self, value: object) -> Quantity[Any, Any, Any]:
-        """Trusted wrap of raw numbers already in this alias's unit system."""
-        from quantype._internal._systems import NoSystem
-        from quantype.core import _no_raw_numbers, _wrap
-
-        cls = cast("Any", self.__origin__)
-        if getattr(cls, "_semantic", None) is None:
-            raise TypeError("from_value requires a named quantity class")
-        system = self.unit_system
-        if system is NoSystem:
-            storage = self.__args__[0]
-            name = getattr(storage, "__name__", None) or repr(storage)
-            raise _no_raw_numbers("from_value", f"{cls._kind}[{name}, Atomistic]")
-        return _wrap(cls._semantic, value, system)
 
     def parse(
         self, data: object, *, units: tuple[Unit[Any], ...] = ()

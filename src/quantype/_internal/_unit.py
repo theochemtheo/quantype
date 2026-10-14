@@ -62,6 +62,17 @@ class Unit[K]:
         ):
             object.__setattr__(self, attribute, value)
 
+    @override
+    def __hash__(self) -> int:
+        # Units key the caches every product consults; hash each once.
+        cached = self.__dict__.get("_hash")
+        if isinstance(cached, int):
+            return cached
+        fields = (self.name, self.semantic, self.scale, self.offset, self.symbol)
+        computed = hash(fields)
+        object.__setattr__(self, "_hash", computed)
+        return computed
+
     def __call__[V](self, value: V) -> Quantity[K, V, Any]:
         """Unit-first construction without a system: stored and shown in this unit.
 

@@ -37,7 +37,7 @@ assert isinstance(force, Force)
 assert length.magnitude() == 2.0  # kept in the unit it was given in
 assert length.magnitude(u.angstrom) == 20.0
 assert repr(length) == "Length(2.0 nm)"
-assert repr(force) == "Force(1.5 eV/nm)"  # the division composes the units
+assert repr(force) == "Force(0.15 eV/Å)"  # a product shows in a named unit
 assert force.magnitude(u.eV_per_angstrom) == 0.15
 
 shown = length.to(u.angstrom)
@@ -80,22 +80,24 @@ assert repr(x) == "Length(2.0 nm, SI)"
 kernel_input = (1.0 * u.eV).to_system(Real)  # LAMMPS real units
 assert round(kernel_input.value, 4) == 23.0605  # kcal/mol
 
-for misuse in (lambda: length.value, lambda: x + length):
-    try:
-        misuse()  # no raw numbers without a system; SI plus no system
-    except TypeError as error:
-        assert "to_system" in str(error)
-    else:
-        raise AssertionError("raw numbers need a unit system")
+assert (x + length).system is SI  # without a system, length adopts SI
+try:
+    length.value  # no raw numbers without a system
+except TypeError as error:
+    assert "to_system" in str(error)
+else:
+    raise AssertionError("raw numbers need a unit system")
 ```
 
 The unit system is the second type argument. It defaults to `NoSystem`, so
 `Length[float]` is `Length[float, NoSystem]`: its numbers stay in the unit they
 were given in, and it has no `.value`. In a system such as `Atomistic` (Å, eV,
 and fs) or `SI`, `.value` holds the numbers in that system's units, so it has
-one meaning for each type. `.to_system(...)` converts once. Reading `.value`
-without a system, and mixing systems, are type errors and runtime `TypeError`s
-whose messages point to `.to_system(...)`. See
+one meaning for each type. `.to_system(...)` converts once. A quantity without
+a system adopts the system of a quantity it's combined with, so
+`x + 1.0 * u.nm` stays in `SI`. Reading `.value` without a system, and mixing
+two systems, are type errors and runtime `TypeError`s whose messages point to
+`.to_system(...)`. See
 [units and unit systems](units.md#unit-systems) and
 [defining your own system](unit-systems.md).
 
@@ -161,9 +163,9 @@ np.testing.assert_array_equal(shifted.magnitude(u.nm), [2.0, 3.0, 1.0])
 
 The function must give the same physical result whatever unit the numbers are
 in. Sorting, slicing, reshaping, detaching, and moving to a device do, while
-`np.log` and adding a constant don't, and nothing checks it. In a unit system,
-`with_value` takes new raw numbers, which must already be in the system's
-units.
+`np.log` and adding a constant don't, and nothing checks it. The function
+returns numbers of the same backend; to move NumPy numbers into Torch, construct
+a new quantity from `.magnitude(unit)`.
 
 A plain number or a NumPy, JAX, or Torch array scales a quantity without
 changing its dtype. Builtin `sum()`, format specs, and `reinterpret` work too:
@@ -247,7 +249,7 @@ input, and `TypeAdapter` comes from `pydantic`.
 | --- | --- |
 | Numerical data with a known unit and desired storage | `Length[float](data, u.nm)` |
 | The same, stored in another unit system | `Length[float, SI](data, u.nm)` |
-| Trusted raw numbers in a system's units, preserving storage and graphs | `Length[V, Atomistic].from_value(data)` |
+| Trusted raw numbers in a system's units, preserving storage and graphs | `Length.from_value(data, Atomistic)` |
 | External quantity object or scalar string, default storage | `Length.parse(data)` |
 | External data with a particular storage type | `TypeAdapter(Length[np.float32]).validate_python(data)` |
 | Several validated fields | A Pydantic `BaseModel` |
@@ -313,10 +315,11 @@ Serialization saves values; device placement and autodiff graphs are lost.
 | `Length has no raw numbers without a unit system` | Read `.magnitude(unit)`, or choose a system with `.to_system(...)` first. |
 | `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists can't scale a quantity. Convert lists with `np.asarray`. |
 | `Cannot add int and Length; give it a unit` | Plain numbers can only be added to `Dimensionless` values, and zero to anything (so `sum()` works). Give the number a unit. |
-| `Cannot compare Length and int; give it a unit` | Compare with a quantity, as in `q > 0 * u.nm`. Plain numbers compare only with `Dimensionless` values. |
+| `Cannot compare Length and int; give it a unit` | Compare with a quantity, as in `q > 0 * u.nm`. Plain numbers compare only with `Dimensionless` values, and zero with `==` and `!=`. |
 | `The truth value of a Length quantity is ambiguous` | Compare against a value, as in `q > 0 * u.nm`, or test `q is not None`. |
 | An `EnergyDensity` where a `Pressure` is expected | Rename it with `Pressure.reinterpret(q)`. |
-| `Cannot combine SI and Atomistic quantities` | Convert one operand with `.to_system(...)`. |
+| `Cannot combine SI and Atomistic quantities` | Convert one operand with `.to_system(...)`. A quantity without a system adopts the other's. |
+| `from_value trusts raw numbers in a unit system, and NoSystem has none` | Construct from a unit, as in `Length(raw, u.nm)`, or name a system: `Length.from_value(raw, SI)`. |
 | An unnamed result cannot be serialized | Only named kinds have units on the wire. Name it with `reinterpret`, or declare the kind in an [application catalogue](custom-catalogues.md). |
 
 Result types come from declared relations, whatever the order of the factors:

@@ -148,6 +148,7 @@ extend-exclude = [
   "notes",
   "src/quantype/_constants/*.pyi",
   "src/quantype/_generated.pyi",
+  "src/quantype/_kinds/*",
   "src/quantype/_products/*.pyi",
 ]
 # Apply the exclusions to paths named on the command line too, as hooks name them.

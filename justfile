@@ -19,7 +19,7 @@ typecheck:
     uv run --all-extras ty check
     uv run --all-extras scripts/check_mypy.py
     # Checking all ~1,700 generated stub modules needs more than Node's default heap.
-    NODE_OPTIONS=--max-old-space-size=8192 uv run --all-extras pyright
+    NODE_OPTIONS=--max-old-space-size=12288 uv run --all-extras pyright
     uv run --all-extras pyrefly check
     uv run scripts/check_typing.py
 

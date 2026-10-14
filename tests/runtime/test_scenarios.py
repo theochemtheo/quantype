@@ -48,7 +48,7 @@ def test_presentation(system: type[AnySystem]) -> None:
     assert repr(five_a + two_nm) == f"Length(25.0 Å{suffix})"
     ratio = energy(3, u.eV) / two_nm
     shown: dict[type[AnySystem], str] = {
-        NoSystem: "1.5 eV/nm",
+        NoSystem: "0.15 eV/Å",
         Atomistic: "0.15 eV/Å",
         SI: "2.403264951e-10 N",
     }

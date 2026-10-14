@@ -191,6 +191,7 @@ metal = Length[float, Metal](5, u.angstrom)
 with pytest.raises(TypeError, match="Cannot combine SI and Metal"):
     x + metal  # also a static type error
 assert (x + metal.to_system(SI)).magnitude(u.nm) == pytest.approx(2.5)
+assert (x + 1 * u.nm).system is SI  # 1 nm has no system, so it adopts SI
 
 kernel_input = (2 * u.nm).to_system(Real)  # LAMMPS real units
 assert kernel_input.value == pytest.approx(20.0)
@@ -245,19 +246,21 @@ has no effect on the stored numbers. It is set and kept as follows:
 - Same-kind operations keep it: addition and subtraction (the left operand
   wins), scaling, negation, `abs`, reductions, and indexing.
 - Point minus point gives the matching difference unit: `°C − °C → Δ°C`.
-- Without a system, one product, ratio, or power shows its composed unit, such
-  as `eV/nm`, `nm·ps`, or `nm^3`, or a catalogue unit of the same scale, so
-  kcal/mol/Å times Å shows kcal/mol. A product of products of a named kind,
-  such as Da·((Å/fs)^2) for an energy, shows in the kind's unit in the first of
-  `Atomistic`, `Metal`, `Real`, `SI`, `CGS`, and `Atomic` that stores each
-  operand's kind in that operand's unit, and in `SI` when none does. Either way,
-  the numbers stay in the composed unit.
+- Without a system, a product, ratio, or power shows in the kind's unit in the
+  first of `Atomistic`, `Metal`, `Real`, `SI`, `CGS`, and `Atomic` that stores
+  each operand's kind in that operand's unit, and in `Atomistic` when none
+  does. So J/m shows in N, kcal/mol/Å times Å in kcal/mol, and eV/nm in eV/Å.
+  Constants fit every system. A dimensionless result is a plain number: ns/fs
+  is 1e6. The numbers aren't converted to show them, except a dimensionless
+  result's.
 - In a unit system, products, ratios, and powers show in the system's unit for
   the result.
 - `.to(unit)` selects a display unit without changing the stored numbers, and
   `.unit` reports the unit in use (`None` for unnamed products in a system).
 - Format specs apply to the magnitude: `f"{q:.3f}"` gives `2.000 nm`.
-- JAX transformations drop it, because it isn't part of the pytree.
+- JAX transformations drop it, because it isn't part of the pytree. Results
+  show in the reference units without a system, and in the system's units in
+  one.
 
 ```python
 from quantype import Energy, Length, Mass, Temperature, Velocity, u
@@ -265,8 +268,9 @@ from quantype.systems import Atomistic
 
 assert repr(2 * u.nm + 5 * u.angstrom) == "Length(2.5 nm)"
 assert repr(5 * u.angstrom + 2 * u.nm) == "Length(25.0 Å)"
-assert repr((3 * u.eV) / (2 * u.nm)) == "Force(1.5 eV/nm)"
-assert repr((2 * u.nm) * (3 * u.ps)) == "LengthTime(6.0 nm·ps)"
+assert repr((3 * u.eV) / (2 * u.nm)) == "Force(0.15 eV/Å)"
+assert repr((2 * u.m) * (3 * u.s)) == "LengthTime(6.0 m·s)"
+assert repr((1 * u.ns) / (2 * u.fs)) == "Dimensionless(500000.0)"
 speed = Velocity[float](1, u.angstrom_per_fs)
 kinetic = Mass[float](2, u.Da) * speed**2
 assert repr(kinetic) == "Energy(207.2853933432161 eV)"
@@ -296,19 +300,24 @@ the system if there is one. `str` shows only the magnitude and unit.
   `.unit`. In the unit the numbers are stored in, it returns them unconverted.
 - `.to(unit)` selects a display unit without changing data.
 - `.to_system(T)` rescales into another unit system, once.
-- `Length[V, S].from_value(raw)` wraps raw numbers that are already in `S`'s
+- `Length.from_value(raw, S)` wraps raw numbers that are already in `S`'s
   units, keeping their storage. It trusts its input and doesn't check or
   convert it. The quantity holds `raw` itself, not a copy, so a read-only NumPy
-  array stays read-only. Without a system it raises, as there are no raw
-  numbers to trust, and so does `with_value`.
+  array stays read-only. `Length.from_value(raw, NoSystem)` is a type error and
+  raises at runtime: without a system there are no raw numbers to trust.
 - `q.apply(function)` applies a function to the stored numbers, keeping the
-  kind, system, and units: `q.apply(np.sort)` or
+  kind, system, units, and backend: `q.apply(np.sort)` or
   `q.apply(lambda t: t.detach())`. The function must give the same physical
   result in any unit, as sorting, slicing, and moving to a device do. Nothing
-  checks that.
+  checks that. To change backend, construct a new quantity from
+  `.magnitude(unit)`.
 - Quantities have no in-place operators and no item assignment. `q += other`
-  builds a new quantity and rebinds `q`, so quantype never writes into the
-  storage it was given.
+  builds a new quantity and rebinds `q`.
+- Like `np.asarray`, construction keeps an array that is already in the
+  requested storage, and `.magnitude(unit)` in the unit the numbers are stored
+  in returns the stored array itself. Writing into either array changes the
+  quantity. Call `.copy()` on the quantity, or copy the array, to keep them
+  apart.
 - `np.asarray(q)` and other implicit conversions to arrays raise `TypeError`,
   and NumPy functions can't write into a quantity with `out=`.
 
@@ -319,7 +328,9 @@ is derived, as energy time² / length², so its reference unit is eV fs²/Å², 
 the dalton that `Atomistic` stores it in. Without a system, quantities in
 different units compare and hash in the reference units. JAX pytrees and the
 `ujax` and `utorch` derivatives work in them too, so `jit` traces once whatever
-units its inputs were given in.
+units its inputs were given in. Numbers stored in another unit are rescaled
+when they enter a transformation, which rounds them, and the rescaling happens
+outside `jit`.
 Importing `quantype` doesn't import NumPy, Pydantic, Torch, or JAX.
 
 ## CODATA edition
@@ -475,17 +486,21 @@ assert 1 * u.nm == 10 * u.angstrom
 ```
 
 `==` compares values. It returns a `bool` for scalar storage and an
-element-wise result for arrays, as NumPy does. Quantities of different kinds or
-systems compare unequal, as naive and aware datetimes do. Without a system,
-quantities stored in the same unit compare their stored numbers, and others
+element-wise result for arrays, as NumPy does. Quantities of different kinds,
+or in two different unit systems, compare unequal, as naive and aware
+datetimes do. A quantity without a system compares with one in any system.
+Quantities stored in the same unit compare their stored numbers, and others
 compare in the reference units. That is floating-point equality, so two
 distinct nm values can each equal the same Å value. Scalar quantities hash
-by value, so they work as dict keys and in sets. Quantities with array storage
-are unhashable, like NumPy arrays. `<` and the other orderings need the same
-kind and system, statically and at runtime, and return backend booleans.
+by value in the reference units, so they work as dict keys and in sets, and
+`1 nm` and `10 Å` hash alike. Quantities with array storage are unhashable,
+like NumPy arrays. `<` and the other orderings need the same kind and a shared
+system, statically and at runtime, and return backend booleans.
 Comparing a quantity with a plain number, as in `2 * u.nm == 2`, raises
 `TypeError` for `==` and the orderings alike, except for `Dimensionless`
-values. `None` and other non-numbers compare unequal.
+values. Zero means the same in every unit, so `q == 0` and `q != 0` work for
+every kind but absolute temperatures. `None` and other non-numbers compare
+unequal.
 
 Indexing, iteration, `.shape`, `.ndim`, `.size`, `len()`, `.sum()`, `.mean()`,
 `.max()`, `.min()`, `.ravel()`, and `.copy()` keep the kind, system, and display

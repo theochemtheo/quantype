@@ -1,9 +1,12 @@
 """Each marked line must produce a diagnostic in every supported checker."""
 
+import numpy as np
+import numpy.typing as npt
+
 import quantype.numpy as qnp
 from quantype import Energy, EnergyPerAtom, Force, Length, Pressure, Temperature
 from quantype import units as u
-from quantype.systems import SI, AnySystem, Metal, UnitSystem
+from quantype.systems import SI, AnySystem, Metal, NoSystem, UnitSystem
 
 
 def energy_only(value: Energy[float]) -> None:
@@ -71,11 +74,13 @@ def work[S: UnitSystem](f: Force[float, S], d: Length[float, S]) -> Energy[float
 
 mixed_generic = work(e_si / x_si, x_metal)  # error
 
-# Without a system there are no raw numbers, and nothing mixes with a system.
+# Without a system there are no raw numbers. Arithmetic adopts the other
+# operand's system, but parameters don't.
 x_none = Length[float](2.0, u.nm)
 raw_without_system = x_none.value  # error
-mixed_with_system = x_none + x_si  # error
-mixed_comparison_with_system = x_none < x_si  # error
+raw_numbers_need_a_system = Length.from_value(2.0, NoSystem)  # error
+apply_replaces_with_value = x_si.with_value(2.0)  # error
+mixed_systems_after_adopting = (x_none + x_si) + x_metal  # error
 unbound_is_not_bound: Length[float, SI] = x_none  # error
 unbound_work = work(e_si / x_si, x_none)  # error
 
@@ -90,3 +95,12 @@ bad_float = float(2 * u.nm)  # error
 bad_text_scale = (2 * u.nm) * "2"  # error
 bad_reinterpret = Length.reinterpret(2.0)  # error
 bad_point_from_zero = 0 - (300 * u.K)  # error
+
+
+def _pair(raw: float) -> npt.NDArray[np.float64]:
+    return np.array([raw, raw])
+
+
+apply_keeps_the_storage = Length[float](1.0, u.nm).apply(_pair)  # error
+any_system_is_no_system = x_si.to_system(AnySystem)  # error
+mixed_kinds_in_numpy = qnp.maximum(2.0 * u.nm, 2.0 * u.eV)  # error

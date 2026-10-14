@@ -35,7 +35,9 @@ def test_physical_algebra() -> None:
     assert inverse.magnitude() == 0.5
     inverse_tension = 1.0 / (length * pressure)
     assert inverse_tension.kind == "Pow[SurfaceTension,-1]"  # as tension ** -1
-    assert inverse_tension.magnitude() == 1.0 / (length * pressure).magnitude()
+    assert inverse_tension.magnitude() == pytest.approx(
+        1.0 / (length * pressure).magnitude()
+    )
 
 
 def test_structural_reciprocals() -> None:

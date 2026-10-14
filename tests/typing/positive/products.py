@@ -76,7 +76,7 @@ assert_type(2.0 * (length * t) / t, Length[float])
 assert_type((lengths * t).sum() / t, Length[Array])
 assert_type((lengths * t).std() / times, Length[Array])
 assert_type((length * t).to_system(SI) / t.to_system(SI), Length[float, SI])
-assert_type(LengthTime[float, SI].from_value(1.0), LengthTime[float, SI])
+assert_type(LengthTime.from_value(1.0, SI), LengthTime[float, SI])
 
 # Constants take part like any other factor, from either side.
 assert_type(constants.k_B * length, LengthEntropy[float])
@@ -89,9 +89,9 @@ assert_type(
     q * (length * t), Quantity[Mul[ChargeKind, Mul[LengthKind, TimeKind]], float]
 )
 
-# apply and with_value keep the quantity's own class, product classes included.
+# apply keeps the quantity's own class, product classes included, and storage.
 assert_type(lengths.apply(np.sort), Length[Array])
 assert_type((length * t).apply(lambda raw: raw * 2), LengthTime[float])
 bound = lengths.to_system(SI)
-assert_type(bound.with_value(np.sort(bound.value)), Length[Array, SI])
-assert_type((length * t).to_system(SI).with_value(2.0), LengthTime[float, SI])
+assert_type(bound.apply(np.sort), Length[Array, SI])
+assert_type((length * t).to_system(SI).apply(abs), LengthTime[float, SI])
