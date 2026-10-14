@@ -16,7 +16,7 @@ in [decisions](decisions/).
 | Unit definitions and catalogue lookup | `src/quantype/_internal/_unit.py`; handwritten `_unit.pyi` | `test_core.py`, `test_validation.py` |
 | Unit lookup by name, alias, or symbol (`unit_named`, `parse`) | `src/quantype/_internal/_lookup.py` | `test_unit_lookup.py`, `test_validation.py` |
 | Unit systems, `NoSystem`, derived units, range checks | `src/quantype/_internal/_systems.py`; public `systems.py` | `test_systems.py`, `test_scenarios.py`, typing fixtures |
-| Storage units without a system: composed units, catalogue lookup by scale, the named unit a product shows in ([ADR-014](decisions/ADR-014-opt-in-unit-system.md)) | `src/quantype/_internal/_storage_units.py` | `test_core.py`, `test_quantities.py`, `test_numpy.py` |
+| Storage units without a system: composed units, their names and parsing, `simplified()` ([ADR-014](decisions/ADR-014-opt-in-unit-system.md)) | `src/quantype/_internal/_storage_units.py` | `test_core.py`, `test_quantities.py`, `test_numpy.py` |
 | Typed constructors and backend conversion | `src/quantype/_internal/_construction.py`, `_storage.py` | `test_refactor.py`, `test_binary_failures.py` |
 | NumPy functions and dispatch | `src/quantype/_internal/_numpy.py` (unit rules, backend namespaces, `UFUNCS`/`FUNCTIONS`/Torch names); generated `numpy.py`/`numpy.pyi` per catalogue; `Quantity.__array_ufunc__`/`__array_function__`/`__torch_function__` | `test_numpy.py`, `test_scenarios_jax.py`, `test_torch.py` |
 | JSON, archive and Pydantic boundaries | `src/quantype/serialization.py`, `_internal/_validation.py` | `test_validation.py`, `test_binary_failures.py`, `test_refactor.py` |

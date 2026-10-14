@@ -35,13 +35,12 @@ from quantype._internal._semantics import (
 from quantype._internal._storage import backend_name, keep_storage, real_operand
 from quantype._internal._storage_units import (
     ComposedUnit,
+    adapted,
     compose,
-    neutral,
-    presented,
     raised,
     recast,
     reference_unit,
-    shown,
+    simplest,
     system_unit,
 )
 from quantype._internal._systems import (
@@ -209,21 +208,18 @@ def _wrap(  # noqa: PLR0913 -- one keyword argument per optional field
 
 
 def _composite(
-    kind: Semantic, raw: Any, storage: Unit[Any], *operands: Quantity[Any, Any, Any]
+    kind: Semantic, raw: Any, storage: Unit[Any], display: Unit[Any]
 ) -> Quantity[Any, Any, Any]:
-    """A product, quotient or power of ``operands`` without a unit system.
+    """A product, quotient or power without a unit system.
 
-    The numbers stay in the composed ``storage`` unit and show in a named unit
-    chosen from the operands' units. A dimensionless result holds plain numbers,
-    so ns/fs is 1e6 and composes with nothing.
+    The numbers stay in the composed ``storage`` unit, and show in ``display``,
+    composed the same way from the operands' displayed units. A dimensionless
+    result holds plain numbers, so ns/fs is 1e6 and composes with nothing.
     """
-    units = [
-        cast("Unit[Any]", operand._display or operand.unit) for operand in operands
-    ]
-    stored, display = _presentation(kind, storage, *units)
+    stored, shown = _result_units(kind, storage, display)
     if stored is not storage:
         raw = keep_storage(raw, _between(raw, storage.scale, stored.scale))
-    return _wrap(kind, raw, NoSystem, display=display, storage=stored)
+    return _wrap(kind, raw, NoSystem, display=shown, storage=stored)
 
 
 def _product(
@@ -257,17 +253,19 @@ def _product_units(  # noqa: PLR0913, PLR0917 -- the cache key
     right_shown: Unit[Any],
 ) -> tuple[Unit[Any], Unit[Any], Unit[Any]]:
     composed = compose(operation, kind, left, right)
-    return (composed, *_presentation(kind, composed, left_shown, right_shown))
+    shown = compose(operation, kind, left_shown, right_shown)
+    return (composed, *_result_units(kind, composed, shown))
 
 
 @cache
-def _presentation(
-    kind: Semantic, storage: Unit[Any], *units: Unit[Any]
+def _result_units(
+    kind: Semantic, storage: Unit[Any], display: Unit[Any]
 ) -> tuple[Unit[Any], Unit[Any]]:
-    """A product's storage and display units: a dimensionless one is plain."""
+    """A result's storage and display units: a dimensionless one is plain."""
     if isinstance(kind, Kind) and DIMENSIONLESS_KINDS.get(kind) is kind:
-        storage = reference_unit(kind)
-    return storage, shown(kind, *units)
+        plain = reference_unit(kind)
+        return plain, plain
+    return storage, display
 
 
 def _is_scalar(raw: object) -> bool:
@@ -435,7 +433,7 @@ class Quantity[K, V, S: AnySystem]:
         if self._display is not None:
             return self._display
         if self._storage is not None:
-            return cast("Unit[K]", presented(self._storage, self._semantic))
+            return cast("Unit[K]", self._storage)
         if isinstance(self._semantic, Kind):
             system = cast("type[UnitSystem]", self._system)
             return cast("Unit[K]", system.unit_for(self._semantic))
@@ -568,20 +566,43 @@ class Quantity[K, V, S: AnySystem]:
             )
         return cast("V", unit_conversion(self._value, scale, offset, inverse=True))
 
-    def to(self, unit: Unit[K]) -> Self:
-        """Present in ``unit``; the stored numbers are unchanged."""
-        self._check_unit(
-            unit,
-            "`.to` sets the display unit; to move a tensor to another device, "
-            "use `q.apply(lambda t: t.to(device))`.",
-        )
+    def to(self, unit: Unit[K] | type[UnitSystem]) -> Self:
+        """Present in ``unit``, or in a system's unit; the numbers are unchanged.
+
+        ``q.to(Atomistic)`` shows the kind's unit in that system without
+        choosing it as ``q``'s system.
+        """
+        if isinstance(unit, type):
+            shown = system_unit(require_system(unit), self._semantic)
+        else:
+            self._check_unit(
+                unit,
+                "`.to` sets the display unit; to move a tensor to another device, "
+                "use `q.apply(lambda t: t.to(device))`.",
+            )
+            shown = unit
+        return self._shown(shown)
+
+    def simplified(self) -> Self:
+        """Present in the simplest unit; the numbers are unchanged.
+
+        Units of one dimension merge, so kcal/mol·nm/Å shows as kcal/mol. A
+        named kind then shows in its unit in a display system that holds
+        every remaining unit, so Da·Å^2/fs^2 shows as eV.
+        """
+        unit = self.unit
+        if unit is None:
+            return self
+        return self._shown(simplest(self._semantic, unit))
+
+    def _shown(self, display: Unit[Any]) -> Self:
         return cast(
             "Self",
             _wrap(
                 self._semantic,
                 self._value,
                 self._system,
-                display=unit,
+                display=display,
                 storage=self._storage,
             ),
         )
@@ -590,14 +611,19 @@ class Quantity[K, V, S: AnySystem]:
         """Rescale the numbers into another unit system; the display is kept.
 
         Into ``NoSystem``, nothing converts: the numbers stay in the units of
-        the system they came from. An unnamed product's composed display is a
-        system's, so it gives way to the target's.
+        the system they came from. An unnamed product's display is a system's
+        composed units, so it gives way to the target's.
         """
         target = require_any_system(system)
         raw: Any = self._value
         storage = self._storage
         display = self._display
-        if isinstance(display, ComposedUnit) and target is not self._system:
+        structural = not isinstance(self._semantic, Kind)
+        if (
+            structural
+            and isinstance(display, ComposedUnit)
+            and target is not self._system
+        ):
             display = None
         if target is NoSystem:
             if storage is None:
@@ -828,7 +854,8 @@ class Quantity[K, V, S: AnySystem]:
         if self._storage is not None:
             one = reference_unit(numerator)
             storage = compose("div", kind, one, self._storage)
-            return _composite(kind, quotient, storage, self)
+            display = compose("div", kind, one, cast("Unit[Any]", self.unit))
+            return _composite(kind, quotient, storage, display)
         scale = _product_scale(self._system, numerator, self._semantic, kind, "div")
         return _wrap(kind, _rescaled(quotient, scale), self._system)
 
@@ -858,7 +885,8 @@ class Quantity[K, V, S: AnySystem]:
         raw: Any = self._value
         if self._storage is not None:
             storage = raised(kind, self._storage, exponent)
-            return _composite(kind, raw**exponent, storage, self)
+            display = raised(kind, cast("Unit[Any]", self.unit), exponent)
+            return _composite(kind, raw**exponent, storage, display)
         base = coherence(self._system, self._semantic)
         scale = base**exponent / coherence(self._system, kind)
         return _wrap(kind, _rescaled(raw**exponent, scale), self._system)
@@ -1309,7 +1337,7 @@ class Constant[K]:
                     self._semantic,
                     self._reference,
                     NoSystem,
-                    display=neutral(self._semantic),
+                    display=adapted(self._semantic, cast("Unit[Any]", quantity.unit)),
                 )
                 if quantity._system is NoSystem
                 else self.to_system(quantity._system)

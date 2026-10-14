@@ -291,19 +291,21 @@ def _result(
     return _wrap(kind, keep_storage(like, raw), system, display=display)
 
 
-def _composed(
-    kind: Semantic, raw: Any, storage: Any, like: Any, *operands: _Quantity
-) -> _Quantity:
-    """A product or power of ``operands`` stored in ``storage``, keeping the
-    operand's storage type."""
-    return _composite(kind, keep_storage(like, raw), storage, *operands)
+def _composed(kind: Semantic, raw: Any, units: tuple[Any, Any], like: Any) -> _Quantity:
+    """A product or power stored and shown in ``units``, keeping the operand's
+    storage type."""
+    storage, display = units
+    return _composite(kind, keep_storage(like, raw), storage, display)
 
 
-def _product_storage(first: _Quantity, second: _Quantity, kind: Semantic) -> Any:
-    """The product's storage unit without a system; None in a unit system."""
+def _product_units(first: _Quantity, second: _Quantity, kind: Semantic) -> Any:
+    """The product's storage and display units without a system; None in one."""
     if first._storage is None or second._storage is None:
         return None
-    return compose("mul", kind, first._storage, second._storage)
+    return (
+        compose("mul", kind, first._storage, second._storage),
+        compose("mul", kind, first.unit, second.unit),
+    )
 
 
 def _respread(quantity: _Quantity, raw: Any) -> _Quantity:
@@ -409,9 +411,8 @@ def sqrt(x: Any, /) -> Any:
     raw = _raw(quantity) if storage is None else quantity._value
     root = math.sqrt(raw) if isinstance(raw, (int, float)) else _xp(raw).sqrt(raw)
     if storage is not None:
-        return _composed(
-            kind, root, raised(kind, storage, 0.5), quantity._value, quantity
-        )
+        units = (raised(kind, storage, 0.5), raised(kind, quantity.unit, 0.5))
+        return _composed(kind, root, units, quantity._value)
     return _result(kind, root, quantity.system, quantity._value)
 
 
@@ -543,10 +544,10 @@ def dot(a: Any, b: Any, /) -> Any:
     first, second = first._adopted(second)
     kind = product("mul", first._semantic, second._semantic)
     namespace = _xp(first._value, second._value)
-    storage = _product_storage(first, second, kind)
+    storage = _product_units(first, second, kind)
     if storage is not None:
         raw = _as_like(first._value, namespace.dot(first._value, second._value))
-        return _composed(kind, raw, storage, first._value, first, second)
+        return _composed(kind, raw, storage, first._value)
     raw = namespace.dot(_raw(first), _raw(second))
     return _result(kind, _as_like(first._value, raw), first.system, first._value)
 
@@ -561,10 +562,10 @@ def cross(a: Any, b: Any, /, axis: int = -1) -> Any:
     first, second = first._adopted(second)
     kind = Expression("mul", first._semantic, second._semantic)
     namespace = _xp(first._value, second._value)
-    storage = _product_storage(first, second, kind)
+    storage = _product_units(first, second, kind)
     if storage is not None:
         raw = namespace.cross(first._value, second._value, axis=axis)
-        return _composed(kind, raw, storage, first._value, first, second)
+        return _composed(kind, raw, storage, first._value)
     raw = namespace.cross(_raw(first), _raw(second), axis=axis)
     return _result(kind, raw, first.system, first._value)
 
@@ -782,8 +783,11 @@ def _variance(name: str) -> Callable[..., Any]:
         kind = power(spread, 2)
         raw = _as_like(x._value, raw)
         if storage is not None:
-            squared = raised(kind, recast(spread, storage), 2)
-            return _composed(kind, raw, squared, x._value, x)
+            squared = (
+                raised(kind, recast(spread, storage), 2),
+                raised(kind, recast(spread, x.unit), 2),
+            )
+            return _composed(kind, raw, squared, x._value)
         return _result(kind, raw, x.system, x._value)
 
     function.__name__ = function.__qualname__ = name
@@ -804,9 +808,9 @@ def square(x: Any, /) -> Any:
         return _xp(x).square(x)
     kind = power(x._semantic, 2)
     if x._storage is not None:
-        squared = raised(kind, x._storage, 2)
+        squared = (raised(kind, x._storage, 2), raised(kind, x.unit, 2))
         raw = _xp(x._value).square(x._value)
-        return _composed(kind, raw, squared, x._value, x)
+        return _composed(kind, raw, squared, x._value)
     return _result(kind, _xp(x._value).square(_raw(x)), x.system, x._value)
 
 
@@ -874,10 +878,10 @@ def _product_of(name: str) -> Callable[..., Any]:
         a, b = a._adopted(b)
         kind = product("mul", a._semantic, b._semantic)
         namespace = _xp(a._value, b._value)
-        storage = _product_storage(a, b, kind)
+        storage = _product_units(a, b, kind)
         if storage is not None:
             raw = _as_like(a._value, call(namespace, a._value, b._value))
-            return _composed(kind, raw, storage, a._value, a, b)
+            return _composed(kind, raw, storage, a._value)
         raw = call(namespace, _raw(a), _raw(b))
         return _result(kind, _as_like(a._value, raw), a.system, a._value)
 
@@ -925,9 +929,9 @@ def trapezoid(y: Any, x: Any = None, dx: Any = 1.0, axis: int = -1) -> Any:
     y, step = y._adopted(step)
     kind = product("mul", y._semantic, step._semantic)
     raw = _as_like(y._value, raw)
-    storage = _product_storage(y, step, kind)
+    storage = _product_units(y, step, kind)
     if storage is not None:
-        return _composed(kind, raw, storage, y._value, y, step)
+        return _composed(kind, raw, storage, y._value)
     return _result(kind, raw, y.system, y._value)
 
 

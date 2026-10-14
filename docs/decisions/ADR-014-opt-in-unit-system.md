@@ -40,7 +40,7 @@ are in [opt-in unit systems](../design/opt-in-unit-system.md).
 
 ```python notest
 x = Length[float](2, u.nm)  # Length[float, NoSystem]; stores 2.0 in nm
-f = Energy[float](3, u.eV) / x  # Force; stores 1.5 in eV/nm, shows 0.15 eV/Å
+f = Energy[float](3, u.eV) / x  # Force; stores and shows 1.5 eV/nm
 x + Length[float](3, u.angstrom)  # 2.3 nm: the right operand converts to nm
 x.value  # type error, and a TypeError at runtime
 x.to_system(Real).value  # 20.0: choosing a system converts once
@@ -55,18 +55,20 @@ The rules for null-system quantities:
 * `+`, `-`, and the multi-operand `quantype.numpy` functions convert the other
   operands into the first operand's unit.
 * Products, quotients, and powers compose their units and never convert. A
-  catalogue unit with the same scale is used when one exists, so
-  kcal/mol/Å × Å stores kcal/mol. Unnamed products, such as nm × ps, store a
+  composed unit is a product of catalogue units with exponents, so an
+  identical unit cancels exactly: (eV/nm)·nm is eV. When its scale is the
+  kind's unit in a display system, it takes that name, so J/m is N and
+  kcal/mol/Å × Å is kcal/mol. Unnamed products, such as nm × ps, store a
   composed unit too. A dimensionless result stores plain numbers, so ns/fs is
-  1e6, and it composes with nothing.
+  1e6, and it composes with nothing. Composed symbols parse back.
 * `==`, ordering, and `__hash__` compare stored numbers when both sides share a
   storage unit, and values in the reference units otherwise.
-* A product, quotient, or power displays in a named unit: the kind's unit in
-  the first of a fixed list of systems that stores each operand's kind in the
-  operand's displayed unit, else in `Atomistic`'s, the reference units.
-  Constants fit every system. So eV/nm shows as eV/Å, J/m as N, and
-  kcal/mol/Å × Å as kcal/mol, whatever the operand order. Storage is
-  unchanged.
+* A product, quotient, or power displays its unit composed the same way from
+  its operands' displayed units, whatever their order: `1.5 eV/nm`,
+  `9.0 Da·nm^2/ps^2`. A constant takes the base units its operand uses, so
+  h·c over 500 nm shows in eV. Nothing chooses a system for it:
+  `.simplified()` merges units of one dimension and shows a named kind in a
+  display system that holds every unit left, and `.to(S)` shows `S`'s unit.
 * Combined with a quantity in a unit system, a null-system quantity adopts
   that system, as constants do: arithmetic, comparisons, and the
   `quantype.numpy` functions convert it into the system first. Two unit systems
@@ -96,8 +98,8 @@ functions of operands of one kind have per-kind overloads that do the same.
 
 This supersedes ADR-003, whose system type parameter carries over unchanged,
 and replaces one rule of [ADR-004](ADR-004-display-unit-is-presentation.md): products,
-ratios, and powers of null-system quantities show in a unit chosen from their
-operands' units instead of the system's unit.
+ratios, and powers of null-system quantities show their operands' units
+composed instead of the system's unit.
 
 ### Consequences
 
@@ -119,9 +121,10 @@ operands' units instead of the system's unit.
 * Bad, because operations across units convert: adding a million nm values to
   Å values took 1,013 µs instead of 513 µs. Scalar products cost 0.72 µs
   instead of 0.58 µs, mostly to choose the unit a product shows in.
-* Bad, because products show in `Atomistic`'s units unless one display system
-  holds every operand's unit, so work in nm shows products in Å, and GROMACS
-  units (nm, kJ/mol, ps) show in Å, eV, and fs. `.to(unit)` shows another.
+* Bad, because a composed unit can be unfamiliar: kinetic energy from Da, nm,
+  and ps shows as Da·nm^2/ps^2, though that is about a kJ/mol, and
+  `.magnitude()` returns numbers in it. `.simplified()`, `.to(unit)`, and
+  `.to(S)` show another.
 * Bad, because adoption needs a second overload for each operator and product
   relation: the stubs grew from 17 MB to 27 MB. Each named kind moved into its
   own stub module to stay under Pyright's per-module complexity limit, which
@@ -221,8 +224,9 @@ follow if code turns up that has its numbers in a unit it can name.
   (`Length has no raw numbers without a unit system`). `Unspecified` and `Portable`
   were alternatives. The prototype used `Unbound`, which collides with
   "unbound type variable" in checker output. `Free` was rejected.
-* Products display in the first of `Atomistic`, `Metal`, `Real`, `SI`, `CGS`,
-  and `Atomic` that stores each operand's kind in the operand's unit, with
-  `Atomistic` as the fallback, so g × (m/s)² displays in eV, as JAX results
-  without a system do. A composed symbol such as `eV/nm` read naturally but
-  didn't parse or serialize, and left ratios such as `0.5 ns/fs` unreduced.
+* A composed unit takes the name of the kind's unit in the first of
+  `Atomistic`, `Metal`, `Real`, `SI`, `CGS`, and `Atomic` whose scale it has.
+  Any catalogue unit of the same scale was rejected: nm/ps × fs would show
+  as pm. Showing every product in a display system's units, with `Atomistic`
+  as the fallback, was tried and rejected: eV/nm showed as eV/Å, choosing a
+  system for a quantity that has none.

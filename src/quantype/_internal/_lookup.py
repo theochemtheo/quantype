@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from quantype._internal._storage_units import parsed
 from quantype._internal._systems import AnySystem, NoSystem, UnitSystem
 from quantype._internal._unit import Unit, get_unit, known_kinds, units_of
 
@@ -57,7 +58,13 @@ def unit_of_kind(
     error that names both kinds.
     """
     definitions = tuple(units)
-    unit = resolve_unit(name, definitions, kind=kind, system=system)
+    try:
+        unit = resolve_unit(name, definitions, kind=kind, system=system)
+    except ValueError:
+        composed = parsed(name, kind, lambda leaf: _leaf(leaf, definitions, system))
+        if composed is None:
+            raise
+        return composed
     if unit.semantic is kind:
         return unit
     try:
@@ -66,6 +73,29 @@ def unit_of_kind(
         raise ValueError(
             f"Expected {kind}; received {unit.kind} (unit {name!r})"
         ) from None
+
+
+def _leaf(name: str, units: Iterable[Unit[Any]], system: type[AnySystem]) -> Unit[Any]:
+    """A unit of any kind in a composed symbol: a name or alias, else a symbol."""
+    definitions = tuple(units)
+    try:
+        return resolve_unit(name, definitions, system=system)
+    except ValueError:
+        pass
+    found = list(
+        dict.fromkeys(
+            unit
+            for unit in (
+                *definitions,
+                *_system_units(system),
+                *(unit for kind in known_kinds() for unit in units_of(kind)),
+            )
+            if unit.symbol == name
+        )
+    )
+    if len(found) != 1:
+        raise ValueError(f"Unknown or ambiguous unit {name!r}")
+    return found[0]
 
 
 def _system_units(system: type[AnySystem]) -> list[Unit[Any]]:

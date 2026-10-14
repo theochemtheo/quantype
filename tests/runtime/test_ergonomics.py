@@ -148,7 +148,7 @@ def test_unit_names_the_presented_unit() -> None:
     assert Pressure.from_value(1.0, Metal).unit is u.bar
     product = (1 * u.nm) * (1 * u.fs)
     assert product.unit is not None
-    assert product.unit.symbol == "Å·fs"
+    assert product.unit.symbol == "fs·nm"
     si_unit = ((1 * u.m) * (1 * u.s)).unit
     assert si_unit is not None
     assert si_unit.symbol == "m·s"

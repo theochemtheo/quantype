@@ -16,6 +16,7 @@ from quantype import (
     Energy,
     Force,
     Length,
+    Mass,
     Quantity,
     Temperature,
     TemperatureDifference,
@@ -139,10 +140,10 @@ def test_products_ratios_and_powers_fall_back_to_the_system() -> None:
     assert repr(x**2) == "Area(4e-18 m^2, SI)"
     assert repr(Energy[float, SI](3, u.eV) / x).startswith("Force(")
     area = (2 * u.nm) * (3 * u.nm)
-    assert repr(area) == "Area(600.0 Å^2)"
-    assert repr(area.to_system(Atomistic)) == "Area(600.0 Å^2, Atomistic)"
+    assert repr(area) == "Area(6.0 nm^2)"
+    assert repr(area.to_system(Atomistic)) == "Area(6.0 nm^2, Atomistic)"
     structural = (2 * u.angstrom) * (3 * u.fs)
-    assert repr(structural) == "LengthTime(6.0 Å·fs)"
+    assert repr(structural) == "LengthTime(6.0 fs·Å)"
     assert (
         repr(structural.to_system(Atomistic)) == "LengthTime(6.0 (Å * fs), Atomistic)"
     )
@@ -162,8 +163,31 @@ def test_products_without_a_system_show_named_units() -> None:
     tension = Force[float](1, u.kcal_per_mol_per_angstrom)
     assert repr(tension * Length[float](2, u.angstrom)) == "Energy(2.0 kcal/mol)"
     nm, angstrom = Length[float](1, u.nm), Length[float](2, u.angstrom)
-    assert repr(nm * angstrom) == repr(angstrom * nm) == "Area(20.0 Å^2)"
-    assert repr(1 / nm) == repr(nm**-1)
+    assert repr(nm * angstrom) == repr(angstrom * nm) == "Area(2.0 nm·Å)"
+    assert repr(1 / nm) == repr(nm**-1) == "PerLength(1.0 1/nm)"
+    force = Energy[float](3, u.eV) / Length[float](2, u.nm)
+    assert repr(force) == "Force(1.5 eV/nm)"
+    assert repr(force * Length[float](2, u.nm)) == "Energy(3.0 eV)"
+    mass, speed = Mass[float](2, u.Da), Length[float](1, u.nm) / Time[float](1, u.ps)
+    assert repr(mass * speed**2) == "Energy(2.0 Da·nm^2/ps^2)"
+
+
+def test_simplified_and_system_units_change_only_the_display() -> None:
+    energy = Force[float](1, u.kcal_per_mol_per_angstrom) * Length[float](2, u.nm)
+    assert repr(energy) == "Energy(2.0 (kcal/mol/Å)·nm)"
+    assert repr(energy.simplified()) == "Energy(20.0 kcal/mol)"
+    assert energy.simplified() == energy
+    assert repr(energy.to(Atomistic)) == "Energy(0.8672820848360187 eV)"
+    assert energy.to(Atomistic).system is NoSystem
+    speed = Length[float](1, u.angstrom) / Time[float](1, u.fs)
+    kinetic = Mass[float](2, u.Da) * speed**2
+    assert repr(kinetic.simplified()) == "Energy(207.2853933432161 eV)"
+    md = Mass[float](2, u.Da) * (Length[float](1, u.nm) / Time[float](1, u.ps)) ** 2
+    assert md.simplified().unit == md.unit
+    bound = Length[float, SI](2, u.nm)
+    assert repr(bound.to(Atomistic)) == "Length(20.0 Å, SI)"
+    with pytest.raises(TypeError, match="unit system class"):
+        bound.to(cast("Any", NoSystem))
 
 
 def test_scaling_by_a_dimensionless_keeps_the_storage_unit() -> None:
@@ -173,7 +197,7 @@ def test_scaling_by_a_dimensionless_keeps_the_storage_unit() -> None:
     for _ in range(50):
         scaled = scaled * factor
     assert scaled._storage is velocity._storage  # noqa: SLF001
-    assert scaled.unit is velocity.unit is u.angstrom_per_fs
+    assert scaled.unit is velocity.unit
 
 
 def test_conversions_by_exact_ratios_are_exact() -> None:

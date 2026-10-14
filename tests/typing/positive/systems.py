@@ -133,6 +133,10 @@ assert_type(qnp.arctan2(1.0 * u.nm, x_si), Angle[float, SI])
 assert_type(qnp.linspace(0.0 * u.nm, x_si), Length[npt.NDArray[np.float64], SI])
 
 
+assert_type(x_si.to(Atomistic), Length[float, SI])
+assert_type((x_default * x_default).simplified(), Area[float])
+
+
 def shifted[S: AnySystem](r: Length[float, S]) -> Length[float, S]:
     return r + 1.0 * u.angstrom
 

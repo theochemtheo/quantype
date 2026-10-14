@@ -37,7 +37,7 @@ assert isinstance(force, Force)
 assert length.magnitude() == 2.0  # kept in the unit it was given in
 assert length.magnitude(u.angstrom) == 20.0
 assert repr(length) == "Length(2.0 nm)"
-assert repr(force) == "Force(0.15 eV/Å)"  # a product shows in a named unit
+assert repr(force) == "Force(1.5 eV/nm)"  # the division multiplies units out
 assert force.magnitude(u.eV_per_angstrom) == 0.15
 
 shown = length.to(u.angstrom)

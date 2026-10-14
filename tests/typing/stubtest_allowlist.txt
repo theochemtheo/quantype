@@ -11,6 +11,7 @@
 # A type alias has no runtime tuple base class (stubtest treats it as a class).
 ^quantype\._internal\._registry\.Dimensions$
 ^quantype\._internal\._systems\.AnySystem$
+^quantype\._internal\._storage_units\.Factors$
 ^quantype\._internal\._semantics\.Semantic$
 ^quantype\._internal\._codata\.Edition$
 ^quantype\._internal\._registry\.Relations$
@@ -19,7 +20,7 @@
 
 # functools.cache exposes a variadic checker signature but preserves runtime __wrapped__.
 ^quantype\._internal\._registry\._unit_specs$
-^quantype\._internal\._storage_units\.(_catalogue_systems|compose|neutral|raised|recast|reference_unit|shown|system_unit)$
+^quantype\._internal\._storage_units\.(_expanded|adapted|compose|raised|recast|reference_unit|simplest|system_unit)$
 
 # Standard static generics are retained; the runtime alias adds conversion on call.
 ^quantype\.core\.Quantity\.__class_getitem__$

@@ -288,10 +288,10 @@ def test_scalar_storage_hashes_by_value_and_arrays_do_not_hash() -> None:
 
 def test_structural_results_display_their_units() -> None:
     product = (2 * u.nm) * (3 * u.fs) * u.eV(1)
-    assert repr(product**2) == "Quantity(3600.0 ((Å·fs)·eV)^2)"
-    assert repr(product - product) == "Quantity(0.0 (Å·fs)·eV)"
+    assert repr(product**2) == "Quantity(36.0 eV^2·fs^2·nm^2)"
+    assert repr(product - product) == "Quantity(0.0 eV·fs·nm)"
     si = (2 * u.m) * (3 * u.s) * u.J(1)
-    assert repr(si) == "Quantity(6.0 (m·s)·J)"
+    assert repr(si) == "Quantity(6.0 J·m·s)"
     bound = product.to_system(Atomistic)
     assert repr(bound**2) == "Quantity(3600.0 (((Å * fs) * eV))^2, Atomistic)"
     assert repr(u.nm) == "nm"

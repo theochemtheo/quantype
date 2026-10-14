@@ -23,6 +23,7 @@ from quantype import (
     u,
     ujax,
 )
+from quantype._internal._storage_units import reference_unit
 from quantype.products import LengthEnergy
 from quantype.systems import (
     CGS,
@@ -124,7 +125,9 @@ def test_jax_pytree_keeps_kind_and_system_but_not_display() -> None:
     assert type(structural) is LengthEnergy
     leaves, tree = _trees.tree_flatten(structural)
     assert len(leaves) == 1
-    assert leaves[0] is structural.magnitude()
+    # Leaves hold the reference units, Å·eV, whatever the display.
+    reference = reference_unit(structural._semantic)  # noqa: SLF001
+    assert leaves[0] is structural.magnitude(reference)
     rebuilt = _trees.tree_unflatten(tree, leaves)
     assert type(rebuilt) is LengthEnergy
     assert rebuilt.kind == structural.kind

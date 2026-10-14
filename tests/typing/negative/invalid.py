@@ -104,3 +104,4 @@ def _pair(raw: float) -> npt.NDArray[np.float64]:
 apply_keeps_the_storage = Length[float](1.0, u.nm).apply(_pair)  # error
 any_system_is_no_system = x_si.to_system(AnySystem)  # error
 mixed_kinds_in_numpy = qnp.maximum(2.0 * u.nm, 2.0 * u.eV)  # error
+shown_without_a_system = x_si.to(NoSystem)  # error

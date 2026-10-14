@@ -62,8 +62,8 @@ To turn one into the other, call `reinterpret`.
 ## Unit systems
 
 A quantity keeps its numbers in the unit it was given in. A sum converts the
-right operand into the left one's unit. Products keep their numbers unconverted
-and show in a named unit.
+right operand into the left one's unit, and a product multiplies its operands'
+units out, unconverted.
 
 ```python
 from typing import assert_type
@@ -75,7 +75,7 @@ b = Length[float](20, u.angstrom)
 assert a == b
 assert repr(a + b) == "Length(4.0 nm)"
 force = (3 * u.eV) / a
-assert repr(force) == "Force(0.15 eV/Å)"  # shown in eV/Å, stored unconverted
+assert repr(force) == "Force(1.5 eV/nm)"  # no conversion in the division
 
 x = a.to_system(Atomistic)
 assert_type(x, Length[float, Atomistic])

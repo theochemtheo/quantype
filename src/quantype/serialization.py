@@ -25,7 +25,7 @@ from quantype._internal._storage import (
     reject_booleans,
     unit_conversion,
 )
-from quantype._internal._storage_units import ComposedUnit, storage_map
+from quantype._internal._storage_units import storage_map
 from quantype._internal._systems import AnySystem, NoSystem
 from quantype.core import Quantity, Unit, _wrap
 from quantype.typing import quantity_type
@@ -45,8 +45,8 @@ def selected_unit(
     if not isinstance(quantity._semantic, Kind):
         raise ValueError("Serialization requires a named quantity")
     selected = unit or quantity.unit
-    if selected is None or isinstance(selected, ComposedUnit):
-        raise ValueError(f"{selected} has no name to decode by; name a unit")
+    if selected is None:
+        raise ValueError("Name a unit to write this quantity in")
     quantity._check_unit(selected)
     return selected
 

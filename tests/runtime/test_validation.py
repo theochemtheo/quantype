@@ -53,11 +53,17 @@ def test_scalar_roundtrip_and_display_unit() -> None:
 
 def test_products_are_written_in_the_unit_they_show() -> None:
     force = Energy[float](3, u.eV) / Length[float](2, u.nm)
-    wire = {"kind": "Force", "magnitude": 0.15, "unit": "eV_per_angstrom"}
+    wire = {"kind": "Force", "magnitude": 1.5, "unit": "eV/nm"}
     assert to_dict(force) == wire
     assert to_dict(force, u.newton)["unit"] == "newton"
     assert Force.parse(wire) == force
     assert Force.parse(str(force)) == force
+    assert Force.unit_named("(kcal/mol)/nm").scale == pytest.approx(0.0043364, rel=1e-4)
+    energy = Energy.parse("2 Da·nm^2/ps^2")
+    assert energy.unit is not None
+    assert energy.unit.symbol == "Da·nm^2/ps^2"
+    with pytest.raises(ValueError, match="Unknown unit"):
+        Force.parse("1 eV·nm")
 
 
 def test_pydantic_roundtrip() -> None:

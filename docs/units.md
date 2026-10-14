@@ -246,16 +246,22 @@ has no effect on the stored numbers. It is set and kept as follows:
 - Same-kind operations keep it: addition and subtraction (the left operand
   wins), scaling, negation, `abs`, reductions, and indexing.
 - Point minus point gives the matching difference unit: `°C − °C → Δ°C`.
-- Without a system, a product, ratio, or power shows in the kind's unit in the
-  first of `Atomistic`, `Metal`, `Real`, `SI`, `CGS`, and `Atomic` that stores
-  each operand's kind in that operand's unit, and in `Atomistic` when none
-  does. So J/m shows in N, kcal/mol/Å times Å in kcal/mol, and eV/nm in eV/Å.
-  Constants fit every system. A dimensionless result is a plain number: ns/fs
-  is 1e6. The numbers aren't converted to show them, except a dimensionless
-  result's.
+- Without a system, a product, ratio, or power shows in its operands' units
+  multiplied out: eV/nm, nm^2, Da·nm^2/ps^2. A unit above and below the line
+  cancels, so (eV/nm)·nm is eV. When the result's scale is the kind's unit in
+  `Atomistic`, `Metal`, `Real`, `SI`, `CGS`, or `Atomic`, it takes that name:
+  J/m shows as N, and kcal/mol/Å times Å as kcal/mol. A constant takes the
+  units its operand uses, so h·c over 500 nm shows in eV. A dimensionless
+  result is a plain number: ns/fs is 1e6. These units parse back, as in
+  `Force.parse("1.5 eV/nm")`.
+- `.simplified()` shows a quantity in its simplest unit. Units of one
+  dimension merge, so (kcal/mol/Å)·nm shows as kcal/mol, and a named kind
+  takes its unit in a system that holds every unit left, so Da·(Å/fs)^2
+  shows as eV. Da·nm^2/ps^2 stays as it is, as no built-in system uses nm.
 - In a unit system, products, ratios, and powers show in the system's unit for
   the result.
 - `.to(unit)` selects a display unit without changing the stored numbers, and
+  `.to(Atomistic)` the kind's unit in a system, without choosing that system.
   `.unit` reports the unit in use (`None` for unnamed products in a system).
 - Format specs apply to the magnitude: `f"{q:.3f}"` gives `2.000 nm`.
 - JAX transformations drop it, because it isn't part of the pytree. Results
@@ -268,12 +274,14 @@ from quantype.systems import Atomistic
 
 assert repr(2 * u.nm + 5 * u.angstrom) == "Length(2.5 nm)"
 assert repr(5 * u.angstrom + 2 * u.nm) == "Length(25.0 Å)"
-assert repr((3 * u.eV) / (2 * u.nm)) == "Force(0.15 eV/Å)"
+assert repr((3 * u.eV) / (2 * u.nm)) == "Force(1.5 eV/nm)"
 assert repr((2 * u.m) * (3 * u.s)) == "LengthTime(6.0 m·s)"
 assert repr((1 * u.ns) / (2 * u.fs)) == "Dimensionless(500000.0)"
 speed = Velocity[float](1, u.angstrom_per_fs)
 kinetic = Mass[float](2, u.Da) * speed**2
-assert repr(kinetic) == "Energy(207.2853933432161 eV)"
+assert repr(kinetic) == "Energy(2.0 Da·(Å/fs)^2)"
+assert repr(kinetic.simplified()) == "Energy(207.2853933432161 eV)"
+assert repr(kinetic.to(Atomistic)) == "Energy(207.2853933432161 eV)"
 assert repr(30 * u.celsius - 20 * u.celsius) == "TemperatureDifference(10.0 Δ°C)"
 assert repr(Length[float](2, u.nm, display=False)) == "Length(2.0 nm)"
 bound = Length[float, Atomistic](2, u.nm, display=False)
