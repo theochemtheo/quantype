@@ -20,7 +20,7 @@
 
 # functools.cache exposes a variadic checker signature but preserves runtime __wrapped__.
 ^quantype\._internal\._registry\._unit_specs$
-^quantype\._internal\._storage_units\.(_expanded|adapted|compose|raised|recast|reference_unit|simplest|system_unit)$
+^quantype\._internal\._storage_units\.(_expanded|adapted|compose|raised|recast|reference_unit|rooted|simplest|system_unit)$
 
 # Standard static generics are retained; the runtime alias adds conversion on call.
 ^quantype\.core\.Quantity\.__class_getitem__$
@@ -29,6 +29,10 @@
 # Dimensionless quantity, whose generated class declares it; elsewhere float()
 # stays a static error.
 ^quantype\.core\.Quantity\.(__bool__|__float__)$
+
+# Runtime-only: dividing or raising a unit always raises with a hint; declaring
+# it would let checkers accept u.eV / u.angstrom.
+^quantype\._internal\._unit\.Unit\.(__pow__|__rtruediv__|__truediv__)$
 
 # NumPy and Torch dispatch methods: unit rules at runtime; NumPy's and Torch's
 # stubs do not accept quantities, so declaring them would type results as arrays.

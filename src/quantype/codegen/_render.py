@@ -78,19 +78,19 @@ def adopting(signatures: list[str], receiver: str) -> list[str]:
     that it also binds a caller's ``[S: AnySystem]``. ``receiver`` is the
     implicit type of ``self``.
     """
-    widened, adopted = _adoption(signatures, receiver)
-    return widened + adopted
-
-
-def _adoption(signatures: list[str], receiver: str) -> tuple[list[str], list[str]]:
     widened: list[str] = []
     adopted: list[str] = []
     for signature in signatures:
         match = _SIGNATURE.match(signature)
-        operand = "" if match is None else str(match["other"])
+        if match is None:
+            if re.search(r"other: [^/]*, S\]", signature):
+                raise ValueError(f"Can't add adoption to {signature!r}")
+            widened.append(signature)
+            continue
+        operand = str(match["other"])
         alternatives = operand.split(" | ")
         systemic = [option for option in alternatives if option.endswith(", S]")]
-        if match is None or not systemic:
+        if not systemic:
             widened.append(signature)
             continue
         other = " | ".join(
@@ -100,9 +100,12 @@ def _adoption(signatures: list[str], receiver: str) -> tuple[list[str], list[str
             for option in alternatives
         )
         widened.append(signature.replace(f"other: {operand}", f"other: {other}"))
-        self_type = (
-            match["self"].removeprefix("self: ") if ":" in match["self"] else receiver
-        )
+        if ":" in match["self"]:
+            self_type = match["self"].removeprefix("self: ")
+        elif receiver:
+            self_type = receiver
+        else:
+            raise ValueError(f"{signature!r} needs a receiver type to adopt")
         parameters = ", ".join(filter(None, (match["parameters"], "T: AnySystem")))
         adopted.append(
             f"def {match['method']}[{parameters}]"
@@ -110,7 +113,7 @@ def _adoption(signatures: list[str], receiver: str) -> tuple[list[str], list[str
             f"other: {' | '.join(option.removesuffix(', S]') + ', T]' for option in systemic)}, /) "
             f"-> {match['result'].replace(', S]', ', T]')}: ..."
         )
-    return widened, adopted
+    return widened + adopted
 
 
 def adopting_members(single: list[str], pair: list[str], receiver: str) -> str:
@@ -420,7 +423,8 @@ def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
     )
     # x ** 2 is x * x and x ** -1 is 1 / x, so literal powers are named or pairs.
     exponents = literal_exponents(name, catalogue)
-    powers = [
+    powers = [f"def __pow__(self, exponent: Literal[1], /) -> {name}[V, S]: ..."]
+    powers += [
         f"def __pow__(self, exponent: Literal[{exponent}], /) -> {power_type(name, exponent, catalogue, table)}: ..."
         for exponent in exponents
     ]
@@ -477,7 +481,8 @@ def constant_stub(name: str, catalogue: Catalogue, table: Table) -> str:
         # A named reciprocal refines the base's structural return type, which
         # checkers compare as an override.
         text += block if method != "__rtruediv__" else suppressed_override(block)
-    powers = [
+    powers = [f"def __pow__(self, exponent: Literal[1], /) -> _{name}Constant: ..."]
+    powers += [
         f"def __pow__(self, exponent: Literal[{exponent}], /) -> _{powered}Constant: ..."
         for exponent in literal_exponents(name, catalogue)
         if (powered := power_name(name, exponent, catalogue, table)) is not None
@@ -572,6 +577,7 @@ def structural_quantity_stub() -> str:
     )
     text += overloads(
         [
+            "def __pow__[Q: _StructuralQuantity[Any, Any, Any, Any]](self: Q, exponent: Literal[1], /) -> Q: ...",
             "def __pow__[A, B](self: _StructuralQuantity[A, B, V, S], exponent: Literal[2], /) -> Quantity[Pow[K, Literal[2]], V, S]: ...",
             "def __pow__[A, B, N: int](self: _StructuralQuantity[A, B, V, S], exponent: N, /) -> Quantity[Pow[K, N], V, S]: ...",
         ],

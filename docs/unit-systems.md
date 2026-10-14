@@ -138,7 +138,7 @@ import numpy as np
 from quantype.systems import SI
 
 for issue in SI.check_range(np.float32):
-    print(issue)  # SI: Energy (1.6e-23 J)² would underflow float32, ...
+    print(issue)  # SI: Area (1e-24 m^2)² would underflow float32, ...
 ```
 
 The [range table](units.md#numerical-range) for built-in systems comes from the
@@ -175,20 +175,23 @@ system, because every operand is in `S`, and a literal such as `1.0 * u.nm`
 has no system, so it adopts `S`. Pyright and ty find a product's kind from its
 right operand, and can't adopt `S` from there: write the literal on the left,
 as in `(1.0 * u.nm) * force`, or give it the system, as in
-`cutoff / (1.0 * u.fs).to_system(cutoff.system)`. `raw_cutoff` rejects a length without a
-system, because `.value` needs a `UnitSystem`. Checker messages for that name
-the descriptor behind `.value`: mypy says
-``Value of type variable "T" of "__get__" of "_Value" cannot be "NoSystem"``,
-and Pyrefly says ``NoSystem`` "is not assignable to upper bound `UnitSystem`".
+`cutoff / (1.0 * u.fs).to_system(cutoff.system)`. `raw_cutoff` rejects a
+length without a system, because `.value` needs a `UnitSystem`: mypy says
+``Value of type variable "S" of "raw_cutoff" cannot be "NoSystem"``, and Pyrefly
+that ``NoSystem`` "is not assignable to upper bound `UnitSystem`". Reading
+`.value` of such a length directly names the descriptor behind it instead, as
+in mypy's ``Value of type variable "T" of "__get__" of "_Value" cannot be
+"NoSystem"``.
 `AnySystem` is `UnitSystem | NoSystem`, a bound for type parameters: no
 quantity is a `Length[float, AnySystem]`, and `.to_system(AnySystem)` is a type
 error.
 
-Annotations without a system, such as `Length[float]`, mean `NoSystem`.
-Arithmetic adopts a system, and parameters don't: a function typed
+Annotations without a system, such as `Length[float]`, mean `NoSystem`, and
+parameters don't [adopt a system](units.md#unit-systems): a function typed
 `Length[float]` rejects SI quantities, and one typed `Length[float, SI]` rejects
-quantities without a system. The runtime error message names `.to_system(...)`
-as the fix. Prefer the generic form in shared libraries, and
+quantities without a system. Checkers enforce that for plain functions;
+Pydantic fields and `TypeAdapter` also check at runtime, with a message that
+names `.to_system(...)`. Prefer the generic form in shared libraries, and
 the explicit form (`Length[npt.NDArray[np.float64], Real]`) for kernels whose raw
 numbers must be in particular units.
 

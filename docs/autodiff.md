@@ -71,6 +71,14 @@ results come back shown in the system's unit. Quantities in different
 systems have different pytree structures, just as they have different static
 types.
 
+Inside `jit`, `vmap`, and the derivatives, a quantity without a system holds
+reference units, so `.magnitude()` without a unit gives numbers in Å, eV, and fs
+there, and in the units it was given in outside. Name the unit, as in
+`x.magnitude(u.nm)`, in code a transformation traces. `jax.device_put` and
+`jax.tree_util.tree_map` flatten quantities too, so their results show in the
+reference units. Quantities are unhashable, so they can't be static arguments
+of `jax.jit`; pass `q.magnitude(unit)` and rebuild the quantity inside.
+
 Differentiate with `ujax.grad`, `ujax.value_and_grad`, and `ujax.hessian`.
 Before `ujax` is imported, JAX's own `jax.grad` rejects a quantity as "not a
 valid JAX type". After, it treats a quantity as a container, so for a function
@@ -113,6 +121,9 @@ gradient = utorch.grad(energy, x, create_graph=True)
 on_x, on_y = utorch.grad(energy, [x, y])
 force = -gradient
 ```
+
+`energy` shows in `(eV/Å^2)·nm^2`, the units its factors were given in, so
+`energy.magnitude()` is 100 times its value in eV. Log `energy.magnitude(u.eV)`.
 
 `utorch.grad` differentiates a scalar output with respect to one quantity, or
 with respect to a sequence of them, which gives a tuple. The input tensor needs

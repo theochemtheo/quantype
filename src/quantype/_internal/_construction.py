@@ -60,6 +60,7 @@ class StorageAlias(GenericAlias):
         dtype: object = None,
         display: bool = True,
     ) -> Quantity[Any, Any, Any]:
+        from quantype._internal._semantics import kind_mismatch
         from quantype._internal._storage import convert, storage_origin
         from quantype._internal._storage_units import storage_map
         from quantype.core import _wrap, require_unit
@@ -73,7 +74,7 @@ class StorageAlias(GenericAlias):
             )
         require_unit(unit, cls._kind)
         if unit.semantic is not cls._semantic:
-            raise ValueError(f"Expected {cls._kind}; received {unit.kind}")
+            raise ValueError(kind_mismatch(cls._semantic, unit.semantic))
         scale, offset, stored = storage_map(unit, system)
         raw = convert(value, self.storage, dtype=dtype, scale=scale, offset=offset)
         if not display:

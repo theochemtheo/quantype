@@ -166,7 +166,19 @@ def product(
     return Expression(operation, left, right)
 
 
+def kind_mismatch(expected: object, received: object) -> str:
+    """``Expected X; received Y``, explaining two catalogues' kinds of one name."""
+    if str(expected) == str(received):
+        return (
+            f"Expected {expected}; received the {received} of another catalogue, "
+            "a different kind. Use one catalogue's quantity classes and units"
+        )
+    return f"Expected {expected}; received {received}"
+
+
 def power(kind: Semantic, exponent: int) -> Semantic:
+    if exponent == 1:
+        return kind
     if isinstance(kind, Kind):
         known = EXPONENTS.get((kind, exponent))
         # x ** 2 is x * x, and x ** -1 is 1 / x, wherever those are named.

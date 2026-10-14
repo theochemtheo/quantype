@@ -17,6 +17,7 @@ from quantype import (
     Force,
     Length,
     Mass,
+    Pressure,
     Quantity,
     Temperature,
     TemperatureDifference,
@@ -144,9 +145,7 @@ def test_products_ratios_and_powers_fall_back_to_the_system() -> None:
     assert repr(area.to_system(Atomistic)) == "Area(6.0 nm^2, Atomistic)"
     structural = (2 * u.angstrom) * (3 * u.fs)
     assert repr(structural) == "LengthTime(6.0 fs·Å)"
-    assert (
-        repr(structural.to_system(Atomistic)) == "LengthTime(6.0 (Å * fs), Atomistic)"
-    )
+    assert repr(structural.to_system(Atomistic)) == "LengthTime(6.0 fs·Å, Atomistic)"
     assert "Mul" not in repr(structural)
 
 
@@ -171,6 +170,20 @@ def test_products_without_a_system_show_named_units() -> None:
     assert repr(force * Length[float](2, u.nm)) == "Energy(3.0 eV)"
     mass, speed = Mass[float](2, u.Da), Length[float](1, u.nm) / Time[float](1, u.ps)
     assert repr(mass * speed**2) == "Energy(2.0 Da·nm^2/ps^2)"
+
+
+def test_roots_merge_units_of_one_dimension() -> None:
+    root = qnp.sqrt(Length[float](2, u.nm) * Length[float](5, u.angstrom))
+    assert root.unit is u.nm
+    assert root.magnitude(u.angstrom) == pytest.approx(10)
+
+
+def test_simplified_keeps_catalogue_units_and_merges_into_the_largest_power() -> None:
+    warm = Temperature[float](25, u.degC)
+    assert warm.simplified().unit is u.degC
+    stress = (Pressure[float](6, u.Pa) * Length[float](1, u.angstrom)).simplified()
+    assert str(stress.unit) == "J/m^2"
+    assert stress.magnitude() == pytest.approx(6e-10)
 
 
 def test_units_of_one_dimension_cancel_into_the_left_operands() -> None:

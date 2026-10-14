@@ -42,6 +42,8 @@ times: Time[Array] = Time[Array](np.ones(3), u.fs)
 
 # Three factors are named whatever their order, grouping or powers.
 assert_type(m * v**2, Energy[float])
+assert_type(v**1, Velocity[float])
+assert_type((m * v) ** 1, Momentum[float])
 assert_type(v**2 * m, Energy[float])
 assert_type(m * (v * v), Energy[float])
 assert_type(p**2 / m, Energy[float])

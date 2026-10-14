@@ -35,7 +35,7 @@ from quantype._internal._semantics import (
     product,
 )
 from quantype._internal._storage import keep_storage
-from quantype._internal._storage_units import raised, recast
+from quantype._internal._storage_units import raised, recast, rooted
 from quantype._internal._systems import NoSystem, coherence
 from quantype.core import (
     Quantity,
@@ -412,7 +412,7 @@ def sqrt(x: Any, /) -> Any:
     raw = _raw(quantity) if storage is None else quantity._value
     root = math.sqrt(raw) if isinstance(raw, (int, float)) else _xp(raw).sqrt(raw)
     if storage is not None:
-        units = (raised(kind, storage, 0.5), raised(kind, quantity.unit, 0.5))
+        units = (raised(kind, storage, 0.5), rooted(kind, quantity.unit, 0.5))
         return _composed(kind, root, units, quantity._value)
     return _result(kind, root, quantity.system, quantity._value)
 

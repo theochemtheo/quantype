@@ -194,7 +194,7 @@ def test_structural_results_are_stored_coherently() -> None:
     mass = Mass[float, Metal](1, u.gram_per_mole)
     moment = mass * Length[float, Metal](1, u.angstrom)
     assert type(moment) is LengthMass  # factors in catalogue order
-    assert repr(moment).endswith("(Å * eV ps^2/Å^2), Metal)")
+    assert repr(moment).endswith("(eV ps^2/Å^2)·Å, Metal)")
     assert moment.value == pytest.approx(LAMMPS_METAL["mvv2e"], rel=LAMMPS_DIGITS)
 
 

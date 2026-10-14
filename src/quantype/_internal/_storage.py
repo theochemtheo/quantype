@@ -60,18 +60,21 @@ def reject_booleans(value: Any) -> None:
             reject_booleans(item)
 
 
-def validate_floating_storage(value: Any) -> None:
-    """Inspect existing storage without converting, detaching, or moving it."""
+def is_floating(value: Any) -> bool:
+    """Whether array or NumPy scalar storage has a real floating dtype."""
     module = type(value).__module__
     if module.startswith("torch"):
-        valid = value.is_floating_point()
-    elif module.startswith(("jax", "jaxlib")):
+        return bool(value.is_floating_point())
+    if module.startswith(("jax", "jaxlib")):
         import jax.numpy as jnp
 
-        valid = jnp.issubdtype(value.dtype, jnp.floating)
-    else:
-        valid = value.dtype.kind == "f"
-    if not valid:
+        return jnp.issubdtype(value.dtype, jnp.floating)
+    return bool(value.dtype.kind == "f")
+
+
+def validate_floating_storage(value: Any) -> None:
+    """Inspect existing storage without converting, detaching, or moving it."""
+    if not is_floating(value):
         raise ValueError(
             "Unit-first construction requires a real floating dtype; "
             "use a typed quantity constructor to convert integer magnitudes"

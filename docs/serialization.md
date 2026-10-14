@@ -59,8 +59,9 @@ restored = Configuration.model_validate_json(config.model_dump_json())
 ```
 
 A field's unit system comes from its annotation, so `cutoff: Length[float, SI]`
-reads `"0.5 nm"` as meters. A quantity object from another system raises;
-convert it with `.to_system(...)` first.
+reads `"0.5 nm"` as meters. Strings and wire objects carry no system, so they
+decode into the field's. A quantity object in another system, or without one,
+raises, as fields don't adopt a system; convert it with `.to_system(...)` first.
 
 Pass custom units through the validation context:
 
@@ -117,7 +118,7 @@ restored_positions = load_npz(
     "positions",
     Length[npt.NDArray[np.float64]],
 )
-in_metres = load_npz("frame.npz", "positions", Length[npt.NDArray[np.float64], SI])
+in_meters = load_npz("frame.npz", "positions", Length[npt.NDArray[np.float64], SI])
 
 with np.load("frame.npz", allow_pickle=False) as archive:
     metadata_json = str(archive["metadata"])

@@ -35,9 +35,10 @@ from quantype._internal._unit import Unit, units_of
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-# A composed scale takes a catalogue unit's name when they agree this closely,
-# which absorbs the rounding of each operand's scale.
-_TOLERANCE = 1e-12
+# A composed scale takes a catalogue unit's name when they agree this closely:
+# a few ulps, the rounding of each operand's scale, so a name never stands for
+# a unit whose scale differs.
+_TOLERANCE = 4e-15
 # Leaf symbols holding these are parenthesized in a composed symbol.
 _COMPOUND = frozenset("/·* ")
 
@@ -339,26 +340,45 @@ def _expanded(leaf: Unit[Any]) -> Factors:
     return ((leaf, 1.0),)
 
 
+def _merged(factors: Factors) -> Factors:
+    """Units of one dimension merged into the one with the largest power."""
+    groups: dict[tuple[int, ...], list[tuple[Unit[Any], float]]] = {}
+    for leaf, exponent in factors:
+        groups.setdefault(tuple(leaf.semantic.dimensions), []).append((leaf, exponent))
+    return tuple(
+        (max(group, key=lambda pair: abs(pair[1]))[0], total)
+        for group in groups.values()
+        if (total := sum(exponent for _, exponent in group))
+    )
+
+
+@cache
+def rooted(kind: Semantic, unit: Unit[Any], exponent: float) -> Unit[Any]:
+    """The displayed unit of a root of a quantity shown in ``unit``.
+
+    Units of one dimension merge first, so the root of nm·Å shows in nm
+    rather than nm^0.5·Å^0.5.
+    """
+    return settled(kind, _built(kind, _combined((_merged(factors_of(unit)), exponent))))
+
+
 @cache
 def simplest(kind: Semantic, unit: Unit[Any]) -> Unit[Any]:
     """``unit`` in its simplest form, for ``simplified()``.
 
-    A unit a display system derives from its base units, such as kcal/mol/Å in
-    ``Real``, expands into them. Units of one dimension then merge into the
-    first of them by symbol, so (kcal/mol/Å)·nm is kcal/mol. A named kind then
-    takes its unit in the first display system that holds every remaining
-    unit, so Da·Å^2/fs^2 is eV, else a catalogue unit of the same scale in a
-    display system. What remains is the merged product.
+    A catalogue unit is already simplest. A unit a display system derives from
+    its base units, such as kcal/mol/Å in ``Real``, expands into them. Units of
+    one dimension then merge into the one with the largest power, so
+    (kcal/mol/Å)·nm is kcal/mol and Pa·Å is J/m^2. A named kind then takes its
+    unit in the first display system that holds every remaining unit, so
+    Da·Å^2/fs^2 is eV, else a catalogue unit of the same scale in a display
+    system. What remains is the merged product.
     """
-    expanded = _combined(
-        *((_expanded(leaf), exponent) for leaf, exponent in factors_of(unit))
+    if not isinstance(unit, ComposedUnit):
+        return unit
+    factors = _merged(
+        _combined(*((_expanded(leaf), exponent) for leaf, exponent in factors_of(unit)))
     )
-    merged: dict[tuple[int, ...], tuple[Unit[Any], float]] = {}
-    for leaf, exponent in expanded:
-        key = tuple(leaf.semantic.dimensions)
-        target, total = merged.get(key, (leaf, 0.0))
-        merged[key] = (target, total + exponent)
-    factors = tuple((leaf, total) for leaf, total in merged.values() if total)
     simplified = _built(kind, factors)
     if isinstance(kind, Kind) and factors:
         systems = _systems(simplified)
@@ -373,11 +393,13 @@ def storage_map(
     """How magnitudes in ``unit`` are stored in ``system``: scale, offset, unit.
 
     Without a system the numbers stay in ``unit``, except that offset units
-    (°C, °F) store kelvin. In a unit system there is no storage unit.
+    (°C, °F) store kelvin and a dimensionless composed unit, such as nm/Å,
+    plain numbers. In a unit system there is no storage unit.
     """
     if system is not NoSystem:
         return (*into_system(unit, cast("type[UnitSystem]", system)), None)
-    if unit.offset:
+    plain = isinstance(unit, ComposedUnit) and not any(unit.semantic.dimensions)
+    if unit.offset or plain:
         return unit.scale, unit.offset, reference_unit(unit.semantic)
     return 1.0, 0.0, unit
 
@@ -391,21 +413,22 @@ def parsed(text: str, kind: Kind, leaf: Callable[[str], Unit[Any]]) -> Unit[Any]
     ``leaf`` resolves a catalogue name or symbol, raising ``ValueError`` for
     neither. Parenthesized text is tried as one unit first, so ``(kcal/mol)·nm``
     works. Operators apply left to right, as in ``a/b·c = (a/b)·c``. None if
-    ``text`` isn't composed or isn't of ``kind``'s dimensions.
+    ``text`` isn't composed; ``ValueError`` if it can't be read, names a unit
+    with an offset, or isn't of ``kind``'s dimensions.
     """
     tokens = list(_TOKENS.finditer(text))
     if not {token.group() for token in tokens} & set("()·*/^"):
         return None
     try:
         factors = _Parser(text, tokens, leaf).factors()
-    except (ValueError, IndexError):
-        return None
+    except IndexError:
+        raise ValueError(f"Can't read the unit {text!r}") from None
     dimensions = [0.0] * len(kind.dimensions)
     for unit, exponent in factors:
         for index, power in enumerate(unit.semantic.dimensions):
             dimensions[index] += power * exponent
     if dimensions != [float(power) for power in kind.dimensions]:
-        return None
+        raise ValueError(f"{text!r} is not a unit of {kind}")
     return _built(kind, factors)
 
 
@@ -439,13 +462,20 @@ class _Parser:
         factors = self._atom()
         if self.position < len(self.tokens) and self._next() == "^":
             self._take()
-            factors = _combined((factors, float(self._take())))
+            exponent = self._take()
+            try:
+                power = float(exponent)
+            except ValueError:
+                power = math.nan
+            if not math.isfinite(power):
+                raise ValueError(f"Can't read the exponent {exponent!r}")
+            factors = _combined((factors, power))
         return factors
 
     def _atom(self) -> Factors:
         text = self._take()
         if text != "(":
-            return factors_of(self.leaf(text))
+            return self._leaf(text)
         start, depth = self.position, 1
         while depth:
             depth += {"(": 1, ")": -1}.get(self._take(), 0)
@@ -453,6 +483,13 @@ class _Parser:
         # A leaf symbol such as ``eV ps/Å`` keeps its spaces.
         whole = self.text[inner[0].start() : inner[-1].end()]
         try:
-            return factors_of(self.leaf(whole))
+            unit = self.leaf(whole)
         except ValueError:
             return _Parser(self.text, inner, self.leaf).factors()
+        return self._leaf(whole, unit)
+
+    def _leaf(self, text: str, unit: Unit[Any] | None = None) -> Factors:
+        unit = self.leaf(text) if unit is None else unit
+        if unit.offset:
+            raise ValueError(f"{unit.symbol} has an offset; a product can't hold it")
+        return factors_of(unit)

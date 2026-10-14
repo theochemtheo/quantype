@@ -286,7 +286,7 @@ def test_structural_results_display_their_units() -> None:
     si = (2 * u.m) * (3 * u.s) * u.J(1)
     assert repr(si) == "Quantity(6.0 J·m·s)"
     bound = product.to_system(Atomistic)
-    assert repr(bound**2) == "Quantity(3600.0 (((Å * fs) * eV))^2, Atomistic)"
+    assert repr(bound**2) == "Quantity(3600.0 eV^2·fs^2·Å^2, Atomistic)"
     assert repr(u.nm) == "nm"
 
 

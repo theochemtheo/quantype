@@ -65,7 +65,7 @@ def test_products_are_written_in_the_unit_they_show() -> None:
     energy = Energy.parse("2 Da·nm^2/ps^2")
     assert energy.unit is not None
     assert energy.unit.symbol == "Da·nm^2/ps^2"
-    with pytest.raises(ValueError, match="Unknown unit"):
+    with pytest.raises(ValueError, match="'eV·nm' is not a unit of Force"):
         Force.parse("1 eV·nm")
 
 
@@ -78,6 +78,26 @@ def test_products_parse_back_from_units_with_spaces_and_reciprocals() -> None:
     rate = 1 / Time[float](2, u.ns)
     assert str(rate) == "0.5 ns^-1"
     assert InverseTime.parse(str(rate)) == rate
+
+
+@pytest.mark.parametrize(
+    ("text", "message"),
+    [
+        ("eV/ps", "'eV/ps' is not a unit of Force"),
+        ("eV/nm^x", "Can't read the exponent 'x'"),
+        ("eV/(nm", "Can't read the unit 'eV/\\(nm'"),
+        ("eV/K·degC", "°C has an offset"),
+    ],
+)
+def test_unreadable_products_say_why(text: str, message: str) -> None:
+    with pytest.raises(ValueError, match=message):
+        Force.unit_named(text)
+
+
+def test_a_dimensionless_product_unit_stores_a_plain_number() -> None:
+    ratio = Dimensionless.parse("1 nm/Å")
+    assert float(ratio) == 10.0
+    assert str(ratio) == "1.0 nm/Å"
 
 
 def test_products_are_written_by_unit_names_not_symbols() -> None:

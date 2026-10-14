@@ -36,13 +36,29 @@ def test_differences_name_the_kind_system_and_unit() -> None:
     with pytest.raises(AssertionError, match="Expected Energy; received Length"):
         assert_allclose(cast("Any", 2 * u.nm), 2 * u.eV)
     with pytest.raises(AssertionError, match="Expected a quantity in SI"):
-        assert_allclose(cast("Any", 2 * u.nm), Length[float, SI](2, u.nm))
+        assert_allclose(
+            cast("Any", Length[float, Atomistic](2, u.nm)), Length[float, SI](2, u.nm)
+        )
+
+
+def test_quantities_and_tolerances_without_a_system_adopt_one() -> None:
+    bound = Length[float, SI](1e-9, u.m)
+    assert_allclose(cast("Any", 1 * u.nm), bound)
+    assert_allclose(bound, Length[float, SI](1.05e-9, u.m), atol=0.1 * u.nm)
+    with pytest.raises(AssertionError):
+        assert_allclose(bound, Length[float, SI](1.05e-9, u.m), atol=0.01 * u.nm)
+
+
+def test_temperatures_compare_in_kelvin_whatever_their_display() -> None:
+    triple = Temperature[float](273.16, u.kelvin)
+    assert_allclose(triple, Temperature[float](0.0, u.degC), rtol=1e-3)
+    assert_allclose(triple, Temperature[float](273.15, u.kelvin), rtol=1e-3)
 
 
 def test_plain_numbers_and_mismatched_tolerances_are_type_errors() -> None:
     with pytest.raises(TypeError, match=r"Compare plain numbers with numpy\.testing"):
         assert_allclose(cast("Any", 2.0), 2 * u.nm)
-    with pytest.raises(TypeError, match="atol must be a Length in NoSystem"):
+    with pytest.raises(TypeError, match="atol must be a Length, or 0"):
         assert_allclose(2 * u.nm, 2 * u.nm, atol=cast("Any", 1 * u.eV))
 
 
@@ -70,5 +86,5 @@ def test_apply_keeps_kind_system_storage_and_display_unit() -> None:
 
 def test_temperature_kinds_round_trip_through_apply() -> None:
     warm = Temperature[float, Atomistic](20, u.celsius)
-    assert warm.apply(lambda raw: raw + 1).magnitude() == pytest.approx(21)
+    assert warm.apply(abs).magnitude() == pytest.approx(20)
     assert isinstance(Energy[float, Atomistic](1, u.eV).apply(abs), Energy)

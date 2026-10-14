@@ -64,6 +64,29 @@ Pass `.magnitude(unit)` to a library that expects a particular unit. You get a
 plain float or array with no unit attached, and nothing converts when `unit` is
 the one the quantity was given in.
 
+A product shows its operands' units multiplied out, and `.magnitude()` without
+a unit gives the number in them:
+
+```python
+import pytest
+
+from quantype import Length, Mass, Time, u
+from quantype.constants import k_B
+
+mass = Mass[float](12, u.Da)
+speed = Length[float](0.01, u.angstrom) / Time[float](1, u.fs)
+kinetic = 0.5 * mass * speed**2
+assert str(kinetic.unit) == "Da·(Å/fs)^2"
+assert kinetic.magnitude() == pytest.approx(6e-4)
+assert str(kinetic.simplified().unit) == "eV"
+assert kinetic.magnitude(u.eV) == pytest.approx(0.0621856)
+assert (kinetic / k_B).magnitude(u.K) == pytest.approx(721.634, rel=1e-5)
+```
+
+`.simplified()` shows a simpler unit, and `.magnitude(unit)` gives the number in
+the unit you name. Units of one dimension that would cancel convert, so
+`(3 * u.eV) * (2 * u.nm) / (4 * u.angstrom)` is 15 eV.
+
 ## Choose a unit system
 
 ```python
@@ -145,8 +168,8 @@ the same kind and unit system, and return backend booleans. `==` compares
 values, element-wise for arrays, and quantities of different kinds or systems
 compare unequal. Quantities in different units are equal when one converts
 exactly onto the other, so `1 * u.nm == 10 * u.angstrom`. Quantities are
-unhashable, so key a dict or cache on `q.magnitude(unit)`. A plain number needs a unit to compare with a
-quantity: `q == 0` raises, and `q == 0 * u.nm` works.
+unhashable, so key a dict or cache on `q.magnitude(unit)`. A plain number needs
+a unit to compare with a quantity: `q == 0` raises, and `q == 0 * u.nm` works.
 
 For any other array operation, pass a function to `apply`. It runs on the
 stored numbers, and the result keeps the kind, unit system, and units:
@@ -180,7 +203,8 @@ from quantype import Pressure, Time, u
 step = Time[float](0.5, u.fs)
 times = step * np.arange(4)
 assert f"{times[-1]:.2f}" == "1.50 fs"
-assert sum([1 * u.nm, 5 * u.angstrom]).magnitude(u.angstrom) == pytest.approx(15)
+total = sum([1 * u.nm, 5 * u.angstrom], 0 * u.nm)
+assert total.magnitude(u.angstrom) == pytest.approx(15)
 
 density = (1 * u.eV) / (1 * u.angstrom_cubed)  # an EnergyDensity
 stress = Pressure.reinterpret(density)  # same dimensions, renamed
@@ -202,9 +226,10 @@ assert_allclose(u.nm(np.array([1.0, 2.0])), u.angstrom(np.array([10.0, 20.0])))
 assert_allclose(300 * u.K, 300.05 * u.K, atol=0.1 * u.delta_K)
 ```
 
-`assert_allclose` checks that both quantities have the same kind and unit
-system, then compares their numbers as `numpy.testing.assert_allclose` does.
-Their display units may differ. `numpy.testing` and `pytest.approx` convert
+`assert_allclose` checks that both quantities have the same kind and a shared
+unit system, then compares their numbers as `numpy.testing.assert_allclose`
+does. Their display units may differ, and a temperature given in °C compares in
+kelvin. `numpy.testing` and `pytest.approx` convert
 their arguments to arrays, which quantities refuse; for one number,
 `q.magnitude(u.nm) == pytest.approx(2.0)` works too.
 
@@ -320,6 +345,10 @@ Serialization saves values; device placement and autodiff graphs are lost.
 | `The truth value of a Length quantity is ambiguous` | Compare against a value, as in `q > 0 * u.nm`, or test `q is not None`. |
 | An `EnergyDensity` where a `Pressure` is expected | Rename it with `Pressure.reinterpret(q)`. |
 | `Cannot combine SI and Atomistic quantities` | Convert one operand with `.to_system(...)`. A quantity without a system adopts the other's. |
+| `Expected a quantity in SI; received one in NoSystem` from Pydantic | Fields don't adopt a system. Convert with `.to_system(SI)`, or pass a string or wire object, which decodes into the field's system. |
+| `unhashable type: 'Length'` | Quantities can't be dict keys, set members, or cache and `jax.jit` static arguments. Key on `q.magnitude(unit)`. |
+| `Units only scale magnitudes` | `u.eV / u.angstrom` isn't a unit. Divide quantities, as in `(1 * u.eV) / (1 * u.angstrom)`, or look one up with `Force.unit_named("eV/Å")`. |
+| `'eV/ps' is not a unit of Force` | The composed unit has other dimensions. Check the units in it. |
 | `from_value trusts raw numbers in a unit system, and NoSystem has none` | Construct from a unit, as in `Length(raw, u.nm)`, or name a system: `Length.from_value(raw, SI)`. |
 | An unnamed result cannot be serialized | Only named kinds have units on the wire. Name it with `reinterpret`, or declare the kind in an [application catalogue](custom-catalogues.md). |
 

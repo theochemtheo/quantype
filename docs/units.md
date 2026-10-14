@@ -225,10 +225,16 @@ rounded to about seven digits (in `metal`, `boltz = 8.617343e-5`). Values it
 derives from them, such as a temperature from kinetic energy, can differ from
 quantype's in the seventh significant figure.
 
-Combining quantities from two systems, or one without a system with one in a
-system, is a type error in mypy, Pyright, Pyrefly, and ty, and a `TypeError` at
-runtime. Convert one with `.to_system(T)`, which rescales the raw numbers and
-keeps the display unit. `.to_system(NoSystem)` converts nothing: the numbers
+Combining quantities from two systems is a type error in mypy, Pyright, Pyrefly,
+and ty, and a `TypeError` at runtime. A quantity without a system adopts the
+system of the quantity it's combined with: arithmetic, comparisons including
+`==`, and the `quantype.numpy` functions convert it into that system first, as
+`1 * u.nm` does above. Parameters don't adopt: a function or Pydantic field
+typed `Length[float, SI]` takes only SI lengths, and one typed `Length[float]`
+only lengths without a system. The `quantype.numpy` functions that take a list,
+such as `concatenate`, adopt at runtime, but checkers want the list in one
+system. Convert with `.to_system(T)`, which rescales the raw numbers and keeps
+the display unit. `.to_system(NoSystem)` converts nothing: the numbers
 stay in the units of the system they came from.
 Temperatures convert without an offset, because every system measures
 temperature on a kelvin scale. To define your own system, or to write code that
@@ -257,9 +263,12 @@ has no effect on the stored numbers. It is set and kept as follows:
   result is a plain number: ns/fs is 1e6. These units parse back, as in
   `Force.parse("1.5 eV/nm")`.
 - `.simplified()` shows a quantity in its simplest unit. Units of one
-  dimension merge, so (kcal/mol/Å)·nm shows as kcal/mol, and a named kind
-  takes its unit in a system that holds every unit left, so Da·(Å/fs)^2
-  shows as eV. Da·nm^2/ps^2 stays as it is, as no built-in system uses nm.
+  dimension merge into the one with the largest power, so (kcal/mol/Å)·nm
+  shows as kcal/mol and Pa·Å as J/m^2, and a named kind takes its unit in a
+  system that holds every unit left, so Da·(Å/fs)^2 shows as eV. Da·nm^2/ps^2
+  stays as it is, as no built-in system uses nm, and a catalogue unit such as
+  °C is already simplest. A root, such as `qnp.sqrt` of nm·Å, merges units of
+  one dimension the same way.
 - In a unit system, products, ratios, and powers show in the system's unit for
   the result.
 - `.to(unit)` selects a display unit without changing the stored numbers, and
@@ -267,8 +276,8 @@ has no effect on the stored numbers. It is set and kept as follows:
   `.unit` reports the unit in use (`None` for unnamed products in a system).
 - Format specs apply to the magnitude: `f"{q:.3f}"` gives `2.000 nm`.
 - JAX transformations drop it, because it isn't part of the pytree. Results
-  show in the reference units without a system, and in the system's units in
-  one.
+  show in the [reference units](#explicit-numerical-boundaries) (Å, eV, fs)
+  without a system, and in the system's units in one.
 
 ```python
 from quantype import Energy, Length, Mass, Temperature, Velocity, u

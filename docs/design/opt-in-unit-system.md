@@ -1,14 +1,12 @@
 # Opt-in unit systems: prototype comparison
 
-Evidence for the [opt-in unit system decision](../decisions/ADR-014-opt-in-unit-system.md),
-and notes for implementing it. The prototypes were built in October 2026 as
-copies of quantype 0.2.0 (commit `056c344`), changed by script. They live
-outside the repository, in `/Users/tk/p/quantype-opt-in/`, which git can't
-restore. Timings are best of 7 runs on one Apple-silicon Mac, with float64 data
+Evidence for the [opt-in unit system decision](../decisions/ADR-014-opt-in-unit-system.md).
+The prototypes were built in October 2026 as copies of quantype 0.2.0 (commit
+`056c344`), changed by script, and weren't kept. Timings are best of 7 runs on one Apple-silicon Mac, with float64 data
 and million-element arrays unless stated. The prototypes call the null system
 `Unbound`. The ADR has the rules as decided, which differ from these notes on
-how products display, on `from_value` and `with_value`, and on mixing a
-null-system quantity with a bound one.
+how products display, on `from_value` and `with_value`, on mixing a
+null-system quantity with a bound one, and on equality and hashing.
 
 ## Round 1: three ways to make the system opt-in
 
@@ -95,8 +93,9 @@ elements; raising or returning False across units breaks `in`, dict lookups,
 or `1 nm == 10 Å`.
 
 The prototype showed nested compositions in `Atomistic`'s units, which gives
-`2 g × (3 m/s)²` as `1.12e+17 eV`. The proposal infers the system from the
-operands, with a fixed fallback; that rule isn't prototyped.
+`2 g × (3 m/s)²` as `1.12e+17 eV`. ADR-014 rejected that, and the proposal's
+system inferred from the operands with a fixed fallback: a product shows its
+operands' units composed.
 
 ### The `quantype.numpy` rules
 
@@ -116,6 +115,9 @@ fourth, the products, and the multi-operand rules with shared units make no
 conversion.
 
 ### Display examples (P1b)
+
+The prototype's output. Under ADR-014 the last two show as
+`Energy(2.0 Da·(Å/fs)^2)`.
 
 | Expression | Shows | Stored as |
 | --- | --- | --- |
@@ -169,8 +171,9 @@ class _Value:
     ) -> W: ...
 ```
 
-The null system and `UnitSystem` both derive from `AnySystem`, which bounds
-the system parameter. `x.value` on a null-system quantity reports:
+In the prototype, the null system and `UnitSystem` both derive from
+`AnySystem`, which bounds the system parameter; quantype makes `AnySystem` the
+alias `UnitSystem | NoSystem` instead. `x.value` on a null-system quantity reports:
 
 | Checker | Message |
 | --- | --- |
@@ -181,57 +184,3 @@ the system parameter. `x.value` on a null-system quantity reports:
 
 Pyrefly prints a defaulted type argument as nothing, so its messages about the
 null system say `Length[float]`.
-
-## Implementing it
-
-Suggested order; each step has a runtime test and a typing test
-([ADR-002](../decisions/ADR-002-generated-stubs-for-four-checkers.md)).
-
-1. Round each catalogue scale once, in `_internal/_registry.py`, by evaluating
-   the definitions with `fractions.Fraction` and converting at the end. Add a
-   test that repeats the round-3 audit. This can land on its own.
-2. Add `AnySystem` and the null system in `_internal/_systems.py`. The
-   prototype kept the null system a `UnitSystem` subclass at runtime and hid
-   that from the checkers; the real version must match its stub, so the
-   system machinery (`unit_for`, `factor`, `into_system`) needs a reference-unit
-   path for the null system.
-3. Change the renderers (`codegen/_render.py`, `codegen/_products.py`): the
-   system type variable's bound and default, and `T: AnySystem` wherever a
-   system is accepted. Replace `value` in the handwritten `core.pyi` with the
-   descriptor. Regenerate.
-4. Store the input unit: a `_storage` field set by `_wrap`; construction in
-   `_internal/_construction.py` and `Unit.__call__`; decoding in
-   `serialization.py` and `_internal/_validation.py`; `.magnitude()`, `.to()`,
-   `to_system` (bind converts, unbind records the system's unit), and
-   `reinterpret`. Widen `Unit`'s kind parameter to accept product trees, and
-   compare product trees by structure in `_check_unit` (`cross` builds one
-   without interning it).
-5. Arithmetic: alignment for `+`, `-`, and comparisons; composed units for
-   `*`, `/`, `**`, and reflected division; the equality and hashing rule.
-6. The `quantype.numpy` groups above, in `_internal/_numpy.py`. Normalize to
-   reference units in the JAX pytree flatten, in `ujax` differentiation, and in
-   `testing.assert_allclose`; scale `utorch.grad` results by the output's and
-   input's storage scales.
-7. Display: composed symbols, and the operand-inferred system for nested
-   compositions. A composed unit can carry the set of built-in systems that
-   store its operands' kinds in those units: the intersection of its
-   operands' sets, which doesn't depend on operand order. It displays in the
-   kind's unit of the first system in the fixed order, or of the fallback
-   system when the set is empty.
-8. `apply(function)` on every quantity, as the null-system replacement for
-   `with_value`.
-9. Docs and README: the default, `.value`, `from_value`, and display rules all
-   change.
-
-### Prototype shortcuts not to copy
-
-- The stubs were edited by regular expressions, not by changing the renderers.
-- Composed units are named `unbound:<symbol>`, and catalogue lookup matches
-  scales to 12 significant digits. Exact rational scales would replace the
-  key.
-- A nested composition is detected by a parenthesis in its symbol. Record the
-  nesting when the unit is built.
-- `to_dict` of a quantity stored in a composed unit wasn't tested.
-- Many runtime tests fail at `.value` before they reach storage code, so the
-  P1b test run says little about the paths behind them, Torch differentiation
-  among them. Those paths need their own tests.

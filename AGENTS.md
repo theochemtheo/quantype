@@ -10,7 +10,7 @@ Each kind of information has one home. Link to it rather than restating it.
 
 | Question | Read |
 | --- | --- |
-| Why is it built this way? | [Decisions](docs/decisions/) and [design principles](docs/DESIGN_PRINCIPLES.md) |
+| Why is it built this way? | [Decisions](docs/decisions/), the [design notes](docs/design/) they cite, and [design principles](docs/DESIGN_PRINCIPLES.md) |
 | Where does a concern live, and what is generated? | [Architecture](docs/architecture.md) |
 | How do I change an area safely? | The [repository skill](.agents/skills/quantype/SKILL.md), which routes to one skill per area |
 | Which checks should I run? | [Checks](.agents/skills/quantype/references/checks.md); setup and commands are in [development](docs/development.md) |

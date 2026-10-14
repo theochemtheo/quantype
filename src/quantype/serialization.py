@@ -17,7 +17,7 @@ import numpy as np
 from quantype import codata
 from quantype._internal._lookup import resolve_unit as resolve_unit  # noqa: PLC0414
 from quantype._internal._lookup import unit_of_kind
-from quantype._internal._semantics import Kind
+from quantype._internal._semantics import Kind, kind_mismatch
 from quantype._internal._storage import (
     backend_name,
     convert,
@@ -142,7 +142,7 @@ def parse_quantity(
     """
     if _is_quantity(data):
         if data._semantic is not cls._semantic:
-            raise ValueError(f"Expected {cls._kind}; received {data.kind}")
+            raise ValueError(kind_mismatch(cls._semantic, data._semantic))
         if data._system is not system:
             raise ValueError(
                 f"Expected a quantity in {system.__name__}; received one in "

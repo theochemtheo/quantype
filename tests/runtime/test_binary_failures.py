@@ -11,6 +11,7 @@ import pytest
 
 import quantype.numpy as qnp
 from quantype import Length, u
+from quantype.core import _wrap  # pyright: ignore[reportPrivateUsage]
 from quantype.serialization import load_npz, save_npz
 from quantype.systems import Atomistic
 
@@ -56,9 +57,11 @@ def test_loading_object_arrays_is_rejected(tmp_path: Path) -> None:
         load_npz(path, "q", Length[npt.NDArray[np.float64]])
 
 
-def test_saving_object_arrays_is_rejected(tmp_path: Path) -> None:
-    quantity = Length.from_value(np.array([object()], dtype=object), Atomistic)
-
+def test_object_arrays_are_rejected(tmp_path: Path) -> None:
+    objects = np.array([object()], dtype=object)
+    with pytest.raises(TypeError, match="real numbers or a numerical array"):
+        Length.from_value(objects, Atomistic)
+    quantity = _wrap("Length", objects, Atomistic)
     with pytest.raises(ValueError, match="dtype"):
         save_npz(tmp_path / "object.npz", q=quantity)
 

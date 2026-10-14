@@ -61,7 +61,10 @@ def unit_of_kind(
     try:
         unit = resolve_unit(name, definitions, kind=kind, system=system)
     except ValueError:
-        composed = parsed(name, kind, lambda leaf: _leaf(leaf, definitions, system))
+        try:
+            composed = parsed(name, kind, lambda leaf: _leaf(leaf, definitions, system))
+        except ValueError as error:
+            raise error from None
         if composed is None:
             raise
         return composed

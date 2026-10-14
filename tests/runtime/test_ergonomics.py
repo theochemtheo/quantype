@@ -10,6 +10,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
+import quantype.units
 from quantype import (
     Dimensionless,
     Energy,
@@ -24,7 +25,9 @@ from quantype import (
     Volume,
     u,
 )
-from quantype.systems import SI, Atomistic, Metal
+from quantype._internal._semantics import KINDS, Kind, kind_mismatch
+from quantype.constants import k_B
+from quantype.systems import SI, Atomistic, Metal, NoSystem
 from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
@@ -246,3 +249,72 @@ def test_non_numbers_are_unequal_and_dimensionless_values_take_numbers() -> None
     ratio = (1 * u.nm) / (4 * u.nm)
     assert ratio == 0.25
     assert ratio < 1
+
+
+@pytest.mark.parametrize(
+    "combine",
+    [
+        lambda: cast("Any", u.nm) * u.nm,
+        lambda: cast("Any", u.eV) / u.angstrom,
+        lambda: cast("Any", u.nm) ** 2,
+        lambda: 2 / cast("Any", u.nm),
+    ],
+)
+def test_units_only_scale_magnitudes(combine: Callable[[], object]) -> None:
+    with pytest.raises(TypeError, match=r"combine quantities instead"):
+        combine()
+
+
+def test_array_methods_name_the_quantity_way() -> None:
+    lengths: Any = Length[npt.NDArray[np.float64]](np.ones(2), u.nm)
+    with pytest.raises(
+        AttributeError, match=r"q\.apply\(lambda raw: raw\.astype\(\)\)"
+    ):
+        lengths.astype(np.float32)
+    with pytest.raises(AttributeError, match=r"q\.magnitude\(unit\)\.tolist\(\)"):
+        lengths.tolist()
+    with pytest.raises(AttributeError, match=r"has no attribute 'nonsense'$"):
+        _ = lengths.nonsense
+
+
+def test_kinds_of_one_name_from_two_catalogues_say_so() -> None:
+    other = Kind("Length", (1, 0, 0, 0, 0, 0, 0, 0), "angstrom")
+    assert "another catalogue" in kind_mismatch(KINDS["Length"], other)
+    assert kind_mismatch(KINDS["Length"], KINDS["Energy"]) == (
+        "Expected Length; received Energy"
+    )
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [True, [1.0], np.array([1, 2]), np.array([True]), "1.0"],
+    ids=["bool", "list", "int-array", "bool-array", "str"],
+)
+def test_from_value_takes_real_floating_numbers(raw: object) -> None:
+    with pytest.raises(TypeError, match="from_value needs"):
+        Length.from_value(raw, SI)
+
+
+def test_apply_keeps_a_floating_dtype() -> None:
+    lengths = Length[npt.NDArray[np.float64]](np.ones(2), u.nm)
+    with pytest.raises(TypeError, match="must return a floating dtype"):
+        lengths.apply(lambda raw: cast("Any", raw.astype(int)))
+
+
+def test_a_first_power_keeps_the_kind() -> None:
+    length = Length[float](2, u.nm)
+    assert type(length**1) is Length
+    assert (length**1).unit is u.nm
+    product = length * Time[float](1, u.fs)
+    assert type(product**1) is type(product)
+
+
+def test_a_namespace_of_units_is_not_a_unit() -> None:
+    with pytest.raises(TypeError, match="received a namespace of units"):
+        Length[float](1.0, cast("Any", quantype.units.length))
+
+
+def test_constants_convert_without_a_system_into_reference_units() -> None:
+    reference = k_B.to_system(NoSystem)
+    assert reference.system is NoSystem
+    assert reference == k_B.to_system(SI)

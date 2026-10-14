@@ -1,7 +1,10 @@
 # A quantity remembers its input unit for display only
 
-[ADR-014](ADR-014-opt-in-unit-system.md) replaces the rule for products,
-ratios, and powers of quantities without a unit system.
+[ADR-014](ADR-014-opt-in-unit-system.md) changes this decision for quantities
+without a unit system. They store their numbers in the input unit, the third
+option below, so the input unit is presentation only in a unit system. Without
+one, products, ratios, and powers show their operands' units composed, and
+values coming out of a JAX transformation show in the reference units.
 
 ## Context and Problem Statement
 

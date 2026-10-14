@@ -51,8 +51,10 @@ assert_type(density, EnergyDensity[float])
 assert_type(Pressure.reinterpret(density), Pressure[float])
 ```
 
-`.magnitude()` gives the number in the unit you constructed with, or in any unit
-you pass it.
+`.magnitude(unit)` gives the number in the unit you pass. Without a unit, it
+gives the number in the unit the quantity shows: the one it was given in, or
+for a product its operands' units multiplied out, such as eV/nm. Pass a unit
+wherever a number leaves quantype.
 
 Result types come from relations declared in the catalogue. `Force * Length` is
 `Energy`, so `Energy / Force` is `Length` and `Energy / Length` is `Force`.
@@ -63,7 +65,7 @@ To turn one into the other, call `reinterpret`.
 
 A quantity keeps its numbers in the unit it was given in. A sum converts the
 right operand into the left one's unit, and a product multiplies its operands'
-units out, unconverted.
+units out, converting only a unit that would cancel one of the same dimension.
 
 ```python
 from typing import assert_type
@@ -88,14 +90,18 @@ assert_type(Energy[float, SI](3, u.eV) / si, Force[float, SI])  # newtons
 A unit system is the set of units a quantity stores its numbers in, and it is
 the second type argument. Choose one where you need raw numbers, such as at a
 kernel's boundary. `.value` exists only in a system, so it has one meaning for
-each type, and arithmetic inside a system never converts. The systems are
+each type, and arithmetic inside a system doesn't convert, except for the few
+kinds a system stores in units of their own, such as `Atomistic` masses in
+daltons. The systems are
 `Atomistic` (Å, eV, and fs), `SI`, `CGS`, Hartree `Atomic`, LAMMPS's `Metal`
 and `Real`, or [your own](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md).
 
 `Length[float]` is short for `Length[float, NoSystem]`, which has no `.value`:
 reading it is a type error and a runtime `TypeError`. So is adding an SI length
-to an `Atomistic` one. A quantity with no system adopts the system of the one
-it's combined with, so `si + 1 * u.nm` is in `SI`. `.to_system(...)` converts.
+to an `Atomistic` one. A quantity with no system
+[adopts the system](https://github.com/theochemtheo/quantype/blob/main/docs/units.md#unit-systems)
+of the one it's combined with, so `si + 1 * u.nm` is in `SI`. `.to_system(...)`
+converts.
 `Metal` and `Real` store each kind in the unit LAMMPS documents for it, so a
 `Metal` pressure is in bar.
 

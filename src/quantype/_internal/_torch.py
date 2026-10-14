@@ -61,13 +61,14 @@ def grad(
 
 def _derivative(output: _Quantity, argument: _Quantity, value: Any) -> _Quantity:
     kind = result_kind("div", output._semantic, argument._semantic)
-    # Raw derivatives are coherent, except where the system overrides a kind.
     system = argument.system
-    scale = (
-        coherence(system, output._semantic)
-        / coherence(system, argument._semantic)
-        / coherence(system, kind)
-    )
     if output._storage is not None and argument._storage is not None:
         scale = output._storage.scale / argument._storage.scale
+    else:
+        # Raw derivatives are coherent, except where the system overrides a kind.
+        scale = (
+            coherence(system, output._semantic)
+            / coherence(system, argument._semantic)
+            / coherence(system, kind)
+        )
     return _wrap(kind, _rescaled(value, scale), system)

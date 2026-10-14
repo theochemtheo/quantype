@@ -74,26 +74,31 @@ The rules for null-system quantities:
   are unhashable.
 * A product, quotient, or power displays its unit composed the same way from
   its operands' displayed units, the left operand's winning where they
-  cancel: `1.5 eV/nm`,
-  `9.0 Da·nm^2/ps^2`. A constant takes the base units its operand uses, so
-  h·c over 500 nm shows in eV. Nothing chooses a system for it:
-  `.simplified()` merges units of one dimension and shows a named kind in a
-  display system that holds every unit left, and `.to(S)` shows `S`'s unit.
+  cancel: `1.5 eV/nm`, `9.0 Da·nm^2/ps^2`. A root merges units of one
+  dimension first, so √(nm·Å) shows in nm. A constant takes the units its
+  operand uses, so h·c over 500 nm shows in eV. Nothing chooses a system for
+  it: `.simplified()` merges units of one dimension into the one with the
+  largest power and shows a named kind in a display system that holds every
+  unit left, and `.to(S)` shows `S`'s unit. A catalogue unit, such as °C, is
+  already simplest.
 * Combined with a quantity in a unit system, a null-system quantity adopts
   that system, as constants do: arithmetic, comparisons, and the
   `quantype.numpy` functions convert it into the system first. Two unit systems
   still don't mix, and parameters don't adopt: a function typed
-  `Length[float, SI]` rejects a null-system length.
+  `Length[float, SI]` rejects a null-system length. The `quantype.numpy`
+  functions that take a list, such as `concatenate`, adopt at runtime only:
+  checkers infer a list literal of two systems as a union or `object`.
 * `.value` and `from_value(raw, system)` exist only for a unit system.
   `apply(function)` replaces `with_value` on every quantity.
-  `x.to_system(S)` converts once. `q.to_system(NoSystem)` records `S`'s unit
-  instead of converting.
+  `x.to_system(S)` converts once. For a quantity `q` in a system `S`,
+  `q.to_system(NoSystem)` records `S`'s unit instead of converting.
 * `quantype.numpy` rules work on stored numbers. Only functions that need
   radians or plain numbers (trigonometric, `exp`, `log`) convert, and only when
   the input is stored in another unit.
 * JAX pytrees and `ujax`/`utorch` differentiation see reference units, so `jit`
-  traces once and `lax.cond` works across units. As ADR-004 already accepts,
-  values coming out of a transformation display in reference units.
+  traces once and `lax.cond` works across units. Values coming out of a
+  transformation display in reference units, as ADR-004 already accepted for a
+  system's units.
 
 Statically, `NoSystem` is the default system parameter and is not a
 `UnitSystem`. `AnySystem` is the alias `UnitSystem | NoSystem`, the bound of
@@ -134,8 +139,10 @@ composed instead of the system's unit.
   instead of 0.58 µs, mostly to choose the unit a product shows in.
 * Bad, because a composed unit can be unfamiliar: kinetic energy from Da, nm,
   and ps shows as Da·nm^2/ps^2, though that is about a kJ/mol, and
-  `.magnitude()` returns numbers in it. `.simplified()`, `.to(unit)`, and
-  `.to(S)` show another.
+  `.magnitude()` returns numbers in it. `.simplified()` leaves it as it is,
+  as no display system uses nm and ps; `.to(unit)` and `.to(S)` show another.
+  A quotient renamed to a catalogue unit no longer cancels, so `(e / y) * x`
+  shows `(eV/Å)·nm` where `e * x / y` shows eV.
 * Bad, because adoption needs a second overload for each operator and product
   relation: the stubs grew from 17 MB to 27 MB. Each named kind moved into its
   own stub module to stay under Pyright's per-module complexity limit, which

@@ -18,7 +18,16 @@ import numbers
 import operator
 import sys
 from functools import cache
-from typing import TYPE_CHECKING, Any, ClassVar, Literal, Self, cast, override
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    ClassVar,
+    Literal,
+    NoReturn,
+    Self,
+    cast,
+    override,
+)
 
 from quantype._internal._products import class_for
 from quantype._internal._semantics import (
@@ -29,10 +38,16 @@ from quantype._internal._semantics import (
     Semantic,
     addition,
     dimensionless_kind,
+    kind_mismatch,
     power,
     product,
 )
-from quantype._internal._storage import backend_name, keep_storage, real_operand
+from quantype._internal._storage import (
+    backend_name,
+    is_floating,
+    keep_storage,
+    real_operand,
+)
 from quantype._internal._storage_units import (
     ComposedUnit,
     adapted,
@@ -49,7 +64,6 @@ from quantype._internal._systems import (
     NoSystem,
     UnitSystem,
     coherence,
-    coherent_symbol,
     factor,
     into_system,
     overridden_kinds,
@@ -83,17 +97,6 @@ def dimensions(kind: str | Semantic) -> tuple[int, ...]:
     return (KINDS[kind] if isinstance(kind, str) else kind).dimensions
 
 
-def _symbol(kind: Semantic, system: type[UnitSystem]) -> str:
-    """A structural quantity's symbol: its leaves in their coherent units."""
-    if isinstance(kind, Kind):
-        return coherent_symbol(system, kind)
-    if isinstance(kind.right, int):
-        return f"({_symbol(kind.left, system)})^{kind.right}"
-    operator_symbol = "*" if kind.operation == "mul" else "/"
-    left, right = _symbol(kind.left, system), _symbol(kind.right, system)
-    return f"({left} {operator_symbol} {right})"
-
-
 def _numpy_bool() -> type:
     """NumPy's boolean scalar type when NumPy is loaded; it is not a Python bool."""
     numpy = sys.modules.get("numpy")
@@ -116,6 +119,28 @@ def _between(raw: Any, source: float, target: float) -> Any:
     if source > target:
         return raw * (source / target)
     return raw / (target / source)
+
+
+# Array and tensor methods that keep the backend, which apply runs, and ones
+# that read or leave the numbers, which need a unit first.
+_STORAGE_METHODS = frozenset(
+    {"detach", "cpu", "cuda", "clone", "contiguous", "requires_grad_", "astype"}
+)
+_READ_METHODS = frozenset({"numpy", "tolist", "backward", "block_until_ready"})
+
+
+def _check_raw(value: Any, context: str) -> None:
+    """Raw numbers a quantity can keep as they are: real, and floating if arrays."""
+    if real_operand(value) is None:
+        raise TypeError(
+            f"{context} real numbers or a numerical array; "
+            f"received {type(value).__name__}"
+        )
+    if not isinstance(value, (int, float)) and not is_floating(value):
+        raise TypeError(
+            f"{context} a floating dtype; received {value.dtype}. "
+            "Convert first, as in raw.astype(float)"
+        )
 
 
 def _either(left: Any, right: Any) -> Any:
@@ -417,7 +442,7 @@ class Quantity[K, V, S: AnySystem]:
     ) -> Unit[K]:
         require_unit(reference, cls._kind)
         if reference.semantic is not cls._semantic:
-            raise ValueError(f"Expected {cls._kind}; received {reference.kind}")
+            raise ValueError(kind_mismatch(cls._semantic, reference.semantic))
         return Unit(
             name,
             reference.semantic,
@@ -483,6 +508,7 @@ class Quantity[K, V, S: AnySystem]:
             raise TypeError(
                 "from_value takes raw numbers, such as q.value, not a quantity"
             )
+        _check_raw(value, "from_value needs")
         # The bound rejects NoSystem statically; untyped callers reach here.
         if cast("object", system) is NoSystem:
             raise TypeError(
@@ -551,7 +577,7 @@ class Quantity[K, V, S: AnySystem]:
             isinstance(semantic, Expression) and semantic == self._semantic
         ):
             raise ValueError(
-                f"Expected {self.kind}; unit {unit.name!r} represents {unit.kind}"
+                f"{kind_mismatch(self._semantic, semantic)} (unit {unit.name!r})"
             )
 
     def magnitude(self, unit: Unit[K] | None = None) -> V:
@@ -597,8 +623,8 @@ class Quantity[K, V, S: AnySystem]:
         else:
             self._check_unit(
                 unit,
-                "`.to` sets the display unit; to move a tensor to another device, "
-                "use `q.apply(lambda t: t.to(device))`.",
+                "`.to` sets the display unit; to move a tensor to another device "
+                "or dtype, use `q.apply(lambda t: t.to(...))`.",
             )
             shown = unit
         return self._shown(shown)
@@ -715,11 +741,7 @@ class Quantity[K, V, S: AnySystem]:
         result: Any = function(self._value)
         if isinstance(result, Quantity):
             raise TypeError("apply's function returns numbers, not a quantity")
-        if real_operand(result) is None:
-            raise TypeError(
-                "apply's function must return real numbers or a numerical array; "
-                f"received {type(result).__name__}"
-            )
+        _check_raw(result, "apply's function must return")
         before, after = backend_name(self._value), backend_name(result)
         # A NumPy float64 is a float, as checkers also accept.
         if before != after and not isinstance(result, type(self._value)):
@@ -1009,6 +1031,18 @@ class Quantity[K, V, S: AnySystem]:
     def __ne__(self, other: object) -> Any:
         return self._equality(other, operator.ne)
 
+    def __getattr__(self, name: str) -> NoReturn:
+        """Only reached for missing attributes: name the quantity way to do it."""
+        message = f"{type(self).__name__!r} object has no attribute {name!r}"
+        if name in _STORAGE_METHODS:
+            message += (
+                "; apply it to the stored numbers, as in "
+                f"q.apply(lambda raw: raw.{name}())"
+            )
+        elif name in _READ_METHODS:
+            message += f"; take the numbers first, as in q.magnitude(unit).{name}()"
+        raise AttributeError(message, name=name, obj=self)
+
     def __bool__(self) -> bool:
         raise TypeError(
             f"The truth value of a {self.kind} quantity is ambiguous; compare it "
@@ -1261,7 +1295,8 @@ class Quantity[K, V, S: AnySystem]:
     def _symbol(self) -> str:
         unit = self.unit
         if unit is None:
-            symbol = _symbol(self._semantic, cast("type[UnitSystem]", self._system))
+            system = cast("type[UnitSystem]", self._system)
+            symbol = system_unit(system, self._semantic).symbol
         else:
             symbol = unit.symbol
         return "" if symbol == "1" else f" {symbol}"

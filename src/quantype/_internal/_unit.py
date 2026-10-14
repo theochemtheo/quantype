@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 from functools import cache
-from typing import TYPE_CHECKING, Any, ClassVar, cast, override
+from typing import TYPE_CHECKING, Any, ClassVar, NoReturn, cast, override
 
 from quantype._internal._semantics import KINDS, Kind, Semantic
 
@@ -94,6 +94,8 @@ class Unit[K]:
             validate_floating_storage(raw)
         elif isinstance(raw, (int, float)):
             raw = echo = float(raw)
+        elif isinstance(raw, Unit):
+            raise TypeError(_UNIT_ARITHMETIC)
         else:
             raise TypeError(
                 "Use a real scalar or numerical array as a magnitude; "
@@ -122,6 +124,15 @@ class Unit[K]:
     def __rmul__(self, value: Any) -> Quantity[K, Any, Any]:
         return self(value)
 
+    def __truediv__(self, other: object) -> NoReturn:
+        raise TypeError(_UNIT_ARITHMETIC)
+
+    def __rtruediv__(self, other: object) -> NoReturn:
+        raise TypeError(_UNIT_ARITHMETIC)
+
+    def __pow__(self, exponent: object) -> NoReturn:
+        raise TypeError(_UNIT_ARITHMETIC)
+
     def __array_ufunc__(
         self, ufunc: Any, method: str, *inputs: Any, **kwargs: Any
     ) -> Any:
@@ -135,6 +146,11 @@ class Unit[K]:
         return self.symbol
 
 
+_UNIT_ARITHMETIC = (
+    "Units only scale magnitudes; combine quantities instead, as in "
+    "(1.0 * u.eV) / (1.0 * u.angstrom), or name a composed unit, as in "
+    "Force.unit_named('eV/Å')"
+)
 _UNIT_LOOKUPS: dict[Kind, Callable[[str], Unit[Any]]] = {}
 # Units of kinds from explicitly imported generated catalogues, in catalogue order.
 _CATALOGUE_UNITS: dict[Kind, tuple[Unit[Any], ...]] = {}

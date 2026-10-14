@@ -15,7 +15,7 @@ from quantype._generated import (
     _EntropyConstant,
 )
 from quantype.products import EntropySquared, VelocityAction
-from quantype.systems import SI, Metal
+from quantype.systems import SI, Metal, NoSystem
 
 point = 300 * u.K
 point_si = Temperature[float, SI](300, u.K)
@@ -27,6 +27,8 @@ assert_type(constants.k_B * point_si, Energy[float, SI])
 assert_type(constants.k_B * points, Energy[npt.NDArray[np.float64]])
 assert_type((2 * u.eV) / constants.k_B, Temperature[float])
 assert_type(constants.k_B.to_system(SI), Entropy[float, SI])
+assert_type(constants.k_B.to_system(NoSystem), Entropy[float])
+assert_type(constants.k_B**1, _EntropyConstant)
 assert_type(constants.k_B.to(u.joule_per_kelvin), Entropy[float])
 assert_type(constants.k_B.magnitude(u.joule_per_kelvin), float)
 assert_type(2 * constants.k_B, _EntropyConstant)
