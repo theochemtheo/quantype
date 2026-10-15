@@ -1,6 +1,6 @@
 # Unit storage and display: prototype comparison
 
-Evidence for [ADR-003](../decisions/ADR-003-unit-system-is-a-type-parameter.md)
+Evidence for [ADR-003](../decisions/superseded/ADR-003-unit-system-is-a-type-parameter.md)
 and [ADR-004](../decisions/ADR-004-display-unit-is-presentation.md). Eleven
 standalone prototypes, built outside the repository in September 2026, reused
 quantype's kinds, relations, temperature rules, and unit scales, and differed

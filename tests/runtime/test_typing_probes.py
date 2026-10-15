@@ -25,5 +25,5 @@ def test_positive_probe_runs(
     # construction.py restores this archive.
     monkeypatch.chdir(tmp_path)
     save_npz("positions.npz", positions=u.angstrom(np.zeros(3)))
-    assert Length.from_value(0.0).value == 0
+    assert Length[float](0.0, u.angstrom).magnitude() == 0
     runpy.run_path(str(probe), run_name="probe")

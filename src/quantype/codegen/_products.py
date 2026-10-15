@@ -18,6 +18,8 @@ from quantype.codegen._render import (
     PROTOCOL_MEMBERS,
     PROTOCOLS,
     QUANTITY_OVERRIDES,
+    adopting,
+    adopting_members,
     binary,
     method_overloads,
     numpy_imports,
@@ -75,15 +77,18 @@ def pair_class(pair: Pair, table: Table) -> str:
         signatures += structural_fallback(
             method, name, f"Quantity[{expression}[{pair.marker}, K], {{}}, S]"
         )
-        text += method_overloads(method, signatures)
+        text += method_overloads(method, signatures, f"{name}[V, S]")
         for (op, left, right), result in table.entries.items():
             if op == operation and right == name:
-                text += f"    def {member}{left}_f(self, other: {left}[float, S], /) -> {result}[V, S]: ...\n"
-                text += overloads(
+                text += adopting_members(
+                    [
+                        f"def {member}{left}_f(self, other: {left}[float, S], /) -> {result}[V, S]: ..."
+                    ],
                     [
                         f"def {member}{left}[W](self: {name}[float, S], other: {left}[W, S], /) -> {result}[W, S]: ...",
                         f"def {member}{left}(self, other: {left}[V, S], /) -> {result}[V, S]: ...",
-                    ]
+                    ],
+                    f"{name}[V, S]",
                 )
     # `a @ b` multiplies kinds as `a * b` does; scalars have no matrix product.
     signatures = [
@@ -98,7 +103,7 @@ def pair_class(pair: Pair, table: Table) -> str:
     signatures += structural_fallback(
         "__matmul__", name, f"Quantity[Mul[{pair.marker}, K], {{}}, S]"
     )
-    text += method_overloads("__matmul__", signatures)
+    text += method_overloads("__matmul__", signatures, f"{name}[V, S]")
     for method in ("__rmul__", "__rmatmul__"):
         scaled = scaling(method, name, lambda storage: f"{name}[{storage}, S]")
         text += overloads(
@@ -120,14 +125,18 @@ def pair_class(pair: Pair, table: Table) -> str:
     structure = f"Quantity[{pair.marker}, {{}}, S]"
     for method in ("__add__", "__sub__"):
         text += overloads(
-            [
-                f"def {method}[W](self: {name}[float, S], other: {structure.format('W')}, /) -> {name}[W, S]: ...",
-                f"def {method}(self, other: {structure.format('V')} | {structure.format('float')}, /) -> {name}[V, S]: ...",
-            ],
+            adopting(
+                [
+                    f"def {method}[W](self: {name}[float, S], other: {structure.format('W')}, /) -> {name}[W, S]: ...",
+                    f"def {method}(self, other: {structure.format('V')} | {structure.format('float')}, /) -> {name}[V, S]: ...",
+                ],
+                f"{name}[V, S]",
+            ),
             overrides=True,
         )
-    text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[V, T]: ...\n"
-    text += f"    @classmethod\n    @override\n    def from_value[W](cls, value: W) -> {name}[W, S]: ...\n"
+    text += f"    @override\n    def to_system[T: AnySystem](self, system: type[T]) -> {name}[V, T]: ...\n"
+    text += f"    @classmethod\n    @override\n    def from_value[W, T: UnitSystem](cls, value: W, system: type[T]) -> {name}[W, T]: ...\n"
+    text += f"    @override\n    def apply(self, function: Callable[[V], V], /) -> {name}[V, S]: ...\n"
     return text
 
 
@@ -140,7 +149,7 @@ def constant_class(pair: Pair, table: Table) -> str:
     name, marker = pair.name, pair.marker
     own = f"_{name}Constant"
     text = f"\nclass {own}(Constant[{marker}]):\n"
-    text += f"    @override\n    def to_system[T: UnitSystem](self, system: type[T]) -> {name}[float, T]: ...\n"
+    text += f"    @override\n    def to_system[T: AnySystem](self, system: type[T]) -> {name}[float, T]: ...\n"
     text += (
         f"    @override\n    def to(self, unit: Unit[{marker}]) -> {name}[float]: ...\n"
     )
@@ -161,11 +170,11 @@ def constant_class(pair: Pair, table: Table) -> str:
             f"def {method}(self, other: _Scalar, /) -> {own}: ...",
         ]
         signatures += [
-            f"def {method}[W, T: UnitSystem](self, other: {right}[W, T], /) -> {result}[W, T]: ..."
+            f"def {method}[W, T: AnySystem](self, other: {right}[W, T], /) -> {result}[W, T]: ..."
             for right, result in entries
         ]
         signatures.append(
-            f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{marker}, L], W, T]: ..."
+            f"def {method}[L, W, T: AnySystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[{marker}, L], W, T]: ..."
         )
         text += overloads(signatures, overrides=True)
     for method, expression, scalar in (
@@ -175,7 +184,7 @@ def constant_class(pair: Pair, table: Table) -> str:
         text += overloads(
             [
                 f"def {method}(self, other: _Scalar, /) -> {scalar}: ...",
-                f"def {method}[L, W, T: UnitSystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[L, {marker}], W, T]: ...",
+                f"def {method}[L, W, T: AnySystem](self, other: _Operand[L, W, T], /) -> Quantity[{expression}[L, {marker}], W, T]: ...",
             ],
             overrides=True,
         )
@@ -184,8 +193,8 @@ def constant_class(pair: Pair, table: Table) -> str:
     ):
         for (op, left, right), result in table.entries.items():
             if op == operation and right == name:
-                text += f"    def {member}{left}_f[T: UnitSystem](self, other: {left}[float, T], /) -> {result}[float, T]: ...\n"
-                text += f"    def {member}{left}[W, T: UnitSystem](self, other: {left}[W, T], /) -> {result}[W, T]: ...\n"
+                text += f"    def {member}{left}_f[T: AnySystem](self, other: {left}[float, T], /) -> {result}[float, T]: ...\n"
+                text += f"    def {member}{left}[W, T: AnySystem](self, other: {left}[W, T], /) -> {result}[W, T]: ...\n"
                 text += f"    def {constant_member}{left}(self, other: _{left}Constant, /) -> _{result}Constant: ...\n"
     return text
 
@@ -212,10 +221,11 @@ def _pair_module(pair: Pair, catalogue: Catalogue, package: str, table: Table) -
         + "# pyright: reportPrivateUsage=false\n"
         + (PROTOCOL_MEMBERS if "    def _r" in body else "")
     )
+    text += "from collections.abc import Callable\n"
     text += "from typing import " + ", ".join(n for n in _TYPING if n in used) + "\n"
     text += numpy_imports(used)
     text += "from typing_extensions import TypeVar\n"
-    text += "from quantype.systems import Atomistic, UnitSystem\n"
+    text += "from quantype.systems import AnySystem, NoSystem, UnitSystem\n"
     text += (
         "from quantype.core import " + ", ".join(n for n in _CORE if n in used) + "\n"
     )
@@ -239,9 +249,7 @@ def _pair_module(pair: Pair, catalogue: Catalogue, package: str, table: Table) -
     text += f"from {package}.products import {pair.name} as _C\n"
     text += "# Public parameter names read better in diagnostics than private ones.\n"
     text += "# ruff: noqa: PYI001\n"
-    text += (
-        "V = TypeVar('V')\nS = TypeVar('S', bound=UnitSystem, default=Atomistic)\n\n"
-    )
+    text += "V = TypeVar('V')\nS = TypeVar('S', bound=AnySystem, default=NoSystem)\n\n"
     return text + body
 
 

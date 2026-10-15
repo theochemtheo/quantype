@@ -55,7 +55,7 @@ def test_constants_are_typed_by_kind() -> None:
 
 
 def test_values_are_easy_to_inspect() -> None:
-    assert repr(constants.k_B) == "Constant(k_B = 8.617333262145179e-05 eV/K)"
+    assert repr(constants.k_B) == "Constant(k_B = 8.617333262145177e-05 eV/K)"
     assert repr(constants.k_B.to_system(SI)) == "Entropy(1.380649e-23 J/K, SI)"
     assert constants.k_B.magnitude(u.joule_per_kelvin) == pytest.approx(1.380649e-23)
     assert repr(constants.hbar.to(u.joule_second)).startswith("Action(1.05457")
@@ -85,7 +85,9 @@ def test_constants_adopt_the_operand_system(system: type[UnitSystem]) -> None:
 def test_coulomb_energy_through_the_constant() -> None:
     energy = constants.k_e * (1 * u.e) * (1 * u.e) / (1 * u.angstrom)
     assert energy.dimensions == Energy[float](1, u.eV).dimensions
-    assert energy.value == pytest.approx(14.3996, rel=1e-5)
+    assert Energy.reinterpret(energy).magnitude(u.eV) == pytest.approx(
+        14.3996, rel=1e-5
+    )
 
 
 def test_constant_arithmetic() -> None:

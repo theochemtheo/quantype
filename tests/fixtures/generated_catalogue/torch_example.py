@@ -6,12 +6,12 @@ from labquantities import Energy, Force, Length, Quantity, Time, u, utorch
 
 def test_gradient() -> None:
     x = Length[torch.Tensor](torch.tensor([1.0, 2.0], requires_grad=True), u.angstrom)
-    energy = Energy.from_value((x.value**2).sum())
+    energy = Energy[torch.Tensor]((x.magnitude(u.angstrom) ** 2).sum(), u.eV)
 
     gradient = utorch.grad(energy, x)
 
     assert isinstance(gradient, Force)
-    torch.testing.assert_close(gradient.value, torch.tensor([2.0, 4.0]))
+    torch.testing.assert_close(gradient.magnitude(), torch.tensor([2.0, 4.0]))
 
 
 def test_structural_gradient() -> None:
@@ -21,4 +21,4 @@ def test_structural_gradient() -> None:
     assert isinstance(q, Quantity)
     # A product class over one of its factors is the other factor.
     assert type(gradient) is Time
-    torch.testing.assert_close(gradient.value, torch.tensor([3.0, 3.0]))
+    torch.testing.assert_close(gradient.magnitude(), torch.tensor([3.0, 3.0]))

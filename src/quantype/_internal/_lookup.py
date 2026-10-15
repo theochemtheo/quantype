@@ -4,13 +4,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from quantype._internal._systems import Atomistic, UnitSystem
+from quantype._internal._storage_units import parsed
+from quantype._internal._systems import AnySystem, NoSystem, UnitSystem
 from quantype._internal._unit import Unit, get_unit, known_kinds, units_of
 
 if TYPE_CHECKING:
     from collections.abc import Iterable
 
-    from quantype._internal._semantics import Kind
+    from quantype._internal._semantics import Kind, Semantic
 
 
 def resolve_unit(
@@ -18,7 +19,7 @@ def resolve_unit(
     units: Iterable[Unit[Any]] = (),
     *,
     kind: Kind | None = None,
-    system: type[UnitSystem] = Atomistic,
+    system: type[AnySystem] = NoSystem,
 ) -> Unit[Any]:
     """Resolve explicit definitions without mutating the builtin catalogue.
 
@@ -31,7 +32,7 @@ def resolve_unit(
     for unit in named:
         if unit.semantic is kind:
             return unit
-    if kind is not None and system is not Atomistic:
+    if kind is not None and issubclass(system, UnitSystem):
         for unit in (system.unit_for(kind), *system.units):
             if unit.name == name and unit.semantic is kind:
                 return unit
@@ -49,7 +50,7 @@ def unit_of_kind(
     name: str,
     kind: Kind,
     units: Iterable[Unit[Any]] = (),
-    system: type[UnitSystem] = Atomistic,
+    system: type[AnySystem] = NoSystem,
 ) -> Unit[Any]:
     """The unit of ``kind`` that ``name`` names: an identifier, else a symbol.
 
@@ -57,7 +58,16 @@ def unit_of_kind(
     error that names both kinds.
     """
     definitions = tuple(units)
-    unit = resolve_unit(name, definitions, kind=kind, system=system)
+    try:
+        unit = resolve_unit(name, definitions, kind=kind, system=system)
+    except ValueError:
+        try:
+            composed = parsed(name, kind, lambda leaf: _leaf(leaf, definitions, system))
+        except ValueError as error:
+            raise error from None
+        if composed is None:
+            raise
+        return composed
     if unit.semantic is kind:
         return unit
     try:
@@ -68,7 +78,32 @@ def unit_of_kind(
         ) from None
 
 
-def _system_units(system: type[UnitSystem]) -> list[Unit[Any]]:
+def _leaf(name: str, units: Iterable[Unit[Any]], system: type[AnySystem]) -> Unit[Any]:
+    """A unit of any kind in a composed symbol: a name or alias, else a symbol."""
+    definitions = tuple(units)
+    try:
+        return resolve_unit(name, definitions, system=system)
+    except ValueError:
+        pass
+    found = list(
+        dict.fromkeys(
+            unit
+            for unit in (
+                *definitions,
+                *_system_units(system),
+                *(unit for kind in known_kinds() for unit in units_of(kind)),
+            )
+            if unit.symbol == name
+        )
+    )
+    if len(found) != 1:
+        raise ValueError(f"Unknown or ambiguous unit {name!r}")
+    return found[0]
+
+
+def _system_units(system: type[AnySystem]) -> list[Unit[Any]]:
+    if not issubclass(system, UnitSystem):
+        return []
     return [*system.units, *(system.unit_for(kind) for kind in known_kinds())]
 
 
@@ -94,8 +129,8 @@ def _by_symbol(name: str, kind: Kind, extra: Iterable[Unit[Any]]) -> Unit[Any]:
 
 def _definitions(
     units: Iterable[Unit[Any]], kind: Kind | None
-) -> dict[tuple[str, Kind], Unit[Any]]:
-    definitions: dict[tuple[str, Kind], Unit[Any]] = {}
+) -> dict[tuple[str, Semantic], Unit[Any]]:
+    definitions: dict[tuple[str, Semantic], Unit[Any]] = {}
     for unit in units:
         if (unit.name, unit.semantic) in definitions:
             raise ValueError(f"Duplicate unit definition {unit.name!r}")

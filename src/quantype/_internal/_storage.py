@@ -60,18 +60,21 @@ def reject_booleans(value: Any) -> None:
             reject_booleans(item)
 
 
-def validate_floating_storage(value: Any) -> None:
-    """Inspect existing storage without converting, detaching, or moving it."""
+def is_floating(value: Any) -> bool:
+    """Whether array or NumPy scalar storage has a real floating dtype."""
     module = type(value).__module__
     if module.startswith("torch"):
-        valid = value.is_floating_point()
-    elif module.startswith(("jax", "jaxlib")):
+        return bool(value.is_floating_point())
+    if module.startswith(("jax", "jaxlib")):
         import jax.numpy as jnp
 
-        valid = jnp.issubdtype(value.dtype, jnp.floating)
-    else:
-        valid = value.dtype.kind == "f"
-    if not valid:
+        return jnp.issubdtype(value.dtype, jnp.floating)
+    return bool(value.dtype.kind == "f")
+
+
+def validate_floating_storage(value: Any) -> None:
+    """Inspect existing storage without converting, detaching, or moving it."""
+    if not is_floating(value):
         raise ValueError(
             "Unit-first construction requires a real floating dtype; "
             "use a typed quantity constructor to convert integer magnitudes"
@@ -325,6 +328,17 @@ def unit_conversion(
         if offset != 0:
             raw = raw + offset
     return _restore_storage(value, raw)
+
+
+def rescale(value: Any, source: float, target: float) -> Any:
+    """Numbers in a unit of scale ``source`` as numbers in one of scale ``target``.
+
+    The factor is a ratio of at least 1, multiplied or divided by, so an exact
+    ratio such as 10 stays exact both ways: 0.7 nm is 7.0 Å, not 6.999999999999999.
+    """
+    if source >= target:
+        return unit_conversion(value, source / target, 0.0)
+    return unit_conversion(value, target / source, 0.0, inverse=True)
 
 
 def _working_value(value: Any) -> tuple[Any, Any]:

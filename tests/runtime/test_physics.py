@@ -50,11 +50,12 @@ def test_atomistic_stores_mass_in_daltons() -> None:
     assert Atomistic.unit_for(Mass) is u.dalton
     assert Atomistic.unit_for(MassDensity) is u.gram_per_cubic_centimeter
     assert Atomistic.unit_for(Momentum) is u.eV_fs_per_angstrom
-    assert Mass[float](12, u.Da).value == 12
-    assert (12 * u.Da).value == 12
-    assert Mass.from_value(12.0).magnitude(u.Da) == 12
-    assert (1 * u.m_e).value == pytest.approx(5.485799090441e-4, rel=1e-9)
-    assert repr(Mass.from_value(1.0)) == "Mass(1.0 Da)"
+    assert Mass[float, Atomistic](12, u.Da).value == 12
+    assert (12 * u.Da).to_system(Atomistic).value == 12
+    assert Mass.from_value(12.0, Atomistic).magnitude(u.Da) == 12
+    electron = (1 * u.m_e).to_system(Atomistic)
+    assert electron.value == pytest.approx(5.485799090441e-4, rel=1e-9)
+    assert repr(Mass.from_value(1.0, Atomistic)) == "Mass(1.0 Da, Atomistic)"
 
 
 class Ase(UnitSystem, name="test-physics:ase"):
@@ -71,7 +72,9 @@ def test_ase_units_make_daltons_coherent() -> None:
     )
     speed = Velocity[float](1, u.ase_velocity)
     derived = Length[float](1, u.angstrom) / Time[float](1, u.ase_time)
-    assert speed.value == pytest.approx(derived.value, rel=1e-12)
+    assert speed.magnitude(u.angstrom_per_fs) == pytest.approx(
+        derived.magnitude(u.angstrom_per_fs), rel=1e-12
+    )
     kinetic = Mass[float](1, u.Da) * speed * speed
     assert kinetic.magnitude(u.eV) == pytest.approx(1, rel=1e-12)
     momentum = Mass[float](1, u.Da) * speed
@@ -87,32 +90,34 @@ def test_a_system_on_ase_time_stores_ase_units() -> None:
     assert Ase.unit_for(Mass) is u.dalton
     assert Ase.unit_for(Velocity) is u.ase_velocity
     assert Ase.unit_for(Momentum) is u.ase_momentum
-    velocities = Velocity[npt.NDArray[np.float64], Ase].from_value(np.full(3, 0.5))
+    velocities = Velocity.from_value(np.full(3, 0.5), Ase)
     momenta = Mass[float, Ase](2, u.Da) * velocities
     np.testing.assert_allclose(momenta.value, np.full(3, 1.0))
 
 
 def test_atomistic_mass_arithmetic_rescales() -> None:
-    mass = Mass[float](1, u.Da)
-    speed = Velocity[float](1, u.angstrom_per_fs)
+    mass = Mass[float, Atomistic](1, u.Da)
+    speed = Velocity[float, Atomistic](1, u.angstrom_per_fs)
     kinetic = mass * speed * speed
     assert isinstance(kinetic, Energy)
     assert kinetic.value == pytest.approx(DA_ANGSTROM2_PER_FS2, rel=1e-12)
     momentum = mass * speed
     assert isinstance(momentum, Momentum)
     assert momentum.value == pytest.approx(DA_ANGSTROM2_PER_FS2, rel=1e-12)
-    acceleration = Force[float](1, u.eV_per_angstrom) / mass
+    acceleration = Force[float, Atomistic](1, u.eV_per_angstrom) / mass
     assert isinstance(acceleration, Acceleration)
     assert acceleration.value == pytest.approx(1 / DA_ANGSTROM2_PER_FS2, rel=1e-12)
     assert (momentum / speed).value == pytest.approx(1, rel=1e-12)
-    density = Mass[float](1, u.gram) / Volume[float](1, u.cubic_centimeter)
+    density = Mass[float, Atomistic](1, u.gram) / Volume[float, Atomistic](
+        1, u.cubic_centimeter
+    )
     assert isinstance(density, MassDensity)
     assert density.value == pytest.approx(1, rel=1e-12)
-    per_cubic_angstrom = mass / Volume[float](1, u.angstrom_cubed)
+    per_cubic_angstrom = mass / Volume[float, Atomistic](1, u.angstrom_cubed)
     assert per_cubic_angstrom.value == pytest.approx(1.66053906892, rel=1e-12)
-    assert (per_cubic_angstrom * Volume[float](1, u.angstrom_cubed)).value == (
-        pytest.approx(1, rel=1e-12)
-    )
+    assert (
+        per_cubic_angstrom * Volume[float, Atomistic](1, u.angstrom_cubed)
+    ).value == (pytest.approx(1, rel=1e-12))
 
 
 def test_metal_stores_lammps_units() -> None:
@@ -189,16 +194,16 @@ def test_structural_results_are_stored_coherently() -> None:
     mass = Mass[float, Metal](1, u.gram_per_mole)
     moment = mass * Length[float, Metal](1, u.angstrom)
     assert type(moment) is LengthMass  # factors in catalogue order
-    assert repr(moment).endswith("(Å * eV ps^2/Å^2), Metal)")
+    assert repr(moment).endswith("(eV ps^2/Å^2)·Å, Metal)")
     assert moment.value == pytest.approx(LAMMPS_METAL["mvv2e"], rel=LAMMPS_DIGITS)
 
 
 def test_overridden_kinds_serialize_in_their_units(tmp_path: Path) -> None:
-    pressure = Pressure[float, Metal].from_value(3.0)
+    pressure = Pressure.from_value(3.0, Metal)
     assert pressure.to_dict() == {"kind": "Pressure", "magnitude": 3.0, "unit": "bar"}
     assert Pressure[float, Metal].parse("3 bar").value == pytest.approx(3.0)
     path = tmp_path / "frame.npz"
-    save_npz(path, p=Pressure[npt.NDArray[np.float64], Metal].from_value(np.ones(2)))
+    save_npz(path, p=Pressure.from_value(np.ones(2), Metal))
     restored = load_npz(path, "p", Pressure[npt.NDArray[np.float64], Real])
     np.testing.assert_allclose(restored.magnitude(u.bar), [1, 1])
 
@@ -249,12 +254,12 @@ def test_derivatives_rescale_through_overridden_kinds() -> None:
 
     def pressure(volume: Volume[Any, Metal]) -> Quantity[Any, Any, Metal]:
         # P(V) = c / V, stored in bar.
-        result: Quantity[Any, Any, Metal] = Pressure[Any, Metal].from_value(2.0) * (
+        result: Quantity[Any, Any, Metal] = Pressure.from_value(2.0, Metal) * (
             Volume[float, Metal](1, u.angstrom_cubed) / volume
         )
         return result
 
-    volume = Volume[Any, Metal].from_value(jax.numpy.asarray(2.0))
+    volume = Volume.from_value(jax.numpy.asarray(2.0), Metal)
     slope = ujax.grad(pressure)(volume)
     # dP/dV = -c / V²: -0.5 bar/Å³, stored coherently as eV/Å⁶.
     expected = -0.5 / LAMMPS_METAL["nktv2p"]
@@ -265,8 +270,8 @@ def test_torch_derivatives_rescale_through_overridden_kinds() -> None:
     torch = pytest.importorskip("torch")
     utorch = pytest.importorskip("quantype.utorch")
     raw = torch.tensor(2.0, dtype=torch.float64, requires_grad=True)
-    volume = Volume[Any, Metal].from_value(raw)
-    pressure = Pressure[Any, Metal].from_value(torch.tensor(2.0, dtype=torch.float64))
+    volume = Volume.from_value(raw, Metal)
+    pressure = Pressure.from_value(torch.tensor(2.0, dtype=torch.float64), Metal)
     output = pressure * (Volume[float, Metal](1, u.angstrom_cubed) / volume)
     slope = utorch.grad(output, volume)
     expected = -0.5 / LAMMPS_METAL["nktv2p"]

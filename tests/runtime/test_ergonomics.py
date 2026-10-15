@@ -10,6 +10,7 @@ import numpy as np
 import numpy.typing as npt
 import pytest
 
+import quantype.units
 from quantype import (
     Dimensionless,
     Energy,
@@ -24,7 +25,9 @@ from quantype import (
     Volume,
     u,
 )
-from quantype.systems import SI, Metal
+from quantype._internal._semantics import KINDS, Kind, kind_mismatch
+from quantype.constants import k_B
+from quantype.systems import SI, Atomistic, Metal, NoSystem
 from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
@@ -40,7 +43,7 @@ def test_real_scalars_scale_quantities(factor: float) -> None:
     length = Length[float](2, u.nm)
     for scaled in (length * factor, factor * length, length / (1 / factor)):
         assert scaled.magnitude(u.nm) == pytest.approx(4)
-        assert type(scaled.value) is float
+        assert type(scaled.magnitude(u.nm)) is float
 
 
 def test_numerical_arrays_scale_quantities() -> None:
@@ -53,8 +56,8 @@ def test_numerical_arrays_scale_quantities() -> None:
     positions = Length[npt.NDArray[np.float32]]([2, 4], u.angstrom)
     weighted = positions * weights
     assert_allclose(weighted, u.angstrom(np.array([2.0, 2.0])))
-    assert weighted.value.dtype == np.float32
-    assert (positions * np.float64(2)).value.dtype == np.float32
+    assert weighted.dtype == np.float32
+    assert (positions * np.float64(2)).dtype == np.float32
     reciprocal = np.ones(2) / Length[float](2, u.angstrom)
     assert_allclose(reciprocal, 1 / u.angstrom(np.array([2.0, 2.0])))
 
@@ -69,7 +72,7 @@ def test_non_real_factors_are_rejected(factor: object) -> None:
 
 
 def test_absolute_temperatures_scale() -> None:
-    assert (2 * (300 * u.K)).value == 600
+    assert (2 * (300 * u.K)).magnitude(u.K) == 600
 
 
 def test_zero_is_the_additive_identity() -> None:
@@ -97,7 +100,7 @@ def test_dimensionless_values_mix_with_plain_numbers() -> None:
     assert str(ratio) == "0.25"
     assert float(ratio) == 0.25
     assert isinstance(ratio + 1, Dimensionless)
-    assert (1 - ratio).value == 0.75
+    assert float(1 - ratio) == 0.75
     assert ratio < 1
     assert ratio == 0.25
     assert ratio != 0.5
@@ -116,14 +119,18 @@ def test_truthiness_is_ambiguous() -> None:
             bool(quantity)
 
 
-def test_quantities_from_different_systems_are_unequal() -> None:
-    atomistic = 2 * u.nm
-    si: Any = atomistic.to_system(SI)
+def test_quantities_from_two_unit_systems_are_unequal() -> None:
+    unbound = 2 * u.nm
+    si: Any = unbound.to_system(SI)
+    atomistic: Any = unbound.to_system(Atomistic)
     assert atomistic != si
     assert atomistic not in [si, 3 * u.nm]
-    assert len({atomistic, si}) == 2
     with pytest.raises(TypeError, match="Cannot combine Atomistic and SI"):
         _ = atomistic < si
+    # Without a system, a quantity adopts the other's.
+    assert unbound == si
+    assert unbound == atomistic
+    assert unbound < si + 1 * u.nm
 
 
 def test_format_specs_apply_to_the_magnitude() -> None:
@@ -138,10 +145,16 @@ def test_format_specs_apply_to_the_magnitude() -> None:
 
 def test_unit_names_the_presented_unit() -> None:
     assert (2 * u.nm).unit is u.nanometer
-    assert Length.from_value(1.0).unit is u.angstrom
-    assert Length[float, SI].from_value(1.0).unit is u.meter
-    assert Pressure[float, Metal].from_value(1.0).unit is u.bar
-    assert ((1 * u.nm) * (1 * u.fs)).unit is None
+    assert Length.from_value(1.0, Atomistic).unit is u.angstrom
+    assert Length.from_value(1.0, SI).unit is u.meter
+    assert Pressure.from_value(1.0, Metal).unit is u.bar
+    product = (1 * u.nm) * (1 * u.fs)
+    assert product.unit is not None
+    assert product.unit.symbol == "fs·nm"
+    si_unit = ((1 * u.m) * (1 * u.s)).unit
+    assert si_unit is not None
+    assert si_unit.symbol == "m·s"
+    assert product.to_system(Atomistic).unit is None
 
 
 def test_reinterpret_names_equal_dimensions_explicitly() -> None:
@@ -206,11 +219,26 @@ def test_a_device_passed_to_to_explains_display_units() -> None:
 def test_comparing_with_a_plain_number_needs_a_unit(number: object) -> None:
     length: Any = 2 * u.nm
     other: Any = number
-    for compare in (operator.eq, operator.ne, operator.lt, operator.ge):
+    # Only zero means the same in every unit, so only it is equal or not.
+    unequal = type(number) is int and number == 0
+    for compare in (
+        (operator.lt, operator.ge)
+        if unequal
+        else (
+            operator.eq,
+            operator.ne,
+            operator.lt,
+            operator.ge,
+        )
+    ):
         with pytest.raises(TypeError, match=r"Cannot compare Length and .*; give it a"):
             compare(length, other)
-    with pytest.raises(TypeError, match="give it a unit"):
-        operator.eq(other, length)
+    if unequal:
+        assert length != other
+        assert other != length
+    else:
+        with pytest.raises(TypeError, match="give it a unit"):
+            operator.eq(other, length)
 
 
 def test_non_numbers_are_unequal_and_dimensionless_values_take_numbers() -> None:
@@ -221,3 +249,72 @@ def test_non_numbers_are_unequal_and_dimensionless_values_take_numbers() -> None
     ratio = (1 * u.nm) / (4 * u.nm)
     assert ratio == 0.25
     assert ratio < 1
+
+
+@pytest.mark.parametrize(
+    "combine",
+    [
+        lambda: cast("Any", u.nm) * u.nm,
+        lambda: cast("Any", u.eV) / u.angstrom,
+        lambda: cast("Any", u.nm) ** 2,
+        lambda: 2 / cast("Any", u.nm),
+    ],
+)
+def test_units_only_scale_magnitudes(combine: Callable[[], object]) -> None:
+    with pytest.raises(TypeError, match=r"combine quantities instead"):
+        combine()
+
+
+def test_array_methods_name_the_quantity_way() -> None:
+    lengths: Any = Length[npt.NDArray[np.float64]](np.ones(2), u.nm)
+    with pytest.raises(
+        AttributeError, match=r"q\.apply\(lambda raw: raw\.astype\(\)\)"
+    ):
+        lengths.astype(np.float32)
+    with pytest.raises(AttributeError, match=r"q\.magnitude\(unit\)\.tolist\(\)"):
+        lengths.tolist()
+    with pytest.raises(AttributeError, match=r"has no attribute 'nonsense'$"):
+        _ = lengths.nonsense
+
+
+def test_kinds_of_one_name_from_two_catalogues_say_so() -> None:
+    other = Kind("Length", (1, 0, 0, 0, 0, 0, 0, 0), "angstrom")
+    assert "another catalogue" in kind_mismatch(KINDS["Length"], other)
+    assert kind_mismatch(KINDS["Length"], KINDS["Energy"]) == (
+        "Expected Length; received Energy"
+    )
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [True, [1.0], np.array([1, 2]), np.array([True]), "1.0"],
+    ids=["bool", "list", "int-array", "bool-array", "str"],
+)
+def test_from_value_takes_real_floating_numbers(raw: object) -> None:
+    with pytest.raises(TypeError, match="from_value needs"):
+        Length.from_value(raw, SI)
+
+
+def test_apply_keeps_a_floating_dtype() -> None:
+    lengths = Length[npt.NDArray[np.float64]](np.ones(2), u.nm)
+    with pytest.raises(TypeError, match="must return a floating dtype"):
+        lengths.apply(lambda raw: cast("Any", raw.astype(int)))
+
+
+def test_a_first_power_keeps_the_kind() -> None:
+    length = Length[float](2, u.nm)
+    assert type(length**1) is Length
+    assert (length**1).unit is u.nm
+    product = length * Time[float](1, u.fs)
+    assert type(product**1) is type(product)
+
+
+def test_a_namespace_of_units_is_not_a_unit() -> None:
+    with pytest.raises(TypeError, match="received a namespace of units"):
+        Length[float](1.0, cast("Any", quantype.units.length))
+
+
+def test_constants_convert_without_a_system_into_reference_units() -> None:
+    reference = k_B.to_system(NoSystem)
+    assert reference.system is NoSystem
+    assert reference == k_B.to_system(SI)

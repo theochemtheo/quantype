@@ -6,6 +6,73 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+Quantities no longer have a unit system unless you choose one.
+`Length[float]` is now `Length[float, NoSystem]`: it keeps the unit it was
+given in, and has no `.value` until `.to_system(...)` picks a system. Code that
+reads `.value` or calls `from_value` on default quantities, or calls
+`with_value`, needs updating; see Changed and
+[ADR-014](docs/decisions/ADR-014-opt-in-unit-system.md).
+
+### Added
+
+- `NoSystem`, the default system, and `AnySystem`, the alias
+  `UnitSystem | NoSystem` that bounds the system parameter. Code that accepts
+  quantities with or without a system is generic over `[S: AnySystem]`.
+- `q.apply(function)` maps the stored numbers and keeps the kind, units, and
+  storage backend. It works with or without a system.
+- `q.simplified()` merges units of one dimension and shows a named kind in a
+  display system that holds every unit left, so `(kcal/mol/Å)·nm` is
+  `kcal/mol` and `Da·(Å/fs)^2` is `eV`.
+- `q.to(System)` shows a quantity in a system's unit for its kind without
+  converting it into that system.
+
+### Changed
+
+- Construction and decoding without a system store the number in the unit it
+  was given in, so `Length[float](2, u.nm).magnitude(u.nm)` returns the input
+  exactly. Units with an offset, such as °C, still store kelvin.
+- `.value` and `from_value` need a unit system, and all four checkers reject
+  them without one. `from_value(raw, system)` takes the system:
+  `Length.from_value(2.0, SI)`.
+- `+` and `-` convert the right operand into the left one's unit:
+  `2 nm + 3 Å` is `2.3 nm`.
+- Products, quotients, and powers without a system compose their operands'
+  units instead of converting: `Energy[float](3, u.eV) / Length[float](2, u.nm)`
+  shows `1.5 eV/nm`, and `.magnitude()` returns numbers in that unit. A
+  composed unit takes a catalogue name when the scales agree, so J/m is N.
+  Composed units parse back through `parse`, `unit_named`, and `to_dict`.
+- A quantity without a system adopts the other operand's system in
+  arithmetic, comparisons, `==`, `quantype.numpy`, and `assert_allclose`, as
+  constants do. Two unit systems still don't mix, and a parameter typed
+  `Length[float, SI]` rejects a quantity without a system.
+- `==` and ordering compare as arithmetic does, so `1 nm == 10 Å` and
+  `q == q.to_system(SI)`. `q == 0` works for every kind except absolute
+  temperatures.
+- Quantities are unhashable, scalars included. Key dicts, sets, caches, and
+  `jax.jit` static arguments on `q.magnitude(unit)`.
+- `Length.parse`, Pydantic fields, `load_npz` targets, and
+  `quantype.typing.quantity_type` read an annotation without a system, such as
+  `Force[float]`, as `NoSystem` instead of `Atomistic`.
+- JAX pytrees and `ujax`/`utorch` derivatives see reference units, so `jit`
+  traces once across input units. Values that come out of a transformation
+  show in reference units.
+- `quantype.numpy` functions that take several quantities of one kind have
+  per-kind overloads, so checkers reject mixed kinds.
+- Each catalogue unit scale and physical constant is computed exactly and
+  rounded to a float once. 46 scales move by 1 to 5 ulp, so a picosecond is
+  exactly 1000 fs and N = kg·m/s² holds.
+- Error messages for mismatched kinds and systems, unit arithmetic, and array
+  methods called on a quantity name the fix.
+- `x**1` keeps its kind, at runtime and in the stubs.
+- `from_value` and `apply` reject booleans, lists, and integer arrays.
+- `assert_allclose` compares in the desired quantity's unit, compares
+  temperatures in kelvin, and takes an `atol` without a system.
+
+### Removed
+
+- `with_value`. Use `apply` to change numbers in place, or construct a new
+  quantity from `.magnitude(unit)` to change backend.
+
 ## [0.2.0] - 2026-10-03
 
 `Atomistic` now stores masses in daltons and mass densities in g/cm³, so code

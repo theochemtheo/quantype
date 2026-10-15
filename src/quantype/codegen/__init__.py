@@ -62,7 +62,10 @@ _BATCH = 200
 
 def _private_stub(name: str) -> bool:
     """A module that is minified (see ``quantype.codegen._compact``)."""
-    return name.startswith(("_products/", "_constants/")) or name == "_generated.pyi"
+    return (
+        name.startswith(("_products/", "_constants/", "_kinds/"))
+        or name == "_generated.pyi"
+    )
 
 
 def _formatted(formatter: str, package: str, sources: dict[str, str]) -> dict[str, str]:
@@ -119,8 +122,8 @@ def generate(
 ) -> list[str]:
     """Write/check a package directory, returning names of changed/stale files.
 
-    The generator owns ``_products/`` and ``_constants/``: a module there that it
-    no longer renders is stale, and is removed.
+    The generator owns ``_products/``, ``_constants/`` and ``_kinds/``: a module
+    there that it no longer renders is stale, and is removed.
     """
     formatter = shutil.which("ruff")
     if formatter is None:
@@ -145,7 +148,7 @@ def _unrendered(
 ) -> list[str]:
     """Modules in the generator's own folders that it no longer renders."""
     stale: list[str] = []
-    for owned in ("_products", "_constants"):
+    for owned in ("_products", "_constants", "_kinds"):
         folder = directory / owned
         if not folder.is_dir():
             continue

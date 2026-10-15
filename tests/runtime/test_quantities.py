@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 import numpy.typing as npt
@@ -16,6 +16,8 @@ from quantype import (
     Energy,
     Force,
     Length,
+    Mass,
+    Pressure,
     Quantity,
     Temperature,
     TemperatureDifference,
@@ -23,7 +25,8 @@ from quantype import (
     u,
 )
 from quantype.catalogue import builtin_catalogue
-from quantype.systems import SI, Atomistic, Metal
+from quantype.constants import c, h, k_B
+from quantype.systems import SI, Atomistic, Metal, NoSystem, Real, UnitSystem
 
 if TYPE_CHECKING:
     from quantype.core import Unit
@@ -40,7 +43,7 @@ def test_a_kind_class_names_its_kind() -> None:
         cls: Any = getattr(quantype, name)
         assert cls.kind == name
         assert cls[float].kind == name
-        assert cls.from_value(1.0).kind == name
+        assert cls.from_value(1.0, Atomistic).kind == name
     product = Length[float](2, u.nm) * Time[float](1, u.fs)
     assert type(product).kind == product.kind == "Mul[Length,Time]"
     with pytest.raises(AttributeError, match="named quantity classes"):
@@ -57,10 +60,10 @@ def test_construction_remembers_the_input_unit() -> None:
     assert repr(2 * u.nm) == "Length(2.0 nm)"
     bare: Length[float] = Length(2, u.nm)
     assert repr(bare) == "Length(2.0 nm)"
-    assert bare.system is Atomistic
+    assert bare.system is NoSystem
     assert repr(Length.parse("3 bohr")) == "Length(3.0 a0)"
-    assert repr(Length[float, SI].from_value(2.0)) == "Length(2.0 m, SI)"
-    assert repr(Length.from_value(2.0)) == "Length(2.0 Å)"
+    assert repr(Length.from_value(2.0, SI)) == "Length(2.0 m, SI)"
+    assert repr(Length.from_value(2.0, Atomistic)) == "Length(2.0 Å, Atomistic)"
 
 
 @pytest.mark.parametrize(
@@ -83,20 +86,22 @@ def test_construction_can_leave_the_display_unit_unset(
     assert stored.value.dtype == raw.dtype
     np.testing.assert_array_equal(stored.value, shown.value)
     assert stored.unit is SI.unit_for(Force)
-    assert str(stored) == str(alias.from_value(shown.value))
+    assert str(stored) == str(Force.from_value(shown.value, SI))
     assert stored.to_dict()["unit"] == "newton"
     assert shown.to_dict()["unit"] == unit.name
 
 
 def test_construction_without_a_display_unit_converts_offsets() -> None:
     point = Temperature[float](20.1, u.celsius, display=False)
-    assert point.value == Temperature[float](20.1, u.celsius).value
+    assert point == Temperature[float](20.1, u.celsius)
     assert point.unit is u.kelvin
-    assert point.magnitude() == point.value
-    assert repr(point) == f"Temperature({point.value} K)"
+    assert point.magnitude() == point.magnitude(u.kelvin)
+    assert repr(point) == f"Temperature({point.magnitude()} K)"
     bare = Length(2.0, u.nm, display=False)
-    assert bare.value == 20.0
-    assert repr(bare) == "Length(20.0 Å)"
+    assert bare.magnitude(u.angstrom) == 20.0
+    assert repr(bare) == "Length(2.0 nm)"
+    bound = Length[float, Atomistic](2.0, u.nm, display=False)
+    assert repr(bound) == "Length(20.0 Å, Atomistic)"
     assert repr(Length[float](2, u.nm, display=True)) == "Length(2.0 nm)"
 
 
@@ -125,7 +130,8 @@ def test_addition_prefers_the_left_display_unit() -> None:
     nm, angstrom = 2 * u.nm, 5 * u.angstrom
     assert repr(nm + angstrom) == "Length(2.5 nm)"
     assert repr(angstrom + nm) == "Length(25.0 Å)"
-    assert repr(Length.from_value(5.0) + nm) == "Length(2.5 nm)"
+    undisplayed = Length[float](5.0, u.angstrom, display=False)
+    assert repr(undisplayed + nm) == "Length(2.5 nm)"
     assert repr(nm - angstrom) == "Length(1.5 nm)"
 
 
@@ -134,10 +140,100 @@ def test_products_ratios_and_powers_fall_back_to_the_system() -> None:
     assert repr(x * x) == "Area(4e-18 m^2, SI)"
     assert repr(x**2) == "Area(4e-18 m^2, SI)"
     assert repr(Energy[float, SI](3, u.eV) / x).startswith("Force(")
-    assert repr((2 * u.nm) * (3 * u.nm)) == "Area(600.0 Å^2)"
+    area = (2 * u.nm) * (3 * u.nm)
+    assert repr(area) == "Area(6.0 nm^2)"
+    assert repr(area.to_system(Atomistic)) == "Area(6.0 nm^2, Atomistic)"
     structural = (2 * u.angstrom) * (3 * u.fs)
-    assert repr(structural) == "LengthTime(6.0 (Å * fs))"
+    assert repr(structural) == "LengthTime(6.0 fs·Å)"
+    assert repr(structural.to_system(Atomistic)) == "LengthTime(6.0 fs·Å, Atomistic)"
     assert "Mul" not in repr(structural)
+
+
+def test_products_without_a_system_show_named_units() -> None:
+    steps = Time[float](1, u.ns) / Time[float](2, u.fs)
+    assert repr(steps) == "Dimensionless(500000.0)"
+    assert steps.magnitude() == float(steps) == 500000.0
+    assert f"{steps:.0f}" == "500000"
+    energy = Energy[float](1, u.kcal_per_mol)
+    assert repr(energy / k_B).startswith("Temperature(503.2")
+    assert (energy / (k_B * Temperature[float](300, u.K))).unit is u.one
+    assert repr(h * c / Length[float](500, u.nm)).startswith("Energy(2.479")
+    assert repr(Energy[float](1, u.J) / Length[float](1, u.m)) == "Force(1.0 N)"
+    tension = Force[float](1, u.kcal_per_mol_per_angstrom)
+    assert repr(tension * Length[float](2, u.angstrom)) == "Energy(2.0 kcal/mol)"
+    nm, angstrom = Length[float](1, u.nm), Length[float](2, u.angstrom)
+    assert repr(nm * angstrom) == repr(angstrom * nm) == "Area(2.0 nm·Å)"
+    assert repr(1 / nm) == repr(nm**-1) == "PerLength(1.0 nm^-1)"
+    assert repr(nm**0) == repr(Energy[float](2, u.eV) ** 0) == "Quantity(1.0)"
+    force = Energy[float](3, u.eV) / Length[float](2, u.nm)
+    assert repr(force) == "Force(1.5 eV/nm)"
+    assert repr(force * Length[float](2, u.nm)) == "Energy(3.0 eV)"
+    mass, speed = Mass[float](2, u.Da), Length[float](1, u.nm) / Time[float](1, u.ps)
+    assert repr(mass * speed**2) == "Energy(2.0 Da·nm^2/ps^2)"
+
+
+def test_roots_merge_units_of_one_dimension() -> None:
+    root = qnp.sqrt(Length[float](2, u.nm) * Length[float](5, u.angstrom))
+    assert root.unit is u.nm
+    assert root.magnitude(u.angstrom) == pytest.approx(10)
+
+
+def test_simplified_keeps_catalogue_units_and_merges_into_the_largest_power() -> None:
+    warm = Temperature[float](25, u.degC)
+    assert warm.simplified().unit is u.degC
+    stress = (Pressure[float](6, u.Pa) * Length[float](1, u.angstrom)).simplified()
+    assert str(stress.unit) == "J/m^2"
+    assert stress.magnitude() == pytest.approx(6e-10)
+
+
+def test_units_of_one_dimension_cancel_into_the_left_operands() -> None:
+    energy, nm, angstrom = Energy[float](3, u.eV), 2 * u.nm, 4 * u.angstrom
+    assert repr(energy * nm / angstrom) == "Energy(15.0 eV)"
+    assert repr(energy * (nm / angstrom)) == "Energy(15.0 eV)"
+    stride = Length[float](1, u.nm) * Time[float](1, u.fs) / Time[float](1, u.ps)
+    assert repr(stride) == "Length(0.001 nm)"
+    assert repr(nm * angstrom) == "Area(8.0 nm·Å)"
+    scaled = energy
+    for _ in range(400):
+        scaled = scaled * nm / (20 * u.angstrom)
+    assert scaled.unit is u.eV
+    assert scaled.magnitude() == pytest.approx(3)
+    assert str(qnp.dot(energy * nm, 1 / angstrom)) == "15.0 eV"
+
+
+def test_simplified_and_system_units_change_only_the_display() -> None:
+    energy = Force[float](1, u.kcal_per_mol_per_angstrom) * Length[float](2, u.nm)
+    assert repr(energy) == "Energy(2.0 (kcal/mol/Å)·nm)"
+    assert repr(energy.simplified()) == "Energy(20.0 kcal/mol)"
+    assert energy.simplified() == energy
+    assert repr(energy.to(Atomistic)) == "Energy(0.8672820848360187 eV)"
+    assert energy.to(Atomistic).system is NoSystem
+    speed = Length[float](1, u.angstrom) / Time[float](1, u.fs)
+    kinetic = Mass[float](2, u.Da) * speed**2
+    assert repr(kinetic.simplified()) == "Energy(207.2853933432161 eV)"
+    md = Mass[float](2, u.Da) * (Length[float](1, u.nm) / Time[float](1, u.ps)) ** 2
+    assert md.simplified().unit == md.unit
+    bound = Length[float, SI](2, u.nm)
+    assert repr(bound.to(Atomistic)) == "Length(20.0 Å, SI)"
+    with pytest.raises(TypeError, match="unit system class"):
+        bound.to(cast("Any", NoSystem))
+
+
+def test_scaling_by_a_dimensionless_keeps_the_storage_unit() -> None:
+    velocity = Length[float](0.5, u.nm) / Time[float](1, u.ps)
+    factor = Dimensionless[float](1.01, u.one)
+    scaled = velocity
+    for _ in range(50):
+        scaled = scaled * factor
+    assert scaled._storage is velocity._storage  # noqa: SLF001
+    assert scaled.unit is velocity.unit
+
+
+def test_conversions_by_exact_ratios_are_exact() -> None:
+    assert Length[float](0.7, u.nm).magnitude(u.angstrom) == 7.0
+    assert Length[float](7, u.angstrom).magnitude(u.nm) == 0.7
+    assert (Length[float](0, u.nm) + Length[float](7, u.angstrom)).magnitude() == 0.7
+    assert Length[float, SI](0.7, u.nm).magnitude(u.nm) == 0.7
 
 
 def test_temperature_points_and_differences() -> None:
@@ -154,7 +250,7 @@ def test_temperature_points_and_differences() -> None:
 
 def test_exact_echo_of_python_scalars() -> None:
     point = Temperature[float](20.1, u.celsius)
-    assert point.value == pytest.approx(293.25)
+    assert point.magnitude(u.kelvin) == pytest.approx(293.25)
     assert point.magnitude() == 20.1
     assert point.magnitude(u.celsius) == 20.1
     assert point.to_dict()["magnitude"] == 20.1
@@ -177,9 +273,8 @@ def test_storage_alias_names_storage_then_system() -> None:
     bad: Any = _dynamic(Length)[float, int]
     with pytest.raises(TypeError, match="unit system class"):
         bad(1, u.nm)
-    abstract: Any = Length[float, Any]
     with pytest.raises(TypeError, match="unit system class"):
-        abstract.from_value(1.0)
+        Length.from_value(1.0, cast("Any", Any))
     with pytest.raises(TypeError, match="from_value"):
         _dynamic(Length)[float, SI](1)
     parsed = Length[float, Metal].parse("1 nm")
@@ -194,35 +289,72 @@ def test_value_equality() -> None:
     assert a != 1 * u.eV
     with pytest.raises(TypeError, match="give it a unit"):
         _ = a != 1.0
+    # Zero means the same in every unit, except for absolute temperatures.
+    assert a != 0
+    assert 0 * u.nm == 0
+    assert a not in [None, 0]
+    with pytest.raises(TypeError, match="give it a unit"):
+        _ = Temperature[float](0, u.kelvin) == 0
     arrays = Length[npt.NDArray[np.float64]]([1.0, 2.0], u.nm)
     np.testing.assert_array_equal(arrays == arrays.to(u.angstrom), [True, True])
     np.testing.assert_array_equal(arrays != 1 * u.nm, [False, True])
-    with pytest.raises(TypeError, match="unhashable"):
-        hash(arrays)
-    # Like naive and aware datetimes: unequal across systems, unordered.
-    mixed: Any = a.to_system(SI)
-    assert a != mixed
-    assert (a == mixed) is False
-    assert a not in [mixed, 2 * u.nm]
-    with pytest.raises(TypeError, match="Cannot combine Atomistic and SI"):
-        _ = a < mixed
+    # Unequal across two systems, and unordered, as arithmetic doesn't mix them.
+    si: Any = a.to_system(SI)
+    real: Any = a.to_system(Real)
+    assert si != real
+    assert (si == real) is False
+    with pytest.raises(TypeError, match="Cannot combine SI and Real"):
+        _ = si < real
+    # A quantity without a system adopts the other's.
+    assert a == si
+    assert a <= si
+    assert (si + a).system is SI
+    assert (a + si).system is SI
 
 
-def test_scalar_quantities_hash_by_value() -> None:
-    a, b = Length[float](1, u.nm), Length[float](10, u.angstrom)
-    assert hash(a) == hash(b)
-    assert hash(a) == hash(Length[np.float64](1, u.nm))
-    assert hash(-(0 * u.nm)) == hash(0 * u.nm)
-    assert len({a, b, 2 * u.nm}) == 2
-    assert {a: "cutoff"}[b] == "cutoff"
-    structural = (2 * u.angstrom) * (3 * u.fs)
-    assert hash(structural) == hash((6 * u.angstrom) * (1 * u.fs))
-    for unhashable in (
+@pytest.mark.parametrize("system", [SI, Atomistic, Metal, Real])
+@pytest.mark.parametrize(
+    "quantity",
+    [
+        *(Length[float](value, u.nm) for value in (0.3, 7.58, 1e-3, 123.456)),
+        *(Energy[float](value, u.kcal_per_mol) for value in (0.3, 7.58, 123.456)),
+    ],
+    ids=str,
+)
+def test_a_quantity_equals_itself_converted_into_a_system_and_back(
+    system: type[UnitSystem], quantity: Quantity[Any, float, NoSystem]
+) -> None:
+    bound = quantity.to_system(system)
+    back = bound.to_system(NoSystem)
+    assert quantity == bound
+    assert bound == quantity
+    assert back == quantity
+    assert quantity <= bound <= quantity
+    assert not quantity < bound
+    assert (quantity != back) is False
+
+
+def test_ordering_agrees_with_equality_across_units() -> None:
+    nm, angstrom = Length[float](0.3, u.nm), Length[float](3, u.angstrom)
+    assert nm == angstrom == nm
+    assert nm <= angstrom
+    assert nm >= angstrom
+    assert not nm < angstrom
+    assert not angstrom > nm
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    [
+        Length[float](1, u.nm),
+        Length[np.float64](1, u.nm),
+        (2 * u.angstrom) * (3 * u.fs),
         Length[npt.NDArray[np.float64]]([1.0], u.nm),
-        Length[npt.NDArray[np.float64]](1.0, u.nm),
-    ):
-        with pytest.raises(TypeError, match="unhashable array storage"):
-            hash(unhashable)
+    ],
+)
+def test_quantities_are_unhashable(quantity: Quantity[Any, Any, Any]) -> None:
+    with pytest.raises(TypeError, match="unhashable type"):
+        hash(quantity)
 
 
 def test_ordering_comparisons() -> None:
@@ -248,7 +380,7 @@ def test_indexing_shape_and_length() -> None:
     assert isinstance(row, Length)
     np.testing.assert_array_equal(row.magnitude(), [3.0, 4.0])
     element = positions[1, 0]
-    assert isinstance(element.value, np.ndarray)
+    assert isinstance(element.magnitude(), np.ndarray)
     assert element.shape == ()
     assert [float(q.magnitude()) for q in positions[0]] == [1.0, 2.0]
     scalar = 1 * u.nm
@@ -263,11 +395,13 @@ def test_indexing_shape_and_length() -> None:
 
 def test_reductions_along_an_axis() -> None:
     q = Length[npt.NDArray[np.float64]]([[1.0, 5.0], [3.0, 2.0]], u.angstrom)
-    np.testing.assert_array_equal(q.max(axis=0).value, [3.0, 5.0])
-    np.testing.assert_array_equal(q.min(axis=1, keepdims=True).value, [[1.0], [2.0]])
+    np.testing.assert_array_equal(q.max(axis=0).magnitude(), [3.0, 5.0])
+    np.testing.assert_array_equal(
+        q.min(axis=1, keepdims=True).magnitude(), [[1.0], [2.0]]
+    )
     points = Temperature[npt.NDArray[np.float64]]([300.0, 310.0], u.K)
-    assert points.max().value == 310
-    assert points.min().value == 300
+    assert points.max().magnitude() == 310
+    assert points.min().magnitude() == 300
 
 
 def test_reflected_numpy_scalars() -> None:
@@ -277,7 +411,7 @@ def test_reflected_numpy_scalars() -> None:
         assert result.magnitude() == 2
     inverse = np.float64(2) / (2 * u.fs)
     assert inverse.kind == "InverseTime"
-    assert inverse.value == 1.0
+    assert inverse.magnitude(u.per_fs) == 1.0
     untyped: Any = q
     with pytest.raises(TypeError, match="Cannot add float64 and Length"):
         np.add(np.float64(1), untyped)

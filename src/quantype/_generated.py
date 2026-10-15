@@ -41,13 +41,13 @@ from quantype.kinds import (
     VelocityKind,
     VolumeKind,
 )
-from quantype.systems import UnitSystem
+from quantype.systems import AnySystem
 
 _defer_table(lambda: _importlib.import_module("quantype.products"))
 
 
-class Dimensionless[V, S: UnitSystem](Quantity[DimensionlessKind, V, S]):
-    """A dimensionless, stored in 1 in the default Atomistic system.
+class Dimensionless[V, S: AnySystem](Quantity[DimensionlessKind, V, S]):
+    """A dimensionless, kept in the unit it is given in.
 
     Build one with ``Dimensionless[float](2, u.one)``.
     Its units are in ``u.dimensionless``.
@@ -56,8 +56,8 @@ class Dimensionless[V, S: UnitSystem](Quantity[DimensionlessKind, V, S]):
     _kind = "Dimensionless"
 
 
-class Length[V, S: UnitSystem](Quantity[LengthKind, V, S]):
-    """A length, stored in Å in the default Atomistic system.
+class Length[V, S: AnySystem](Quantity[LengthKind, V, S]):
+    """A length, kept in the unit it is given in.
 
     Build one with ``Length[float](2, u.angstrom)``.
     Its units are in ``u.length``.
@@ -66,8 +66,8 @@ class Length[V, S: UnitSystem](Quantity[LengthKind, V, S]):
     _kind = "Length"
 
 
-class Area[V, S: UnitSystem](Quantity[AreaKind, V, S]):
-    """An area, stored in Å^2 in the default Atomistic system.
+class Area[V, S: AnySystem](Quantity[AreaKind, V, S]):
+    """An area, kept in the unit it is given in.
 
     Build one with ``Area[float](2, u.angstrom_squared)``.
     Its units are in ``u.area``.
@@ -76,8 +76,8 @@ class Area[V, S: UnitSystem](Quantity[AreaKind, V, S]):
     _kind = "Area"
 
 
-class Volume[V, S: UnitSystem](Quantity[VolumeKind, V, S]):
-    """A volume, stored in Å^3 in the default Atomistic system.
+class Volume[V, S: AnySystem](Quantity[VolumeKind, V, S]):
+    """A volume, kept in the unit it is given in.
 
     Build one with ``Volume[float](2, u.angstrom_cubed)``.
     Its units are in ``u.volume``.
@@ -86,8 +86,8 @@ class Volume[V, S: UnitSystem](Quantity[VolumeKind, V, S]):
     _kind = "Volume"
 
 
-class Time[V, S: UnitSystem](Quantity[TimeKind, V, S]):
-    """A time, stored in fs in the default Atomistic system.
+class Time[V, S: AnySystem](Quantity[TimeKind, V, S]):
+    """A time, kept in the unit it is given in.
 
     Build one with ``Time[float](2, u.femtosecond)``.
     Its units are in ``u.time``.
@@ -96,8 +96,8 @@ class Time[V, S: UnitSystem](Quantity[TimeKind, V, S]):
     _kind = "Time"
 
 
-class Velocity[V, S: UnitSystem](Quantity[VelocityKind, V, S]):
-    """A velocity, stored in Å/fs in the default Atomistic system.
+class Velocity[V, S: AnySystem](Quantity[VelocityKind, V, S]):
+    """A velocity, kept in the unit it is given in.
 
     Build one with ``Velocity[float](2, u.angstrom_per_fs)``.
     Its units are in ``u.velocity``.
@@ -106,8 +106,8 @@ class Velocity[V, S: UnitSystem](Quantity[VelocityKind, V, S]):
     _kind = "Velocity"
 
 
-class Energy[V, S: UnitSystem](Quantity[EnergyKind, V, S]):
-    """An energy, stored in eV in the default Atomistic system.
+class Energy[V, S: AnySystem](Quantity[EnergyKind, V, S]):
+    """An energy, kept in the unit it is given in.
 
     Build one with ``Energy[float](2, u.electron_volt)``.
     Its units are in ``u.energy``.
@@ -116,8 +116,8 @@ class Energy[V, S: UnitSystem](Quantity[EnergyKind, V, S]):
     _kind = "Energy"
 
 
-class EnergyPerAtom[V, S: UnitSystem](Quantity[EnergyPerAtomKind, V, S]):
-    """An energy per atom, stored in eV/atom in the default Atomistic system.
+class EnergyPerAtom[V, S: AnySystem](Quantity[EnergyPerAtomKind, V, S]):
+    """An energy per atom, kept in the unit it is given in.
 
     Build one with ``EnergyPerAtom[float](2, u.eV_per_atom)``.
     Its units are in ``u.energy_per_atom``.
@@ -126,8 +126,8 @@ class EnergyPerAtom[V, S: UnitSystem](Quantity[EnergyPerAtomKind, V, S]):
     _kind = "EnergyPerAtom"
 
 
-class Force[V, S: UnitSystem](Quantity[ForceKind, V, S]):
-    """A force, stored in eV/Å in the default Atomistic system.
+class Force[V, S: AnySystem](Quantity[ForceKind, V, S]):
+    """A force, kept in the unit it is given in.
 
     Build one with ``Force[float](2, u.eV_per_angstrom)``.
     Its units are in ``u.force``.
@@ -136,8 +136,8 @@ class Force[V, S: UnitSystem](Quantity[ForceKind, V, S]):
     _kind = "Force"
 
 
-class ForceConstant[V, S: UnitSystem](Quantity[ForceConstantKind, V, S]):
-    """A force constant, stored in eV/Å^2 in the default Atomistic system.
+class ForceConstant[V, S: AnySystem](Quantity[ForceConstantKind, V, S]):
+    """A force constant, kept in the unit it is given in.
 
     Build one with ``ForceConstant[float](2, u.eV_per_angstrom_squared)``.
     Its units are in ``u.force_constant``.
@@ -146,8 +146,8 @@ class ForceConstant[V, S: UnitSystem](Quantity[ForceConstantKind, V, S]):
     _kind = "ForceConstant"
 
 
-class Pressure[V, S: UnitSystem](Quantity[PressureKind, V, S]):
-    """A pressure, stored in eV/Å^3 in the default Atomistic system.
+class Pressure[V, S: AnySystem](Quantity[PressureKind, V, S]):
+    """A pressure, kept in the unit it is given in.
 
     Build one with ``Pressure[float](2, u.eV_per_angstrom_cubed)``.
     Its units are in ``u.pressure``.
@@ -156,8 +156,8 @@ class Pressure[V, S: UnitSystem](Quantity[PressureKind, V, S]):
     _kind = "Pressure"
 
 
-class EnergyDensity[V, S: UnitSystem](Quantity[EnergyDensityKind, V, S]):
-    """An energy density, stored in eV/Å^3 in the default Atomistic system.
+class EnergyDensity[V, S: AnySystem](Quantity[EnergyDensityKind, V, S]):
+    """An energy density, kept in the unit it is given in.
 
     Build one with ``EnergyDensity[float](2, u.energy_density.energy_density)``.
     Its units are in ``u.energy_density``.
@@ -166,8 +166,8 @@ class EnergyDensity[V, S: UnitSystem](Quantity[EnergyDensityKind, V, S]):
     _kind = "EnergyDensity"
 
 
-class EnergyPerVolume[V, S: UnitSystem](Quantity[EnergyPerVolumeKind, V, S]):
-    """An energy per volume, stored in eV/Å^3 in the default Atomistic system.
+class EnergyPerVolume[V, S: AnySystem](Quantity[EnergyPerVolumeKind, V, S]):
+    """An energy per volume, kept in the unit it is given in.
 
     Build one with ``EnergyPerVolume[float](2, u.energy_per_volume.energy_per_volume)``.
     Its units are in ``u.energy_per_volume``.
@@ -176,8 +176,8 @@ class EnergyPerVolume[V, S: UnitSystem](Quantity[EnergyPerVolumeKind, V, S]):
     _kind = "EnergyPerVolume"
 
 
-class Temperature[V, S: UnitSystem](Quantity[TemperatureKind, V, S]):
-    """A temperature, stored in K in the default Atomistic system.
+class Temperature[V, S: AnySystem](Quantity[TemperatureKind, V, S]):
+    """A temperature, kept in the unit it is given in.
 
     Build one with ``Temperature[float](2, u.kelvin)``.
     Its units are in ``u.temperature``.
@@ -186,10 +186,8 @@ class Temperature[V, S: UnitSystem](Quantity[TemperatureKind, V, S]):
     _kind = "Temperature"
 
 
-class TemperatureDifference[V, S: UnitSystem](
-    Quantity[TemperatureDifferenceKind, V, S]
-):
-    """A temperature difference, stored in ΔK in the default Atomistic system.
+class TemperatureDifference[V, S: AnySystem](Quantity[TemperatureDifferenceKind, V, S]):
+    """A temperature difference, kept in the unit it is given in.
 
     Build one with ``TemperatureDifference[float](2, u.delta_kelvin)``.
     Its units are in ``u.temperature_difference``.
@@ -198,8 +196,8 @@ class TemperatureDifference[V, S: UnitSystem](
     _kind = "TemperatureDifference"
 
 
-class TemperatureRate[V, S: UnitSystem](Quantity[TemperatureRateKind, V, S]):
-    """A temperature rate, stored in K/fs in the default Atomistic system.
+class TemperatureRate[V, S: AnySystem](Quantity[TemperatureRateKind, V, S]):
+    """A temperature rate, kept in the unit it is given in.
 
     Build one with ``TemperatureRate[float](2, u.kelvin_per_fs)``.
     Its units are in ``u.temperature_rate``.
@@ -208,8 +206,8 @@ class TemperatureRate[V, S: UnitSystem](Quantity[TemperatureRateKind, V, S]):
     _kind = "TemperatureRate"
 
 
-class MagneticMoment[V, S: UnitSystem](Quantity[MagneticMomentKind, V, S]):
-    """A magnetic moment, stored in μB in the default Atomistic system.
+class MagneticMoment[V, S: AnySystem](Quantity[MagneticMomentKind, V, S]):
+    """A magnetic moment, kept in the unit it is given in.
 
     Build one with ``MagneticMoment[float](2, u.bohr_magneton)``.
     Its units are in ``u.magnetic_moment``.
@@ -218,8 +216,8 @@ class MagneticMoment[V, S: UnitSystem](Quantity[MagneticMomentKind, V, S]):
     _kind = "MagneticMoment"
 
 
-class Magnetization[V, S: UnitSystem](Quantity[MagnetizationKind, V, S]):
-    """A magnetization, stored in μB/Å^3 in the default Atomistic system.
+class Magnetization[V, S: AnySystem](Quantity[MagnetizationKind, V, S]):
+    """A magnetization, kept in the unit it is given in.
 
     Build one with ``Magnetization[float](2, u.bohr_magneton_per_angstrom_cubed)``.
     Its units are in ``u.magnetization``.
@@ -228,8 +226,8 @@ class Magnetization[V, S: UnitSystem](Quantity[MagnetizationKind, V, S]):
     _kind = "Magnetization"
 
 
-class ParticleDensity[V, S: UnitSystem](Quantity[ParticleDensityKind, V, S]):
-    """A particle density, stored in atom/Å^3 in the default Atomistic system.
+class ParticleDensity[V, S: AnySystem](Quantity[ParticleDensityKind, V, S]):
+    """A particle density, kept in the unit it is given in.
 
     Build one with ``ParticleDensity[float](2, u.atom_per_angstrom_cubed)``.
     Its units are in ``u.particle_density``.
@@ -238,8 +236,8 @@ class ParticleDensity[V, S: UnitSystem](Quantity[ParticleDensityKind, V, S]):
     _kind = "ParticleDensity"
 
 
-class ElectronDensity[V, S: UnitSystem](Quantity[ElectronDensityKind, V, S]):
-    """An electron density, stored in electron/Å^3 in the default Atomistic system.
+class ElectronDensity[V, S: AnySystem](Quantity[ElectronDensityKind, V, S]):
+    """An electron density, kept in the unit it is given in.
 
     Build one with ``ElectronDensity[float](2, u.electron_per_angstrom_cubed)``.
     Its units are in ``u.electron_density``.
@@ -248,8 +246,8 @@ class ElectronDensity[V, S: UnitSystem](Quantity[ElectronDensityKind, V, S]):
     _kind = "ElectronDensity"
 
 
-class Angle[V, S: UnitSystem](Quantity[AngleKind, V, S]):
-    """An angle, stored in rad in the default Atomistic system.
+class Angle[V, S: AnySystem](Quantity[AngleKind, V, S]):
+    """An angle, kept in the unit it is given in.
 
     Build one with ``Angle[float](2, u.radian)``.
     Its units are in ``u.angle``.
@@ -258,8 +256,8 @@ class Angle[V, S: UnitSystem](Quantity[AngleKind, V, S]):
     _kind = "Angle"
 
 
-class Frequency[V, S: UnitSystem](Quantity[FrequencyKind, V, S]):
-    """A frequency, stored in fs^-1 in the default Atomistic system.
+class Frequency[V, S: AnySystem](Quantity[FrequencyKind, V, S]):
+    """A frequency, kept in the unit it is given in.
 
     Build one with ``Frequency[float](2, u.frequency_per_fs)``.
     Its units are in ``u.frequency``.
@@ -268,8 +266,8 @@ class Frequency[V, S: UnitSystem](Quantity[FrequencyKind, V, S]):
     _kind = "Frequency"
 
 
-class InverseTime[V, S: UnitSystem](Quantity[InverseTimeKind, V, S]):
-    """An inverse time, stored in fs^-1 in the default Atomistic system.
+class InverseTime[V, S: AnySystem](Quantity[InverseTimeKind, V, S]):
+    """An inverse time, kept in the unit it is given in.
 
     Build one with ``InverseTime[float](2, u.per_fs)``.
     Its units are in ``u.inverse_time``.
@@ -278,8 +276,8 @@ class InverseTime[V, S: UnitSystem](Quantity[InverseTimeKind, V, S]):
     _kind = "InverseTime"
 
 
-class AtomCount[V, S: UnitSystem](Quantity[AtomCountKind, V, S]):
-    """An atom count, stored in atom in the default Atomistic system.
+class AtomCount[V, S: AnySystem](Quantity[AtomCountKind, V, S]):
+    """An atom count, kept in the unit it is given in.
 
     Build one with ``AtomCount[float](2, u.atom)``.
     Its units are in ``u.atom_count``.
@@ -288,8 +286,8 @@ class AtomCount[V, S: UnitSystem](Quantity[AtomCountKind, V, S]):
     _kind = "AtomCount"
 
 
-class ElectronCount[V, S: UnitSystem](Quantity[ElectronCountKind, V, S]):
-    """An electron count, stored in electron in the default Atomistic system.
+class ElectronCount[V, S: AnySystem](Quantity[ElectronCountKind, V, S]):
+    """An electron count, kept in the unit it is given in.
 
     Build one with ``ElectronCount[float](2, u.electron)``.
     Its units are in ``u.electron_count``.
@@ -298,8 +296,8 @@ class ElectronCount[V, S: UnitSystem](Quantity[ElectronCountKind, V, S]):
     _kind = "ElectronCount"
 
 
-class Mass[V, S: UnitSystem](Quantity[MassKind, V, S]):
-    """A mass, stored in Da in the default Atomistic system.
+class Mass[V, S: AnySystem](Quantity[MassKind, V, S]):
+    """A mass, kept in the unit it is given in.
 
     Build one with ``Mass[float](2, u.dalton)``.
     Its units are in ``u.mass``.
@@ -308,8 +306,8 @@ class Mass[V, S: UnitSystem](Quantity[MassKind, V, S]):
     _kind = "Mass"
 
 
-class MassDensity[V, S: UnitSystem](Quantity[MassDensityKind, V, S]):
-    """A mass density, stored in g/cm^3 in the default Atomistic system.
+class MassDensity[V, S: AnySystem](Quantity[MassDensityKind, V, S]):
+    """A mass density, kept in the unit it is given in.
 
     Build one with ``MassDensity[float](2, u.gram_per_cubic_centimeter)``.
     Its units are in ``u.mass_density``.
@@ -318,8 +316,8 @@ class MassDensity[V, S: UnitSystem](Quantity[MassDensityKind, V, S]):
     _kind = "MassDensity"
 
 
-class Momentum[V, S: UnitSystem](Quantity[MomentumKind, V, S]):
-    """A momentum, stored in eV fs/Å in the default Atomistic system.
+class Momentum[V, S: AnySystem](Quantity[MomentumKind, V, S]):
+    """A momentum, kept in the unit it is given in.
 
     Build one with ``Momentum[float](2, u.eV_fs_per_angstrom)``.
     Its units are in ``u.momentum``.
@@ -328,8 +326,8 @@ class Momentum[V, S: UnitSystem](Quantity[MomentumKind, V, S]):
     _kind = "Momentum"
 
 
-class Acceleration[V, S: UnitSystem](Quantity[AccelerationKind, V, S]):
-    """An acceleration, stored in Å/fs^2 in the default Atomistic system.
+class Acceleration[V, S: AnySystem](Quantity[AccelerationKind, V, S]):
+    """An acceleration, kept in the unit it is given in.
 
     Build one with ``Acceleration[float](2, u.angstrom_per_fs2)``.
     Its units are in ``u.acceleration``.
@@ -338,8 +336,8 @@ class Acceleration[V, S: UnitSystem](Quantity[AccelerationKind, V, S]):
     _kind = "Acceleration"
 
 
-class Charge[V, S: UnitSystem](Quantity[ChargeKind, V, S]):
-    """A charge, stored in e in the default Atomistic system.
+class Charge[V, S: AnySystem](Quantity[ChargeKind, V, S]):
+    """A charge, kept in the unit it is given in.
 
     Build one with ``Charge[float](2, u.elementary_charge)``.
     Its units are in ``u.charge``.
@@ -348,8 +346,8 @@ class Charge[V, S: UnitSystem](Quantity[ChargeKind, V, S]):
     _kind = "Charge"
 
 
-class ElectricPotential[V, S: UnitSystem](Quantity[ElectricPotentialKind, V, S]):
-    """An electric potential, stored in V in the default Atomistic system.
+class ElectricPotential[V, S: AnySystem](Quantity[ElectricPotentialKind, V, S]):
+    """An electric potential, kept in the unit it is given in.
 
     Build one with ``ElectricPotential[float](2, u.volt)``.
     Its units are in ``u.electric_potential``.
@@ -358,8 +356,8 @@ class ElectricPotential[V, S: UnitSystem](Quantity[ElectricPotentialKind, V, S])
     _kind = "ElectricPotential"
 
 
-class ElectricField[V, S: UnitSystem](Quantity[ElectricFieldKind, V, S]):
-    """An electric field, stored in V/Å in the default Atomistic system.
+class ElectricField[V, S: AnySystem](Quantity[ElectricFieldKind, V, S]):
+    """An electric field, kept in the unit it is given in.
 
     Build one with ``ElectricField[float](2, u.volt_per_angstrom)``.
     Its units are in ``u.electric_field``.
@@ -368,8 +366,8 @@ class ElectricField[V, S: UnitSystem](Quantity[ElectricFieldKind, V, S]):
     _kind = "ElectricField"
 
 
-class DipoleMoment[V, S: UnitSystem](Quantity[DipoleMomentKind, V, S]):
-    """A dipole moment, stored in e Å in the default Atomistic system.
+class DipoleMoment[V, S: AnySystem](Quantity[DipoleMomentKind, V, S]):
+    """A dipole moment, kept in the unit it is given in.
 
     Build one with ``DipoleMoment[float](2, u.e_angstrom)``.
     Its units are in ``u.dipole_moment``.
@@ -378,8 +376,8 @@ class DipoleMoment[V, S: UnitSystem](Quantity[DipoleMomentKind, V, S]):
     _kind = "DipoleMoment"
 
 
-class Entropy[V, S: UnitSystem](Quantity[EntropyKind, V, S]):
-    """An entropy, stored in eV/K in the default Atomistic system.
+class Entropy[V, S: AnySystem](Quantity[EntropyKind, V, S]):
+    """An entropy, kept in the unit it is given in.
 
     Build one with ``Entropy[float](2, u.eV_per_kelvin)``.
     Its units are in ``u.entropy``.
@@ -388,8 +386,8 @@ class Entropy[V, S: UnitSystem](Quantity[EntropyKind, V, S]):
     _kind = "Entropy"
 
 
-class Action[V, S: UnitSystem](Quantity[ActionKind, V, S]):
-    """An action, stored in eV fs in the default Atomistic system.
+class Action[V, S: AnySystem](Quantity[ActionKind, V, S]):
+    """An action, kept in the unit it is given in.
 
     Build one with ``Action[float](2, u.eV_fs)``.
     Its units are in ``u.action``.

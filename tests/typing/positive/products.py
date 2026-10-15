@@ -19,6 +19,7 @@ from quantype import (
     Time,
     Velocity,
     constants,
+    u,
 )
 from quantype.kinds import ChargeKind, LengthKind, Mul, TimeKind
 from quantype.products import (
@@ -30,17 +31,19 @@ from quantype.products import (
 from quantype.systems import SI
 
 Array = npt.NDArray[np.float64]
-m = Mass[float].from_value(1.0)
-v = Velocity[float].from_value(1.0)
-p = Momentum[float].from_value(1.0)
-length = Length[float].from_value(1.0)
-t = Time[float].from_value(1.0)
-q = Charge[float].from_value(1.0)
-lengths: Length[Array] = Length[Array].from_value(np.ones(3))
-times: Time[Array] = Time[Array].from_value(np.ones(3))
+m = Mass[float](1.0, u.Da)
+v = Velocity[float](1.0, u.angstrom_per_fs)
+p = Momentum[float](1.0, u.eV_fs_per_angstrom)
+length = Length[float](1.0, u.angstrom)
+t = Time[float](1.0, u.fs)
+q = Charge[float](1.0, u.e)
+lengths: Length[Array] = Length[Array](np.ones(3), u.angstrom)
+times: Time[Array] = Time[Array](np.ones(3), u.fs)
 
 # Three factors are named whatever their order, grouping or powers.
 assert_type(m * v**2, Energy[float])
+assert_type(v**1, Velocity[float])
+assert_type((m * v) ** 1, Momentum[float])
 assert_type(v**2 * m, Energy[float])
 assert_type(m * (v * v), Energy[float])
 assert_type(p**2 / m, Energy[float])
@@ -75,7 +78,7 @@ assert_type(2.0 * (length * t) / t, Length[float])
 assert_type((lengths * t).sum() / t, Length[Array])
 assert_type((lengths * t).std() / times, Length[Array])
 assert_type((length * t).to_system(SI) / t.to_system(SI), Length[float, SI])
-assert_type(LengthTime[float].from_value(1.0), LengthTime[float])
+assert_type(LengthTime.from_value(1.0, SI), LengthTime[float, SI])
 
 # Constants take part like any other factor, from either side.
 assert_type(constants.k_B * length, LengthEntropy[float])
@@ -88,6 +91,9 @@ assert_type(
     q * (length * t), Quantity[Mul[ChargeKind, Mul[LengthKind, TimeKind]], float]
 )
 
-# with_value keeps the quantity's own class, product classes included.
-assert_type(lengths.with_value(np.sort(lengths.value)), Length[Array])
-assert_type((length * t).with_value(2.0), LengthTime[float])
+# apply keeps the quantity's own class, product classes included, and storage.
+assert_type(lengths.apply(np.sort), Length[Array])
+assert_type((length * t).apply(lambda raw: raw * 2), LengthTime[float])
+bound = lengths.to_system(SI)
+assert_type(bound.apply(np.sort), Length[Array, SI])
+assert_type((length * t).to_system(SI).apply(abs), LengthTime[float, SI])

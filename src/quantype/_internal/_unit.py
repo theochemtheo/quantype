@@ -4,10 +4,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from functools import cache, cached_property
-from typing import TYPE_CHECKING, Any, ClassVar, cast, override
+from functools import cache
+from typing import TYPE_CHECKING, Any, ClassVar, NoReturn, cast, override
 
-from quantype._internal._semantics import KINDS, Kind
+from quantype._internal._semantics import KINDS, Kind, Semantic
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 class Unit[K]:
     name: str
     kind: str
-    semantic: Kind
+    semantic: Semantic
     scale: float
     offset: float
     symbol: str
@@ -33,7 +33,7 @@ class Unit[K]:
     def __init__(
         self,
         name: str,
-        kind: str | Kind,
+        kind: str | Semantic,
         scale: float = 1.0,
         offset: float = 0.0,
         symbol: str | None = None,
@@ -50,7 +50,7 @@ class Unit[K]:
                 "Unit scale must be finite and positive; offset must be finite"
             )
         semantic = KINDS[kind] if isinstance(kind, str) else kind
-        if offset and not semantic.affine:
+        if offset and not (isinstance(semantic, Kind) and semantic.affine):
             raise ValueError("Only absolute-temperature units may have an offset")
         for attribute, value in (
             ("name", name),
@@ -62,16 +62,25 @@ class Unit[K]:
         ):
             object.__setattr__(self, attribute, value)
 
-    @cached_property
-    def _default_storage(self) -> tuple[float, float]:
-        """The affine map into the default system, for unit-first construction."""
-        from quantype._internal._systems import Atomistic, into_system
-
-        return into_system(cast("Any", self), Atomistic)
+    @override
+    def __hash__(self) -> int:
+        # Units key the caches every product consults; hash each once.
+        cached = self.__dict__.get("_hash")
+        if isinstance(cached, int):
+            return cached
+        fields = (self.name, self.semantic, self.scale, self.offset, self.symbol)
+        computed = hash(fields)
+        object.__setattr__(self, "_hash", computed)
+        return computed
 
     def __call__[V](self, value: V) -> Quantity[K, V, Any]:
-        """Unit-first construction: default-system storage, displayed in this unit."""
+        """Unit-first construction without a system: stored and shown in this unit.
+
+        Units with an offset (°C) store kelvin.
+        """
         from quantype._internal._storage import unit_conversion
+        from quantype._internal._storage_units import reference_unit
+        from quantype._internal._systems import NoSystem
         from quantype.core import _wrap
 
         raw: Any = value
@@ -85,16 +94,28 @@ class Unit[K]:
             validate_floating_storage(raw)
         elif isinstance(raw, (int, float)):
             raw = echo = float(raw)
+        elif isinstance(raw, Unit):
+            raise TypeError(_UNIT_ARITHMETIC)
         else:
             raise TypeError(
                 "Use a real scalar or numerical array as a magnitude; "
                 "for lists, use a typed quantity constructor or numpy.asarray "
                 "with a floating dtype first"
             )
-        stored = unit_conversion(raw, *self._default_storage)
+        storage: Any = self
+        if self.offset:
+            raw = unit_conversion(raw, self.scale, self.offset)
+            storage = reference_unit(self.semantic)
         return cast(
             "Quantity[K, V, Any]",
-            _wrap(self.semantic, stored, None, display=cast("Any", self), echo=echo),
+            _wrap(
+                self.semantic,
+                raw,
+                NoSystem,
+                display=cast("Any", self),
+                echo=echo,
+                storage=storage,
+            ),
         )
 
     def __mul__(self, value: Any) -> Quantity[K, Any, Any]:
@@ -102,6 +123,15 @@ class Unit[K]:
 
     def __rmul__(self, value: Any) -> Quantity[K, Any, Any]:
         return self(value)
+
+    def __truediv__(self, other: object) -> NoReturn:
+        raise TypeError(_UNIT_ARITHMETIC)
+
+    def __rtruediv__(self, other: object) -> NoReturn:
+        raise TypeError(_UNIT_ARITHMETIC)
+
+    def __pow__(self, exponent: object) -> NoReturn:
+        raise TypeError(_UNIT_ARITHMETIC)
 
     def __array_ufunc__(
         self, ufunc: Any, method: str, *inputs: Any, **kwargs: Any
@@ -116,6 +146,11 @@ class Unit[K]:
         return self.symbol
 
 
+_UNIT_ARITHMETIC = (
+    "Units only scale magnitudes; combine quantities instead, as in "
+    "(1.0 * u.eV) / (1.0 * u.angstrom), or name a composed unit, as in "
+    "Force.unit_named('eV/Å')"
+)
 _UNIT_LOOKUPS: dict[Kind, Callable[[str], Unit[Any]]] = {}
 # Units of kinds from explicitly imported generated catalogues, in catalogue order.
 _CATALOGUE_UNITS: dict[Kind, tuple[Unit[Any], ...]] = {}
@@ -133,8 +168,8 @@ def _builtin_units() -> dict[str, Unit[Any]]:
     return units
 
 
-def get_unit(name: str, *, kind: Kind | None = None) -> Unit[Any]:
-    if kind is not None and kind in _UNIT_LOOKUPS:
+def get_unit(name: str, *, kind: Semantic | None = None) -> Unit[Any]:
+    if isinstance(kind, Kind) and kind in _UNIT_LOOKUPS:
         return _UNIT_LOOKUPS[kind](name)
     try:
         return _builtin_units()[name]
@@ -146,7 +181,7 @@ def get_unit(name: str, *, kind: Kind | None = None) -> Unit[Any]:
 def _builtin_kind_units() -> dict[Kind, tuple[Unit[Any], ...]]:
     grouped: dict[Kind, list[Unit[Any]]] = {}
     for unit in dict.fromkeys(_builtin_units().values()):
-        grouped.setdefault(unit.semantic, []).append(unit)
+        grouped.setdefault(cast("Kind", unit.semantic), []).append(unit)
     return {kind: tuple(units) for kind, units in grouped.items()}
 
 

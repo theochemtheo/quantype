@@ -17,9 +17,12 @@ A serialized quantity names its kind:
 {"kind": "Length", "magnitude": 0.5, "unit": "nanometer"}
 ```
 
-`to_dict` writes the value in its display unit: the unit it was given in, or
-the one chosen with `.to(unit)`. A value with no display unit is written in its
-system's unit for the kind. That is a catalogue name for built-in systems, or a
+`to_dict` writes the value in its display unit: the unit it was given in, the
+one chosen with `.to(unit)`, or for a product the unit it shows in, written
+with unit names: eV/nm is `electron_volt/nanometer`, so a custom unit that
+reuses a catalogue symbol reads back as itself. A value with no display unit is
+written in its system's unit
+for the kind. That is a catalogue name for built-in systems, or a
 system-qualified identifier such as `gromacs:Force` for
 [custom systems](unit-systems.md#decoding). A configuration's `"0.5 nm"` is
 written back as `0.5 nanometer` in every system, and `"20.1 degC"` as exactly
@@ -56,8 +59,9 @@ restored = Configuration.model_validate_json(config.model_dump_json())
 ```
 
 A field's unit system comes from its annotation, so `cutoff: Length[float, SI]`
-reads `"0.5 nm"` as meters. A quantity object from another system raises;
-convert it with `.to_system(...)` first.
+reads `"0.5 nm"` as meters. Strings and wire objects carry no system, so they
+decode into the field's. A quantity object in another system, or without one,
+raises, as fields don't adopt a system; convert it with `.to_system(...)` first.
 
 Pass custom units through the validation context:
 
@@ -81,8 +85,8 @@ restored_point = adapter.validate_python(wire, context={"units": (bleb,)})
 Pydantic converts to the annotated storage, including the NumPy dtype, and to
 the annotated unit system. A bare annotation such as `Length` works at runtime,
 but strict type checkers want the storage spelled out. `Length.parse(...)`
-returns a float or a float64 array in the default system, and
-`Length[float, SI].parse(...)` chooses the system. For a particular storage
+returns a float or a float64 array without a system, kept in the unit the data
+used, and `Length[float, SI].parse(...)` chooses the system. For a particular storage
 type, use a typed constructor or a `TypeAdapter`. When the target type names a
 custom system, that system's units are found without `units=`.
 
@@ -114,7 +118,7 @@ restored_positions = load_npz(
     "positions",
     Length[npt.NDArray[np.float64]],
 )
-in_metres = load_npz("frame.npz", "positions", Length[npt.NDArray[np.float64], SI])
+in_meters = load_npz("frame.npz", "positions", Length[npt.NDArray[np.float64], SI])
 
 with np.load("frame.npz", allow_pickle=False) as archive:
     metadata_json = str(archive["metadata"])
@@ -127,7 +131,8 @@ it also records `source_backend`, such as `"numpy"` or `"torch"`. That field is
 only a record, and loading never imports the backend. The target type decides
 the storage and unit system, so a Torch-produced archive can be read into NumPy
 without Torch installed, and an archive written from SI quantities can be read
-into `Atomistic`. Restored quantities keep the archived unit for display. Pass
+into `Atomistic`. Restored quantities keep the archived unit for display, and
+without a system they store their numbers in it. Pass
 `units=(...)` to decode custom units.
 
 Dtypes NumPy can't represent, such as Torch's bfloat16, raise `TypeError`.
@@ -164,7 +169,7 @@ from typing import Annotated, get_type_hints
 import numpy as np
 import numpy.typing as npt
 from quantype import Energy, Force
-from quantype.systems import SI, Atomistic
+from quantype.systems import SI, NoSystem
 from quantype.typing import QuantityType, quantity_type
 
 
@@ -176,13 +181,13 @@ class Sample:
 
 hints = get_type_hints(Sample, include_extras=True)
 forces = quantity_type(hints["forces"])
-assert forces == QuantityType(Force, npt.NDArray[np.float64], Atomistic)
+assert forces == QuantityType(Force, npt.NDArray[np.float64], NoSystem)
 assert quantity_type(hints["energy"]) == QuantityType(Energy, float, SI)
 assert quantity_type(hints["label"]) is None
-assert quantity_type(Force) == QuantityType(Force, None, Atomistic)
+assert quantity_type(Force) == QuantityType(Force, None, NoSystem)
 ```
 
-An annotation without a system, such as `Force[float]`, is in `Atomistic`. A
+An annotation without a system, such as `Force[float]`, has `NoSystem`. A
 bare class has `storage` `None`. `quantity_type` returns `None` for anything
 that isn't a quantity type, including unions such as `Force[float] | None`, so
 look at a union's members yourself. `Annotated` metadata is skipped. A

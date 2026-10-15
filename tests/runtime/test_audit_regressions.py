@@ -60,12 +60,13 @@ def test_unit_first_preserves_numpy_floating_scalars(
     scalar_type: type[np.floating[Any]],
 ) -> None:
     raw = scalar_type(2)
-    assert u.angstrom(raw).value is raw
-    converted = u.nm(raw)
-    assert type(converted.value) is scalar_type
-    assert converted.value == 20
-    assert type(u.angstrom(2).value) is float
-    assert type(u.angstrom(2.0).value) is float
+    assert u.angstrom(raw).magnitude() is raw
+    assert u.nm(raw).magnitude() is raw
+    converted = u.nm(raw).magnitude(u.angstrom)
+    assert type(converted) is scalar_type
+    assert converted == 20
+    assert type(u.angstrom(2).magnitude()) is float
+    assert type(u.angstrom(2.0).magnitude()) is float
 
 
 def test_python_scalar_subclasses_still_promote_to_float() -> None:
@@ -75,16 +76,16 @@ def test_python_scalar_subclasses_still_promote_to_float() -> None:
     class PythonInt(int):
         pass
 
-    assert type(u.angstrom(PythonFloat(2)).value) is float
-    assert type(u.angstrom(PythonInt(2)).value) is float
+    assert type(u.angstrom(PythonFloat(2)).magnitude()) is float
+    assert type(u.angstrom(PythonInt(2)).magnitude()) is float
 
 
 def test_integer_conversion_remains_available_explicitly() -> None:
     quantity = Length[npt.NDArray[np.float64]](
         np.array([100], dtype=np.int8), u.angstrom
     )
-    np.testing.assert_array_equal((quantity**2).value, [10000])
-    assert quantity.value.dtype == np.float64
+    np.testing.assert_array_equal((quantity**2).magnitude(), [10000])
+    assert quantity.dtype == np.float64
 
 
 @pytest.mark.parametrize(
@@ -120,10 +121,11 @@ def test_builtin_definitions_are_canonical_across_scopes_and_aliases() -> None:
     assert get_unit("nm", kind=u.nm.semantic) is u.nm
     assert get_unit("nanometer") is u.nm
     assert get_unit("nm", kind=u.nm.semantic) is u.length.nanometer
-    assert Length.parse("1 angstrom", units=(u.angstrom,)).value == 1
-    assert Length.parse("1 nm", units=(u.nm,)).value == 10
+    assert Length.parse("1 angstrom", units=(u.angstrom,)).magnitude(u.angstrom) == 1
+    assert Length.parse("1 nm", units=(u.nm,)).magnitude(u.angstrom) == 10
     adapter = TypeAdapter(Length[float])
-    assert adapter.validate_python("1 nm", context={"units": (u.nm,)}).value == 10
+    validated = adapter.validate_python("1 nm", context={"units": (u.nm,)})
+    assert validated.magnitude(u.angstrom) == 10
     with pytest.raises(ValueError, match="Duplicate"):
         Length.parse("1 nm", units=(u.nm, u.length.nanometer))
 
@@ -133,7 +135,7 @@ def test_archive_accepts_explicit_builtin_units(tmp_path: Path) -> None:
     quantity = u.nm(np.array([1.0, 2.0])).to(u.nm)
     save_npz(path, length=quantity)
     restored = load_npz(path, "length", Length[npt.NDArray[np.float64]], units=(u.nm,))
-    np.testing.assert_array_equal(restored.value, quantity.value)
+    np.testing.assert_array_equal(restored.magnitude(), quantity.magnitude())
 
 
 @pytest.mark.parametrize("scale", [1.0, 2.0])
@@ -155,13 +157,14 @@ def test_torch_unit_first_validation_and_graph_preservation() -> None:
     with pytest.raises(ValueError, match="booleans"):
         Length[torch.Tensor]([True, 2], u.angstrom)
     raw_float = torch.tensor([1.0, 2.0], dtype=torch.float64, requires_grad=True)
-    assert u.angstrom(raw_float).value is raw_float
-    converted = u.nm(raw_float).value
+    assert u.angstrom(raw_float).magnitude() is raw_float
+    assert u.nm(raw_float).magnitude() is raw_float
+    converted = u.nm(raw_float).magnitude(u.angstrom)
     assert converted.dtype == raw_float.dtype
     assert converted.device == raw_float.device
     (gradient,) = torch.autograd.grad(converted.sum(), raw_float)
     np.testing.assert_array_equal(gradient.numpy(), [10, 10])
-    assert Length[torch.Tensor]([1, 2], u.angstrom).mean().value == 1.5
+    assert Length[torch.Tensor]([1, 2], u.angstrom).mean().magnitude() == 1.5
 
 
 def test_jax_unit_first_validation_and_tracer_preservation() -> None:
@@ -173,7 +176,7 @@ def test_jax_unit_first_validation_and_tracer_preservation() -> None:
     transforms = cast("_JaxTransforms", jax)
 
     def convert_units(value: jax.Array) -> jax.Array:
-        return u.nm(value).value
+        return u.nm(value).magnitude(u.angstrom)
 
     def summed(value: jax.Array) -> jax.Array:
         return convert_units(value).sum()
@@ -191,7 +194,7 @@ def test_jax_unit_first_validation_and_tracer_preservation() -> None:
         Length[jax.Array]([[1, 2], [True, 3]], u.angstrom)
     for dtype in (jnp.float32, jnp.bfloat16):
         raw_float = arrays.asarray([1.0, 2.0], dtype=dtype)
-        assert u.angstrom(raw_float).value is raw_float
+        assert u.angstrom(raw_float).magnitude() is raw_float
         converted = transforms.jit(convert_units)(raw_float)
         assert converted.dtype == raw_float.dtype
         np.testing.assert_array_equal(converted, [10, 20])
@@ -201,17 +204,17 @@ def test_jax_unit_first_validation_and_tracer_preservation() -> None:
 
 def test_structural_arithmetic_and_reciprocals() -> None:
     product = (2 * u.angstrom) * (3 * u.fs)
-    assert (product + product).value == 12
-    assert (product - product).value == 0
-    assert (product * 2).value == 12
-    assert (2 * product).value == 12
-    assert (product / 2).value == 3
-    assert (-product).value == -6
-    assert abs(-product).value == 6
-    assert product.mean().value == 6
-    assert product.sum().value == 6
+    assert (product + product).magnitude() == 12
+    assert (product - product).magnitude() == 0
+    assert (product * 2).magnitude() == 12
+    assert (2 * product).magnitude() == 12
+    assert (product / 2).magnitude() == 3
+    assert (-product).magnitude() == -6
+    assert abs(-product).magnitude() == 6
+    assert product.mean().magnitude() == 6
+    assert product.sum().magnitude() == 6
     assert (1.0 / (2 * u.fs)).kind == "InverseTime"
-    assert (1.0 / (2 * u.fs)).value == 0.5
+    assert (1.0 / (2 * u.fs)).magnitude() == 0.5
     inverse_product = 1.0 / product
     assert inverse_product.kind == "Div[Dimensionless,Mul[Length,Time]]"
-    assert inverse_product.value == pytest.approx(1 / 6)
+    assert inverse_product.magnitude() == pytest.approx(1 / 6)

@@ -5,8 +5,8 @@
 - [Getting started](getting-started.md): building quantities, arithmetic,
   NumPy, and validation
 - [Units](units.md): units, conversion, display, temperatures, and constants
-- [Unit systems](unit-systems.md): choosing and defining the units `.value` is
-  stored in
+- [Unit systems](unit-systems.md): defining the units a quantity stores its
+  numbers in, and code that works in any system
 - [Serialization](serialization.md): JSON, Pydantic, NPZ, NPY, and reading
   quantity annotations
 - [Autodiff](autodiff.md): gradients with JAX and Torch

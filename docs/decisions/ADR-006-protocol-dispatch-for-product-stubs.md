@@ -30,16 +30,18 @@ structural fallback. Float storage on the left has its own protocol
 float. Product classes inherit kind-preserving methods from the base class.
 Constant classes carry protocol members too, and each has its own stub module
 under `_constants/`, because together they exceed Pyright's per-module
-complexity limit. The runtime table is stored as text rows and parsed lazily,
+complexity limit. Each named kind has its own stub module under `_kinds/` for
+the same reason. The runtime table is stored as text rows and parsed lazily,
 because a tuple literal took Pyright 47 s to analyze.
 
 ### Consequences
 
 * Good, because Pyright, Pyrefly, and ty check the test suite within a second of
   the old stubs, and mypy's edit loop is 0.3 s slower.
-* Bad, because loading about 1,700 stub modules is a fixed cost for any file
+* Bad, because loading about 1,800 stub modules is a fixed cost for any file
   that imports quantype: mypy +5.5 s cold, Pyright +0.5 s, and Pyrefly and ty
-  +0.2 s.
-* Bad, because the package carries about 19 MB of stubs.
+  +0.2 s, measured at 1,700.
+* Bad, because the package carries about 28 MB of stubs, 19 MB before
+  [ADR-014](ADR-014-opt-in-unit-system.md)'s adoption overloads.
 * Bad, because the `_rmul_*` members exist only in the stubs, so stubtest's
   allowlist names them.

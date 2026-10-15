@@ -12,7 +12,7 @@ import quantype._generated as named
 from quantype import products
 from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
 from quantype.codegen._table import Operation, Product, Table, naming_table
-from quantype.core import Constant, _constant
+from quantype.core import Constant, _constant, _wrap
 
 if TYPE_CHECKING:
     from quantype.core import Quantity
@@ -85,9 +85,9 @@ def test_a_pair_name_clashing_with_a_quantity_is_rejected() -> None:
 
 
 def _operand(name: str) -> Quantity[Any, float, Any]:
-    """A value of the named kind or product class."""
+    """A value of the named kind or product class, without a unit system."""
     cls = getattr(named, name, None) or getattr(products, name)
-    return cast("Quantity[Any, float, Any]", cls.from_value(2.0))
+    return cast("Quantity[Any, float, Any]", _wrap(cls._semantic, 2.0, None))
 
 
 def _apply(operation: str, left: object, right: object) -> object:

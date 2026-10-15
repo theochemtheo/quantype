@@ -16,6 +16,7 @@ show a constant's value in a system or unit.
 from __future__ import annotations
 
 import math
+from fractions import Fraction
 from typing import TYPE_CHECKING, Any
 
 from quantype import _generated, codata
@@ -40,41 +41,66 @@ def _coulomb_kind(*, inverse: bool) -> Semantic:
     return product("div", energy_length, charge_squared)
 
 
-def _permittivity(values: codata.Codata) -> float:
+def _exact(value: float) -> Fraction:
+    """A CODATA value as the exact decimal the table states."""
+    return Fraction(repr(value))
+
+
+def _permittivity(v: codata.Codata) -> Fraction:
     # F/m is C²/(J m); the reference units are e²/(eV Å).
-    return values.vacuum_electric_permittivity / (values.elementary_charge * 1e10)
+    return _exact(v.vacuum_electric_permittivity) / (
+        _exact(v.elementary_charge) * Fraction("1e10")
+    )
 
 
-# Name -> kind and value in the reference units (Å, eV, fs, K, e).
+# Name -> kind and value in the reference units (Å, eV, fs, K, e), exact except
+# where π enters, and rounded once on first use.
 _DEFINITIONS: dict[
-    str, tuple[Callable[[], Semantic], Callable[[codata.Codata], float]]
+    str, tuple[Callable[[], Semantic], Callable[[codata.Codata], Fraction | float]]
 ] = {
     "k_B": (
         lambda: KINDS["Entropy"],
-        lambda v: v.boltzmann_constant / v.elementary_charge,
+        lambda v: _exact(v.boltzmann_constant) / _exact(v.elementary_charge),
     ),
     "h": (
         lambda: KINDS["Action"],
-        lambda v: v.planck_constant / v.elementary_charge / 1e-15,
+        lambda v: (
+            _exact(v.planck_constant) / _exact(v.elementary_charge) / Fraction("1e-15")
+        ),
     ),
     "hbar": (
         lambda: KINDS["Action"],
-        lambda v: v.planck_constant / (2 * math.pi) / v.elementary_charge / 1e-15,
+        lambda v: (
+            float(
+                _exact(v.planck_constant)
+                / _exact(v.elementary_charge)
+                / Fraction("1e-15")
+            )
+            / (2 * math.pi)
+        ),
     ),
-    "e": (lambda: KINDS["Charge"], lambda _: 1.0),
+    "e": (lambda: KINDS["Charge"], lambda _: 1),
     "m_e": (
         lambda: KINDS["Mass"],
-        lambda v: v.electron_mass / (v.elementary_charge * 1e-10),
+        lambda v: (
+            _exact(v.electron_mass) / (_exact(v.elementary_charge) * Fraction("1e-10"))
+        ),
     ),
     "m_u": (
         lambda: KINDS["Mass"],
-        lambda v: v.atomic_mass_constant / (v.elementary_charge * 1e-10),
+        lambda v: (
+            _exact(v.atomic_mass_constant)
+            / (_exact(v.elementary_charge) * Fraction("1e-10"))
+        ),
     ),
-    "c": (lambda: KINDS["Velocity"], lambda v: v.speed_of_light_in_vacuum * 1e-5),
+    "c": (
+        lambda: KINDS["Velocity"],
+        lambda v: _exact(v.speed_of_light_in_vacuum) * Fraction("1e-5"),
+    ),
     "epsilon_0": (lambda: _coulomb_kind(inverse=True), _permittivity),
     "k_e": (
         lambda: _coulomb_kind(inverse=False),
-        lambda v: 1 / (4 * math.pi * _permittivity(v)),
+        lambda v: 1 / (4 * math.pi * float(_permittivity(v))),
     ),
 }
 
@@ -84,6 +110,6 @@ def __getattr__(name: str) -> Constant[Any]:
     if definition is None:
         raise AttributeError(name)
     kind, value = definition
-    constant = _constant(name, kind(), value(codata.values()))
+    constant = _constant(name, kind(), float(value(codata.values())))
     globals()[name] = constant
     return constant

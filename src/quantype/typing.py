@@ -11,7 +11,7 @@ from dataclasses import dataclass
 from typing import Annotated, Any, TypeGuard, get_args, get_origin
 
 from quantype._internal._construction import StorageAlias
-from quantype._internal._systems import Atomistic, UnitSystem
+from quantype._internal._systems import AnySystem, NoSystem
 from quantype.core import Quantity
 
 __all__ = ["QuantityType", "quantity_type"]
@@ -23,13 +23,13 @@ class QuantityType:
 
     kind: type[Quantity[Any, Any, Any]]
     storage: object
-    system: type[UnitSystem]
+    system: type[AnySystem]
 
 
 def quantity_type(annotation: object) -> QuantityType | None:
     """The kind, storage, and system an annotation names, or None for a non-quantity.
 
-    ``Force[V]`` is ``Force[V, Atomistic]``, and a bare ``Force`` has no storage.
+    ``Force[V]`` is ``Force[V, NoSystem]``, and a bare ``Force`` has no storage.
     ``Annotated`` metadata is skipped; a union such as ``Force[float] | None`` is
     not a quantity type, so look inside it first. An annotation that names a
     quantity incorrectly, such as ``Force[SI]``, raises ``TypeError``.
@@ -45,7 +45,7 @@ def quantity_type(annotation: object) -> QuantityType | None:
             "annotate with a kind class such as Force[float]"
         )
     if not isinstance(annotation, StorageAlias):
-        return QuantityType(kind, None, Atomistic)
+        return QuantityType(kind, None, NoSystem)
     return QuantityType(kind, annotation.storage, annotation.unit_system)
 
 

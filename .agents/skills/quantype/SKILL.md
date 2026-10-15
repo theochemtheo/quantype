@@ -35,7 +35,7 @@ Read the relevant specialization and its parent guidance. Load another branch on
 ## Shared contract
 
 - Physical meaning comes from nominal kinds and declared relationships. Equal dimension vectors do not make kinds interchangeable ([ADR-001](../../../docs/decisions/ADR-001-nominal-kinds.md)).
-- `.value` holds raw numbers in the quantity's unit system (`Atomistic` by default). Units convert input and presentation; `.to(unit)` changes presentation without changing storage; `.to_system(T)` is the only bridge between systems ([ADR-003](../../../docs/decisions/ADR-003-unit-system-is-a-type-parameter.md)).
+- `.value` holds raw numbers in the quantity's unit system, and exists only in a `UnitSystem`. The default, `NoSystem`, keeps each quantity's numbers in a storage unit: the input unit, or one composed from the operands' units. Units name input and presentation; `.to(unit)` changes presentation without changing storage; `.to_system(T)` is the only bridge between systems ([ADR-014](../../../docs/decisions/ADR-014-opt-in-unit-system.md)).
 - Runtime and static contracts must agree ([ADR-002](../../../docs/decisions/ADR-002-generated-stubs-for-four-checkers.md)). Generated files come from the catalogue and renderers; change those sources and regenerate rather than editing generated output alone.
 - The base import stays light. NumPy, Pydantic, JAX and Torch are deferred until needed; each optional adapter works without the other backend installed.
 - Existing dynamic internals support backend dispatch. Preserve precise public result types rather than widening them to `Any` to make a checker pass.

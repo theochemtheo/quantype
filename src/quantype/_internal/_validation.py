@@ -8,7 +8,7 @@ import numpy as np
 from pydantic_core import core_schema
 
 from quantype._internal._storage import convert, storage_origin
-from quantype._internal._systems import Atomistic, UnitSystem
+from quantype._internal._systems import AnySystem, NoSystem
 from quantype.core import _wrap
 from quantype.serialization import (
     DIMENSIONLESS_STRING,
@@ -42,7 +42,7 @@ def pydantic_schema(
     del handler
     annotation = quantity_type(source_type)
     storage: object = Any
-    system: type[UnitSystem] = Atomistic
+    system: type[AnySystem] = NoSystem
     if annotation is not None:
         storage = Any if annotation.storage is None else annotation.storage
         system = annotation.system
@@ -59,14 +59,21 @@ def pydantic_schema(
         if storage is Any:
             return quantity
         try:
-            raw = convert(quantity.value, storage)
+            raw = convert(quantity._value, storage)
         except (TypeError, ValueError) as exc:
             raise ValueError(
                 f"Expected {cls._kind} storage {storage!r}: {exc}"
             ) from exc
         # The echo is a Python float, so only float storage can keep it.
         echo = quantity._echo if origin is float else None
-        return _wrap(cls._semantic, raw, system, display=quantity._display, echo=echo)
+        return _wrap(
+            cls._semantic,
+            raw,
+            system,
+            display=quantity._display,
+            echo=echo,
+            storage=quantity._storage,
+        )
 
     number = core_schema.float_schema()
     array = core_schema.list_schema(core_schema.any_schema())

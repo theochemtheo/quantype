@@ -1,6 +1,6 @@
 # mypy: disable-error-code=overload-overlap
 # pyright: reportOverlappingOverload=false
-from collections.abc import Iterator, Sequence
+from collections.abc import Callable, Iterator, Sequence
 from typing import (
     Any,
     ClassVar,
@@ -17,8 +17,8 @@ import numpy.typing as npt
 from typing_extensions import TypeVar
 
 from quantype._internal._kind_types import Div, Mul, Pow
-from quantype._internal._semantics import Semantic
-from quantype._internal._systems import Atomistic, UnitSystem
+from quantype._internal._semantics import Kind, Semantic
+from quantype._internal._systems import AnySystem, NoSystem, UnitSystem
 from quantype._internal._unit import Unit as Unit
 from quantype._internal._unit import get_unit as get_unit
 from quantype.kinds import DimensionlessKind
@@ -37,19 +37,22 @@ __all__ = [
 # ruff: noqa: PYI001
 K = TypeVar("K")
 V = TypeVar("V")
-S = TypeVar("S", bound=UnitSystem, default=Atomistic)
+S = TypeVar("S", bound=AnySystem, default=NoSystem)
 
-type _StructuralQuantity[A, B, X, Y: UnitSystem] = (
+type _StructuralQuantity[A, B, X, Y: AnySystem] = (
     Quantity[Mul[A, B], X, Y] | Quantity[Div[A, B], X, Y] | Quantity[Pow[A, B], X, Y]
 )
 
 class Quantity(Generic[K, V, S]):
     _kind: str
     _semantic: Semantic
-    _system: type[UnitSystem]
+    _value: V
+    _system: type[AnySystem]
+    _storage: Unit[Any] | None
     _display: Unit[K] | None
     _echo: float | None
     kind: ClassVar[str]
+    value: _Value
     # Without a storage parameter, a float, NumPy float, or array is the
     # storage. Calling the unit converts integers and lists to float storage,
     # which an __init__ can't express in every checker, so they leave V open.
@@ -82,8 +85,6 @@ class Quantity(Generic[K, V, S]):
         cls, name: str, *, units: tuple[Unit[Any], ...] = ...
     ) -> Unit[K]: ...
     @property
-    def value(self) -> V: ...
-    @property
     def dimensions(self) -> tuple[int, ...]: ...
     @property
     def system(self) -> type[S]: ...
@@ -94,9 +95,11 @@ class Quantity(Generic[K, V, S]):
     @property
     def ndim(self) -> int: ...
     @classmethod
-    def from_value[W](cls, value: W) -> Quantity[K, W, S]: ...
+    def from_value[W, T: UnitSystem](
+        cls, value: W, system: type[T]
+    ) -> Quantity[K, W, T]: ...
     @classmethod
-    def reinterpret[W, T: UnitSystem](
+    def reinterpret[W, T: AnySystem](
         cls, quantity: Quantity[Any, W, T]
     ) -> Quantity[K, W, T]: ...
     @overload
@@ -112,12 +115,21 @@ class Quantity(Generic[K, V, S]):
     @classmethod
     def __get_pydantic_core_schema__(cls, source_type: Any, handler: Any) -> Any: ...
     def _check_unit(self, unit: Unit[K], hint: str = ...) -> None: ...
-    def _same_system(self, other: Quantity[Any, Any, Any]) -> None: ...
+    def _adopted(
+        self, other: Quantity[Any, Any, Any]
+    ) -> tuple[Quantity[Any, Any, Any], Quantity[Any, Any, Any]]: ...
     def _with(self, raw: Any, *, display: bool = ...) -> Self: ...
+    def _aligned(self, other: Quantity[Any, Any, Any]) -> Any: ...
+    def _reference(self) -> Any: ...
+    def _comparable(self, other: Quantity[Any, Any, Any]) -> tuple[Any, Any]: ...
+    def _ordered(
+        self, other: Quantity[Any, Any, Any], compare: Callable[[Any, Any], Any]
+    ) -> Any: ...
     def magnitude(self, unit: Unit[K] | None = ...) -> V: ...
-    def to(self, unit: Unit[K]) -> Self: ...
-    def with_value(self, value: V, /) -> Self: ...
-    def to_system[T: UnitSystem](self, system: type[T]) -> Quantity[K, V, T]: ...
+    def to(self, unit: Unit[K] | type[UnitSystem]) -> Self: ...
+    def simplified(self) -> Self: ...
+    def apply(self, function: Callable[[V], V], /) -> Self: ...
+    def to_system[T: AnySystem](self, system: type[T]) -> Quantity[K, V, T]: ...
     def to_dict(self, unit: Unit[K] | None = ...) -> dict[str, object]: ...
     def __pos__(self) -> Self: ...
     def mean(
@@ -176,61 +188,144 @@ class Quantity(Generic[K, V, S]):
     def __eq__(self, other: object, /) -> Any: ...
     @override
     def __ne__(self, other: object, /) -> Any: ...
-    # Scalar storage hashes by value; array storage raises TypeError.
-    @override
-    def __hash__(self) -> int: ...
-    # Ordering requires the same kind and system; K and S anchor to the class.
+    __hash__: ClassVar[None]  # type: ignore[assignment]
+    # Ordering requires the same kind and a shared system, which an operand
+    # without one adopts; K and S anchor to the class.
     @overload
     def __lt__(
-        self: Quantity[K, float, S], other: Quantity[K, float, S], /
+        self: Quantity[K, float, S],
+        other: Quantity[K, float, S] | Quantity[K, float, NoSystem],
+        /,
     ) -> bool: ...
     @overload
-    def __lt__(self, other: Quantity[K, Any, S], /) -> Any: ...
+    def __lt__[U: UnitSystem](
+        self: Quantity[K, float, NoSystem], other: Quantity[K, float, U], /
+    ) -> bool: ...
+    @overload
+    def __lt__(
+        self, other: Quantity[K, Any, S] | Quantity[K, Any, NoSystem], /
+    ) -> Any: ...
+    @overload
+    def __lt__[U: UnitSystem](
+        self: Quantity[K, V, NoSystem], other: Quantity[K, Any, U], /
+    ) -> Any: ...
     @overload
     def __le__(
-        self: Quantity[K, float, S], other: Quantity[K, float, S], /
+        self: Quantity[K, float, S],
+        other: Quantity[K, float, S] | Quantity[K, float, NoSystem],
+        /,
     ) -> bool: ...
     @overload
-    def __le__(self, other: Quantity[K, Any, S], /) -> Any: ...
+    def __le__[U: UnitSystem](
+        self: Quantity[K, float, NoSystem], other: Quantity[K, float, U], /
+    ) -> bool: ...
+    @overload
+    def __le__(
+        self, other: Quantity[K, Any, S] | Quantity[K, Any, NoSystem], /
+    ) -> Any: ...
+    @overload
+    def __le__[U: UnitSystem](
+        self: Quantity[K, V, NoSystem], other: Quantity[K, Any, U], /
+    ) -> Any: ...
     @overload
     def __gt__(
-        self: Quantity[K, float, S], other: Quantity[K, float, S], /
+        self: Quantity[K, float, S],
+        other: Quantity[K, float, S] | Quantity[K, float, NoSystem],
+        /,
     ) -> bool: ...
     @overload
-    def __gt__(self, other: Quantity[K, Any, S], /) -> Any: ...
+    def __gt__[U: UnitSystem](
+        self: Quantity[K, float, NoSystem], other: Quantity[K, float, U], /
+    ) -> bool: ...
+    @overload
+    def __gt__(
+        self, other: Quantity[K, Any, S] | Quantity[K, Any, NoSystem], /
+    ) -> Any: ...
+    @overload
+    def __gt__[U: UnitSystem](
+        self: Quantity[K, V, NoSystem], other: Quantity[K, Any, U], /
+    ) -> Any: ...
     @overload
     def __ge__(
-        self: Quantity[K, float, S], other: Quantity[K, float, S], /
+        self: Quantity[K, float, S],
+        other: Quantity[K, float, S] | Quantity[K, float, NoSystem],
+        /,
     ) -> bool: ...
     @overload
-    def __ge__(self, other: Quantity[K, Any, S], /) -> Any: ...
+    def __ge__[U: UnitSystem](
+        self: Quantity[K, float, NoSystem], other: Quantity[K, float, U], /
+    ) -> bool: ...
+    @overload
+    def __ge__(
+        self, other: Quantity[K, Any, S] | Quantity[K, Any, NoSystem], /
+    ) -> Any: ...
+    @overload
+    def __ge__[U: UnitSystem](
+        self: Quantity[K, V, NoSystem], other: Quantity[K, Any, U], /
+    ) -> Any: ...
     # Named quantities have catalogue-generated operators. Restrict base
     # arithmetic to structural trees, so each named kind's own operators apply.
     # K remains anchored to the class, preserving nominal tree equality.
     @overload
     def __add__[A, B, W](
-        self: _StructuralQuantity[A, B, float, S], other: Quantity[K, W, S], /
+        self: _StructuralQuantity[A, B, float, S],
+        other: Quantity[K, W, S] | Quantity[K, W, NoSystem],
+        /,
     ) -> Quantity[K, W, S]: ...
     @overload
     def __add__[A, B](
-        self: _StructuralQuantity[A, B, V, S], other: Quantity[K, float, S], /
+        self: _StructuralQuantity[A, B, V, S],
+        other: Quantity[K, float, S] | Quantity[K, float, NoSystem],
+        /,
     ) -> Quantity[K, V, S]: ...
     @overload
     def __add__[A, B](
-        self: _StructuralQuantity[A, B, V, S], other: Quantity[K, V, S], /
+        self: _StructuralQuantity[A, B, V, S],
+        other: Quantity[K, V, S] | Quantity[K, V, NoSystem],
+        /,
     ) -> Quantity[K, V, S]: ...
+    @overload
+    def __add__[A, B, W, U: UnitSystem](
+        self: _StructuralQuantity[A, B, float, NoSystem], other: Quantity[K, W, U], /
+    ) -> Quantity[K, W, U]: ...
+    @overload
+    def __add__[A, B, U: UnitSystem](
+        self: _StructuralQuantity[A, B, V, NoSystem], other: Quantity[K, float, U], /
+    ) -> Quantity[K, V, U]: ...
+    @overload
+    def __add__[A, B, U: UnitSystem](
+        self: _StructuralQuantity[A, B, V, NoSystem], other: Quantity[K, V, U], /
+    ) -> Quantity[K, V, U]: ...
     @overload
     def __sub__[A, B, W](
-        self: _StructuralQuantity[A, B, float, S], other: Quantity[K, W, S], /
+        self: _StructuralQuantity[A, B, float, S],
+        other: Quantity[K, W, S] | Quantity[K, W, NoSystem],
+        /,
     ) -> Quantity[K, W, S]: ...
     @overload
     def __sub__[A, B](
-        self: _StructuralQuantity[A, B, V, S], other: Quantity[K, float, S], /
+        self: _StructuralQuantity[A, B, V, S],
+        other: Quantity[K, float, S] | Quantity[K, float, NoSystem],
+        /,
     ) -> Quantity[K, V, S]: ...
     @overload
     def __sub__[A, B](
-        self: _StructuralQuantity[A, B, V, S], other: Quantity[K, V, S], /
+        self: _StructuralQuantity[A, B, V, S],
+        other: Quantity[K, V, S] | Quantity[K, V, NoSystem],
+        /,
     ) -> Quantity[K, V, S]: ...
+    @overload
+    def __sub__[A, B, W, U: UnitSystem](
+        self: _StructuralQuantity[A, B, float, NoSystem], other: Quantity[K, W, U], /
+    ) -> Quantity[K, W, U]: ...
+    @overload
+    def __sub__[A, B, U: UnitSystem](
+        self: _StructuralQuantity[A, B, V, NoSystem], other: Quantity[K, float, U], /
+    ) -> Quantity[K, V, U]: ...
+    @overload
+    def __sub__[A, B, U: UnitSystem](
+        self: _StructuralQuantity[A, B, V, NoSystem], other: Quantity[K, V, U], /
+    ) -> Quantity[K, V, U]: ...
     @overload
     def __mul__[A, B](
         self: _StructuralQuantity[A, B, V, S], other: _Scalar, /
@@ -245,16 +340,34 @@ class Quantity(Generic[K, V, S]):
     ) -> Quantity[K, V, S]: ...
     @overload
     def __mul__[A, B, L, W](
-        self: _StructuralQuantity[A, B, float, S], other: Quantity[L, W, S], /
+        self: _StructuralQuantity[A, B, float, S],
+        other: Quantity[L, W, S] | Quantity[L, W, NoSystem],
+        /,
     ) -> Quantity[Mul[K, L], W, S]: ...
     @overload
     def __mul__[A, B, L](
-        self: _StructuralQuantity[A, B, V, S], other: Quantity[L, float, S], /
+        self: _StructuralQuantity[A, B, V, S],
+        other: Quantity[L, float, S] | Quantity[L, float, NoSystem],
+        /,
     ) -> Quantity[Mul[K, L], V, S]: ...
     @overload
     def __mul__[A, B, L](
-        self: _StructuralQuantity[A, B, V, S], other: Quantity[L, V, S], /
+        self: _StructuralQuantity[A, B, V, S],
+        other: Quantity[L, V, S] | Quantity[L, V, NoSystem],
+        /,
     ) -> Quantity[Mul[K, L], V, S]: ...
+    @overload
+    def __mul__[A, B, L, W, U: UnitSystem](
+        self: _StructuralQuantity[A, B, float, NoSystem], other: Quantity[L, W, U], /
+    ) -> Quantity[Mul[K, L], W, U]: ...
+    @overload
+    def __mul__[A, B, L, U: UnitSystem](
+        self: _StructuralQuantity[A, B, V, NoSystem], other: Quantity[L, float, U], /
+    ) -> Quantity[Mul[K, L], V, U]: ...
+    @overload
+    def __mul__[A, B, L, U: UnitSystem](
+        self: _StructuralQuantity[A, B, V, NoSystem], other: Quantity[L, V, U], /
+    ) -> Quantity[Mul[K, L], V, U]: ...
     @overload
     def __truediv__[A, B](
         self: _StructuralQuantity[A, B, V, S], other: _Scalar, /
@@ -269,16 +382,34 @@ class Quantity(Generic[K, V, S]):
     ) -> Quantity[K, V, S]: ...
     @overload
     def __truediv__[A, B, L, W](
-        self: _StructuralQuantity[A, B, float, S], other: Quantity[L, W, S], /
+        self: _StructuralQuantity[A, B, float, S],
+        other: Quantity[L, W, S] | Quantity[L, W, NoSystem],
+        /,
     ) -> Quantity[Div[K, L], W, S]: ...
     @overload
     def __truediv__[A, B, L](
-        self: _StructuralQuantity[A, B, V, S], other: Quantity[L, float, S], /
+        self: _StructuralQuantity[A, B, V, S],
+        other: Quantity[L, float, S] | Quantity[L, float, NoSystem],
+        /,
     ) -> Quantity[Div[K, L], V, S]: ...
     @overload
     def __truediv__[A, B, L](
-        self: _StructuralQuantity[A, B, V, S], other: Quantity[L, V, S], /
+        self: _StructuralQuantity[A, B, V, S],
+        other: Quantity[L, V, S] | Quantity[L, V, NoSystem],
+        /,
     ) -> Quantity[Div[K, L], V, S]: ...
+    @overload
+    def __truediv__[A, B, L, W, U: UnitSystem](
+        self: _StructuralQuantity[A, B, float, NoSystem], other: Quantity[L, W, U], /
+    ) -> Quantity[Div[K, L], W, U]: ...
+    @overload
+    def __truediv__[A, B, L, U: UnitSystem](
+        self: _StructuralQuantity[A, B, V, NoSystem], other: Quantity[L, float, U], /
+    ) -> Quantity[Div[K, L], V, U]: ...
+    @overload
+    def __truediv__[A, B, L, U: UnitSystem](
+        self: _StructuralQuantity[A, B, V, NoSystem], other: Quantity[L, V, U], /
+    ) -> Quantity[Div[K, L], V, U]: ...
     @overload
     def __rmul__[A, B](
         self: _StructuralQuantity[A, B, V, S], other: _Scalar, /
@@ -301,14 +432,29 @@ class Quantity(Generic[K, V, S]):
     ) -> Quantity[K, V, S]: ...
     @overload
     def __matmul__[A, B, L, W](
-        self: _StructuralQuantity[A, B, float, S], other: Quantity[L, W, S], /
+        self: _StructuralQuantity[A, B, float, S],
+        other: Quantity[L, W, S] | Quantity[L, W, NoSystem],
+        /,
     ) -> Quantity[Mul[K, L], W, S]: ...
     @overload
     def __matmul__[A, B, L](
         self: _StructuralQuantity[A, B, V, S],
-        other: Quantity[L, V, S] | Quantity[L, float, S],
+        other: Quantity[L, V, S]
+        | Quantity[L, V, NoSystem]
+        | Quantity[L, float, S]
+        | Quantity[L, float, NoSystem],
         /,
     ) -> Quantity[Mul[K, L], V, S]: ...
+    @overload
+    def __matmul__[A, B, L, W, U: UnitSystem](
+        self: _StructuralQuantity[A, B, float, NoSystem], other: Quantity[L, W, U], /
+    ) -> Quantity[Mul[K, L], W, U]: ...
+    @overload
+    def __matmul__[A, B, L, U: UnitSystem](
+        self: _StructuralQuantity[A, B, V, NoSystem],
+        other: Quantity[L, V, U] | Quantity[L, float, U],
+        /,
+    ) -> Quantity[Mul[K, L], V, U]: ...
     @overload
     def __rmatmul__[A, B, W: _Numerical](
         self: _StructuralQuantity[A, B, float, S], other: W, /
@@ -341,6 +487,10 @@ class Quantity(Generic[K, V, S]):
     ) -> Q: ...
     # A literal square keeps its exponent in every checker, so qnp.sqrt undoes it.
     @overload
+    def __pow__[Q: _StructuralQuantity[Any, Any, Any, Any]](
+        self: Q, exponent: Literal[1], /
+    ) -> Q: ...
+    @overload
     def __pow__[A, B](
         self: _StructuralQuantity[A, B, V, S], exponent: Literal[2], /
     ) -> Quantity[Pow[K, Literal[2]], V, S]: ...
@@ -362,6 +512,19 @@ type _Scalar = float | np.floating[Any] | np.integer[Any]
 # prints an alias's name in diagnostics, so aliases stand only for parameters.
 type _IntArray = npt.NDArray[np.integer[Any]]  # noqa: PYI047
 
+# Raw numbers exist only in a unit system: the second overload binds only a
+# quantity whose system is a UnitSystem, so every checker rejects .value on one
+# without a system.
+class _Value:
+    # The instance overload comes first, so checkers that name the closest
+    # overload of a failed call name it.
+    @overload
+    def __get__[W, T: UnitSystem](
+        self, obj: Quantity[Any, W, T], owner: Any, /
+    ) -> W: ...
+    @overload
+    def __get__(self, obj: None, owner: Any, /) -> _Value: ...
+
 # A NumPy, JAX or Torch array scaling a quantity: each exports through DLPack,
 # which quantities do not, so a quantity never matches it.
 class _Numerical(Protocol):
@@ -370,9 +533,7 @@ class _Numerical(Protocol):
 # A quantity as an operand of a constant. Typing it structurally, not as
 # Quantity, spares checkers from binding Quantity's structural-only __mul__,
 # and keeps it from competing with the named relations' overloads.
-class _Operand[K, V, S: UnitSystem](Protocol):
-    @property
-    def value(self) -> V: ...
+class _Operand[K, V, S: AnySystem](Protocol):
     @property
     def system(self) -> type[S]: ...
     def magnitude(self, unit: Unit[K] | None = ..., /) -> V: ...
@@ -388,13 +549,13 @@ class Constant[K]:
     def kind(self) -> str: ...
     @property
     def dimensions(self) -> tuple[int, ...]: ...
-    def to_system[T: UnitSystem](self, system: type[T]) -> Quantity[K, float, T]: ...
+    def to_system[T: AnySystem](self, system: type[T]) -> Quantity[K, float, T]: ...
     def magnitude(self, unit: Unit[K]) -> float: ...
-    def to(self, unit: Unit[K]) -> Quantity[K, float, Atomistic]: ...
+    def to(self, unit: Unit[K]) -> Quantity[K, float, NoSystem]: ...
     @overload
     def __mul__(self, other: _Scalar, /) -> Self: ...
     @overload
-    def __mul__[L, W, T: UnitSystem](
+    def __mul__[L, W, T: AnySystem](
         self, other: _Operand[L, W, T], /
     ) -> Quantity[Mul[K, L], W, T]: ...
     @overload
@@ -402,13 +563,13 @@ class Constant[K]:
     @overload
     def __rmul__(self, other: _Scalar, /) -> Self: ...
     @overload
-    def __rmul__[L, W, T: UnitSystem](
+    def __rmul__[L, W, T: AnySystem](
         self, other: _Operand[L, W, T], /
     ) -> Quantity[Mul[L, K], W, T]: ...
     @overload
     def __truediv__(self, other: _Scalar, /) -> Self: ...
     @overload
-    def __truediv__[L, W, T: UnitSystem](
+    def __truediv__[L, W, T: AnySystem](
         self, other: _Operand[L, W, T], /
     ) -> Quantity[Div[K, L], W, T]: ...
     @overload
@@ -418,9 +579,12 @@ class Constant[K]:
         self, other: _Scalar, /
     ) -> Constant[Div[DimensionlessKind, K]]: ...
     @overload
-    def __rtruediv__[L, W, T: UnitSystem](
+    def __rtruediv__[L, W, T: AnySystem](
         self, other: _Operand[L, W, T], /
     ) -> Quantity[Div[L, K], W, T]: ...
+    @overload
+    def __pow__(self, exponent: Literal[1], /) -> Self: ...
+    @overload
     def __pow__[N: int](self, exponent: N, /) -> Constant[Pow[K, N]]: ...
     def __neg__(self) -> Self: ...
 
@@ -431,20 +595,32 @@ def _constant(name: str, semantic: Semantic, reference: float) -> Constant[Any]:
 def _wrap(
     kind: str | Semantic,
     value: Any,
-    system: type[UnitSystem] | None,
+    system: type[AnySystem] | None,
     *,
     display: Unit[Any] | None = ...,
     echo: float | None = ...,
+    storage: Unit[Any] | None = ...,
 ) -> Quantity[Any, Any, Any]: ...
+def _composite(
+    kind: Semantic, raw: Any, storage: Unit[Any], display: Unit[Any]
+) -> Quantity[Any, Any, Any]: ...
+def _product(
+    operation: Literal["mul", "div"],
+    kind: Semantic,
+    raw: Any,
+    left: Quantity[Any, Any, Any],
+    right: Quantity[Any, Any, Any],
+) -> Quantity[Any, Any, Any]: ...
+def _delta_unit(point: Unit[Any], kind: Kind) -> Unit[Any] | None: ...
 def _unit_named(
     cls: type[Quantity[Any, Any, Any]],
     name: str,
     units: tuple[Unit[Any], ...],
-    system: type[UnitSystem],
+    system: type[AnySystem],
 ) -> Unit[Any]: ...
 def _parse(
     cls: type[Quantity[Any, Any, Any]],
     data: object,
     units: tuple[Unit[Any], ...],
-    system: type[UnitSystem],
+    system: type[AnySystem],
 ) -> Quantity[Any, Any, Any]: ...

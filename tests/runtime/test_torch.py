@@ -25,7 +25,7 @@ from quantype import (
     utorch,
 )
 from quantype.products import PerLength
-from quantype.systems import SI
+from quantype.systems import SI, Atomistic
 from quantype.testing import assert_allclose
 
 
@@ -40,14 +40,14 @@ def test_torch_graph_and_higher_derivative() -> None:
     energy = _torch_harmonic(x)
     first = utorch.grad(energy, x, create_graph=True)
     assert isinstance(first, Force)
-    assert type(first.value) is torch.Tensor
-    assert first.value.requires_grad
-    assert first.value.grad_fn is not None
-    torch.testing.assert_close(first.value, 2.0 * raw)
+    assert type(first.magnitude()) is torch.Tensor
+    assert first.magnitude().requires_grad
+    assert first.magnitude().grad_fn is not None
+    torch.testing.assert_close(first.magnitude(), 2.0 * raw)
     second = utorch.grad(first.sum(), x)
     assert isinstance(second, ForceConstant)
-    torch.testing.assert_close(second.value, torch.full_like(raw, 2.0))
-    torch.testing.assert_close((-first).value, -2.0 * raw)
+    torch.testing.assert_close(second.magnitude(), torch.full_like(raw, 2.0))
+    torch.testing.assert_close((-first).magnitude(), -2.0 * raw)
 
 
 def test_torch_conversion_preserves_graph_and_canonical_derivative() -> None:
@@ -55,20 +55,24 @@ def test_torch_conversion_preserves_graph_and_canonical_derivative() -> None:
     x = u.nm(raw).to(u.angstrom)
     energy = _torch_harmonic(x)
     first = utorch.grad(energy, x, retain_graph=True)
-    torch.testing.assert_close(first.value, torch.tensor([2.0, 4.0, 6.0]))
-    (raw_gradient,) = torch.autograd.grad(energy.value, raw)
-    torch.testing.assert_close(raw_gradient, 10.0 * first.value)
+    torch.testing.assert_close(
+        first.magnitude(u.eV_per_angstrom), torch.tensor([2.0, 4.0, 6.0])
+    )
+    (raw_gradient,) = torch.autograd.grad(energy.magnitude(u.eV), raw)
+    torch.testing.assert_close(raw_gradient, 10.0 * first.magnitude())
 
 
 def test_torch_raw_model_boundary() -> None:
-    x = u.angstrom(torch.tensor([1.0, 2.0], requires_grad=True))
-    energy = Energy.from_value(torch.sum(x.value**2))
+    x = Length[torch.Tensor, Atomistic](
+        torch.tensor([1.0, 2.0], requires_grad=True), u.angstrom
+    )
+    energy = Energy.from_value(torch.sum(x.value**2), Atomistic)
     torch.testing.assert_close(utorch.grad(energy, x).value, 2.0 * x.value)
 
 
 def test_torch_rejects_nonscalar_energy() -> None:
     x = u.angstrom(torch.tensor([1.0, 2.0], requires_grad=True))
-    energy = Energy.from_value(x.value**2)
+    energy = x * x * u.eV_per_angstrom_squared(torch.tensor(1.0))
     with pytest.raises(ValueError, match="scalar"):
         utorch.grad(energy, x)
 
@@ -87,13 +91,13 @@ def test_torch_grad_in_another_system() -> None:
     with pytest.raises(
         TypeError, match="output in Atomistic with respect to an input in SI"
     ):
-        untyped(Energy.from_value(x.value.sum()) * 1.0, x)
+        untyped(Energy.from_value(x.value.sum(), Atomistic), x)
 
 
 def test_torch_grad_rescales_atomistic_masses() -> None:
     raw = torch.tensor([0.01, 0.02], dtype=torch.float64, requires_grad=True)
-    v = Velocity[torch.Tensor](raw, u.angstrom_per_fs)
-    mass = Mass[float](12, u.Da)
+    v = Velocity[torch.Tensor, Atomistic](raw, u.angstrom_per_fs)
+    mass = Mass[float, Atomistic](12, u.Da)
     momentum = utorch.grad(0.5 * mass * (v * v).sum(), v)
     assert type(momentum) is Momentum
     torch.testing.assert_close(
@@ -102,13 +106,32 @@ def test_torch_grad_rescales_atomistic_masses() -> None:
     )
 
 
+def test_torch_grad_without_a_system_is_in_reference_units() -> None:
+    raw = torch.tensor([0.1, 0.2], dtype=torch.float64, requires_grad=True)
+    x = Length[torch.Tensor](raw, u.nm)
+    k = ForceConstant[float](2.0, u.eV_per_angstrom_squared)
+    force = utorch.grad(0.5 * k * (x**2).sum(), x)
+    assert force.unit is u.eV_per_angstrom
+    torch.testing.assert_close(
+        force.magnitude(), torch.tensor([2.0, 4.0], dtype=torch.float64)
+    )
+    v = Velocity[torch.Tensor](raw, u.angstrom_per_ps)
+    mass = Mass[float](12, u.Da)
+    momentum = utorch.grad(0.5 * mass * (v * v).sum(), v)
+    expected = mass * Velocity[torch.Tensor](raw.detach(), u.angstrom_per_ps)
+    torch.testing.assert_close(
+        momentum.magnitude(u.eV_fs_per_angstrom),
+        expected.magnitude(u.eV_fs_per_angstrom),
+    )
+
+
 def test_torch_tensors_scale_quantities() -> None:
     length = Length[torch.Tensor](torch.tensor([1.0, 2.0]), u.angstrom)
     scaled = length * torch.tensor(2.0)
-    assert torch.equal(scaled.value, torch.tensor([2.0, 4.0]))
+    assert torch.equal(scaled.magnitude(), torch.tensor([2.0, 4.0]))
     # The quantity's dtype is kept, as unit conversion keeps it.
     doubled = torch.tensor(2.0, dtype=torch.float64) * length
-    assert doubled.value.dtype == torch.float32
+    assert doubled.dtype == torch.float32
 
 
 def test_grad_takes_several_inputs() -> None:
@@ -119,7 +142,7 @@ def test_grad_takes_several_inputs() -> None:
     gradients = utorch.grad(energy, [x, y])
     assert len(gradients) == 2
     assert all(isinstance(gradient, Force) for gradient in gradients)
-    assert torch.allclose(gradients[1].value, torch.tensor([6.0]))
+    assert torch.allclose(gradients[1].magnitude(), torch.tensor([6.0]))
 
 
 def test_torch_functions_apply_unit_rules() -> None:
@@ -127,13 +150,13 @@ def test_torch_functions_apply_unit_rules() -> None:
     untyped_torch: Any = torch
     cosines = cast("Dimensionless[torch.Tensor]", untyped_torch.cos(angles))
     assert isinstance(cosines, Dimensionless)
-    assert torch.allclose(cosines.value, torch.tensor([1.0, 0.0]), atol=1e-6)
+    assert torch.allclose(cosines.magnitude(), torch.tensor([1.0, 0.0]), atol=1e-6)
     positions = Length[torch.Tensor](torch.tensor([[3.0, 4.0]]), u.angstrom)
     norms = cast(
         "Length[torch.Tensor]", untyped_torch.linalg.vector_norm(positions, dim=-1)
     )
     assert isinstance(norms, Length)
-    assert torch.allclose(norms.value, torch.tensor([5.0]))
+    assert torch.allclose(norms.magnitude(), torch.tensor([5.0]))
     assert isinstance(qnp.linalg.norm(positions, axis=-1), Length)
     stacked = untyped_torch.stack([positions, positions])
     assert stacked.shape == (2, 1, 2)
@@ -153,21 +176,21 @@ def test_quantype_numpy_on_tensors_uses_numpys_names() -> None:
     assert qnp.squeeze(qnp.expand_dims(positions, 0)).shape == (2, 3)
     assert qnp.squeeze(qnp.expand_dims(positions, 0), 0).shape == (2, 3)
     assert qnp.concatenate([positions, positions]).shape == (4, 3)
-    assert torch.equal(qnp.cumsum(positions).value[-1], torch.tensor(3.0))
+    assert torch.equal(qnp.cumsum(positions).magnitude()[-1], torch.tensor(3.0))
     assert torch.equal(
-        qnp.cumsum(positions, axis=0).value[-1], torch.tensor([1.0, 2.0, 0.0])
+        qnp.cumsum(positions, axis=0).magnitude()[-1], torch.tensor([1.0, 2.0, 0.0])
     )
     assert torch.equal(
-        qnp.diff(positions, axis=0).value, torch.tensor([[-1.0, 2.0, 0.0]])
+        qnp.diff(positions, axis=0).magnitude(), torch.tensor([[-1.0, 2.0, 0.0]])
     )
     assert qnp.std(positions).shape == ()
     work = qnp.dot(force, positions[1])
     assert isinstance(work, Energy)
-    assert float(work.value) == 2.0
+    assert float(work.magnitude(u.eV)) == 2.0
     torque = qnp.cross(positions[0], force)
-    assert torch.equal(torque.value, torch.tensor([0.0, 0.0, 1.0]))
+    assert torch.equal(torque.magnitude(), torch.tensor([0.0, 0.0, 1.0]))
     assert torch.equal(
-        qnp.linalg.norm(positions, axis=-1).value, torch.tensor([1.0, 2.0])
+        qnp.linalg.norm(positions, axis=-1).magnitude(), torch.tensor([1.0, 2.0])
     )
 
 
@@ -201,8 +224,8 @@ def test_statistics_products_and_ranges_on_tensors() -> None:
     assert isinstance(work, Energy)
     assert torch.equal(work.magnitude(u.eV), torch.tensor([3.0, 4.0]))
     assert lengths.size == 3
-    assert lengths.copy().value is not lengths.value
-    assert type(lengths[0].item().value) is float
+    assert lengths.copy().magnitude() is not lengths.magnitude()
+    assert type(lengths[0].item().magnitude()) is float
 
 
 def test_tensor_reductions_ranges_and_clipping() -> None:
@@ -224,8 +247,8 @@ def test_tensors_on_the_left_and_storage_dtypes() -> None:
     scaled = cast("Any", torch.ones(1)) * narrow
     assert isinstance(scaled, Length)
     wide = narrow * torch.tensor([2.0], dtype=torch.float64)
-    assert wide.value.dtype == torch.float32
-    with pytest.raises(TypeError, match="unhashable array storage: Tensor"):
+    assert wide.dtype == torch.float32
+    with pytest.raises(TypeError, match="unhashable type"):
         hash(narrow)
     with pytest.raises(TypeError, match="parse accepts scalar/NumPy storage"):
         Length.parse(narrow)

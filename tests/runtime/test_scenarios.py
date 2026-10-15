@@ -19,9 +19,12 @@ from quantype import (
     TemperatureDifference,
     u,
 )
-from quantype.systems import SI, Atomistic, Metal, Real, UnitSystem
+from quantype.systems import SI, AnySystem, Atomistic, Metal, NoSystem, Real, UnitSystem
 
-SYSTEMS = pytest.mark.parametrize("system", [Atomistic, SI], ids=["Atomistic", "SI"])
+SYSTEMS = pytest.mark.parametrize(
+    "system", [NoSystem, Atomistic, SI], ids=["NoSystem", "Atomistic", "SI"]
+)
+BOUND = pytest.mark.parametrize("system", [Atomistic, SI], ids=["Atomistic", "SI"])
 
 
 def _dynamic(cls: object) -> Any:  # noqa: ANN401 -- runtime-chosen parameters
@@ -29,12 +32,12 @@ def _dynamic(cls: object) -> Any:  # noqa: ANN401 -- runtime-chosen parameters
     return cls
 
 
-def _suffix(system: type[UnitSystem]) -> str:
-    return "" if system is Atomistic else f", {system.__name__}"
+def _suffix(system: type[AnySystem]) -> str:
+    return "" if system is NoSystem else f", {system.__name__}"
 
 
 @SYSTEMS
-def test_presentation(system: type[UnitSystem]) -> None:
+def test_presentation(system: type[AnySystem]) -> None:
     length: Any = _dynamic(Length)[float, system]
     energy: Any = _dynamic(Energy)[float, system]
     two_nm, five_a = length(2, u.nm), length(5, u.angstrom)
@@ -44,7 +47,12 @@ def test_presentation(system: type[UnitSystem]) -> None:
     assert repr(two_nm + five_a) == f"Length(2.5 nm{suffix})"
     assert repr(five_a + two_nm) == f"Length(25.0 Å{suffix})"
     ratio = energy(3, u.eV) / two_nm
-    expected = "0.15 eV/Å" if system is Atomistic else "2.4032649509999997e-10 N"
+    shown: dict[type[AnySystem], str] = {
+        NoSystem: "1.5 eV/nm",
+        Atomistic: "0.15 eV/Å",
+        SI: "2.403264951e-10 N",
+    }
+    expected = shown[system]
     assert repr(ratio) == f"Force({expected}{suffix})"
     assert ratio.magnitude(u.eV_per_angstrom) == pytest.approx(0.15)
     array: Any = _dynamic(Length)[npt.NDArray[np.float64], system]
@@ -52,7 +60,7 @@ def test_presentation(system: type[UnitSystem]) -> None:
 
 
 @SYSTEMS
-def test_temperatures(system: type[UnitSystem]) -> None:
+def test_temperatures(system: type[AnySystem]) -> None:
     point: Any = _dynamic(Temperature)[float, system]
     difference: Any = _dynamic(TemperatureDifference)[float, system]
     suffix = _suffix(system)
@@ -67,7 +75,7 @@ def test_temperatures(system: type[UnitSystem]) -> None:
     )
 
 
-@SYSTEMS
+@BOUND
 def test_raw_values_are_in_the_system(system: type[UnitSystem]) -> None:
     length: Any = _dynamic(Length)[float, system]
     a, b = length(2, u.nm).value, length(20, u.angstrom).value
@@ -86,7 +94,7 @@ def test_raw_values_are_in_the_system(system: type[UnitSystem]) -> None:
     ],
 )
 def test_configs_round_trip_in_their_units(
-    system: type[UnitSystem], text: str, magnitude: float, unit: str
+    system: type[AnySystem], text: str, magnitude: float, unit: str
 ) -> None:
     cls: Any = Temperature if unit == "celsius" else Length
     wire = cls[float, system].parse(text).to_dict()
@@ -95,12 +103,16 @@ def test_configs_round_trip_in_their_units(
 
 
 @SYSTEMS
-def test_float32_variance(system: type[UnitSystem]) -> None:
+def test_float32_variance(system: type[AnySystem]) -> None:
     energy: Any = _dynamic(Energy)[npt.NDArray[np.float32], system]
     energies = energy([0.0, 0.002], u.eV)
     variance = ((energies - energies.mean()) ** 2).mean()
-    in_ev2 = float(variance.value) * system.unit_for(Energy).scale ** 2
-    if system is Atomistic:
+    if issubclass(system, UnitSystem):
+        in_ev2 = float(variance.value) * system.unit_for(Energy).scale ** 2
+    else:
+        # Without a system, the square stays in eV², as the input was in eV.
+        in_ev2 = float(variance.magnitude())
+    if system is not SI:
         assert in_ev2 == pytest.approx(1e-6, rel=1e-6)
     else:
         # SI underflows float32 here, as check_range and the docs report.

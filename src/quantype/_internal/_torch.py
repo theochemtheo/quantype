@@ -28,7 +28,8 @@ def grad(
     the positive derivative, not the negative physical force.
     ``create_graph=True`` keeps derivatives differentiable for higher orders;
     ``retain_graph`` follows PyTorch's normal semantics (including its default).
-    Every quantity must share the output's unit system.
+    Every quantity must share the output's unit system. Without a system, the
+    derivatives are stored in the reference units (Å, eV, fs).
     """
     single = isinstance(inputs, Quantity)
     arguments: list[_Quantity] = []
@@ -43,11 +44,11 @@ def grad(
                 f"respect to an input in {argument.system.__name__}; convert one "
                 "with .to_system(...)"
             )
-    if output.value.ndim != 0:
+    if output._value.ndim != 0:
         raise ValueError("utorch.grad requires a scalar (zero-dimensional) output.")
     values = torch.autograd.grad(
-        output.value,
-        [argument.value for argument in arguments],
+        output._value,
+        [argument._value for argument in arguments],
         create_graph=create_graph,
         retain_graph=retain_graph,
     )
@@ -60,11 +61,14 @@ def grad(
 
 def _derivative(output: _Quantity, argument: _Quantity, value: Any) -> _Quantity:
     kind = result_kind("div", output._semantic, argument._semantic)
-    # Raw derivatives are coherent, except where the system overrides a kind.
     system = argument.system
-    scale = (
-        coherence(system, output._semantic)
-        / coherence(system, argument._semantic)
-        / coherence(system, kind)
-    )
+    if output._storage is not None and argument._storage is not None:
+        scale = output._storage.scale / argument._storage.scale
+    else:
+        # Raw derivatives are coherent, except where the system overrides a kind.
+        scale = (
+            coherence(system, output._semantic)
+            / coherence(system, argument._semantic)
+            / coherence(system, kind)
+        )
     return _wrap(kind, _rescaled(value, scale), system)

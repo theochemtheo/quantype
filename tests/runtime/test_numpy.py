@@ -26,7 +26,7 @@ from quantype import (
     u,
 )
 from quantype.products import TemperatureDifferenceSquared
-from quantype.systems import SI, Metal
+from quantype.systems import SI, Atomistic, Metal
 from quantype.testing import assert_allclose
 
 if TYPE_CHECKING:
@@ -116,8 +116,11 @@ def test_joining_choosing_and_limiting() -> None:
     mixed: list[Any] = [first, Energy[Array]([1.0, 2.0], u.eV)]
     with pytest.raises(TypeError, match="quantities of one kind"):
         qnp.stack(mixed)
-    with pytest.raises(TypeError, match="Cannot combine Atomistic and SI"):
-        qnp.maximum(first, first.to_system(SI))
+    adopted = qnp.maximum(first, second.to_system(SI))
+    assert adopted.system is SI
+    assert_allclose(adopted, second.to_system(SI))
+    with pytest.raises(TypeError, match="Cannot combine SI and Atomistic"):
+        qnp.maximum(cast("Any", first.to_system(SI)), first.to_system(Atomistic))
 
 
 def test_products_follow_the_algebra() -> None:
@@ -128,7 +131,7 @@ def test_products_follow_the_algebra() -> None:
     assert work.magnitude(u.eV) == pytest.approx(2)
     torque = qnp.cross(displacement, force)
     assert type(torque) is Quantity  # r cross F is a torque, not a work
-    np.testing.assert_allclose(torque.value, [0, 0, -5])
+    np.testing.assert_allclose(torque.magnitude(), [0, 0, -5])
 
 
 def test_temperature_spreads_are_differences() -> None:
@@ -284,8 +287,8 @@ def test_variances_and_squares_are_squared_kinds(namespace: ModuleType) -> None:
     lengths = _lengths([1.0, 3.0])
     variance = cast("Area[Array]", namespace.var(lengths))
     assert isinstance(variance, Area)
-    assert variance.value == pytest.approx(1)
-    assert isinstance(variance.value, np.ndarray)
+    assert variance.magnitude(u.angstrom_squared) == pytest.approx(1)
+    assert isinstance(variance.magnitude(), np.ndarray)
     assert isinstance(namespace.nanvar(lengths), Area)
     assert isinstance(namespace.square(lengths), Area)
     assert_allclose(namespace.square(lengths), Area[Array]([1.0, 9.0], u.angstrom2))
@@ -294,7 +297,7 @@ def test_variances_and_squares_are_squared_kinds(namespace: ModuleType) -> None:
         namespace.var(Temperature[Array]([300.0, 310.0], u.K)),
     )
     assert type(spread) is TemperatureDifferenceSquared
-    assert spread.value == pytest.approx(25)
+    assert spread.magnitude() == pytest.approx(25)
 
 
 @pytest.mark.parametrize("namespace", [qnp, numpy], ids=["qnp", "np"])
@@ -312,13 +315,13 @@ def test_matrix_products_and_integrals_follow_the_algebra(
     assert_allclose(rotated, _lengths([4.0, 3.0]))
     assert isinstance(namespace.outer(displacement, displacement), Area)
     total = namespace.dot(displacement, displacement)
-    assert isinstance(total.value, np.ndarray)
+    assert isinstance(total.magnitude(), np.ndarray)
     times = Time[Array]([0.0, 1.0, 2.0], u.fs)
     speeds = Velocity[Array]([1.0, 1.0, 1.0], u.angstrom_per_fs)
     distance = cast("Length[Array]", namespace.trapezoid(speeds, times))
     assert isinstance(distance, Length)
     assert distance.magnitude(u.angstrom) == pytest.approx(2)
-    assert isinstance(distance.value, np.ndarray)
+    assert isinstance(distance.magnitude(), np.ndarray)
     stepped = qnp.trapezoid(_lengths([1.0, 1.0, 1.0], u.nm), dx=0.5)
     assert stepped.unit is u.nm
     assert stepped.magnitude() == pytest.approx(1)
@@ -344,11 +347,11 @@ def test_array_conveniences() -> None:
     assert positions.ravel().shape == positions.flatten().shape == (4,)
     assert positions.ravel().unit is u.nm
     first = positions[0, 0].item()
-    assert type(first.value) is float
+    assert type(first.magnitude()) is float
     assert first == 1 * u.nm
     copied = positions.copy()
-    copied.value[0, 0] = 0.0
-    assert positions.value[0, 0] == 10
+    copied.magnitude()[0, 0] = 0.0
+    assert positions.magnitude()[0, 0] == 1
     assert positions.argmin() == 0
     assert positions.argmax() == 3
     np.testing.assert_array_equal(positions[0].argsort(), [0, 1])
@@ -367,7 +370,8 @@ def test_square_roots_of_squared_products_and_ratios() -> None:
     root = qnp.sqrt(product * product)
     assert qnp.sqrt(product**2).kind == product.kind
     assert root.kind == product.kind
-    assert root.value == pytest.approx(product.value)
+    assert root.magnitude() == pytest.approx(product.magnitude())
+    assert root.unit == product.unit
     assert qnp.sqrt(u.one(4.0)) == u.one(2.0)
     untyped: Any = qnp
     with pytest.raises(TypeError, match="sqrt needs a squared kind"):
@@ -379,9 +383,9 @@ def test_shape_helpers_keep_the_kind() -> None:
     zeros = qnp.zeros_like(positions)
     assert isinstance(zeros, Length)
     assert zeros.unit is u.nm
-    np.testing.assert_array_equal(zeros.value, 0)
+    np.testing.assert_array_equal(zeros.magnitude(), 0)
     assert numpy.ndim(positions) == 2
-    assert isinstance(qnp.var(Length[np.float64](2, u.nm)).value, np.float64)
+    assert isinstance(qnp.var(Length[np.float64](2, u.nm)).magnitude(), np.float64)
 
 
 def test_integrating_plain_numbers_over_a_quantity_keeps_its_kind() -> None:
@@ -389,3 +393,25 @@ def test_integrating_plain_numbers_over_a_quantity_keeps_its_kind() -> None:
     total = qnp.trapezoid(np.ones(3), times)
     assert isinstance(total, Time)
     assert total.magnitude(u.fs) == pytest.approx(2)
+
+
+@pytest.mark.parametrize("namespace", [qnp, numpy], ids=["qnp", "np"])
+def test_integrals_adopt_a_system_before_integrating(namespace: ModuleType) -> None:
+    energies = Energy[Array]([1.0, 1.0, 1.0], u.eV)
+    lengths = Length[Array]([0.0, 1.0, 2.0], u.m)
+    expected = Energy[float](2.0, u.eV).to_system(SI) * Length[float, SI](1.0, u.m)
+    adopted = namespace.trapezoid(energies, lengths.to_system(SI))
+    assert_allclose(adopted, expected)
+    assert_allclose(namespace.trapezoid(energies.to_system(SI), lengths), expected)
+    stepped = numpy.trapezoid(energies.to_system(SI), dx=Length[float](1.0, u.m))
+    assert_allclose(stepped, expected)
+
+
+def test_closeness_tolerance_is_in_the_unit_values_compare_in() -> None:
+    angstrom, nm = Length[float](10.0, u.angstrom), Length[float](1.05, u.nm)
+    tight = Length[float](0.1, u.angstrom)
+    assert not qnp.isclose(angstrom, nm, rtol=0, atol=tight)
+    assert not qnp.isclose(nm, angstrom, rtol=0, atol=tight)
+    loose = Length[float](1.0, u.angstrom)
+    assert qnp.isclose(angstrom, nm, rtol=0, atol=loose)
+    assert qnp.isclose(nm, angstrom, rtol=0, atol=loose)

@@ -51,8 +51,10 @@ assert_type(density, EnergyDensity[float])
 assert_type(Pressure.reinterpret(density), Pressure[float])
 ```
 
-`.magnitude()` gives the number in the unit you constructed with, or in any unit
-you pass it.
+`.magnitude(unit)` gives the number in the unit you pass. Without a unit, it
+gives the number in the unit the quantity shows: the one it was given in, or
+for a product its operands' units multiplied out, such as eV/nm. Pass a unit
+wherever a number leaves quantype.
 
 Result types come from relations declared in the catalogue. `Force * Length` is
 `Energy`, so `Energy / Force` is `Length` and `Energy / Length` is `Force`.
@@ -61,13 +63,9 @@ To turn one into the other, call `reinterpret`.
 
 ## Unit systems
 
-A unit system is the set of units a quantity stores its numbers in, and it is
-the second type argument. Storing everything in one set gives `.value` a single
-meaning, keeps arithmetic free of conversions, and lets JAX compile a function
-once, whatever units its inputs were written in. The default is `Atomistic`
-(Å, eV, and fs). You can choose `SI`, `CGS`, Hartree `Atomic`, LAMMPS's `Metal`
-or `Real`, or [define your own](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md), and a type checker tracks
-which system each value uses.
+A quantity keeps its numbers in the unit it was given in. A sum converts the
+right operand into the left one's unit, and a product multiplies its operands'
+units out, converting only a unit that would cancel one of the same dimension.
 
 ```python
 from typing import assert_type
@@ -76,21 +74,36 @@ from quantype.systems import SI, Atomistic
 
 a = Length[float](2, u.nm)
 b = Length[float](20, u.angstrom)
-assert a.value == b.value == 20.0  # Atomistic stores ångströms
-assert str(a) == "2.0 nm"  # and shows the unit it was given in
+assert a == b
+assert repr(a + b) == "Length(4.0 nm)"
 force = (3 * u.eV) / a
-assert force.value == 0.15  # eV/Å, with no conversion in the division
+assert repr(force) == "Force(1.5 eV/nm)"  # no conversion in the division
 
-x = Length[float, SI](2, u.nm)
-assert x.value == 2e-9  # SI stores meters
-assert_type(Energy[float, SI](3, u.eV) / x, Force[float, SI])  # newtons
-assert (a + x.to_system(Atomistic)).magnitude(u.nm) == 4.0
+x = a.to_system(Atomistic)
+assert_type(x, Length[float, Atomistic])
+assert x.value == 20.0  # Atomistic stores ångströms
+si = Length[float, SI](2, u.nm)
+assert si.value == 2e-9  # SI stores meters
+assert_type(Energy[float, SI](3, u.eV) / si, Force[float, SI])  # newtons
 ```
 
-`Length[float]` is short for `Length[float, Atomistic]`. Adding an SI length to
-an `Atomistic` one is a type error and a runtime `TypeError`, so convert one of
-them with `.to_system(...)` first. `Metal` and `Real` store each kind in the
-unit LAMMPS documents for it, so a `Metal` pressure is in bar.
+A unit system is the set of units a quantity stores its numbers in, and it is
+the second type argument. Choose one where you need raw numbers, such as at a
+kernel's boundary. `.value` exists only in a system, so it has one meaning for
+each type, and arithmetic inside a system doesn't convert, except for the few
+kinds a system stores in units of their own, such as `Atomistic` masses in
+daltons. The systems are
+`Atomistic` (Å, eV, and fs), `SI`, `CGS`, Hartree `Atomic`, LAMMPS's `Metal`
+and `Real`, or [your own](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md).
+
+`Length[float]` is short for `Length[float, NoSystem]`, which has no `.value`:
+reading it is a type error and a runtime `TypeError`. So is adding an SI length
+to an `Atomistic` one. A quantity with no system
+[adopts the system](https://github.com/theochemtheo/quantype/blob/main/docs/units.md#unit-systems)
+of the one it's combined with, so `si + 1 * u.nm` is in `SI`. `.to_system(...)`
+converts.
+`Metal` and `Real` store each kind in the unit LAMMPS documents for it, so a
+`Metal` pressure is in bar.
 
 ## NumPy, JAX, and Torch arrays
 
@@ -110,7 +123,7 @@ assert distances.max() == 5 * u.nm
 and works on NumPy, JAX, and Torch arrays.
 
 Any plain number or array scales a quantity. To pass data to another library,
-take `.value` or `.magnitude(unit)`. `np.asarray(q)` raises.
+take `.magnitude(unit)`, or `.value` in a unit system. `np.asarray(q)` raises.
 
 ## Autodiff
 

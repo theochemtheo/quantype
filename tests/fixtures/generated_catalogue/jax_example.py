@@ -6,7 +6,7 @@ from labquantities import Energy, Force, ForceConstant, Length, Quantity, u, uja
 
 
 def energy(x: Length[jax.Array]) -> Energy[jax.Array]:
-    return Energy.from_value((x.value**2).sum())
+    return Energy[jax.Array]((x.magnitude(u.angstrom) ** 2).sum(), u.eV)
 
 
 def test_jit_gradient() -> None:
@@ -15,7 +15,7 @@ def test_jit_gradient() -> None:
     gradient = ujax.jit(ujax.grad(energy))(x)
 
     assert isinstance(gradient, Force)
-    np.testing.assert_array_equal(gradient.value, [2, 4])
+    np.testing.assert_array_equal(gradient.magnitude(), [2, 4])
 
 
 def test_structural_transforms() -> None:
@@ -29,9 +29,9 @@ def test_structural_transforms() -> None:
     assert isinstance(q, Quantity)
     assert type(inverse) is Quantity
     assert type(mapped) is Quantity
-    np.testing.assert_array_equal(doubled.value, [12, 18])
-    np.testing.assert_allclose(inverse.value, [1 / 6, 1 / 9])
-    np.testing.assert_array_equal(mapped.value, inverse.value)
+    np.testing.assert_array_equal(doubled.magnitude(), [12, 18])
+    np.testing.assert_allclose(inverse.magnitude(), [1 / 6, 1 / 9])
+    np.testing.assert_array_equal(mapped.magnitude(), inverse.magnitude())
     assert (inverse + u.one(1) / q).kind == inverse.kind
 
 
@@ -41,4 +41,4 @@ def test_hessian() -> None:
     hessian = ujax.hessian(energy)(x)
 
     assert isinstance(hessian, ForceConstant)
-    np.testing.assert_array_equal(hessian.value, 2 * np.eye(2))
+    np.testing.assert_array_equal(hessian.magnitude(), 2 * np.eye(2))
