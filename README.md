@@ -36,11 +36,11 @@ from quantype import Energy, EnergyDensity, Force, Length, Pressure, u
 
 length = Length[float](2, u.nm)
 energy = Energy[float](3, u.eV)
-assert length.magnitude() == 2.0  # in the unit it was given in
-assert f"{length:.1f}" == "2.0 nm"
+assert repr(length + 5 * u.angstrom) == "Length(2.5 nm)"
 
 force = energy / length
 assert_type(force, Force[float])
+assert repr(force) == "Force(1.5 eV/nm)"
 assert force.magnitude(u.eV_per_angstrom) == 0.15
 assert_type(energy / force, Length[float])
 
@@ -51,59 +51,58 @@ assert_type(density, EnergyDensity[float])
 assert_type(Pressure.reinterpret(density), Pressure[float])
 ```
 
-`.magnitude(unit)` gives the number in the unit you pass. Without a unit, it
-gives the number in the unit the quantity shows: the one it was given in, or
-for a product its operands' units multiplied out, such as eV/nm. Pass a unit
-wherever a number leaves quantype.
+A quantity keeps its number in the unit it was given in. A sum converts the
+right operand into the left one's unit, and a product or quotient shows its
+operands' units multiplied out, such as eV/nm. `.magnitude(unit)` gives the number
+in any unit you pass.
 
 Result types come from relations declared in the catalogue. `Force * Length` is
-`Energy`, so `Energy / Force` is `Length` and `Energy / Length` is `Force`.
-`Pressure` and `EnergyDensity` have the same dimensions but are separate kinds.
-To turn one into the other, call `reinterpret`.
+`Energy`, so `Energy / Force` is `Length` and `Energy / Length` is `Force`. A
+product is named by its factors in any order or grouping, so `m * v**2`,
+`m * v * v`, and `(m * v)**2 / m` are all an `Energy`. Two kinds with no
+relation multiply into a product class from `quantype.products`, such as
+`LengthTime`. `Pressure` and `EnergyDensity` have the same dimensions but are
+separate kinds. To turn one into the other, call `reinterpret`.
 
 ## Unit systems
 
-A quantity keeps its numbers in the unit it was given in. A sum converts the
-right operand into the left one's unit, and a product multiplies its operands'
-units out, converting only a unit that would cancel one of the same dimension.
+A unit system is the set of units a quantity stores its numbers in, and it is
+the second type argument. In a system, `.value` holds the numbers in the
+system's units, so a `Length[float, SI]` always holds meters. Choose one where
+you need raw numbers, such as at a kernel's boundary.
 
 ```python
 from typing import assert_type
-from quantype import Energy, Force, Length, u
-from quantype.systems import SI, Atomistic
+from quantype import Energy, Force, Length, Pressure, u
+from quantype.systems import SI, Atomistic, Metal
 
-a = Length[float](2, u.nm)
-b = Length[float](20, u.angstrom)
-assert a == b
-assert repr(a + b) == "Length(4.0 nm)"
-force = (3 * u.eV) / a
-assert repr(force) == "Force(1.5 eV/nm)"  # no conversion in the division
-
-x = a.to_system(Atomistic)
+length = Length[float](2, u.nm)
+x = length.to_system(Atomistic)
 assert_type(x, Length[float, Atomistic])
-assert x.value == 20.0  # Atomistic stores ångströms
+assert x.value == 20.0  # ångströms
+assert repr(x) == "Length(2.0 nm, Atomistic)"  # shown in the unit it was given in
+
 si = Length[float, SI](2, u.nm)
-assert si.value == 2e-9  # SI stores meters
+assert si.value == 2e-9  # meters
 assert_type(Energy[float, SI](3, u.eV) / si, Force[float, SI])  # newtons
+assert_type(si + length, Length[float, SI])
+
+pressure = Pressure.from_value(1.0, Metal)  # a raw number from LAMMPS
+assert pressure.magnitude(u.bar) == 1.0
 ```
 
-A unit system is the set of units a quantity stores its numbers in, and it is
-the second type argument. Choose one where you need raw numbers, such as at a
-kernel's boundary. `.value` exists only in a system, so it has one meaning for
-each type, and arithmetic inside a system doesn't convert, except for the few
-kinds a system stores in units of their own, such as `Atomistic` masses in
-daltons. The systems are
-`Atomistic` (Å, eV, and fs), `SI`, `CGS`, Hartree `Atomic`, LAMMPS's `Metal`
-and `Real`, or [your own](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md).
-
-`Length[float]` is short for `Length[float, NoSystem]`, which has no `.value`:
-reading it is a type error and a runtime `TypeError`. So is adding an SI length
-to an `Atomistic` one. A quantity with no system
+`Length[float]` is short for `Length[float, NoSystem]`. `.to_system(...)`
+converts the numbers into a system's units, and a quantity without a system
 [adopts the system](https://github.com/theochemtheo/quantype/blob/main/docs/units.md#unit-systems)
-of the one it's combined with, so `si + 1 * u.nm` is in `SI`. `.to_system(...)`
-converts.
-`Metal` and `Real` store each kind in the unit LAMMPS documents for it, so a
-`Metal` pressure is in bar.
+of the one it's combined with, so `si + length` is in `SI`. Reading `.value`
+without a system, or adding `si` to `x`, is a type error and a runtime
+`TypeError`.
+
+The built-in systems are `Atomistic` (Å, eV, and fs), `SI`, `CGS`, Hartree
+`Atomic`, and LAMMPS's `Metal` and `Real`. You can also
+[define your own](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md).
+`Metal` and `Real` store each kind in the unit LAMMPS documents for it, so
+`from_value` wraps raw LAMMPS numbers as they are.
 
 ## NumPy, JAX, and Torch arrays
 
@@ -162,8 +161,8 @@ assert_type(thermal, Energy[float, SI])
 assert repr(constants.k_B.to_system(SI)) == "Entropy(1.380649e-23 J/K, SI)"
 ```
 
-Constants have no unit system of their own. They take the system of the
-quantity they combine with, so `k_B` times an SI temperature is an SI energy.
+Constants have no unit system, so they adopt the system of the quantity they
+combine with: `k_B` times an SI temperature is an SI energy.
 Values are from CODATA 2022, vendored with quantype. CODATA 2014 and 2018 are
 [one setting away](https://github.com/theochemtheo/quantype/blob/main/docs/units.md#codata-edition).
 
@@ -172,7 +171,7 @@ Values are from CODATA 2022, vendored with quantype. CODATA 2014 and 2018 are
 | Area | Kinds |
 | --- | --- |
 | Geometry and time | `Length`, `Area`, `Volume`, `Angle`, `Time`, `Velocity`, `Acceleration`, `Frequency`, `InverseTime` |
-| Energy and stress | `Energy`, `EnergyPerAtom`, `Force`, `ForceConstant`, `Pressure`, `EnergyDensity`, `EnergyPerVolume`, `Action` |
+| Energy and stress | `Energy`, `EnergyPerAtom`, `Force`, `ForceConstant`, `Pressure`, `EnergyDensity`, `Action` |
 | Mechanics | `Mass`, `MassDensity`, `Momentum` |
 | Electrostatics | `Charge`, `ElectricPotential`, `ElectricField`, `DipoleMoment` |
 | Thermal | `Temperature`, `TemperatureDifference`, `TemperatureRate`, `Entropy` |
@@ -180,23 +179,18 @@ Values are from CODATA 2022, vendored with quantype. CODATA 2014 and 2018 are
 
 The [catalogue reference](https://github.com/theochemtheo/quantype/blob/main/docs/catalogue.md) lists every unit, the named
 products and quotients, and each system's units. You can
-[generate your own catalogue](https://github.com/theochemtheo/quantype/blob/main/docs/custom-catalogues.md) with new kinds and
-relations.
+[generate your own catalogue](https://github.com/theochemtheo/quantype/blob/main/docs/custom-catalogues.md) with new kinds,
+relations, and units, or
+[define a unit](https://github.com/theochemtheo/quantype/blob/main/docs/units.md#define-a-unit-without-global-registration)
+for an existing kind without one.
 
 ## Also included
 
 - `quantype.testing.assert_allclose`, which checks kind and unit system before
   comparing numbers.
-- JSON, Pydantic, and NPZ serialization, with no pickle. Values keep the unit
-  they were given in, so a configuration's `"0.5 nm"` is saved as 0.5
-  nanometers.
-- Temperatures: 30 °C minus 20 °C is a `TemperatureDifference` of 10 Δ°C, and
-  `k_B * T` is an energy.
-- A product is named by its factors, in any order or grouping: `m * v**2`,
-  `m * v * v`, and `(m * v)**2 / m` are all an `Energy`. A product of two kinds
-  with no relation is a product class such as `LengthTime`, from
-  `quantype.products`.
-- Custom units, defined locally with no global registry.
+- JSON, Pydantic, and NPZ serialization, with no pickle.
+- Temperatures in °C and °F are points: subtracting two gives a
+  `TemperatureDifference`, and adding two is a type error.
 
 ## Documentation
 
@@ -213,23 +207,3 @@ relations.
 
 quantype is dual-licensed under the [MIT](https://github.com/theochemtheo/quantype/blob/main/LICENSE-MIT) and
 [Apache 2.0](https://github.com/theochemtheo/quantype/blob/main/LICENSE-APACHE) licenses, at your option.
-
-## Development
-
-Install [uv](https://docs.astral.sh/uv/getting-started/installation/), then
-run these from the repository root. `just` and the type checkers come with the
-development dependencies.
-
-```bash
-uv sync --all-extras
-uv run just generate
-uv run just check-generated
-uv run just test
-uv run just typecheck
-uv run just stubcheck
-uv run just lint
-uv build
-```
-
-To test the core alone, run `uv sync` and `uv run pytest tests/runtime`. The
-[development guide](https://github.com/theochemtheo/quantype/blob/main/docs/development.md) covers hooks and CI.
