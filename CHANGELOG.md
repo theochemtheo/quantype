@@ -6,12 +6,14 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-15
+
 Quantities no longer have a unit system unless you choose one.
 `Length[float]` is now `Length[float, NoSystem]`: it keeps the unit it was
 given in, and has no `.value` until `.to_system(...)` picks a system. Code that
 reads `.value` or calls `from_value` on default quantities, or calls
 `with_value`, needs updating; see Changed and
-[ADR-014](docs/decisions/ADR-014-opt-in-unit-system.md).
+[ADR-014](https://github.com/theochemtheo/quantype/blob/v0.3.0/docs/decisions/ADR-014-opt-in-unit-system.md).
 
 ### Added
 
@@ -123,6 +125,7 @@ constants, JAX and Torch autodiff that types a gradient by its physical kind,
 JSON, Pydantic, and NPZ serialization, and custom catalogues of kinds and
 relations.
 
-[Unreleased]: https://github.com/theochemtheo/quantype/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/theochemtheo/quantype/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/theochemtheo/quantype/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/theochemtheo/quantype/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/theochemtheo/quantype/releases/tag/v0.1.0

@@ -112,14 +112,15 @@ else:
     raise AssertionError("raw numbers need a unit system")
 ```
 
-The unit system is the second type argument. It defaults to `NoSystem`, so
-`Length[float]` is `Length[float, NoSystem]`: its numbers stay in the unit they
-were given in, and it has no `.value`. In a system such as `Atomistic` (Å, eV,
-and fs) or `SI`, `.value` holds the numbers in that system's units, so it has
-one meaning for each type. `.to_system(...)` converts once. A quantity without
-a system adopts the system of a quantity it's combined with, so
-`x + 1.0 * u.nm` stays in `SI`. Reading `.value` without a system, and mixing
-two systems, are type errors and runtime `TypeError`s whose messages point to
+A unit system is the set of units a quantity stores its numbers in, and it is
+the second type argument. It defaults to `NoSystem`, so `Length[float]` is
+`Length[float, NoSystem]` and keeps its numbers in the unit they were given in.
+In a system such as `Atomistic` (Å, eV, and fs) or `SI`, `.value` holds the
+numbers in the system's units, so a `Length[float, SI]` always holds meters.
+`.to_system(...)` converts the numbers into a system's units, and a quantity
+without a system adopts the system of one it's combined with, so `x + length`
+is in `SI`. Reading `.value` without a system, or combining two different
+systems, is a type error and a runtime `TypeError` whose message points to
 `.to_system(...)`. See
 [units and unit systems](units.md#unit-systems) and
 [defining your own system](unit-systems.md).
