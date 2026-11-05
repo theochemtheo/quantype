@@ -1,0 +1,18 @@
+docs/** linguist-documentation
+
+docs/catalogue.md linguist-generated
+src/quantype/_constants/** linguist-generated
+src/quantype/_generated.py linguist-generated
+src/quantype/_generated.pyi linguist-generated
+src/quantype/_internal/_codata.py linguist-generated
+src/quantype/_kinds/** linguist-generated
+src/quantype/_products/** linguist-generated
+src/quantype/kinds.py linguist-generated
+src/quantype/numpy.py linguist-generated
+src/quantype/numpy.pyi linguist-generated
+src/quantype/products.py linguist-generated
+src/quantype/products.pyi linguist-generated
+src/quantype/ujax.pyi linguist-generated
+src/quantype/units.py linguist-generated
+src/quantype/units.pyi linguist-generated
+src/quantype/utorch.pyi linguist-generated

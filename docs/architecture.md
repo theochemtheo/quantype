@@ -40,7 +40,8 @@ that it no longer renders. Inspect `render(...)` for the current output set. Han
 `core.pyi`, `constants.pyi` and `_internal/_unit.pyi` must be maintained
 alongside their implementations. `scripts/generate_codata.py` and
 `scripts/generate_docs.py` produce `_internal/_codata.py` and
-`docs/catalogue.md`.
+`docs/catalogue.md`. `.gitattributes` marks these outputs `linguist-generated`,
+and `test_codegen.py` fails until a new output has a matching line.
 
 Adding a built-in quantity may also require a handwritten top-level export in
 `src/quantype/__init__.py`. Generation does not update that file for the
