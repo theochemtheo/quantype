@@ -20,6 +20,7 @@ from quantype.catalogue import Catalogue, QuantitySpec, UnitSpec, builtin_catalo
 from quantype.codegen import generate, render
 from quantype.codegen._compact import minify
 
+REPOSITORY = Path(__file__).parents[2]
 PROJECT_FIXTURE = Path(__file__).parents[1] / "fixtures" / "generated_catalogue"
 
 
@@ -382,6 +383,35 @@ _needs_ruff = pytest.mark.skipif(
 def test_the_builtin_package_is_current() -> None:
     package = Path(__file__).parents[2] / "src" / "quantype"
     assert generate(builtin_catalogue(), package, check=True) == []
+
+
+def _git(*arguments: str, stdin: str = "") -> list[str]:
+    result = subprocess.run(  # noqa: S603 -- fixed git commands, no shell
+        ("git", *arguments),  # noqa: S607 -- whichever git runs the checkout
+        cwd=REPOSITORY,
+        input=stdin,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return result.stdout.split("\0")[:-1]
+
+
+def test_gitattributes_marks_exactly_the_generated_files() -> None:
+    generated = {f"src/quantype/{name}" for name in render(builtin_catalogue())} | {
+        "docs/catalogue.md",
+        "src/quantype/_internal/_codata.py",
+    }
+    paths = generated.union(_git("ls-files", "-z"))
+    attributes = _git(
+        "check-attr", "-z", "--stdin", "linguist-generated", stdin="\0".join(paths)
+    )
+    marked = {
+        path
+        for path, value in zip(attributes[::3], attributes[2::3], strict=True)
+        if value == "set"
+    }
+    assert marked == generated
 
 
 @_needs_ruff
