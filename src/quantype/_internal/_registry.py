@@ -451,6 +451,15 @@ def _electromechanical_units(c: _Constants) -> dict[str, _Definition]:
             "Velocity", 1 / math.sqrt(dalton), symbol="√(eV/amu)"
         ),
         "ase_momentum": _Definition("Momentum", math.sqrt(dalton), symbol="√(amu eV)"),
+        "per_ase_time": _Definition(
+            "InverseTime", 1 / math.sqrt(dalton), symbol="√(eV/amu)/Å"
+        ),
+        "frequency_per_ase_time": _Definition(
+            "Frequency", 1 / math.sqrt(dalton), symbol="√(eV/amu)/Å"
+        ),
+        "kelvin_per_ase_time": _Definition(
+            "TemperatureRate", 1 / math.sqrt(dalton), symbol="K √(eV/amu)/Å"
+        ),
         "kilojoule": _Definition("Energy", c.kilo / ev, symbol="kJ", aliases=("kJ",)),
         "kilocalorie": _Definition(
             "Energy", c.kilo * c.calorie / ev, symbol="kcal", aliases=("kcal",)
@@ -507,6 +516,9 @@ def _electromechanical_units(c: _Constants) -> dict[str, _Definition]:
         "electron_mass_per_bohr_cubed": _Definition(
             "MassDensity", c.exact.electron_mass / mass / bohr**3, symbol="m_e/a0^3"
         ),
+        "dalton_per_cubic_angstrom": _Definition(
+            "MassDensity", dalton, symbol="Da/Å^3"
+        ),
         "eV_fs_per_angstrom": _Definition("Momentum", symbol="eV fs/Å"),
         "eV_ps_per_angstrom": _Definition(
             "Momentum", Fraction("1e3"), symbol="eV ps/Å"
@@ -533,6 +545,9 @@ def _electromechanical_units(c: _Constants) -> dict[str, _Definition]:
         ),
         "atomic_acceleration": _Definition(
             "Acceleration", bohr / au_time**2, symbol="a0 Eh^2/ħ^2"
+        ),
+        "ase_acceleration": _Definition(
+            "Acceleration", 1 / dalton, symbol="eV/(Å amu)"
         ),
         # Charge and electrostatics. An elementary charge is the reference.
         "elementary_charge": _Definition("Charge", symbol="e", aliases=("e",)),
@@ -588,6 +603,7 @@ def _electromechanical_units(c: _Constants) -> dict[str, _Definition]:
         "joule_second": _Definition("Action", 1 / ev / c.femto, symbol="J s"),
         "erg_second": _Definition("Action", c.erg / ev / c.femto, symbol="erg s"),
         "atomic_action": _Definition("Action", hbar, symbol="ħ"),
+        "ase_action": _Definition("Action", math.sqrt(dalton), symbol="Å √(amu eV)"),
     }
 
 

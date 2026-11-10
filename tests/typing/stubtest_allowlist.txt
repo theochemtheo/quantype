@@ -47,7 +47,7 @@
 ^quantype\.units\.(?!_)(?!(exp|sin|sqrt)$)[A-Za-z0-9_]+$
 
 # UnitSystem subclasses must pass name=, which stubtest's probe subclass omits.
-^quantype\._internal\._systems\.(UnitSystem|Atomistic|Metal|Real|SI|CGS|Atomic)$
+^quantype\._internal\._systems\.(UnitSystem|Atomistic|ASE|Metal|Real|SI|CGS|Atomic)$
 # The static signature requires name=; the runtime default gives a clearer error.
 ^quantype\._internal\._systems\.UnitSystem\.__init_subclass__$
 # A descriptor: each concrete system computes its own units on access.

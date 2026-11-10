@@ -187,6 +187,9 @@ _NAMES = {
     "ase_time": "ase_time",
     "ase_velocity": "ase_velocity",
     "ase_momentum": "ase_momentum",
+    "per_ase_time": "per_ase_time",
+    "frequency_per_ase_time": "frequency_per_ase_time",
+    "kelvin_per_ase_time": "kelvin_per_ase_time",
     "kilojoule": "kilojoule",
     "kJ": "kilojoule",
     "kilocalorie": "kilocalorie",
@@ -215,6 +218,7 @@ _NAMES = {
     "gram_per_cubic_centimeter": "gram_per_cubic_centimeter",
     "kilogram_per_cubic_meter": "kilogram_per_cubic_meter",
     "electron_mass_per_bohr_cubed": "electron_mass_per_bohr_cubed",
+    "dalton_per_cubic_angstrom": "dalton_per_cubic_angstrom",
     "eV_fs_per_angstrom": "eV_fs_per_angstrom",
     "eV_ps_per_angstrom": "eV_ps_per_angstrom",
     "kcal_per_mol_fs_per_angstrom": "kcal_per_mol_fs_per_angstrom",
@@ -226,6 +230,7 @@ _NAMES = {
     "meter_per_second_squared": "meter_per_second_squared",
     "centimeter_per_second_squared": "centimeter_per_second_squared",
     "atomic_acceleration": "atomic_acceleration",
+    "ase_acceleration": "ase_acceleration",
     "elementary_charge": "elementary_charge",
     "e": "elementary_charge",
     "coulomb": "coulomb",
@@ -259,6 +264,7 @@ _NAMES = {
     "joule_second": "joule_second",
     "erg_second": "erg_second",
     "atomic_action": "atomic_action",
+    "ase_action": "ase_action",
 }
 
 
@@ -729,6 +735,12 @@ class _TemperatureRateNamespace:
             "Unit[TemperatureRateKind]", _get_unit("kelvin_per_atomic_time")
         )
 
+    @property
+    def kelvin_per_ase_time(self) -> "Unit[TemperatureRateKind]":
+        return _typing.cast(
+            "Unit[TemperatureRateKind]", _get_unit("kelvin_per_ase_time")
+        )
+
 
 temperature_rate = _TemperatureRateNamespace()
 
@@ -876,6 +888,10 @@ class _FrequencyNamespace:
         )
 
     @property
+    def frequency_per_ase_time(self) -> "Unit[FrequencyKind]":
+        return _typing.cast("Unit[FrequencyKind]", _get_unit("frequency_per_ase_time"))
+
+    @property
     def inverse_centimeter(self) -> "Unit[FrequencyKind]":
         return _typing.cast("Unit[FrequencyKind]", _get_unit("inverse_centimeter"))
 
@@ -899,6 +915,10 @@ class _InverseTimeNamespace:
     @property
     def per_atomic_time(self) -> "Unit[InverseTimeKind]":
         return _typing.cast("Unit[InverseTimeKind]", _get_unit("per_atomic_time"))
+
+    @property
+    def per_ase_time(self) -> "Unit[InverseTimeKind]":
+        return _typing.cast("Unit[InverseTimeKind]", _get_unit("per_ase_time"))
 
 
 inverse_time = _InverseTimeNamespace()
@@ -974,6 +994,12 @@ class _MassDensityNamespace:
             "Unit[MassDensityKind]", _get_unit("electron_mass_per_bohr_cubed")
         )
 
+    @property
+    def dalton_per_cubic_angstrom(self) -> "Unit[MassDensityKind]":
+        return _typing.cast(
+            "Unit[MassDensityKind]", _get_unit("dalton_per_cubic_angstrom")
+        )
+
 
 mass_density = _MassDensityNamespace()
 
@@ -1041,6 +1067,10 @@ class _AccelerationNamespace:
     @property
     def atomic_acceleration(self) -> "Unit[AccelerationKind]":
         return _typing.cast("Unit[AccelerationKind]", _get_unit("atomic_acceleration"))
+
+    @property
+    def ase_acceleration(self) -> "Unit[AccelerationKind]":
+        return _typing.cast("Unit[AccelerationKind]", _get_unit("ase_acceleration"))
 
 
 acceleration = _AccelerationNamespace()
@@ -1188,6 +1218,10 @@ class _ActionNamespace:
     def atomic_action(self) -> "Unit[ActionKind]":
         return _typing.cast("Unit[ActionKind]", _get_unit("atomic_action"))
 
+    @property
+    def ase_action(self) -> "Unit[ActionKind]":
+        return _typing.cast("Unit[ActionKind]", _get_unit("ase_action"))
+
 
 action = _ActionNamespace()
 
@@ -1225,6 +1259,8 @@ __all__ = [
     "angstrom_per_ps2",
     "angstrom_squared",
     "area",
+    "ase_acceleration",
+    "ase_action",
     "ase_momentum",
     "ase_time",
     "ase_velocity",
@@ -1262,6 +1298,7 @@ __all__ = [
     "cubic_centimeter",
     "cubic_meter",
     "dalton",
+    "dalton_per_cubic_angstrom",
     "debye",
     "deg",
     "degC",
@@ -1326,6 +1363,7 @@ __all__ = [
     "force",
     "force_constant",
     "frequency",
+    "frequency_per_ase_time",
     "frequency_per_atomic_time",
     "frequency_per_fs",
     "fs",
@@ -1362,6 +1400,7 @@ __all__ = [
     "kcal_per_mol_per_e",
     "kcal_per_mol_per_kelvin",
     "kelvin",
+    "kelvin_per_ase_time",
     "kelvin_per_atomic_time",
     "kelvin_per_fs",
     "kelvin_per_ps",
@@ -1404,6 +1443,7 @@ __all__ = [
     "one",
     "particle_density",
     "pascal",
+    "per_ase_time",
     "per_atomic_time",
     "per_fs",
     "per_ps",

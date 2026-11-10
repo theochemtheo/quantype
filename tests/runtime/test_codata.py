@@ -98,6 +98,10 @@ def test_unit_scales_are_rounded_once(edition: codata.Edition) -> None:
         "ase_time",
         "ase_velocity",
         "ase_momentum",
+        "ase_action",
+        "per_ase_time",
+        "frequency_per_ase_time",
+        "kelvin_per_ase_time",
         "atomic_momentum",
         "atomic_action",
     }

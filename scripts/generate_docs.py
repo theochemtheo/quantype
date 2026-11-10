@@ -8,10 +8,10 @@ from quantype._internal._semantics import KINDS
 from quantype._internal._systems import coherence
 from quantype.catalogue import builtin_catalogue
 from quantype.codegen._render import unit_names
-from quantype.systems import CGS, SI, Atomic, Atomistic, Metal, Real
+from quantype.systems import ASE, CGS, SI, Atomic, Atomistic, Metal, Real
 
 TARGET = Path(__file__).resolve().parents[1] / "docs/catalogue.md"
-SYSTEMS = (Atomistic, Metal, Real, SI, CGS, Atomic)
+SYSTEMS = (Atomistic, ASE, Metal, Real, SI, CGS, Atomic)
 SUPERSCRIPTS = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
 AXES = {"magnetic_moment": "magnetic moment"}
 

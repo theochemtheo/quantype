@@ -6,9 +6,17 @@ import numpy as np
 import numpy.typing as npt
 
 import quantype.numpy as qnp
-from quantype import Energy, EnergyPerAtom, Force, Length, Pressure, Temperature
+from quantype import (
+    Energy,
+    EnergyPerAtom,
+    Force,
+    Length,
+    Pressure,
+    Temperature,
+    Time,
+)
 from quantype import units as u
-from quantype.systems import SI, AnySystem, Metal, NoSystem, UnitSystem
+from quantype.systems import ASE, SI, AnySystem, Atomistic, Metal, NoSystem, UnitSystem
 
 
 def energy_only(value: Energy[float]) -> None:
@@ -62,6 +70,8 @@ e_si = Energy[float, SI](3.0, u.eV)
 mixed_addition = x_si + x_metal  # error
 mixed_ratio = e_si / x_metal  # error
 mixed_comparison = x_si < x_metal  # error
+t_ase = Time[float, ASE](1.0, u.ase_time)
+mixed_ase = t_ase + Time[float, Atomistic](10.0, u.fs)  # error
 energy_only(e_si)  # error
 default_length: Length[float] = x_si  # error
 not_a_system = Length[float, int]  # error
