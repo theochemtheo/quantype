@@ -9,6 +9,7 @@ never mix implicitly; ``.to_system(...)`` is the explicit bridge. Subclass
 
 from quantype._internal._storage import StorageRangeWarning
 from quantype._internal._systems import (
+    ASE,
     CGS,
     SI,
     AnySystem,
@@ -22,6 +23,7 @@ from quantype._internal._systems import (
 )
 
 __all__ = [
+    "ASE",
     "CGS",
     "SI",
     "AnySystem",

@@ -925,6 +925,9 @@ ms: _TimeUnit
 ase_time: _TimeUnit
 ase_velocity: _VelocityUnit
 ase_momentum: _MomentumUnit
+per_ase_time: _InverseTimeUnit
+frequency_per_ase_time: _FrequencyUnit
+kelvin_per_ase_time: _TemperatureRateUnit
 kilojoule: _EnergyUnit
 kJ: _EnergyUnit
 kilocalorie: _EnergyUnit
@@ -953,6 +956,7 @@ eV_fs2_per_angstrom5: _MassDensityUnit
 gram_per_cubic_centimeter: _MassDensityUnit
 kilogram_per_cubic_meter: _MassDensityUnit
 electron_mass_per_bohr_cubed: _MassDensityUnit
+dalton_per_cubic_angstrom: _MassDensityUnit
 eV_fs_per_angstrom: _MomentumUnit
 eV_ps_per_angstrom: _MomentumUnit
 kcal_per_mol_fs_per_angstrom: _MomentumUnit
@@ -964,6 +968,7 @@ angstrom_per_ps2: _AccelerationUnit
 meter_per_second_squared: _AccelerationUnit
 centimeter_per_second_squared: _AccelerationUnit
 atomic_acceleration: _AccelerationUnit
+ase_acceleration: _AccelerationUnit
 elementary_charge: _ChargeUnit
 e: _ChargeUnit
 coulomb: _ChargeUnit
@@ -997,6 +1002,7 @@ kcal_per_mol_fs: _ActionUnit
 joule_second: _ActionUnit
 erg_second: _ActionUnit
 atomic_action: _ActionUnit
+ase_action: _ActionUnit
 
 class _DimensionlessNamespace:
     @property
@@ -1229,6 +1235,8 @@ class _TemperatureRateNamespace:
     def kelvin_per_second(self) -> _TemperatureRateUnit: ...
     @property
     def kelvin_per_atomic_time(self) -> _TemperatureRateUnit: ...
+    @property
+    def kelvin_per_ase_time(self) -> _TemperatureRateUnit: ...
 
 temperature_rate: _TemperatureRateNamespace
 
@@ -1298,6 +1306,8 @@ class _FrequencyNamespace:
     @property
     def frequency_per_atomic_time(self) -> _FrequencyUnit: ...
     @property
+    def frequency_per_ase_time(self) -> _FrequencyUnit: ...
+    @property
     def inverse_centimeter(self) -> _FrequencyUnit: ...
 
 frequency: _FrequencyNamespace
@@ -1311,6 +1321,8 @@ class _InverseTimeNamespace:
     def per_second(self) -> _InverseTimeUnit: ...
     @property
     def per_atomic_time(self) -> _InverseTimeUnit: ...
+    @property
+    def per_ase_time(self) -> _InverseTimeUnit: ...
 
 inverse_time: _InverseTimeNamespace
 
@@ -1351,6 +1363,8 @@ class _MassDensityNamespace:
     def kilogram_per_cubic_meter(self) -> _MassDensityUnit: ...
     @property
     def electron_mass_per_bohr_cubed(self) -> _MassDensityUnit: ...
+    @property
+    def dalton_per_cubic_angstrom(self) -> _MassDensityUnit: ...
 
 mass_density: _MassDensityNamespace
 
@@ -1383,6 +1397,8 @@ class _AccelerationNamespace:
     def centimeter_per_second_squared(self) -> _AccelerationUnit: ...
     @property
     def atomic_acceleration(self) -> _AccelerationUnit: ...
+    @property
+    def ase_acceleration(self) -> _AccelerationUnit: ...
 
 acceleration: _AccelerationNamespace
 
@@ -1461,6 +1477,8 @@ class _ActionNamespace:
     def erg_second(self) -> _ActionUnit: ...
     @property
     def atomic_action(self) -> _ActionUnit: ...
+    @property
+    def ase_action(self) -> _ActionUnit: ...
 
 action: _ActionNamespace
 
@@ -1498,6 +1516,8 @@ __all__ = [
     "angstrom_per_ps2",
     "angstrom_squared",
     "area",
+    "ase_acceleration",
+    "ase_action",
     "ase_momentum",
     "ase_time",
     "ase_velocity",
@@ -1535,6 +1555,7 @@ __all__ = [
     "cubic_centimeter",
     "cubic_meter",
     "dalton",
+    "dalton_per_cubic_angstrom",
     "debye",
     "deg",
     "degC",
@@ -1599,6 +1620,7 @@ __all__ = [
     "force",
     "force_constant",
     "frequency",
+    "frequency_per_ase_time",
     "frequency_per_atomic_time",
     "frequency_per_fs",
     "fs",
@@ -1635,6 +1657,7 @@ __all__ = [
     "kcal_per_mol_per_e",
     "kcal_per_mol_per_kelvin",
     "kelvin",
+    "kelvin_per_ase_time",
     "kelvin_per_atomic_time",
     "kelvin_per_fs",
     "kelvin_per_ps",
@@ -1677,6 +1700,7 @@ __all__ = [
     "one",
     "particle_density",
     "pascal",
+    "per_ase_time",
     "per_atomic_time",
     "per_fs",
     "per_ps",

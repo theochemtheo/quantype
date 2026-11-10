@@ -6,7 +6,7 @@ Every quantity carries three things:
 | --- | --- | --- |
 | **Kind** | the quantity class | `Length`, `Pressure` |
 | **Storage** | the first type parameter | `float`, `npt.NDArray[np.float64]`, `jax.Array` |
-| **Unit system** | the second type parameter | `NoSystem` (default), `Atomistic`, `SI`, `Metal`, or your own |
+| **Unit system** | the second type parameter | `NoSystem` (default), `Atomistic`, `ASE`, `SI`, `Metal`, or your own |
 
 `Length[float]`, which is `Length[float, NoSystem]`, keeps its numbers in the
 unit it was given in and has no `.value`. In a unit system, `.value` holds the
@@ -124,6 +124,7 @@ rescales by a constant factor. The built-in systems are in `quantype.systems`:
 | System | Length | Energy | Time | Charge | Magnetic moment | Own units |
 | --- | --- | --- | --- | --- | --- | --- |
 | `Atomistic` | Å | eV | fs | e | μB | mass Da, density g/cm³ |
+| `ASE` | Å | eV | Å √(amu/eV) ≈ 10.18 fs | e | μB | |
 | `Metal` (LAMMPS) | Å | eV | ps | e | μB | mass g/mol, pressure bar, density g/cm³ |
 | `Real` (LAMMPS) | Å | kcal/mol | fs | e | μB | mass g/mol, pressure atm, electric field V/Å, density g/cm³ |
 | `SI` | m | J | s | C | A·m² | |
@@ -156,25 +157,33 @@ kinetic = 0.5 * m * v**2  # rescaled into eV: 1 Da Å²/fs² ≈ 103.6 eV
 assert kinetic.value == pytest.approx(0.0621856)
 ```
 
-ASE keeps its units coherent by deriving time instead. Its time unit,
-`u.ase_time` (Å √(amu/eV)), is about 10.18 fs. `atoms.get_velocities()` returns
-`u.ase_velocity` (√(eV/amu)), and `atoms.get_momenta()` returns `u.ase_momentum`
-(√(amu eV)), so those arrays wrap as they are:
+ASE keeps its units coherent by deriving time instead. With Å and eV, its time
+unit, Å √(amu/eV) (`u.ase_time`, about 10.18 fs), makes the coherent mass unit
+the dalton. The `ASE` system stores every kind in those units, so the arrays an
+`ase.Atoms` returns wrap with `from_value` as they are, and arithmetic between
+them doesn't rescale. Velocities are in `u.ase_velocity` (√(eV/amu)) and momenta
+in `u.ase_momentum` (√(amu eV)):
 
 ```python
 import numpy as np
-import numpy.typing as npt
 import pytest
 
-from quantype import Mass, Momentum, Velocity, u
+from quantype import Mass, Velocity, u
+from quantype.systems import ASE
 
-raw_velocities = np.array([[0.5, 0.0, 0.0]])  # from atoms.get_velocities()
-v = Velocity[npt.NDArray[np.float64]](raw_velocities, u.ase_velocity)
-assert v.magnitude(u.angstrom_per_fs)[0, 0] == pytest.approx(0.0491135)
-p = Mass[float](12, u.Da) * v
-assert isinstance(p, Momentum)
-np.testing.assert_allclose(p.magnitude(u.ase_momentum), [[6.0, 0.0, 0.0]])
+raw_masses = np.array([[1.008], [15.999]])  # atoms.get_masses()[:, None]
+raw_velocities = np.array([[0.5, 0.0, 0.0], [0.0, 0.1, 0.0]])  # get_velocities()
+masses = Mass.from_value(raw_masses, ASE)
+velocities = Velocity.from_value(raw_velocities, ASE)
+momenta = masses * velocities
+np.testing.assert_array_equal(momenta.value, raw_masses * raw_velocities)
+assert velocities.magnitude(u.angstrom_per_fs)[0, 0] == pytest.approx(0.0491135)
 ```
+
+`ase.units` uses CODATA 2014, and quantype uses 2022 unless you
+[choose another edition](#codata-edition). The two editions' `u.ase_time`
+differ by about 5 parts in 10⁹. Set `QUANTYPE_CODATA=2014` to match ASE's
+values.
 
 ```python
 import pytest
@@ -592,6 +601,7 @@ means only the squares fall outside it.
 | System | float32 | float64 |
 |---|---|---|
 | `Atomistic` | safe | safe |
+| `ASE` | safe | safe |
 | `Metal` | safe | safe |
 | `Real` | safe | safe |
 | `SI` | Acceleration², Action², Area², Charge², DipoleMoment², ElectronDensity², EnergyPerAtom², Energy², Entropy², MagneticMoment², Mass², Momentum², ParticleDensity², Volume² | safe |

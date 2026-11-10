@@ -6,6 +6,19 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- `ASE`, a unit system in ASE's units: Å, eV, and Å √(amu/eV) (about
+  10.18 fs). With that time unit the coherent mass unit is the dalton, so
+  `ASE` stores every kind coherently and its arithmetic doesn't rescale.
+  Arrays from `ase.Atoms` wrap as they are:
+  `Velocity.from_value(atoms.get_velocities(), ASE)`. Mass density is in
+  Da/Å³ and pressure in eV/Å³, the units of ASE's stress. `ase.units` uses
+  CODATA 2014; set `QUANTYPE_CODATA=2014` to match its values.
+- Catalogue units for the kinds that `ASE` derives from its time unit:
+  `ase_acceleration`, `ase_action`, `per_ase_time`, `frequency_per_ase_time`,
+  `kelvin_per_ase_time`, and `dalton_per_cubic_angstrom`.
+
 ## [0.3.0] - 2026-10-15
 
 Quantities no longer have a unit system unless you choose one.

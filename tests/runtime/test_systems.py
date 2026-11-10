@@ -33,6 +33,7 @@ from quantype._internal._unit import known_kinds
 from quantype.core import get_unit
 from quantype.serialization import load_npz, save_npz
 from quantype.systems import (
+    ASE,
     CGS,
     SI,
     Atomic,
@@ -44,7 +45,7 @@ from quantype.systems import (
     UnitSystem,
 )
 
-BUILTIN = (Atomistic, Metal, Real, SI, CGS, Atomic)
+BUILTIN = (Atomistic, ASE, Metal, Real, SI, CGS, Atomic)
 DOCS = Path(__file__).parents[2] / "docs" / "units.md"
 
 # GROMACS uses kJ/mol, which is not a catalogue unit: define it first.
@@ -99,6 +100,7 @@ def test_builtin_systems_name_every_builtin_kind(system: type[UnitSystem]) -> No
     ("system", "expected"),
     [
         (Atomistic, ("angstrom", "electron_volt", "femtosecond", "bohr_magneton")),
+        (ASE, ("angstrom", "electron_volt", "ase_time", "bohr_magneton")),
         (Metal, ("angstrom", "electron_volt", "picosecond", "bohr_magneton")),
         (Real, ("angstrom", "kcal_per_mol", "femtosecond", "bohr_magneton")),
         (SI, ("meter", "joule", "second", "ampere_meter_squared")),
@@ -291,7 +293,7 @@ def test_float32_range_by_system() -> None:
         for system in BUILTIN
     }
     assert flagged["Atomistic"] == flagged["Metal"] == flagged["Real"] == set()
-    assert flagged["Atomic"] == set()
+    assert flagged["ASE"] == flagged["Atomic"] == set()
     assert {"Energy", "Volume"} <= flagged["SI"]
     energy = next(i for i in SI.check_range("float32") if i.kind == "Energy")
     assert energy.squared

@@ -43,6 +43,7 @@ if TYPE_CHECKING:
 # pyright: reportPrivateUsage=false
 
 __all__ = [
+    "ASE",
     "CGS",
     "SI",
     "AnySystem",
@@ -621,6 +622,14 @@ class Atomistic(UnitSystem, name="atomistic"):
     overrides = _catalogue_overrides(*ATOMISTIC_OVERRIDES)
 
 
+class ASE(UnitSystem, name="ase"):
+    """ASE's units: Å, eV, Å √(amu/eV) ≈ 10.18 fs, e; coherent, so mass is Da."""
+
+    length = _catalogue("angstrom", LengthKind)
+    energy = _catalogue("electron_volt", EnergyKind)
+    time = _catalogue("ase_time", TimeKind)
+
+
 class Metal(UnitSystem, name="metal"):
     """LAMMPS ``units metal``: Å, eV, ps, e; mass g/mol, pressure bar, g/cm³."""
 
@@ -675,7 +684,9 @@ class Atomic(UnitSystem, name="atomic"):
 _deferred_validation = False
 
 # A product without a system shows in the first of these that stores each
-# operand's kind in that operand's unit, else in Atomistic.
+# operand's kind in that operand's unit, else in Atomistic. ASE is left out: it
+# is the only one that derives Da from its base units, so simplified() would
+# rewrite every dalton in ASE's time unit.
 DISPLAY_SYSTEMS: tuple[type[UnitSystem], ...] = (
     Atomistic,
     Metal,

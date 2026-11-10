@@ -98,8 +98,8 @@ of the one it's combined with, so `si + length` is in `SI`. Reading `.value`
 without a system, or adding `si` to `x`, is a type error and a runtime
 `TypeError`.
 
-The built-in systems are `Atomistic` (Å, eV, and fs), `SI`, `CGS`, Hartree
-`Atomic`, and LAMMPS's `Metal` and `Real`. You can also
+The built-in systems are `Atomistic` (Å, eV, and fs), `ASE`, `SI`, `CGS`,
+Hartree `Atomic`, and LAMMPS's `Metal` and `Real`. You can also
 [define your own](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md).
 `Metal` and `Real` store each kind in the unit LAMMPS documents for it, so
 `from_value` wraps raw LAMMPS numbers as they are.

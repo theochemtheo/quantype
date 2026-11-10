@@ -29,10 +29,11 @@ from quantype import (
     u,
 )
 from quantype._internal._registry import close_relations, unit_specs
+from quantype._internal._systems import overridden_kinds
 from quantype.catalogue import QuantitySpec, UnitSpec, builtin_catalogue
 from quantype.products import LengthMass
 from quantype.serialization import load_npz, save_npz
-from quantype.systems import SI, Atomistic, Metal, Real, UnitSystem
+from quantype.systems import ASE, SI, Atomistic, Metal, Real, UnitSystem
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -58,12 +59,6 @@ def test_atomistic_stores_mass_in_daltons() -> None:
     assert repr(Mass.from_value(1.0, Atomistic)) == "Mass(1.0 Da, Atomistic)"
 
 
-class Ase(UnitSystem, name="test-physics:ase"):
-    length = u.angstrom
-    energy = u.eV
-    time = u.ase_time
-
-
 def test_ase_units_make_daltons_coherent() -> None:
     fs = 1e5 * math.sqrt(1.66053906892e-27 / 1.602176634e-19)
     assert (1 * u.ase_time).magnitude(u.fs) == pytest.approx(fs, rel=1e-12)
@@ -86,13 +81,48 @@ def test_ase_units_make_daltons_coherent() -> None:
     )
 
 
-def test_a_system_on_ase_time_stores_ase_units() -> None:
-    assert Ase.unit_for(Mass) is u.dalton
-    assert Ase.unit_for(Velocity) is u.ase_velocity
-    assert Ase.unit_for(Momentum) is u.ase_momentum
-    velocities = Velocity.from_value(np.full(3, 0.5), Ase)
-    momenta = Mass[float, Ase](2, u.Da) * velocities
-    np.testing.assert_allclose(momenta.value, np.full(3, 1.0))
+def test_ase_stores_ase_units() -> None:
+    assert ASE.unit_for(Time) is u.ase_time
+    assert ASE.unit_for(Mass) is u.dalton
+    assert ASE.unit_for(MassDensity) is u.dalton_per_cubic_angstrom
+    assert ASE.unit_for(Velocity) is u.ase_velocity
+    assert ASE.unit_for(Momentum) is u.ase_momentum
+    assert ASE.unit_for(Acceleration) is u.ase_acceleration
+    assert ASE.unit_for(Pressure) is u.eV_per_angstrom_cubed
+    assert overridden_kinds(ASE) == {}
+    assert Time[float, ASE](1, u.ase_time).to_system(Atomistic).value == (
+        pytest.approx(10.1805, rel=1e-5)
+    )
+
+
+def test_ase_arrays_combine_without_rescaling() -> None:
+    masses = Mass.from_value(np.array([1.0, 12.0]), ASE)
+    velocities = Velocity.from_value(np.array([0.5, 2.0]), ASE)
+    forces = Force.from_value(np.array([3.0, 6.0]), ASE)
+    momenta = masses * velocities
+    np.testing.assert_array_equal(momenta.value, [0.5, 24.0])
+    kinetic = 0.5 * masses * velocities**2
+    assert isinstance(kinetic, Energy)
+    np.testing.assert_array_equal(kinetic.value, [0.125, 24.0])
+    accelerations = forces / masses
+    assert isinstance(accelerations, Acceleration)
+    np.testing.assert_array_equal(accelerations.value, [3.0, 0.5])
+    kicked = velocities + accelerations * Time[float, ASE](0.5, u.ase_time)
+    np.testing.assert_array_equal(kicked.value, [2.0, 2.25])
+    density = Mass[float, ASE](12, u.Da) / Volume[float, ASE](4, u.angstrom_cubed)
+    assert isinstance(density, MassDensity)
+    assert density.value == 3.0
+
+
+def test_ase_does_not_mix_with_atomistic() -> None:
+    ase: Any = Time[float, ASE](1, u.fs)
+    with pytest.raises(TypeError, match="Cannot combine ASE and Atomistic"):
+        _ = ase + Time[float, Atomistic](1, u.fs)
+
+
+def test_ase_products_show_in_ase_units() -> None:
+    momentum = Mass[float, ASE](12, u.Da) * Velocity[float, ASE](0.5, u.ase_velocity)
+    assert str(momentum) == "6.0 √(amu eV)"
 
 
 def test_atomistic_mass_arithmetic_rescales() -> None:

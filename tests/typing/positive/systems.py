@@ -16,16 +16,21 @@ from quantype import (
     Force,
     ForceConstant,
     Length,
+    Mass,
+    MassDensity,
+    Momentum,
     Temperature,
     TemperatureDifference,
     Time,
     Velocity,
+    Volume,
     ujax,
     utorch,
 )
 from quantype import units as u
 from quantype.products import LengthTime
 from quantype.systems import (
+    ASE,
     SI,
     AnySystem,
     Atomistic,
@@ -200,3 +205,18 @@ tx = Length[torch.Tensor, Metal](torch.tensor([1.0], requires_grad=True), u.angs
 assert_type(utorch.grad(harmonic_torch(tx), tx), Force[torch.Tensor, Metal])
 step = Time[float, Metal](1.0, u.fs)
 assert_type(step.to_system(SI), Time[float, SI])
+
+raw_masses: npt.NDArray[np.float64] = np.array([1.0, 12.0])
+raw_velocities: npt.NDArray[np.float64] = np.array([0.5, 2.0])
+masses = Mass.from_value(raw_masses, ASE)
+velocities = Velocity.from_value(raw_velocities, ASE)
+assert_type(masses, Mass[npt.NDArray[np.float64], ASE])
+assert_type(masses * velocities, Momentum[npt.NDArray[np.float64], ASE])
+assert_type(0.5 * masses * velocities**2, Energy[npt.NDArray[np.float64], ASE])
+assert_type(
+    Mass[float, ASE](12, u.Da) / Volume[float, ASE](4, u.angstrom_cubed),
+    MassDensity[float, ASE],
+)
+assert_type(
+    velocities.to_system(Atomistic), Velocity[npt.NDArray[np.float64], Atomistic]
+)

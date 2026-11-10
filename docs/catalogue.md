@@ -25,26 +25,26 @@ declared name, and the unit each built-in system stores it in. Each unit is on
 | `EnergyPerVolume` | energy / length³ | `energy_per_volume` (eV/Å^3); `energy_per_volume_kcal_per_mol_per_angstrom_cubed` (kcal/mol/Å^3); `energy_per_volume_joule_per_cubic_meter` (J/m^3); `energy_per_volume_erg_per_cubic_centimeter` (erg/cm^3); `energy_per_volume_hartree_per_bohr_cubed` (Ha/a0^3) |
 | `Temperature` | temperature | `kelvin` (K), `K`; `celsius` (°C), `degC` |
 | `TemperatureDifference` | temperature | `delta_kelvin` (ΔK), `delta_K`; `delta_celsius` (Δ°C), `delta_degC` |
-| `TemperatureRate` | temperature / time | `kelvin_per_fs` (K/fs); `kelvin_per_ps` (K/ps); `kelvin_per_second` (K/s); `kelvin_per_atomic_time` (K Eh/ħ) |
+| `TemperatureRate` | temperature / time | `kelvin_per_fs` (K/fs); `kelvin_per_ps` (K/ps); `kelvin_per_second` (K/s); `kelvin_per_atomic_time` (K Eh/ħ); `kelvin_per_ase_time` (K √(eV/amu)/Å) |
 | `MagneticMoment` | magnetic moment | `bohr_magneton` (μB), `mu_B`; `ampere_meter_squared` (A m^2); `erg_per_gauss` (erg/G); `atomic_magnetic_moment` (eħ/me) |
 | `Magnetization` | magnetic moment / length³ | `bohr_magneton_per_angstrom_cubed` (μB/Å^3); `ampere_per_meter` (A/m); `emu_per_cubic_centimeter` (emu/cm^3); `atomic_magnetization` (eħ/me/a0^3) |
 | `ParticleDensity` | atom / length³ | `atom_per_angstrom_cubed` (atom/Å^3); `atom_per_cubic_meter` (atom/m^3); `atom_per_cubic_centimeter` (atom/cm^3); `atom_per_bohr_cubed` (atom/a0^3) |
 | `ElectronDensity` | electron / length³ | `electron_per_angstrom_cubed` (electron/Å^3); `electron_per_cubic_meter` (electron/m^3); `electron_per_cubic_centimeter` (electron/cm^3); `electron_per_bohr_cubed` (electron/a0^3) |
 | `Angle` | dimensionless | `radian` (rad), `rad`; `degree` (°), `deg` |
-| `Frequency` | 1 / time | `frequency_per_fs` (fs^-1); `terahertz` (THz), `THz`; `hertz` (Hz), `Hz`; `frequency_per_atomic_time` (Eh/ħ); `inverse_centimeter` (cm^-1) |
-| `InverseTime` | 1 / time | `per_fs` (fs^-1); `per_ps` (ps^-1); `per_second` (s^-1); `per_atomic_time` (Eh/ħ) |
+| `Frequency` | 1 / time | `frequency_per_fs` (fs^-1); `terahertz` (THz), `THz`; `hertz` (Hz), `Hz`; `frequency_per_atomic_time` (Eh/ħ); `frequency_per_ase_time` (√(eV/amu)/Å); `inverse_centimeter` (cm^-1) |
+| `InverseTime` | 1 / time | `per_fs` (fs^-1); `per_ps` (ps^-1); `per_second` (s^-1); `per_atomic_time` (Eh/ħ); `per_ase_time` (√(eV/amu)/Å) |
 | `AtomCount` | atom | `atom` (atom) |
 | `ElectronCount` | electron | `electron` (electron) |
 | `Mass` | energy time² / length² | `eV_fs2_per_angstrom2` (eV fs^2/Å^2); `dalton` (Da), `Da`, `amu`; `gram_per_mole` (g/mol); `kilogram` (kg), `kg`; `gram` (g), `g`; `electron_mass` (m_e), `m_e` |
-| `MassDensity` | energy time² / length⁵ | `eV_fs2_per_angstrom5` (eV fs^2/Å^5); `gram_per_cubic_centimeter` (g/cm^3); `kilogram_per_cubic_meter` (kg/m^3); `electron_mass_per_bohr_cubed` (m_e/a0^3) |
+| `MassDensity` | energy time² / length⁵ | `eV_fs2_per_angstrom5` (eV fs^2/Å^5); `gram_per_cubic_centimeter` (g/cm^3); `kilogram_per_cubic_meter` (kg/m^3); `electron_mass_per_bohr_cubed` (m_e/a0^3); `dalton_per_cubic_angstrom` (Da/Å^3) |
 | `Momentum` | energy time / length | `ase_momentum` (√(amu eV)); `eV_fs_per_angstrom` (eV fs/Å); `eV_ps_per_angstrom` (eV ps/Å); `kcal_per_mol_fs_per_angstrom` (kcal/mol fs/Å); `kilogram_meter_per_second` (kg m/s); `gram_centimeter_per_second` (g cm/s); `atomic_momentum` (ħ/a0) |
-| `Acceleration` | length / time² | `angstrom_per_fs2` (Å/fs^2); `angstrom_per_ps2` (Å/ps^2); `meter_per_second_squared` (m/s^2); `centimeter_per_second_squared` (cm/s^2); `atomic_acceleration` (a0 Eh^2/ħ^2) |
+| `Acceleration` | length / time² | `angstrom_per_fs2` (Å/fs^2); `angstrom_per_ps2` (Å/ps^2); `meter_per_second_squared` (m/s^2); `centimeter_per_second_squared` (cm/s^2); `atomic_acceleration` (a0 Eh^2/ħ^2); `ase_acceleration` (eV/(Å amu)) |
 | `Charge` | charge | `elementary_charge` (e), `e`; `coulomb` (C), `C`; `statcoulomb` (statC), `statC` |
 | `ElectricPotential` | energy / charge | `volt` (V), `V`; `kcal_per_mol_per_e` (kcal/mol/e); `statvolt` (statV), `statV`; `hartree_per_e` (Ha/e) |
 | `ElectricField` | energy / length charge | `volt_per_angstrom` (V/Å); `volt_per_meter` (V/m); `statvolt_per_centimeter` (statV/cm); `atomic_electric_field` (Ha/(e a0)) |
 | `DipoleMoment` | length charge | `e_angstrom` (e Å); `debye` (D), `D`; `coulomb_meter` (C m); `statcoulomb_centimeter` (statC cm); `e_bohr` (e a0) |
 | `Entropy` | energy / temperature | `eV_per_kelvin` (eV/K); `joule_per_kelvin` (J/K); `erg_per_kelvin` (erg/K); `kcal_per_mol_per_kelvin` (kcal/mol/K); `hartree_per_kelvin` (Ha/K) |
-| `Action` | energy time | `eV_fs` (eV fs); `eV_ps` (eV ps); `kcal_per_mol_fs` (kcal/mol fs); `joule_second` (J s); `erg_second` (erg s); `atomic_action` (ħ) |
+| `Action` | energy time | `eV_fs` (eV fs); `eV_ps` (eV ps); `kcal_per_mol_fs` (kcal/mol fs); `joule_second` (J s); `erg_second` (erg s); `atomic_action` (ħ); `ase_action` (Å √(amu eV)) |
 
 ## Named products and quotients
 
@@ -143,40 +143,40 @@ Each product also names the quotients that undo it. Any other product or quotien
 
 `.value` is in these units, and `System.unit_for(Kind)` returns them. A star marks a unit the system sets directly instead of deriving it from its base units, as LAMMPS does for pressure. Arithmetic that produces or consumes those kinds rescales.
 
-| Kind | `Atomistic` | `Metal` | `Real` | `SI` | `CGS` | `Atomic` |
-| --- | --- | --- | --- | --- | --- | --- |
-| `Dimensionless` | 1 | 1 | 1 | 1 | 1 | 1 |
-| `Length` | Å | Å | Å | m | cm | a0 |
-| `Area` | Å^2 | Å^2 | Å^2 | m^2 | cm^2 | a0^2 |
-| `Volume` | Å^3 | Å^3 | Å^3 | m^3 | cm^3 | a0^3 |
-| `Time` | fs | ps | fs | s | s | ħ/Eh |
-| `Velocity` | Å/fs | Å/ps | Å/fs | m/s | cm/s | a0 Eh/ħ |
-| `Energy` | eV | eV | kcal/mol | J | erg | Ha |
-| `EnergyPerAtom` | eV/atom | eV/atom | kcal/mol/atom | J/atom | erg/atom | Ha/atom |
-| `Force` | eV/Å | eV/Å | kcal/mol/Å | N | dyn | Ha/a0 |
-| `ForceConstant` | eV/Å^2 | eV/Å^2 | kcal/mol/Å^2 | N/m | dyn/cm | Ha/a0^2 |
-| `Pressure` | eV/Å^3 | bar* | atm* | Pa | Ba | Ha/a0^3 |
-| `EnergyDensity` | eV/Å^3 | eV/Å^3 | kcal/mol/Å^3 | J/m^3 | erg/cm^3 | Ha/a0^3 |
-| `EnergyPerVolume` | eV/Å^3 | eV/Å^3 | kcal/mol/Å^3 | J/m^3 | erg/cm^3 | Ha/a0^3 |
-| `Temperature` | K | K | K | K | K | K |
-| `TemperatureDifference` | ΔK | ΔK | ΔK | ΔK | ΔK | ΔK |
-| `TemperatureRate` | K/fs | K/ps | K/fs | K/s | K/s | K Eh/ħ |
-| `MagneticMoment` | μB | μB | μB | A m^2 | erg/G | eħ/me |
-| `Magnetization` | μB/Å^3 | μB/Å^3 | μB/Å^3 | A/m | emu/cm^3 | eħ/me/a0^3 |
-| `ParticleDensity` | atom/Å^3 | atom/Å^3 | atom/Å^3 | atom/m^3 | atom/cm^3 | atom/a0^3 |
-| `ElectronDensity` | electron/Å^3 | electron/Å^3 | electron/Å^3 | electron/m^3 | electron/cm^3 | electron/a0^3 |
-| `Angle` | rad | rad | rad | rad | rad | rad |
-| `Frequency` | fs^-1 | THz | fs^-1 | Hz | Hz | Eh/ħ |
-| `InverseTime` | fs^-1 | ps^-1 | fs^-1 | s^-1 | s^-1 | Eh/ħ |
-| `AtomCount` | atom | atom | atom | atom | atom | atom |
-| `ElectronCount` | electron | electron | electron | electron | electron | electron |
-| `Mass` | Da* | g/mol* | g/mol* | kg | g | m_e |
-| `MassDensity` | g/cm^3* | g/cm^3* | g/cm^3* | kg/m^3 | g/cm^3 | m_e/a0^3 |
-| `Momentum` | eV fs/Å | eV ps/Å | kcal/mol fs/Å | kg m/s | g cm/s | ħ/a0 |
-| `Acceleration` | Å/fs^2 | Å/ps^2 | Å/fs^2 | m/s^2 | cm/s^2 | a0 Eh^2/ħ^2 |
-| `Charge` | e | e | e | C | statC | e |
-| `ElectricPotential` | V | V | kcal/mol/e | V | statV | Ha/e |
-| `ElectricField` | V/Å | V/Å | V/Å* | V/m | statV/cm | Ha/(e a0) |
-| `DipoleMoment` | e Å | e Å | e Å | C m | statC cm | e a0 |
-| `Entropy` | eV/K | eV/K | kcal/mol/K | J/K | erg/K | Ha/K |
-| `Action` | eV fs | eV ps | kcal/mol fs | J s | erg s | ħ |
+| Kind | `Atomistic` | `ASE` | `Metal` | `Real` | `SI` | `CGS` | `Atomic` |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `Dimensionless` | 1 | 1 | 1 | 1 | 1 | 1 | 1 |
+| `Length` | Å | Å | Å | Å | m | cm | a0 |
+| `Area` | Å^2 | Å^2 | Å^2 | Å^2 | m^2 | cm^2 | a0^2 |
+| `Volume` | Å^3 | Å^3 | Å^3 | Å^3 | m^3 | cm^3 | a0^3 |
+| `Time` | fs | Å √(amu/eV) | ps | fs | s | s | ħ/Eh |
+| `Velocity` | Å/fs | √(eV/amu) | Å/ps | Å/fs | m/s | cm/s | a0 Eh/ħ |
+| `Energy` | eV | eV | eV | kcal/mol | J | erg | Ha |
+| `EnergyPerAtom` | eV/atom | eV/atom | eV/atom | kcal/mol/atom | J/atom | erg/atom | Ha/atom |
+| `Force` | eV/Å | eV/Å | eV/Å | kcal/mol/Å | N | dyn | Ha/a0 |
+| `ForceConstant` | eV/Å^2 | eV/Å^2 | eV/Å^2 | kcal/mol/Å^2 | N/m | dyn/cm | Ha/a0^2 |
+| `Pressure` | eV/Å^3 | eV/Å^3 | bar* | atm* | Pa | Ba | Ha/a0^3 |
+| `EnergyDensity` | eV/Å^3 | eV/Å^3 | eV/Å^3 | kcal/mol/Å^3 | J/m^3 | erg/cm^3 | Ha/a0^3 |
+| `EnergyPerVolume` | eV/Å^3 | eV/Å^3 | eV/Å^3 | kcal/mol/Å^3 | J/m^3 | erg/cm^3 | Ha/a0^3 |
+| `Temperature` | K | K | K | K | K | K | K |
+| `TemperatureDifference` | ΔK | ΔK | ΔK | ΔK | ΔK | ΔK | ΔK |
+| `TemperatureRate` | K/fs | K √(eV/amu)/Å | K/ps | K/fs | K/s | K/s | K Eh/ħ |
+| `MagneticMoment` | μB | μB | μB | μB | A m^2 | erg/G | eħ/me |
+| `Magnetization` | μB/Å^3 | μB/Å^3 | μB/Å^3 | μB/Å^3 | A/m | emu/cm^3 | eħ/me/a0^3 |
+| `ParticleDensity` | atom/Å^3 | atom/Å^3 | atom/Å^3 | atom/Å^3 | atom/m^3 | atom/cm^3 | atom/a0^3 |
+| `ElectronDensity` | electron/Å^3 | electron/Å^3 | electron/Å^3 | electron/Å^3 | electron/m^3 | electron/cm^3 | electron/a0^3 |
+| `Angle` | rad | rad | rad | rad | rad | rad | rad |
+| `Frequency` | fs^-1 | √(eV/amu)/Å | THz | fs^-1 | Hz | Hz | Eh/ħ |
+| `InverseTime` | fs^-1 | √(eV/amu)/Å | ps^-1 | fs^-1 | s^-1 | s^-1 | Eh/ħ |
+| `AtomCount` | atom | atom | atom | atom | atom | atom | atom |
+| `ElectronCount` | electron | electron | electron | electron | electron | electron | electron |
+| `Mass` | Da* | Da | g/mol* | g/mol* | kg | g | m_e |
+| `MassDensity` | g/cm^3* | Da/Å^3 | g/cm^3* | g/cm^3* | kg/m^3 | g/cm^3 | m_e/a0^3 |
+| `Momentum` | eV fs/Å | √(amu eV) | eV ps/Å | kcal/mol fs/Å | kg m/s | g cm/s | ħ/a0 |
+| `Acceleration` | Å/fs^2 | eV/(Å amu) | Å/ps^2 | Å/fs^2 | m/s^2 | cm/s^2 | a0 Eh^2/ħ^2 |
+| `Charge` | e | e | e | e | C | statC | e |
+| `ElectricPotential` | V | V | V | kcal/mol/e | V | statV | Ha/e |
+| `ElectricField` | V/Å | V/Å | V/Å | V/Å* | V/m | statV/cm | Ha/(e a0) |
+| `DipoleMoment` | e Å | e Å | e Å | e Å | C m | statC cm | e a0 |
+| `Entropy` | eV/K | eV/K | eV/K | kcal/mol/K | J/K | erg/K | Ha/K |
+| `Action` | eV fs | Å √(amu eV) | eV ps | kcal/mol fs | J s | erg s | ħ |
