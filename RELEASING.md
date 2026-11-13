@@ -1,8 +1,9 @@
 # Releasing
 
 A release is cut by pushing a version tag. The `release.yml` workflow then
-builds the wheel and sdist, publishes them to PyPI through trusted publishing,
-and creates the GitHub Release, with notes from this version's `CHANGELOG.md`
+builds the wheel and sdist, publishes them to PyPI through trusted publishing
+with a SLSA provenance and a publish attestation for each file, and creates the
+GitHub Release, with notes from this version's `CHANGELOG.md`
 section and the built artifacts attached. The tag is the only manual trigger.
 
 ## Steps
