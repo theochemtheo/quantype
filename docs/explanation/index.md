@@ -1,6 +1,6 @@
-# Explanation
+# Concepts
 
-[The physical model](physical-model.md) explains why Quantype separates nominal
+[The physical model](physical-model.md) explains why quantype separates nominal
 kinds from dimensions, how declared relations name products, and why presentation
 units do not control numerical storage. Read it when a dimensionally plausible
 operation is rejected or you need to choose a numerical boundary.

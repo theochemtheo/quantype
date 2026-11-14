@@ -12,6 +12,9 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   search, visible callouts, a linked glossary, Markdown exports, and a curated
   agent index. Local editorial and production-path previews are available through
   `just docs-serve` and `just docs-preview`; publication remains separately gated.
+- Ledger / Glacier documentation styling with self-hosted Atkinson Hyperlegible
+  and Iosevka fonts, dark/light palettes, ruled sections, and responsive code
+  blocks.
 
 ### Changed
 

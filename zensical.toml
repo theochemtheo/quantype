@@ -1,5 +1,5 @@
 [project]
-site_name = "Quantype · development"
+site_name = "quantype · development"
 site_description = "Development documentation for typed physical quantities, unit systems, and differentiable scientific Python."
 site_url = "https://theochemtheo.github.io/quantype/"
 repo_url = "https://github.com/theochemtheo/quantype"
@@ -8,7 +8,10 @@ docs_dir = "docs"
 site_dir = "site"
 dev_addr = "127.0.0.1:8765"
 copyright = "Development documentation for main, not the latest PyPI release. Build identity is on the homepage."
-watch = ["pyproject.toml", "scripts/docs_metadata.py"]
+watch = ["pyproject.toml", "scripts/docs_metadata.py", "CHANGELOG.md"]
+extra_css = [
+  "stylesheets/glacier.css",
+]
 exclude_docs = """
 /proposals/
 /design/
@@ -17,7 +20,8 @@ exclude_docs = """
 """
 nav = [
   { "Home" = "index.md" },
-  { "Tutorials" = [{ "Getting started" = "tutorials/getting-started.md" }] },
+  { "Changelog" = "changelog.md" },
+  { "Getting started" = "tutorials/getting-started.md" },
   { "How-to guides" = [
     { "Overview" = "how-to/index.md" },
     { "Work with arrays" = "how-to/arrays.md" },
@@ -31,6 +35,12 @@ nav = [
     { "Choose physical constants" = "how-to/choose-constants.md" },
     { "Define systems" = "how-to/define-systems.md" },
     { "Generate catalogues" = "how-to/custom-catalogues.md" },
+    { "Troubleshooting" = "troubleshooting.md" },
+  ] },
+  { "Concepts" = [
+    { "Overview" = "explanation/index.md" },
+    { "The physical model" = "explanation/physical-model.md" },
+    { "Glossary" = "explanation/glossary.md" },
   ] },
   { "Reference" = [
     { "Overview" = "reference/index.md" },
@@ -43,12 +53,6 @@ nav = [
     { "Quantity annotations" = "reference/type-annotations.md" },
     { "Built-in catalogue" = "reference/catalogue.md" },
   ] },
-  { "Explanation" = [
-    { "Overview" = "explanation/index.md" },
-    { "The physical model" = "explanation/physical-model.md" },
-    { "Glossary" = "explanation/glossary.md" },
-  ] },
-  { "Troubleshooting" = "troubleshooting.md" },
   { "Contributing" = [
     { "Development" = "contributing/development.md" },
     { "Architecture" = "contributing/architecture.md" },
@@ -73,17 +77,23 @@ nav = [
 ]
 
 [project.theme]
-features = ["navigation.sections", "navigation.path", "navigation.top", "content.code.copy", "content.action.copy", "content.tooltips"]
-
-[[project.theme.palette]]
-scheme = "default"
-toggle.icon = "lucide/sun"
-toggle.name = "Switch to dark mode"
+variant = "modern"
+font = false
+features = ["navigation.path", "navigation.top", "content.code.copy", "content.action.copy", "content.tooltips"]
 
 [[project.theme.palette]]
 scheme = "slate"
+primary = "custom"
+accent = "custom"
 toggle.icon = "lucide/moon"
 toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+scheme = "default"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
 
 [project.plugins.search]
 
@@ -107,6 +117,11 @@ markdown_description = "Development documentation for main, not the latest PyPI 
   { "how-to/custom-catalogues.md" = "Generate a separate nominal API with new kinds and relations." },
   { "troubleshooting.md" = "Resolve errors involving systems, units, coercion, or unsupported calls." },
 ]
+"Concepts" = [
+  { "explanation/index.md" = "Choose a conceptual explanation rather than a task recipe." },
+  { "explanation/physical-model.md" = "Understand nominal kinds, dimensions, structural algebra, and storage versus presentation." },
+  { "explanation/glossary.md" = "Look up kinds, dimensions, storage/display units, backends, and validation boundaries." },
+]
 "Exact reference" = [
   { "reference/index.md" = "Find authoritative public API contracts by concern." },
   { "reference/quantities.md" = "Construction, storage, conversion, copying, and physical algebra." },
@@ -118,21 +133,22 @@ markdown_description = "Development documentation for main, not the latest PyPI 
   { "reference/type-annotations.md" = "Inspect quantity annotations using quantity_type." },
   { "reference/catalogue.md" = "Generated built-in kinds, units, relations, and system storage." },
 ]
-"Explanation" = [
-  { "explanation/index.md" = "Choose a conceptual explanation rather than a task recipe." },
-  { "explanation/physical-model.md" = "Understand nominal kinds, dimensions, structural algebra, and storage versus presentation." },
-  { "explanation/glossary.md" = "Look up kinds, dimensions, storage/display units, backends, and validation boundaries." },
-]
 "Contributor guidance" = [
   { "contributing/development.md" = "Set up, verify, author examples, review, and prepare publication." },
   { "contributing/architecture.md" = "Locate authoritative sources and generated ownership." },
   { "contributing/design-principles.md" = "Apply repository engineering principles." },
+]
+"Release history" = [
+  { "changelog.md" = "Check released changes and unreleased development notes before upgrading." },
 ]
 
 [project.plugins.macros]
 module_name = "scripts/docs_metadata"
 on_error_fail = true
 on_undefined = "strict"
+
+[project.plugins.include-markdown]
+include_from_url = false
 
 [project.validation]
 invalid_links = true

@@ -128,6 +128,25 @@ For final all-example proof, install every backend with
 useful but not full proof. Full suite and coverage commands include Markdown;
 xdist uses file-based scheduling so a tutorial stays on one worker.
 
+### Site presentation
+
+`docs/stylesheets/glacier.css` owns the Ledger layout, Glacier palettes, and
+self-hosted Atkinson Hyperlegible/Iosevka font declarations. Keep the selected
+font binaries and their [Atkinson](../fonts/atkinson/OFL.txt) and
+[Iosevka](../fonts/iosevka/LICENSE.txt) licenses together under `docs/fonts/`.
+`zensical.toml` disables automatic Google Fonts loading and starts in dark mode;
+the palette control also supports light mode.
+Code blocks align with surrounding content at every screen size, retaining
+internal padding and the right-edge accent. Sidebar groups are collapsible;
+the current page's ancestry starts open.
+
+### Changelog source
+
+Edit the root `CHANGELOG.md`; `docs/changelog.md` includes it at build time using
+Zensical's native `include-markdown` support. Do not maintain a second copy of
+release notes. The preview watches the root file for updates. Use absolute
+repository URLs for source links so they work both on GitHub and in the site.
+
 ### Author examples
 
 Use plain, top-level `python` fences for scripts and `>>>` doctest transcripts.

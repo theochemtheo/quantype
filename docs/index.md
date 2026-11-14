@@ -1,4 +1,4 @@
-# Quantype
+# quantype
 
 Physical quantities whose **[kind](explanation/glossary.md#kind "A declared physical meaning, distinct from dimensions.") and [unit system](explanation/glossary.md#unit-system "A convention fixing the units of raw stored numbers.") are part of the type**.
 Use ordinary floats or NumPy, JAX, and Torch arrays; check physical algebra with
