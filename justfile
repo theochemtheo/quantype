@@ -38,8 +38,25 @@ check-generated:
     uv run scripts/generate_docs.py --check
 
 test:
-    uv run --all-extras pytest tests/runtime -n auto
+    uv run --all-extras pytest tests/runtime README.md docs -n auto --dist=loadfile
 
 coverage:
     uv sync --all-extras
     bash scripts/coverage.sh
+
+docs-serve:
+    uv run --locked --group docs zensical serve --open
+
+docs-test:
+    uv run --locked --no-default-groups --group test pytest README.md docs -rs
+
+docs-build:
+    uv run --locked --group docs zensical build --strict --clean
+
+docs-check: docs-test
+    uv run --locked scripts/generate_docs.py --check
+    uv run --locked just docs-build
+    uv run --locked --group docs python scripts/check_site.py
+
+docs-preview: docs-build
+    uv run --locked --group docs python scripts/docs.py

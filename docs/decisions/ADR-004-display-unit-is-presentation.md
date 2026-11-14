@@ -27,7 +27,7 @@ Chosen option: "remember the input unit as presentation only", because it fixes
 printing, `.magnitude()`, and configuration round trips without changing
 `.value` or JAX tree structure. A unit in pytree metadata made `lax.cond` fail
 when branches differed only in unit, and made `jit` retrace for each input
-unit. The prototypes are in [unit storage](../design/unit-storage.md).
+unit. The prototypes are in [unit storage](https://github.com/theochemtheo/quantype/blob/main/docs/design/unit-storage.md).
 
 Same-kind operations keep the display unit, with the left operand winning for
 `+` and `-`. A point minus a point in °C shows Δ°C. Products, ratios, and powers

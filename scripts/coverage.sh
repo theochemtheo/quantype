@@ -17,7 +17,7 @@ set -euo pipefail
 MIN="${COVERAGE_MIN:-98}"
 
 mkdir -p coverage
-uv run --no-sync pytest tests/runtime -n auto -p no:sugar \
+uv run --no-sync pytest tests/runtime README.md docs -n auto --dist=loadfile -p no:sugar \
     --cov --cov-report=html --cov-report=lcov --cov-report=term
 {
     echo "## Coverage"

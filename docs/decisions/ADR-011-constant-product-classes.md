@@ -43,4 +43,4 @@ first use.
 * Bad, because the package grows from 22 MB to 31 MB, and mypy's cold run takes
   2.4 to 2.9 s longer and about 400 MB more memory. Pyright, Pyrefly, and ty
   change by at most 0.13 s; mypy's edit loop by at most 0.13 s. The
-  measurements are in [naming table](../design/naming-table.md).
+  measurements are in [naming table](https://github.com/theochemtheo/quantype/blob/main/docs/design/naming-table.md).

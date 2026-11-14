@@ -29,7 +29,7 @@ and −2, has a product class, such as `LengthTime`, `VelocitySquared`, or
 `PerLength`, importable from `quantype.products`. `x * x` and `x ** 2` give the
 same class. A product with two possible names, such as `Force / Volume * Length`
 (`Pressure` or `EnergyDensity`), stays unnamed. The table's construction is in
-[naming table](../design/naming-table.md).
+[naming table](https://github.com/theochemtheo/quantype/blob/main/docs/design/naming-table.md).
 
 ### Consequences
 

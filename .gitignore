@@ -19,3 +19,7 @@ wheels/
 .coverage.*
 htmlcov/
 coverage/
+
+# Documentation build outputs
+site/
+.cache/

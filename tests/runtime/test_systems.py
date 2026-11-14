@@ -46,7 +46,7 @@ from quantype.systems import (
 )
 
 BUILTIN = (Atomistic, ASE, Metal, Real, SI, CGS, Atomic)
-DOCS = Path(__file__).parents[2] / "docs" / "units.md"
+DOCS = Path(__file__).parents[2] / "docs" / "reference" / "units.md"
 
 # GROMACS uses kJ/mol, which is not a catalogue unit: define it first.
 kilojoule_per_mole = Energy.define_unit(

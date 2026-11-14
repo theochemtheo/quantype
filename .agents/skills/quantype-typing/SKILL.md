@@ -20,7 +20,7 @@ Trace failures from the consumer expression to the selected overload and its gen
 - Static rejection of incompatible addition/conversion, invalid helper inputs and missing constructor units.
 - Bare constructors: `Quantity.__init__` overloads infer storage from `value: V` and never annotate `self`. mypy ignores explicit specialization (`Length[float, SI](...)`) when an `__init__` or `__new__` overload fixes the self or return type, and Pyrefly and ty reject class parameters in an `__init__` self type. Integers and lists therefore leave `V` open instead of claiming the float storage the unit gives them.
 - Overload fallbacks after per-kind or protocol overloads must not also match named kinds: `qnp` fallbacks and named kinds' operator fallbacks (`unnamed_fallback`) take only structural `Mul`/`Div`/`Pow` kinds. An overlapping fallback makes Pyright infer `Any`, and ty `Unknown` for an operand without a system, whenever array storage has `Any` in its shape.
-- Pyright and ty don't solve a protocol member's own type parameter against a caller's type variable, so `d / (1.0 * u.fs)` with `d: Length[float, S]` has no named result there; `docs/unit-systems.md` gives the workarounds.
+- Pyright and ty don't solve a protocol member's own type parameter against a caller's type variable, so `d / (1.0 * u.fs)` with `d: Length[float, S]` has no named result there; `docs/reference/systems.md` gives the workarounds.
 
 Generic left-operand fallback can hide a custom right operand's `__rmul__`. `tests/typing/probes/extension_operators.py` documents this limitation and is not a passing conformance fixture. For a supported extension, use a combined generated catalogue instead of assuming subclass overloads alter the built-in API.
 

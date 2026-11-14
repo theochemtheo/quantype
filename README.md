@@ -10,7 +10,8 @@ quantype makes physical dimensions and unit systems part of your types. mypy,
 Pyright, Pyrefly, and ty check them without a plugin, and the values underneath
 are still plain floats or NumPy, JAX, and Torch arrays.
 
-```python notest
+<!-- skip: next "Illustrative expressions; application supplies quantities and potential." -->
+```python
 force = energy / length  # Force[float]
 energy + length  # type error, and a TypeError at runtime
 gradient = ujax.grad(potential)(positions)  # Force[jax.Array]
@@ -93,14 +94,14 @@ assert pressure.magnitude(u.bar) == 1.0
 
 `Length[float]` is short for `Length[float, NoSystem]`. `.to_system(...)`
 converts the numbers into a system's units, and a quantity without a system
-[adopts the system](https://github.com/theochemtheo/quantype/blob/main/docs/units.md#unit-systems)
+[adopts the system](https://github.com/theochemtheo/quantype/blob/main/docs/reference/systems.md)
 of the one it's combined with, so `si + length` is in `SI`. Reading `.value`
 without a system, or adding `si` to `x`, is a type error and a runtime
 `TypeError`.
 
 The built-in systems are `Atomistic` (Å, eV, and fs), `ASE`, `SI`, `CGS`,
 Hartree `Atomic`, and LAMMPS's `Metal` and `Real`. You can also
-[define your own](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md).
+[define your own](https://github.com/theochemtheo/quantype/blob/main/docs/how-to/define-systems.md).
 `Metal` and `Real` store each kind in the unit LAMMPS documents for it, so
 `from_value` wraps raw LAMMPS numbers as they are.
 
@@ -126,6 +127,7 @@ take `.magnitude(unit)`, or `.value` in a unit system. `np.asarray(q)` raises.
 
 ## Autodiff
 
+<!-- requires: jax -->
 ```python
 import jax
 from typing import assert_type
@@ -146,7 +148,7 @@ force = -gradient
 The gradient of an `Energy` with respect to a `Length` is a `Force`, under `jit`
 too. Arguments after the first, such as `k`, pass through unchanged. The
 gradient is the positive derivative, so the physical force is `-gradient`.
-[Torch autograd, several inputs, and Hessians](https://github.com/theochemtheo/quantype/blob/main/docs/autodiff.md) work the same
+[Torch autograd, several inputs, and Hessians](https://github.com/theochemtheo/quantype/blob/main/docs/reference/autodiff.md) work the same
 way.
 
 ## Physical constants
@@ -164,7 +166,7 @@ assert repr(constants.k_B.to_system(SI)) == "Entropy(1.380649e-23 J/K, SI)"
 Constants have no unit system, so they adopt the system of the quantity they
 combine with: `k_B` times an SI temperature is an SI energy.
 Values are from CODATA 2022, vendored with quantype. CODATA 2014 and 2018 are
-[one setting away](https://github.com/theochemtheo/quantype/blob/main/docs/units.md#codata-edition).
+[one setting away](https://github.com/theochemtheo/quantype/blob/main/docs/how-to/choose-constants.md).
 
 ## Built-in kinds
 
@@ -177,11 +179,11 @@ Values are from CODATA 2022, vendored with quantype. CODATA 2014 and 2018 are
 | Thermal | `Temperature`, `TemperatureDifference`, `TemperatureRate`, `Entropy` |
 | Magnetism and counts | `MagneticMoment`, `Magnetization`, `AtomCount`, `ElectronCount`, `ParticleDensity`, `ElectronDensity`, `Dimensionless` |
 
-The [catalogue reference](https://github.com/theochemtheo/quantype/blob/main/docs/catalogue.md) lists every unit, the named
+The [catalogue reference](https://github.com/theochemtheo/quantype/blob/main/docs/reference/catalogue.md) lists every unit, the named
 products and quotients, and each system's units. You can
-[generate your own catalogue](https://github.com/theochemtheo/quantype/blob/main/docs/custom-catalogues.md) with new kinds,
+[generate your own catalogue](https://github.com/theochemtheo/quantype/blob/main/docs/how-to/custom-catalogues.md) with new kinds,
 relations, and units, or
-[define a unit](https://github.com/theochemtheo/quantype/blob/main/docs/units.md#define-a-unit-without-global-registration)
+[define a unit](https://github.com/theochemtheo/quantype/blob/main/docs/how-to/define-units.md)
 for an existing kind without one.
 
 ## Also included
@@ -194,14 +196,12 @@ for an existing kind without one.
 
 ## Documentation
 
-- [Getting started](https://github.com/theochemtheo/quantype/blob/main/docs/getting-started.md)
-- [Units, unit systems, and physical algebra](https://github.com/theochemtheo/quantype/blob/main/docs/units.md)
-- [Kinds and units reference](https://github.com/theochemtheo/quantype/blob/main/docs/catalogue.md)
-- [Defining unit systems and system-generic code](https://github.com/theochemtheo/quantype/blob/main/docs/unit-systems.md)
-- [Serialization: JSON, Pydantic, NPZ, and NPY](https://github.com/theochemtheo/quantype/blob/main/docs/serialization.md)
-- [JAX and Torch autodiff](https://github.com/theochemtheo/quantype/blob/main/docs/autodiff.md)
-- [Custom catalogues](https://github.com/theochemtheo/quantype/blob/main/docs/custom-catalogues.md)
-- [Development and conformance checks](https://github.com/theochemtheo/quantype/blob/main/docs/development.md)
+- [Getting started](https://github.com/theochemtheo/quantype/blob/main/docs/tutorials/getting-started.md)
+- [How-to guides](https://github.com/theochemtheo/quantype/blob/main/docs/how-to/index.md)
+- [API reference](https://github.com/theochemtheo/quantype/blob/main/docs/reference/index.md)
+- [Physical model](https://github.com/theochemtheo/quantype/blob/main/docs/explanation/physical-model.md)
+- [Troubleshooting](https://github.com/theochemtheo/quantype/blob/main/docs/troubleshooting.md)
+- [Development and conformance checks](https://github.com/theochemtheo/quantype/blob/main/docs/contributing/development.md)
 
 ## License
 

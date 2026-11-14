@@ -5,11 +5,11 @@ choice, and its consequences. A record's folder is its status.
 
 | Folder | Status |
 | --- | --- |
-| [`../proposals/`](../proposals/) | proposed |
+| [`../proposals/`](https://github.com/theochemtheo/quantype/tree/main/docs/proposals) | proposed |
 | `decisions/` | accepted |
-| [`superseded/`](superseded/) | replaced by a later decision |
+| [`superseded/`](https://github.com/theochemtheo/quantype/tree/main/docs/decisions/superseded) | replaced by a later decision |
 
-1. Copy [`_adr_template.md`](_adr_template.md) to
+1. Copy [`_adr_template.md`](https://github.com/theochemtheo/quantype/blob/main/docs/decisions/_adr_template.md) to
    `docs/proposals/<short-slug>.md` and write the proposal.
 2. When it is accepted, give it the next number and move it here as
    `ADR-NNN-<short-slug>.md`.

@@ -1,6 +1,6 @@
 docs/** linguist-documentation
 
-docs/catalogue.md linguist-generated
+docs/reference/catalogue.md linguist-generated
 src/quantype/_constants/** linguist-generated
 src/quantype/_generated.py linguist-generated
 src/quantype/_generated.pyi linguist-generated

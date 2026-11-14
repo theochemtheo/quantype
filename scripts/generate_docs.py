@@ -1,4 +1,4 @@
-"""Regenerate/check docs/catalogue.md, the reference of kinds, units and systems."""
+"""Regenerate/check docs/reference/catalogue.md: kinds, units, and systems."""
 
 import argparse
 from pathlib import Path
@@ -10,7 +10,7 @@ from quantype.catalogue import builtin_catalogue
 from quantype.codegen._render import unit_names
 from quantype.systems import ASE, CGS, SI, Atomic, Atomistic, Metal, Real
 
-TARGET = Path(__file__).resolve().parents[1] / "docs/catalogue.md"
+TARGET = Path(__file__).resolve().parents[1] / "docs/reference/catalogue.md"
 SYSTEMS = (Atomistic, ASE, Metal, Real, SI, CGS, Atomic)
 SUPERSCRIPTS = str.maketrans("-0123456789", "⁻⁰¹²³⁴⁵⁶⁷⁸⁹")
 AXES = {"magnetic_moment": "magnetic moment"}
@@ -75,7 +75,8 @@ def _relations() -> str:
     return (
         "Each product also names the quotients that undo it. Any other product or "
         "quotient of two kinds is a product class from `quantype.products`, such as "
-        "`LengthTime`; see [physical algebra](units.md#physical-algebra).\n\n"
+        "`LengthTime`; see [the physical model]"
+        "(../explanation/physical-model.md#kinds-are-nominal-meanings).\n\n"
         "**Products**\n\n"
         + "\n".join(f"- {line}" for line in sorted(products))
         + "\n\n**Quotients**\n\n"

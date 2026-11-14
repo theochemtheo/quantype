@@ -2,7 +2,7 @@
 
 Where each concern lives, which files are generated, and which tests cover them.
 Paths are relative to the repository root. The reasons behind the structure are
-in [decisions](decisions/).
+in [decisions](https://github.com/theochemtheo/quantype/tree/main/docs/decisions).
 
 | Concern | Authoritative source | Relevant checks |
 | --- | --- | --- |
@@ -10,13 +10,13 @@ in [decisions](decisions/).
 | Catalogue definition validation and immutable extension | `src/quantype/catalogue.py` | `test_codegen.py` |
 | Source rendering and formatted write/check | `src/quantype/codegen/_render.py`, `_package.py`, `__init__.py`; `scripts/generate.py` | `test_codegen.py`, `scripts/generate.py --check` |
 | Runtime semantic identities and expression trees | `src/quantype/_internal/_semantics.py` | `test_core.py`, `test_validation.py` |
-| Naming products by their factors ([ADR-005](decisions/ADR-005-products-named-by-factors.md), [ADR-006](decisions/ADR-006-protocol-dispatch-for-product-stubs.md), [ADR-011](decisions/ADR-011-constant-product-classes.md)) | `src/quantype/codegen/_table.py` (the table), `codegen/_products.py` (product stubs and `products.py`), `_internal/_products.py` (runtime product classes), `_internal/_semantics.py` (lookups) | `test_naming_table.py`, `tests/typing/positive/products.py` |
-| CODATA editions ([ADR-009](decisions/ADR-009-vendored-codata-one-edition-per-process.md)) | `src/quantype/codata.py`; generated `_internal/_codata.py` | `test_codata.py` |
+| Naming products by their factors ([ADR-005](https://github.com/theochemtheo/quantype/blob/main/docs/decisions/ADR-005-products-named-by-factors.md), [ADR-006](https://github.com/theochemtheo/quantype/blob/main/docs/decisions/ADR-006-protocol-dispatch-for-product-stubs.md), [ADR-011](https://github.com/theochemtheo/quantype/blob/main/docs/decisions/ADR-011-constant-product-classes.md)) | `src/quantype/codegen/_table.py` (the table), `codegen/_products.py` (product stubs and `products.py`), `_internal/_products.py` (runtime product classes), `_internal/_semantics.py` (lookups) | `test_naming_table.py`, `tests/typing/positive/products.py` |
+| CODATA editions ([ADR-009](https://github.com/theochemtheo/quantype/blob/main/docs/decisions/ADR-009-vendored-codata-one-edition-per-process.md)) | `src/quantype/codata.py`; generated `_internal/_codata.py` | `test_codata.py` |
 | Quantity wrapping, operators and reductions | `src/quantype/core.py`; handwritten `core.pyi` | `test_core.py`, `test_refactor.py`, typing fixtures |
 | Unit definitions and catalogue lookup | `src/quantype/_internal/_unit.py`; handwritten `_unit.pyi` | `test_core.py`, `test_validation.py` |
 | Unit lookup by name, alias, or symbol (`unit_named`, `parse`) | `src/quantype/_internal/_lookup.py` | `test_unit_lookup.py`, `test_validation.py` |
 | Unit systems, `NoSystem`, derived units, range checks | `src/quantype/_internal/_systems.py`; public `systems.py` | `test_systems.py`, `test_scenarios.py`, typing fixtures |
-| Storage units without a system: composed units, their names and parsing, `simplified()` ([ADR-014](decisions/ADR-014-opt-in-unit-system.md)) | `src/quantype/_internal/_storage_units.py` | `test_core.py`, `test_quantities.py`, `test_numpy.py` |
+| Storage units without a system: composed units, their names and parsing, `simplified()` ([ADR-014](https://github.com/theochemtheo/quantype/blob/main/docs/decisions/ADR-014-opt-in-unit-system.md)) | `src/quantype/_internal/_storage_units.py` | `test_core.py`, `test_quantities.py`, `test_numpy.py` |
 | Typed constructors and backend conversion | `src/quantype/_internal/_construction.py`, `_storage.py` | `test_refactor.py`, `test_binary_failures.py` |
 | NumPy functions and dispatch | `src/quantype/_internal/_numpy.py` (unit rules, backend namespaces, `UFUNCS`/`FUNCTIONS`/Torch names); generated `numpy.py`/`numpy.pyi` per catalogue; `Quantity.__array_ufunc__`/`__array_function__`/`__torch_function__` | `test_numpy.py`, `test_scenarios_jax.py`, `test_torch.py` |
 | JSON, archive and Pydantic boundaries | `src/quantype/serialization.py`, `_internal/_validation.py` | `test_validation.py`, `test_binary_failures.py`, `test_refactor.py` |
@@ -40,7 +40,7 @@ that it no longer renders. Inspect `render(...)` for the current output set. Han
 `core.pyi`, `constants.pyi` and `_internal/_unit.pyi` must be maintained
 alongside their implementations. `scripts/generate_codata.py` and
 `scripts/generate_docs.py` produce `_internal/_codata.py` and
-`docs/catalogue.md`. `.gitattributes` marks these outputs `linguist-generated`,
+`docs/reference/catalogue.md`. `.gitattributes` marks these outputs `linguist-generated`,
 and `test_codegen.py` fails until a new output has a matching line.
 
 Adding a built-in quantity may also require a handwritten top-level export in

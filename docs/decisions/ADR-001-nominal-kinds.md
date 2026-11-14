@@ -32,7 +32,7 @@ is expected is an error. Relations are never solved as equations.
 * Good, because quantities with the same dimensions and different meanings
   can't be confused, statically or at runtime.
 * Good, because every named result comes from the catalogue's relations, which
-  the runtime, the stubs, and `docs/catalogue.md` all read.
+  the runtime, the stubs, and `docs/reference/catalogue.md` all read.
 * Bad, because correct physics through an undeclared relation gives a
   structural result. Users declare the relation in an application catalogue
   ([ADR-010](ADR-010-application-catalogues-are-separate-packages.md)) or

@@ -1,6 +1,6 @@
 # Development and conformance checks
 
-Run commands from the repository root. Consult `justfile`, `pyproject.toml`, `docs/development.md`, and `.github/workflows/test.yml` for current definitions.
+Run commands from the repository root. Consult `justfile`, `pyproject.toml`, `docs/contributing/development.md`, and `.github/workflows/test.yml` for current definitions.
 
 ## Environment
 
@@ -16,6 +16,7 @@ The project requires Python 3.12 or later and uses `uv`. `uv sync --all-extras` 
 | Constructors or storage dispatch | `uv run pytest tests/runtime/test_refactor.py tests/runtime/test_binary_failures.py` |
 | JAX, Torch or import behavior | Relevant `test_autodiff.py` or `test_torch.py`, plus `test_optional_backends.py` and `test_refactor.py` |
 | JSON/Pydantic/archive behavior | `uv run pytest tests/runtime/test_validation.py tests/runtime/test_binary_failures.py tests/runtime/test_refactor.py` |
+| Documentation, examples, or site tooling | `uv run --all-extras just docs-check`; use `uv run --no-default-groups --group test pytest README.md docs -rs` for examples without the site builder; see the [documentation skill](../../quantype-docs/SKILL.md) for review gates |
 | Cross-cutting package change | `uv run just check-generated`, `uv run just typecheck`, `uv run just stubcheck`, `uv run just test`, `uv run just lint`; `uv build` for packaging changes |
 
 ## Static conformance

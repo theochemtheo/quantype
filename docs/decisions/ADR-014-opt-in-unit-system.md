@@ -11,7 +11,7 @@ changes data on the way through: 125,373 of 1,000,000 random float64 values
 given in nm come back different from `.magnitude(u.nm)`.
 
 Can a user opt into a unit system where raw numbers are needed, without losing
-what [ADR-003](superseded/ADR-003-unit-system-is-a-type-parameter.md) gives:
+what [ADR-003](https://github.com/theochemtheo/quantype/blob/main/docs/decisions/superseded/ADR-003-unit-system-is-a-type-parameter.md) gives:
 `.value` has one meaning for each static type, and systems never mix silently?
 
 The decision covers the default system, how default-system quantities store
@@ -36,9 +36,9 @@ Chosen option: "a null system that keeps each value in its input unit",
 because it is the only option where nothing converts unless units differ or a
 system is chosen, while bound systems keep every guarantee of ADR-003 and all
 four checkers enforce the null system's rules. The prototypes and measurements
-are in [opt-in unit systems](../design/opt-in-unit-system.md).
+are in [opt-in unit systems](https://github.com/theochemtheo/quantype/blob/main/docs/design/opt-in-unit-system.md).
 
-```python notest
+```python
 x = Length[float](2, u.nm)  # Length[float, NoSystem]; stores 2.0 in nm
 f = Energy[float](3, u.eV) / x  # Force; stores and shows 1.5 eV/nm
 x + Length[float](3, u.angstrom)  # 2.3 nm: the right operand converts to nm

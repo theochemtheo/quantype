@@ -18,7 +18,8 @@ quantype
 │   └── quantype-typing
 ├── quantype-backends
 │   └── quantype-autodiff
-└── quantype-serialization
+├── quantype-serialization
+└── quantype-docs
 ```
 
 Read the relevant specialization and its parent guidance. Load another branch only when the requested change crosses that boundary.
@@ -31,6 +32,7 @@ Read the relevant specialization and its parent guidance. Load another branch on
 | Construction, storage, dtype, reductions or optional imports | [quantype-backends](../quantype-backends/SKILL.md) |
 | JAX transformations, Torch gradients or physical derivative types | [quantype-autodiff](../quantype-autodiff/SKILL.md) |
 | JSON, Pydantic, NPZ/NPY or custom-unit decoding | [quantype-serialization](../quantype-serialization/SKILL.md) |
+| Documentation authoring, executable examples, site review or agent exports | [quantype-docs](../quantype-docs/SKILL.md) |
 
 ## Shared contract
 
@@ -40,4 +42,4 @@ Read the relevant specialization and its parent guidance. Load another branch on
 - The base import stays light. NumPy, Pydantic, JAX and Torch are deferred until needed; each optional adapter works without the other backend installed.
 - Existing dynamic internals support backend dispatch. Preserve precise public result types rather than widening them to `Any` to make a checker pass.
 
-For ownership across modules, read [architecture](../../../docs/architecture.md). The reasons behind these contracts are in [decisions](../../../docs/decisions/); a change that contradicts one starts as a proposal. For setup, verification commands, and CI scope, read [checks](references/checks.md) when planning validation. These skills support local work; publishing a package or changing remote systems requires authorization for that action.
+For ownership across modules, read [architecture](../../../docs/contributing/architecture.md). The reasons behind these contracts are in [decisions](../../../docs/decisions/); a change that contradicts one starts as a proposal. For setup, verification commands, and CI scope, read [checks](references/checks.md) when planning validation. These skills support local work; publishing a package or changing remote systems requires authorization for that action.
