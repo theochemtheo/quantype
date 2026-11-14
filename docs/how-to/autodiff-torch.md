@@ -27,6 +27,7 @@ x = Length[torch.Tensor](
 y = Length[torch.Tensor](torch.tensor([0.5], requires_grad=True), u.angstrom)
 k = 2.0 * u.eV_per_angstrom_squared
 energy = 0.5 * k * ((x**2).sum() + (y**2).sum())
+torch.testing.assert_close(energy.magnitude(), energy.magnitude(u.eV) / 100)
 gradient = utorch.grad(energy, x, create_graph=True)
 on_x, on_y = utorch.grad(energy, [x, y])
 force = -gradient
@@ -43,7 +44,7 @@ derivative differentiable for higher derivatives; `retain_graph` follows Torch's
 usual graph-lifetime semantics.
 
 The energy's display composes the input units, `(eV/Å^2)·nm^2`; its bare
-`.magnitude()` is 100 times its magnitude in eV. Log
+`.magnitude()` is 1/100 of its magnitude in eV. Log
 `energy.magnitude(u.eV)`, naming the unit explicitly.
 
 ## Keep graphs at a raw-model boundary

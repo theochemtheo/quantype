@@ -32,12 +32,21 @@ Calling a unit, or multiplying a real scalar by it, constructs a quantity
 without a system. For example, `2 * u.nm` and `u.nm(2)` are lengths. Use
 `unit(array)` across numerical backends; `array * unit` is only guaranteed for
 NumPy. Unit-first construction preserves floating storage and holds the input
-array itself; Python integers become `float`. Booleans, complex values,
-non-numbers, and integer arrays or backend scalars are rejected. Lists and
-integer arrays need a [typed quantity constructor](quantities.md), rather than
-a unit call. Offset temperature units store kelvin-scaled numbers.
+array itself; Python integers become `float`. Supported floating backend
+scalars are accepted. Booleans, complex values, non-numbers, and integer
+arrays/backend scalars are rejected. Lists and integer arrays need a
+[typed quantity constructor](quantities.md#construction-and-storage), rather
+than a unit call. Offset temperature units store kelvin-scaled numbers.
+
+Unit objects are conversion definitions, not an algebra of units: `u.m / u.s`,
+`1 / u.s`, `u.m**2`, and `u.m * u.s` are unsupported and raise `TypeError`.
+Use a named unit such as `u.meter_per_second`, or do arithmetic on quantities:
+`(1 * u.m) / (1 * u.s)` and `(1 * u.m)**2`. To define another unit, use
+[`Kind.define_unit`](#define_unit) with a same-kind reference unit.
 
 ## Look up a unit by name
+
+### unit_named
 
 ```text
 Kind.unit_named(name: str, *, units: tuple[Unit, ...] = ()) -> Unit
@@ -66,6 +75,8 @@ with pytest.raises(ValueError, match="Expected Force; received Length"):
 ```
 
 ## Define a unit
+
+### define_unit
 
 ```text
 Kind.define_unit(name: str, *, reference: Unit, scale: float = 1.0,

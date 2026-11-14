@@ -46,11 +46,12 @@ assert in_ev_per_angstrom.value.dtype == np.float32
 ```
 
 !!! warning "`from_value` trusts the kernel's units"
-    `from_value` holds the array itself without validating or converting its
-    raw data. Use it only for numbers already in the system's units. For other
+    `from_value` checks that storage is accepted raw real/floating data and the
+    target is a bound `UnitSystem`. It retains the exact input without copying
+    or coercion, but cannot check that the numbers have the claimed physical
+    units. Use it only for numbers already in the system's units. For other
     units, use [typed construction](../reference/quantities.md#construction-and-storage)
-    or [`.to_system`](../reference/quantities.md#conversion-and-numerical-access)
-    to perform conversions.
+    or [`.to_system`](../reference/quantities.md#to_system) to perform conversions.
 
 Systems are classes, not instances, and nothing is registered globally.
 Prefer a namespaced system name, such as `my_lab:gromacs`, in a shared application.

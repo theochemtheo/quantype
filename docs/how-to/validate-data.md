@@ -7,7 +7,9 @@ a bare numerical value does not tell a validator its physical meaning.
 ## Validate several fields with Pydantic
 
 Annotate each field with the desired kind and storage. Validation checks the
-kind and unit, and restores the annotated numerical dtype:
+kind and unit, and restores the annotated numerical dtype. It does not establish
+application-specific validity: finiteness, positivity, and array shape need
+explicit checks.
 
 ```python
 import numpy as np
@@ -39,6 +41,75 @@ except ValidationError as error:
     assert "Expected Length; received Energy" in str(error)
 else:
     raise AssertionError("An energy is not a length")
+```
+
+## Check application constraints
+
+Nonfinite numerical inputs are not generally rejected by quantity validation.
+Add Pydantic field validators when your consumer requires positive finite
+cutoffs and finite `(N, 3)` positions. Inspect public magnitudes in explicit
+units, after the quantity schema has checked kind and storage:
+
+```python
+from math import isfinite
+
+import numpy as np
+import numpy.typing as npt
+from pydantic import BaseModel, ValidationError, field_validator
+
+from quantype import Length, u
+
+
+class Configuration(BaseModel):
+    cutoff: Length[float]
+    positions: Length[npt.NDArray[np.float64]]
+
+    @field_validator("cutoff")
+    @classmethod
+    def positive_finite_cutoff(cls, cutoff: Length[float]) -> Length[float]:
+        magnitude = cutoff.magnitude(u.nm)
+        if not isfinite(magnitude) or magnitude <= 0:
+            raise ValueError("cutoff must be positive and finite")
+        return cutoff
+
+    @field_validator("positions")
+    @classmethod
+    def finite_positions(
+        cls, positions: Length[npt.NDArray[np.float64]]
+    ) -> Length[npt.NDArray[np.float64]]:
+        magnitude = positions.magnitude(u.nm)
+        if magnitude.ndim != 2 or magnitude.shape[1] != 3:
+            raise ValueError("positions must have shape (N, 3)")
+        if not np.isfinite(magnitude).all():
+            raise ValueError("positions must be finite")
+        return positions
+
+
+valid = {
+    "cutoff": "0.5 nm",
+    "positions": {"magnitude": [[1, 2, 3], [4, 5, 6]], "unit": "nm"},
+}
+config = Configuration.model_validate(valid)
+assert config.cutoff.magnitude(u.nm) == 0.5
+assert config.positions.shape == (2, 3)
+
+invalid_inputs = [
+    ("cutoff", "0 nm", "cutoff must be positive and finite"),
+    ("cutoff", "-1 nm", "cutoff must be positive and finite"),
+    ("cutoff", Length[float](float("inf"), u.nm), "cutoff must be positive and finite"),
+    ("cutoff", Length[float](float("nan"), u.nm), "cutoff must be positive and finite"),
+    ("positions", {"magnitude": [[1, 2]], "unit": "nm"}, "positions must have shape (N, 3)"),
+    ("positions", {"magnitude": [[1, 2, float("inf")]], "unit": "nm"}, "positions must be finite"),
+    ("positions", {"magnitude": [[1, 2, float("nan")]], "unit": "nm"}, "positions must be finite"),
+]
+for field, value, message in invalid_inputs:
+    try:
+        Configuration.model_validate({**valid, field: value})
+    except ValidationError as error:
+        assert error.errors()[0]["loc"] == (field,)
+        assert message in str(error)
+    else:
+        raise AssertionError(f"Expected rejection of {field}: {message}")
 ```
 
 ## Choose a decoding entry point

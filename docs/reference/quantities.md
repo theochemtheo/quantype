@@ -11,6 +11,8 @@ Each Python fence is independently executable.
 
 ## Construction and storage
 
+### Quantity constructors
+
 The constructor form is `Length[V, S](value, unit, *, dtype=..., display=True)`;
 `S` defaults to `NoSystem`. `V` is real floating storage: Python `float`, a NumPy
 floating scalar or array, `jax.Array`, or `torch.Tensor`. Lists and integers can
@@ -23,9 +25,9 @@ use `dtype=`. Optional backends require their respective Quantype extras.
 | --- | --- | --- |
 | `Length[V, S](value, unit)` | Numerical scalar, array, or sequence and a Length unit | Converts storage to `V` and units to `S`; in `NoSystem`, keeps input storage units except offset temperatures |
 | `Length(value, unit)` | Numerical input and a Length unit | Infers storage from floats/arrays; for integer static precision use `Length[float]` |
-| `u.nm(value)` or `value * u.nm` | Real scalar or floating array, not a list or integer array | `Length` without a system; compatible floating storage is retained, Python integers become floats |
-| `Length.from_value(value, system)` | Trusted numbers already in a `UnitSystem`'s units | Preserves raw storage without coercion or copying; not an external validation boundary |
-| `Length.parse(data, *, units=())` | Scalar string or quantity object | Float or float64 NumPy array; choose a `TypeAdapter` for specific storage |
+| `u.nm(value)` or `value * u.nm` | Real scalar or floating array/backend scalar, not a list or integer array/backend scalar | `Length` without a system; compatible floating storage is retained, Python integers become floats |
+| [`Length.from_value(value, system)`](#from_value) | Accepted raw real/floating storage already in a `UnitSystem`'s units | Preserves raw storage without coercion or copying |
+| [`Length.parse(data, *, units=())`](#parse) | Scalar string or quantity object | Float or float64 NumPy array; choose a `TypeAdapter` for specific storage |
 
 A NumPy array already of the requested dtype is kept when conversion is not
 needed. Unit rescaling may allocate. Typed storage conversion can allocate;
@@ -34,10 +36,11 @@ A conflicting explicit NumPy dtype fails. JAX float64 requests fail when x64 is
 unavailable instead of silently becoming float32. Float16/float32 NumPy system
 conversions can emit `StorageRangeWarning` on overflow or subnormal results.
 
-Unit-first construction rejects boolean, complex, nonnumerical and integer
-array storage and backend scalars that are not supported floating storage;
-use typed constructors to convert integer arrays and lists. `unit(array)` works
-across backends; `array * unit` is guaranteed only for NumPy.
+Unit-first construction accepts supported floating backend scalars as well as
+floating arrays. It rejects boolean, complex, nonnumerical, and integer
+array/backend-scalar storage; use typed constructors to convert integer arrays
+and lists. `unit(array)` works across backends; `array * unit` is guaranteed
+only for NumPy.
 
 Conversions use higher working precision where the backend permits, then round
 into the requested storage. Display conversion likewise leaves stored dtype
@@ -51,8 +54,8 @@ allowing the default system/storage presentation.
     Construction and same-storage-unit `.magnitude(unit)` may expose the very same
     array, not a copy. Mutating that array mutates the quantity's numbers. Copy with
     `q.copy()` or copy the input to separate ownership. `from_value` retains its
-    exact input, including a NumPy array's read-only flag, and performs no validation
-    or conversion. It requires a real `UnitSystem`, not `NoSystem`.
+    exact input, including a NumPy array's read-only flag. It checks accepted raw
+    storage and the system, but not the physical units of the data.
 
 ```python
 from typing import assert_type
@@ -69,18 +72,58 @@ assert_type(bound, Length[float, Atomistic])
 assert bound.value == 20.0
 ```
 
+### from_value
+
+`Kind.from_value(value, system)` requires a named quantity class, raw real
+Python numbers or supported floating NumPy/JAX/Torch storage, and a bound
+`UnitSystem` (not `NoSystem`). It rejects quantities, lists, boolean/complex
+data, and nonfloating array/backend-scalar storage. It does not validate that
+the numbers have the claimed physical units, coerce them, or copy them. Use a
+typed constructor when input storage or units need conversion.
+
+### parse
+
+`Kind.parse(data, *, units=())` reads a scalar string or quantity object.
+See [serialization](serialization.md) for input formats, typed targets, custom
+unit definitions, and validation errors.
+
 ## Conversion and numerical access
 
 Signatures below use `V` for storage and `S` for the quantity's system:
 
-| Operation | Result | Errors and conversion |
-| --- | --- | --- |
-| `q.magnitude(unit=None) -> V` | Plain numbers in the supplied or display unit | Wrong-kind unit raises `TypeError`; rescaling may allocate; same storage unit avoids conversion |
-| `q.to(unit_or_system) -> Self` | New presentation, same kind, system, storage | A system here selects its display unit only; wrong-kind unit fails |
-| `q.simplified() -> Self` | Simpler presentation of composed units | Does not rescale stored numbers |
-| `q.to_system(T)` | Same kind/storage type, system `T` | Converts stored numbers; may allocate; the explicit bridge between systems |
-| `q.value -> V` | Raw stored numbers | Available only in a bound `UnitSystem`; `NoSystem` raises `TypeError` and is rejected statically |
-| `q.apply(function: Callable[[V], V]) -> Self` | Same physical metadata, transformed raw numbers | Caller must ensure unit-invariant meaning and preserve backend; no physical validation of the function |
+### magnitude
+
+`q.magnitude(unit=None) -> V` extracts plain numbers in the supplied or display
+unit. A wrong-kind unit raises `ValueError`; a non-unit argument raises
+`TypeError`. Rescaling may allocate; the same storage unit avoids conversion.
+
+### to
+
+`q.to(unit_or_system) -> Self` selects presentation, preserving kind, system,
+and storage. A system selects its display unit only. A wrong-kind unit raises
+`ValueError`; a non-unit, non-system argument raises `TypeError`.
+
+### simplified
+
+`q.simplified() -> Self` simplifies composed presentation without rescaling
+stored numbers.
+
+### to_system
+
+`q.to_system(T)` preserves kind and storage type while converting stored
+numbers into system `T`. It may allocate and is the explicit bridge between
+systems.
+
+### value
+
+`q.value -> V` exposes raw stored numbers only in a bound `UnitSystem`.
+`NoSystem` access raises `TypeError` and is rejected statically.
+
+### apply
+
+`q.apply(function: Callable[[V], V]) -> Self` transforms raw numbers while
+keeping physical metadata. The caller must ensure unit-invariant meaning and
+preserve the backend; the function receives no physical validation.
 
 !!! info "Presentation changes are not storage conversions"
 
@@ -91,10 +134,13 @@ Signatures below use `V` for storage and `S` for the quantity's system:
     The [system adoption rules](systems.md#system-selection-and-adoption) specify
     when arithmetic can do that conversion for an unbound operand.
 
-`.unit` is the presentation unit (or `None` for a dimensionless value);
-`.system` is the system class. Accessing shape/dtype and other array properties
-requires appropriate numerical storage. Implicit array conversion, including
-`np.asarray(q)`, raises: extract numbers explicitly.
+### unit and system
+
+`.unit` is the presentation unit. It is `None` for unnamed structural products
+in a bound system, not for `Dimensionless`; their composed system units are
+still shown. `.system` is the system class. Accessing shape/dtype and other
+array properties requires appropriate numerical storage. Implicit array
+conversion, including `np.asarray(q)`, raises: extract numbers explicitly.
 
 ```python
 from quantype import Length, u

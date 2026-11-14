@@ -28,8 +28,9 @@ are not bit-exact snapshots.
 
 `q.to_dict(unit=None) -> dict[str, object]` selects an explicit compatible unit,
 otherwise the quantity's presentation unit (which defaults to its system's unit
-when bound). Wrong-kind units raise `TypeError`; unnamed kinds or absence of a
-writable unit raise `ValueError`. Unit identifiers use names, not ambiguous
+when bound). Wrong-kind units raise `ValueError`; a non-unit argument raises
+`TypeError`. Unnamed kinds or absence of a writable unit raise `ValueError`.
+Unit identifiers use names, not ambiguous
 symbols: a composed `eV/nm` writes `electron_volt/nanometer`. Custom-system units
 can use identifiers such as `gromacs:Force`.
 
@@ -53,9 +54,13 @@ A written quantity has exactly these fields:
 a wire object, or an existing quantity of the same kind and **exact system**.
 Names, aliases, and printed symbols parse, including `"25 °C"` and
 `"1 eV/Å^2"`. A number without a unit fails except for `Dimensionless`, whose
-bare scalar strings are accepted. Matching existing quantities are returned
-without coercion; decoded wire data becomes Python `float` or a float64 NumPy
-array. A scalar or zero-dimensional wire magnitude parses as `float`.
+bare scalar strings are accepted. Decoded wire data becomes Python `float` or
+a float64 NumPy array; a scalar or zero-dimensional wire magnitude parses as
+`float`. Existing quantities must have Python `float` or NumPy array storage;
+NumPy arrays of other dtypes, including float32, are normalized to float64.
+Other storage, such as JAX/Torch tensors or NumPy float32 scalars, raises
+`TypeError`; use a typed Pydantic field or `TypeAdapter` for those quantities.
+Do not rely on parsing preserving an existing object's identity or dtype.
 
 `Length[float, SI].parse(...)` chooses SI but does **not** select parse storage.
 For exact storage, use Pydantic `TypeAdapter(Length[V, S])` instead. Wire decode

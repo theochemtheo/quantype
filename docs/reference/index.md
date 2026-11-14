@@ -10,6 +10,7 @@ and generated stub refinements; the built-in catalogue comes from its renderer.
 | [Units and constants](units.md) | `u`, unit lookup/definition, presentation, physical constants, CODATA, and numerical ranges |
 | [Unit systems](systems.md) | `UnitSystem`, `NoSystem`, built-ins, overrides, and generic systems |
 | [Numerical operations](numerical-operations.md) | `quantype.numpy`, array methods, runtime dispatch versus static support |
+| [Testing](testing.md) | `quantype.testing.assert_allclose`, tolerances, system adoption, and host comparison |
 | [Serialization](serialization.md) | JSON, Pydantic, NPZ/NPY, explicit custom-unit decoding |
 | [Autodiff](autodiff.md) | `ujax`, `utorch`, derivative kinds, storage, and transformation restrictions |
 | [Quantity annotations](type-annotations.md) | `quantype.typing.quantity_type` |

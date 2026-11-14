@@ -1,6 +1,8 @@
 # Test quantities
 
 Use `quantype.testing.assert_allclose` when comparing quantities in tests.
+The [testing reference](../reference/testing.md#assert_allclose) specifies its
+signature, defaults, system adoption, errors, and backend boundary.
 
 ## Compare arrays in different units
 

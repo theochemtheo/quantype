@@ -80,7 +80,7 @@ quantity. Backend-specific optional numerical keywords are not a portable API.
   is not generally valid inside JAX transformations.
 
 For temperature-difference tolerances and assertion diagnostics, prefer
-[`quantype.testing.assert_allclose`](../how-to/test-quantities.md).
+[`quantype.testing.assert_allclose`](testing.md#assert_allclose).
 
 ## Quantity methods, views, and storage
 
@@ -96,8 +96,20 @@ Array methods retain kind, system, and storage type unless the operation changes
 kind as described above. A NumPy array reduced or indexed to one element stays
 a zero-dimensional array, not a NumPy scalar. `.item()` returns a quantity with
 Python `float` storage. Basic NumPy indexing shares memory; integer/boolean
-array indexing copies. `.copy()` makes an independent numerical copy. Other
-view/copy behavior follows the backend. See [array tasks](../how-to/arrays.md).
+array indexing copies. `.copy()` makes an independent numerical copy.
+
+### flatten
+
+Both `q.flatten()` and `q.ravel()` are implemented as `q.reshape(-1)`.
+Unlike `numpy.ndarray.flatten()`, quantity `.flatten()` does **not** guarantee
+a copy: NumPy storage may be shared with the original quantity. Use
+`q.flatten().copy()` when an independent flattened array is required.
+Other view/copy behavior follows the backend. See [array tasks](../how-to/arrays.md).
+
+### ravel
+
+`q.ravel()` has the same reshape and storage-sharing contract as
+[`q.flatten()`](#flatten).
 
 ## Runtime dispatch versus static support
 

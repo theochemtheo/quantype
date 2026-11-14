@@ -19,7 +19,7 @@ block below runs independently; no optional backend is required.
 | `Implicit array coercion drops units` | In tests use [quantype.testing.assert_allclose](how-to/test-quantities.md); elsewhere pass `.magnitude(unit)`. |
 | `Length has no raw numbers without a unit system` | Read `.magnitude(unit)`, or choose a system with `.to_system(...)` first. See [raw access](#raw-value-access-without-a-system). |
 | `Quantities scale by real numbers or numerical arrays` | Booleans, complex numbers, strings, and lists can't scale a quantity. Convert numerical lists with `np.asarray`; see [arrays](how-to/arrays.md). |
-| `Cannot add int and Length; give it a unit` | Plain numbers can only be added to `Dimensionless` values, and integer zero to non-affine quantities (so `sum()` works). Give the number a unit. |
+| `Cannot add int and Length; give it a unit` | Plain numbers can only be added to `Dimensionless` values, except integer zero is an addition identity (so `sum()` can start). Give other numbers a unit. |
 | `Cannot compare Length and int; give it a unit` | Compare with a quantity, as in `q > 0 * u.nm`. Plain numbers compare with `Dimensionless`; integer zero also works with `==` / `!=` except for absolute temperatures. See [comparisons](reference/quantities.md#algebra-comparison-and-errors). |
 | `The truth value of a Length quantity is ambiguous` | Compare against a value, as in `q > 0 * u.nm`, or test `q is not None`. |
 | An `EnergyDensity` where a `Pressure` is expected | If the meaning really is pressure, rename it with `Pressure.reinterpret(q)`. Equal dimensions alone do not imply equal kinds; see [the physical model](explanation/physical-model.md). |
@@ -31,8 +31,25 @@ block below runs independently; no optional backend is required.
 | `from_value trusts raw numbers in a unit system, and NoSystem has none` | Construct from a unit, as in `Length(raw, u.nm)`, or name a system: `Length.from_value(raw, SI)`. See [raw access](#raw-value-access-without-a-system). |
 | An unnamed result cannot be serialized | Only named kinds have a wire representation. Name it intentionally with `reinterpret`, or declare the kind in an [application catalogue](how-to/custom-catalogues.md). |
 
-The integer-zero exceptions do not allow adding or summing absolute temperature
-points. Their means are meaningful; their sums are not.
+At runtime, integer zero is an identity even for absolute temperatures:
+`T + 0`, `0 + T`, and `sum([T])` return the point. This does not permit adding
+two temperature points: `sum([T, T])`, `.sum()`, and `qnp.sum(T)` are rejected.
+Their means are meaningful; their sums are not.
+
+```python
+from quantype import u
+
+point = 300 * u.K
+assert point + 0 is point
+assert 0 + point is point
+assert sum([point]) is point
+try:
+    sum([point, point])
+except TypeError as error:
+    assert "Cannot add two absolute Temperatures" in str(error)
+else:
+    raise AssertionError("Two absolute temperatures must not be added")
+```
 
 ## Mixed unit systems
 

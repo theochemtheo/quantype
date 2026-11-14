@@ -40,9 +40,11 @@ catalogue = builtin_catalogue().extend(
     relations={("mul", "Pressure", "Length"): "SurfaceTension"},
 )
 changed = generate(catalogue, "src/labquantities", package="labquantities")
-assert "__init__.py" in changed
 assert Path("src/labquantities/__init__.py").is_file()
 ```
+
+`changed` lists files written by this call. An empty list means the generated
+output is already current; rerunning the example does not need to rewrite it.
 
 [Dimensions](../explanation/glossary.md#dimensions "The exponents over Quantype's eight physical base axes.")
 are exponents over eight axes, in order: length, energy, time, temperature,
