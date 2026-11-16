@@ -42,7 +42,9 @@ class Sample:
 
 
 hints = get_type_hints(Sample, include_extras=True)
-assert quantity_type(hints["forces"]) == QuantityType(Force, npt.NDArray[np.float64], NoSystem)
+assert quantity_type(hints["forces"]) == QuantityType(
+    Force, npt.NDArray[np.float64], NoSystem
+)
 assert quantity_type(hints["energy"]) == QuantityType(Energy, float, SI)
 assert quantity_type(hints["label"]) is None
 assert quantity_type(Force) == QuantityType(Force, None, NoSystem)

@@ -108,7 +108,9 @@ save_npz("frame.npz", forces=forces)
 restored = load_npz("frame.npz", "forces", Force[npt.NDArray[np.float32], Gromacs])
 np.testing.assert_array_equal(restored.value, raw)
 other_system = load_npz(
-    "frame.npz", "forces", Force[npt.NDArray[np.float32], Atomistic],
+    "frame.npz",
+    "forces",
+    Force[npt.NDArray[np.float32], Atomistic],
     units=Gromacs.units,
 )
 np.testing.assert_allclose(

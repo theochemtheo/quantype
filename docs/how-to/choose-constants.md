@@ -30,7 +30,7 @@ other examples in the surrounding process:
 import subprocess
 import sys
 
-program = '''
+program = """
 from quantype import codata
 
 codata.use("2018")
@@ -44,7 +44,7 @@ except RuntimeError as error:
     assert "already fixed at 2018" in str(error)
 else:
     raise AssertionError("A process must not mix CODATA editions")
-'''
+"""
 subprocess.run([sys.executable, "-c", program], check=True)
 ```
 

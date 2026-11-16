@@ -98,9 +98,21 @@ invalid_inputs = [
     ("cutoff", "-1 nm", "cutoff must be positive and finite"),
     ("cutoff", Length[float](float("inf"), u.nm), "cutoff must be positive and finite"),
     ("cutoff", Length[float](float("nan"), u.nm), "cutoff must be positive and finite"),
-    ("positions", {"magnitude": [[1, 2]], "unit": "nm"}, "positions must have shape (N, 3)"),
-    ("positions", {"magnitude": [[1, 2, float("inf")]], "unit": "nm"}, "positions must be finite"),
-    ("positions", {"magnitude": [[1, 2, float("nan")]], "unit": "nm"}, "positions must be finite"),
+    (
+        "positions",
+        {"magnitude": [[1, 2]], "unit": "nm"},
+        "positions must have shape (N, 3)",
+    ),
+    (
+        "positions",
+        {"magnitude": [[1, 2, float("inf")]], "unit": "nm"},
+        "positions must be finite",
+    ),
+    (
+        "positions",
+        {"magnitude": [[1, 2, float("nan")]], "unit": "nm"},
+        "positions must be finite",
+    ),
 ]
 for field, value, message in invalid_inputs:
     try:

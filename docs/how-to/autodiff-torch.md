@@ -33,7 +33,8 @@ on_x, on_y = utorch.grad(energy, [x, y])
 force = -gradient
 assert isinstance(force, Force)
 torch.testing.assert_close(
-    force.magnitude(u.eV_per_angstrom), torch.tensor([-20.0, -40.0], dtype=torch.float64)
+    force.magnitude(u.eV_per_angstrom),
+    torch.tensor([-20.0, -40.0], dtype=torch.float64),
 )
 assert force.magnitude(u.eV_per_angstrom).requires_grad
 ```

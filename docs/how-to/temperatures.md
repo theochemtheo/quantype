@@ -19,7 +19,10 @@ import pytest
 from quantype import Temperature, u
 
 fahrenheit = Temperature.define_unit(
-    "lab:fahrenheit", reference=u.celsius, scale=5 / 9, offset=-160 / 9,
+    "lab:fahrenheit",
+    reference=u.celsius,
+    scale=5 / 9,
+    offset=-160 / 9,
     symbol="°F",
 )
 freezing = Temperature[float](0, u.temperature.celsius)

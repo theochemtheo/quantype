@@ -53,8 +53,7 @@ from quantype.testing import assert_allclose
 # The unbound actual quantity adopts SI; different display units are fine.
 assert_allclose(2 * u.nm, Length[float, SI](20, u.angstrom))
 # Absolute tolerance is a physical difference; disable relative tolerance here.
-assert_allclose(20 * u.celsius, 20.05 * u.celsius,
-                rtol=0, atol=0.1 * u.delta_K)
+assert_allclose(20 * u.celsius, 20.05 * u.celsius, rtol=0, atol=0.1 * u.delta_K)
 ```
 
 ### Failures and diagnostics

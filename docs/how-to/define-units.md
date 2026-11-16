@@ -18,9 +18,7 @@ import pytest
 
 from quantype import Length, u
 
-pixel = Length.define_unit(
-    "my_lab:pixel", reference=u.nm, scale=0.25, symbol="px"
-)
+pixel = Length.define_unit("my_lab:pixel", reference=u.nm, scale=0.25, symbol="px")
 width = Length[float](8, pixel)
 assert width.magnitude(u.nm) == pytest.approx(2)
 assert width.unit is pixel
