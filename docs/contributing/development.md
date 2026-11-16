@@ -32,6 +32,8 @@ conformance suite; `just stubcheck` runs mypy's stubtest, which compares every
 stub with the runtime and takes about a minute, so run it when stubs or the
 generator change. CI runs both.
 To install the repository's commit hooks, run `uv run just setup`.
+The Ruff formatting hook also formats Python fences in Markdown. Ruff linting
+remains scoped to Python files.
 
 `just lint` runs [zizmor](https://github.com/zizmorcore/zizmor) offline against the
 GitHub Actions workflows; the pre-commit hook checks workflow changes too.

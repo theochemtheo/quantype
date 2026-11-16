@@ -64,7 +64,7 @@ id = "ruff-format"
 name = "ruff format"
 language = "system"
 entry = "uv run ruff format"
-files = "\\.pyi?$"
+files = "\\.(pyi?|md)$"
 stages = ["pre-commit"]
 
 [[repos.hooks]]
