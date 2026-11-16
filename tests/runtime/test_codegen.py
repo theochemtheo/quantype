@@ -399,7 +399,7 @@ def _git(*arguments: str, stdin: str = "") -> list[str]:
 
 def test_gitattributes_marks_exactly_the_generated_files() -> None:
     generated = {f"src/quantype/{name}" for name in render(builtin_catalogue())} | {
-        "docs/catalogue.md",
+        "docs/reference/catalogue.md",
         "src/quantype/_internal/_codata.py",
     }
     paths = generated.union(_git("ls-files", "-z"))

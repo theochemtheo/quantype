@@ -19,9 +19,9 @@ Parent: read [core physical semantics](../quantype-core/SKILL.md), including its
 
 `src/quantype/codegen/_render.py` produces quantity, kind, unit and autodiff contracts. `_package.py` adds application-package scaffolding. `render(...)` returns source strings without running tools. `generate(...)` formats with Ruff, minifies the private stub modules (`_products/`, `_constants/`, `_kinds/`, `_generated.pyi`; `codegen/_compact.py`), and writes changed files; `check=True` returns stale names without writing. Check mode still requires Ruff on PATH.
 
-For built-ins, change definitions or renderers, run `uv run scripts/generate.py`, then `uv run scripts/generate.py --check`. Review the generated diff. See the [ownership map](../../../docs/architecture.md) for generated files and handwritten exports; adding a built-in class may require updating `src/quantype/__init__.py` as well.
+For built-ins, change definitions or renderers, run `uv run scripts/generate.py`, then `uv run scripts/generate.py --check`. Review the generated diff. See the [ownership map](../../../docs/contributing/architecture.md) for generated files and handwritten exports; adding a built-in class may require updating `src/quantype/__init__.py` as well.
 
-Application generation ([ADR-010](../../../docs/decisions/ADR-010-application-catalogues-are-separate-packages.md)) currently requires a combined catalogue containing the core kinds required by its helpers. Use `builtin_catalogue().extend(...)` and a distinct package name. A generated `labquantities.Length` is a different nominal type from `quantype.Length`; use imports consistently from one API. Generation does not update the installed built-in overloads. Refer to `docs/custom-catalogues.md` for application-facing examples.
+Application generation ([ADR-010](../../../docs/decisions/ADR-010-application-catalogues-are-separate-packages.md)) currently requires a combined catalogue containing the core kinds required by its helpers. Use `builtin_catalogue().extend(...)` and a distinct package name. A generated `labquantities.Length` is a different nominal type from `quantype.Length`; use imports consistently from one API. Generation does not update the installed built-in overloads. Refer to `docs/how-to/custom-catalogues.md` for application-facing examples.
 
 ## Product classes
 

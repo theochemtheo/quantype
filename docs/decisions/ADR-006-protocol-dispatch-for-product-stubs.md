@@ -22,7 +22,7 @@ the stubs installed as users get them?
 Chosen option: "protocol dispatch", because it is the only option whose cost per
 operation matches the old stubs: mypy re-checked 300 products in 0.84 s against
 0.74 s before, and 17.7 s with per-partner overloads. The measurements are in
-[naming table](../design/naming-table.md).
+[naming table](https://github.com/theochemtheo/quantype/blob/main/docs/design/naming-table.md).
 
 `X.__mul__` has a fixed set of overloads: scalars, two protocols, and a
 structural fallback. Float storage on the left has its own protocol

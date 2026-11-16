@@ -7,6 +7,8 @@ repo = "builtin"
 
 [[repos.hooks]]
 id = "trailing-whitespace"
+# Preserve the vendored font licenses byte-for-byte.
+exclude = "^docs/fonts/(atkinson/OFL|iosevka/LICENSE)\\.txt$"
 stages = ["pre-commit"]
 
 [[repos.hooks]]
@@ -33,7 +35,8 @@ stages = ["pre-commit"]
 id = "check-added-large-files"
 # Generated sources hold every kind's protocol members and the product table;
 # `just check-generated` keeps them current.
-exclude = "^src/quantype/(_generated\\.pyi|products\\.py)$"
+# Self-hosted Iosevka webfonts retain the complete upstream character set.
+exclude = "^(src/quantype/(_generated\\.pyi|products\\.py)|docs/fonts/iosevka/[^/]+\\.woff2)$"
 stages = ["pre-commit"]
 
 [[repos]]
@@ -61,7 +64,7 @@ id = "ruff-format"
 name = "ruff format"
 language = "system"
 entry = "uv run ruff format"
-files = "\\.pyi?$"
+files = "\\.(pyi?|md)$"
 stages = ["pre-commit"]
 
 [[repos.hooks]]

@@ -1,0 +1,161 @@
+[project]
+site_name = "quantype · development"
+site_description = "Development documentation for typed physical quantities, unit systems, and differentiable scientific Python."
+site_url = "https://theochemtheo.github.io/quantype/"
+repo_url = "https://github.com/theochemtheo/quantype"
+repo_name = "theochemtheo/quantype"
+docs_dir = "docs"
+site_dir = "site"
+dev_addr = "127.0.0.1:8765"
+copyright = "Development documentation for main, not the latest PyPI release. Build identity is on the homepage."
+watch = ["pyproject.toml", "scripts/docs_metadata.py", "CHANGELOG.md"]
+extra_css = [
+  "stylesheets/glacier.css",
+]
+exclude_docs = """
+/proposals/
+/design/
+/decisions/superseded/
+/decisions/_adr_template.md
+"""
+nav = [
+  { "Home" = "index.md" },
+  { "Changelog" = "changelog.md" },
+  { "Getting started" = "tutorials/getting-started.md" },
+  { "How-to guides" = [
+    { "Overview" = "how-to/index.md" },
+    { "Work with arrays" = "how-to/arrays.md" },
+    { "Test quantities" = "how-to/test-quantities.md" },
+    { "Validate data" = "how-to/validate-data.md" },
+    { "Serialize quantities" = "how-to/serialize.md" },
+    { "JAX differentiation" = "how-to/autodiff-jax.md" },
+    { "Torch differentiation" = "how-to/autodiff-torch.md" },
+    { "Use temperatures" = "how-to/temperatures.md" },
+    { "Define units" = "how-to/define-units.md" },
+    { "Choose physical constants" = "how-to/choose-constants.md" },
+    { "Define systems" = "how-to/define-systems.md" },
+    { "Generate catalogues" = "how-to/custom-catalogues.md" },
+    { "Troubleshooting" = "troubleshooting.md" },
+  ] },
+  { "Concepts" = [
+    { "Overview" = "explanation/index.md" },
+    { "The physical model" = "explanation/physical-model.md" },
+    { "Glossary" = "explanation/glossary.md" },
+  ] },
+  { "Reference" = [
+    { "Overview" = "reference/index.md" },
+    { "Quantities" = "reference/quantities.md" },
+    { "Units and constants" = "reference/units.md" },
+    { "Unit systems" = "reference/systems.md" },
+    { "Numerical operations" = "reference/numerical-operations.md" },
+    { "Testing" = "reference/testing.md" },
+    { "Serialization" = "reference/serialization.md" },
+    { "Autodiff" = "reference/autodiff.md" },
+    { "Quantity annotations" = "reference/type-annotations.md" },
+    { "Built-in catalogue" = "reference/catalogue.md" },
+  ] },
+  { "Contributing" = [
+    { "Development" = "contributing/development.md" },
+    { "Architecture" = "contributing/architecture.md" },
+    { "Design principles" = "contributing/design-principles.md" },
+    { "Accepted decisions" = [
+      { "Decision process" = "decisions/README.md" },
+      { "Nominal kinds" = "decisions/ADR-001-nominal-kinds.md" },
+      { "Generated stubs" = "decisions/ADR-002-generated-stubs-for-four-checkers.md" },
+      { "Presentation units" = "decisions/ADR-004-display-unit-is-presentation.md" },
+      { "Product naming" = "decisions/ADR-005-products-named-by-factors.md" },
+      { "Protocol dispatch" = "decisions/ADR-006-protocol-dispatch-for-product-stubs.md" },
+      { "LAMMPS storage" = "decisions/ADR-007-lammps-systems-store-lammps-units.md" },
+      { "Affine temperatures" = "decisions/ADR-008-absolute-temperatures-are-points.md" },
+      { "CODATA editions" = "decisions/ADR-009-vendored-codata-one-edition-per-process.md" },
+      { "Application catalogues" = "decisions/ADR-010-application-catalogues-are-separate-packages.md" },
+      { "Constant products" = "decisions/ADR-011-constant-product-classes.md" },
+      { "Spelling" = "decisions/ADR-012-american-spelling-except-catalogue.md" },
+      { "Atomistic mass storage" = "decisions/ADR-013-atomistic-stores-mass-in-daltons.md" },
+      { "Opt-in systems" = "decisions/ADR-014-opt-in-unit-system.md" },
+    ] },
+  ] },
+]
+
+[project.theme]
+variant = "modern"
+font = false
+features = ["navigation.path", "navigation.top", "content.code.copy", "content.action.copy", "content.tooltips"]
+
+[[project.theme.palette]]
+scheme = "slate"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+scheme = "default"
+primary = "custom"
+accent = "custom"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to dark mode"
+
+[project.plugins.search]
+
+[project.plugins.llmstxt]
+markdown_description = "Development documentation for main, not the latest PyPI release. Consult the homepage for the package version and build revision. Python 3.12+; NumPy and Pydantic v2 required. JAX and Torch are optional."
+
+[project.plugins.llmstxt.sections]
+"Start here" = [{ "index.md" = "Purpose, build identity, prerequisites, and reading routes." }, { "tutorials/getting-started.md" = "Learn a calculation, conversion, and NumPy array operations in order." }]
+"Tasks" = [
+  { "how-to/index.md" = "Choose a task by prerequisite and desired result." },
+  { "how-to/arrays.md" = "Compute with NumPy, JAX, and Torch storage without dropping physical meaning." },
+  { "how-to/test-quantities.md" = "Compare quantities and temperature tolerances in tests." },
+  { "how-to/validate-data.md" = "Validate external configuration with Pydantic and typed storage." },
+  { "how-to/serialize.md" = "Persist quantities as JSON, NPZ, or NPY without pickle." },
+  { "how-to/autodiff-jax.md" = "Differentiate and compile physical models with JAX." },
+  { "how-to/autodiff-torch.md" = "Preserve physical derivative kinds with Torch autograd." },
+  { "how-to/temperatures.md" = "Work with absolute temperatures and differences." },
+  { "how-to/define-units.md" = "Define local units and decode them explicitly." },
+  { "how-to/choose-constants.md" = "Use physical constants and choose a CODATA edition." },
+  { "how-to/define-systems.md" = "Choose storage units and define application systems." },
+  { "how-to/custom-catalogues.md" = "Generate a separate nominal API with new kinds and relations." },
+  { "troubleshooting.md" = "Resolve errors involving systems, units, coercion, or unsupported calls." },
+]
+"Concepts" = [
+  { "explanation/index.md" = "Choose a conceptual explanation rather than a task recipe." },
+  { "explanation/physical-model.md" = "Understand nominal kinds, dimensions, structural algebra, and storage versus presentation." },
+  { "explanation/glossary.md" = "Look up kinds, dimensions, storage/display units, backends, and validation boundaries." },
+]
+"Exact reference" = [
+  { "reference/index.md" = "Find authoritative public API contracts by concern." },
+  { "reference/quantities.md" = "Construction, storage, conversion, copying, and physical algebra." },
+  { "reference/units.md" = "Unit definitions, lookup, presentation, constants, and numerical ranges." },
+  { "reference/systems.md" = "UnitSystem, NoSystem, built-ins, overrides, and generic code." },
+  { "reference/numerical-operations.md" = "Supported numerical calls and runtime versus static support." },
+  { "reference/testing.md" = "assert_allclose signature, tolerances, system adoption, diagnostics, and host comparison." },
+  { "reference/serialization.md" = "JSON/Pydantic and pickle-free binary input/output contracts." },
+  { "reference/autodiff.md" = "JAX/Torch derivative signatures, kinds, storage, and restrictions." },
+  { "reference/type-annotations.md" = "Inspect quantity annotations using quantity_type." },
+  { "reference/catalogue.md" = "Generated built-in kinds, units, relations, and system storage." },
+]
+"Contributor guidance" = [
+  { "contributing/development.md" = "Set up, verify, author examples, review, and prepare publication." },
+  { "contributing/architecture.md" = "Locate authoritative sources and generated ownership." },
+  { "contributing/design-principles.md" = "Apply repository engineering principles." },
+]
+"Release history" = [
+  { "changelog.md" = "Check released changes and unreleased development notes before upgrading." },
+]
+
+[project.plugins.macros]
+module_name = "scripts/docs_metadata"
+on_error_fail = true
+on_undefined = "strict"
+
+[project.plugins.include-markdown]
+include_from_url = false
+
+[project.validation]
+invalid_links = true
+invalid_link_anchors = true
+
+[project.markdown_extensions]
+admonition = {}
+"pymdownx.superfences" = {}

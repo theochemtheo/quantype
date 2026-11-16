@@ -5,7 +5,7 @@ description: Implement Quantype JSON and Pydantic validation, custom-unit decodi
 
 # Quantype Serialization
 
-Parent: read [Quantype shared guidance](../quantype/SKILL.md). Public behavior is documented in `docs/serialization.md`; implementations live in `src/quantype/serialization.py` and `_internal/_validation.py`.
+Parent: read [Quantype shared guidance](../quantype/SKILL.md). Public behavior is documented in `docs/reference/serialization.md`; implementations live in `src/quantype/serialization.py` and `_internal/_validation.py`.
 
 ## Explicit value boundary
 

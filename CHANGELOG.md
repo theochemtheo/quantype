@@ -6,6 +6,21 @@ follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Added
+
+- Development documentation site with task-oriented guides, exact API reference,
+  search, visible callouts, a linked glossary, Markdown exports, and a curated
+  agent index. Local editorial and production-path previews are available through
+  `just docs-serve` and `just docs-preview`; publication remains separately gated.
+
+### Changed
+
+- README and published Python examples are checked by Sybil and doctest, with
+  sequential tutorials, independent task/reference examples, explicit optional
+  backend requirements, and temporary filesystem isolation.
+- CI requires strict documentation, generated-reference, internal-link, and
+  agent-export checks even for code-only changes.
+
 ## [0.4.0] - 2026-11-13
 
 ### Added

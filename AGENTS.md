@@ -10,11 +10,11 @@ Each kind of information has one home. Link to it rather than restating it.
 
 | Question | Read |
 | --- | --- |
-| Why is it built this way? | [Decisions](docs/decisions/), the [design notes](docs/design/) they cite, and [design principles](docs/DESIGN_PRINCIPLES.md) |
-| Where does a concern live, and what is generated? | [Architecture](docs/architecture.md) |
+| Why is it built this way? | [Decisions](docs/decisions/), the [design notes](docs/design/) they cite, and [design principles](docs/contributing/design-principles.md) |
+| Where does a concern live, and what is generated? | [Architecture](docs/contributing/architecture.md) |
 | How do I change an area safely? | The [repository skill](.agents/skills/quantype/SKILL.md), which routes to one skill per area |
-| Which checks should I run? | [Checks](.agents/skills/quantype/references/checks.md); setup and commands are in [development](docs/development.md) |
-| What do users see? | The [README](README.md) and the [guides](docs/README.md) |
+| Which checks should I run? | [Checks](.agents/skills/quantype/references/checks.md); setup and commands are in [development](docs/contributing/development.md) |
+| What do users see? | The [README](README.md) and the [guides](docs/index.md) |
 
 ## Rules
 
@@ -29,7 +29,7 @@ Each kind of information has one home. Link to it rather than restating it.
   history or provenance ("public since 0.1.0", ticket ids), or add banner
   labels; rename or split the code instead. Suppressions such as
   `# noqa: S603` and the `# error` markers in negative typing tests are fine
-  ([design principles](docs/DESIGN_PRINCIPLES.md)).
+  ([design principles](docs/contributing/design-principles.md)).
 - Prose uses American spelling, except "catalogue", which follows the API
   ([ADR-012](docs/decisions/ADR-012-american-spelling-except-catalogue.md)).
 - A change that contradicts an accepted decision starts as a proposal in
