@@ -3,6 +3,7 @@
 [![test](https://github.com/theochemtheo/quantype/actions/workflows/test.yml/badge.svg)](https://github.com/theochemtheo/quantype/actions/workflows/test.yml)
 [![coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/theochemtheo/quantype/badges/coverage.json)](https://github.com/theochemtheo/quantype/actions/workflows/test.yml)
 [![PyPI](https://img.shields.io/pypi/v/quantype)](https://pypi.org/project/quantype/)
+[![Documentation](https://img.shields.io/badge/docs-development-blue)](https://github.com/theochemtheo/quantype/tree/main/docs)
 [![Python 3.12+](https://img.shields.io/badge/python-3.12%2B-blue)](https://www.python.org/downloads/)
 [![SPEC 0](https://img.shields.io/badge/SPEC-0-green?labelColor=%23004811&color=%235CB05C)](https://scientific-python.org/specs/spec-0000/)
 
@@ -195,6 +196,8 @@ for an existing kind without one.
   `TemperatureDifference`, and adding two is a type error.
 
 ## Documentation
+
+Development documentation tracks `main`, not the latest PyPI release.
 
 - [Getting started](https://github.com/theochemtheo/quantype/blob/main/docs/tutorials/getting-started.md)
 - [How-to guides](https://github.com/theochemtheo/quantype/blob/main/docs/how-to/index.md)
