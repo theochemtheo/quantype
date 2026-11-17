@@ -1201,7 +1201,8 @@ class Quantity[K, V, S: AnySystem]:
                     f"to_numpy() needs a CPU tensor, not one on {raw.device}; "
                     "move it first with q.apply(lambda raw: raw.cpu())"
                 )
-            raw = raw.numpy()
+            # NumPy has no bfloat16 and cannot hold a sparse layout.
+            raw = raw.to_dense().double().numpy()
         array = np.array(raw, dtype=np.float64)
         return cast("Quantity[K, npt.NDArray[np.float64], S]", self._with(array))
 

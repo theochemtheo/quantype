@@ -93,8 +93,8 @@ mypy, Pyright, Pyrefly, and ty all solve `B`, including through `| None`.
 ty solves it because each class declares `to_numpy` without type parameters,
 overloads, or a typed `self`
 ([ADR-015](https://github.com/theochemtheo/quantype/blob/main/docs/decisions/ADR-015-storage-forms-are-plain-methods.md)).
-[Numerical operations](numerical-operations.md#quantity-methods-views-and-storage) describes what
-`to_numpy()` does at runtime.
+[Numerical operations](numerical-operations.md#quantity-methods-views-and-storage)
+describes what `to_numpy()` does at runtime.
 
 ## Runtime discovery versus static checking
 

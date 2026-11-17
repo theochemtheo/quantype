@@ -1165,7 +1165,7 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
     )
     text += f"__all__ = {sorted(NUMPY_FUNCTIONS)!r}\n\n"
     # A stack of float storage is an array, a type only each class's to_numpy
-    # names; array storage stacks to its own type.
+    # names.
     text += "class _FloatToNumpy[B](SupportsToNumpy[B], Protocol):\n"
     text += "    def magnitude(self, unit: None = None) -> float: ...\n\n"
     text += "class _ArrayStorage(Protocol):\n"

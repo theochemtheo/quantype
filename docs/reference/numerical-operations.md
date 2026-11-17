@@ -95,11 +95,13 @@ to methods too.
 Array methods retain kind, system, and storage type unless the operation changes
 kind as described above. A NumPy array reduced or indexed to one element stays
 a zero-dimensional array, not a NumPy scalar. `.item()` returns a quantity with
-Python `float` storage. `.to_numpy()` returns one with float64 NumPy array
-storage: the same array when the storage already is one, and a copy otherwise.
-It raises `ValueError` for a Torch tensor that requires gradients or is not on
-the CPU, and JAX raises inside a trace. Basic NumPy indexing shares memory; integer/boolean
+Python `float` storage. Basic NumPy indexing shares memory; integer/boolean
 array indexing copies. `.copy()` makes an independent numerical copy.
+
+`.to_numpy()` returns a quantity with float64 NumPy array storage: the same
+array when the storage already is one, and a copy otherwise. It raises
+`ValueError` for a Torch tensor that requires gradients or is not on the CPU.
+JAX raises inside a trace.
 
 ### flatten
 

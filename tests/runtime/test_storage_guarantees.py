@@ -10,7 +10,7 @@ import pytest
 
 import quantype
 import quantype.numpy as qnp
-from quantype import Energy, Force, Length, Quantity, u
+from quantype import Energy, Force, Length, Quantity, Temperature, u
 from quantype.catalogue import builtin_catalogue
 from quantype.products import LengthEnergy, LengthTime
 from quantype.systems import ASE, SI, Atomistic, NoSystem
@@ -101,17 +101,35 @@ def test_to_numpy_returns_float64_storage_as_the_same_array() -> None:
     assert isinstance(converted, Force)
 
 
-@pytest.mark.parametrize(
-    "raw", [1.5, np.float64(1.5), np.array([1.5, 2.0], dtype=np.float32)]
-)
-def test_to_numpy_copies_other_storage_into_float64(raw: object) -> None:
-    energy = Energy.from_value(raw, ASE)
-    converted = energy.to_numpy()
-    stored = converted.value
+@pytest.mark.parametrize("raw", [1.5, np.float64(1.5)])
+def test_to_numpy_turns_scalar_storage_into_a_zero_dimensional_array(
+    raw: object,
+) -> None:
+    stored = Energy.from_value(raw, ASE).to_numpy().value
     assert type(stored) is np.ndarray
     assert stored.dtype == np.float64
-    assert not np.shares_memory(stored, np.asarray(raw))
-    np.testing.assert_array_equal(stored, np.asarray(raw, dtype=np.float64))
+    assert stored.shape == ()
+    assert stored == 1.5
+
+
+def test_to_numpy_copies_other_array_storage_into_float64() -> None:
+    raw = np.array([1.5, 2.0], dtype=np.float32)
+    stored = Energy.from_value(raw, ASE).to_numpy().value
+    assert stored.dtype == np.float64
+    raw[0] = 9.0
+    np.testing.assert_array_equal(stored, [1.5, 2.0])
+
+
+def test_to_numpy_keeps_a_non_contiguous_float64_view() -> None:
+    raw = np.arange(6.0)[::2]
+    assert Energy.from_value(raw, ASE).to_numpy().value is raw
+
+
+def test_to_numpy_keeps_an_offset_display_unit() -> None:
+    converted = Temperature[float](25.0, u.degC).to_numpy()
+    assert isinstance(converted, Temperature)
+    assert converted.unit is u.degC
+    np.testing.assert_allclose(converted.magnitude(u.K), 298.15)
 
 
 def test_to_numpy_keeps_kind_unit_and_system() -> None:

@@ -298,3 +298,11 @@ def test_to_numpy_refuses_a_tensor_that_requires_gradients() -> None:
     with pytest.raises(ValueError, match="detach first"):
         tracked.to_numpy()
     assert tracked.apply(lambda raw: raw.detach()).to_numpy().magnitude().shape == (2,)
+
+
+def test_to_numpy_converts_bfloat16_and_sparse_tensors() -> None:
+    half = Length[torch.Tensor](torch.tensor([1.5], dtype=torch.bfloat16), u.nm)
+    np.testing.assert_array_equal(half.to_numpy().magnitude(), [1.5])
+    dense = torch.tensor([[0.0, 1.0], [2.0, 0.0]])
+    sparse = Length[torch.Tensor](dense.to_sparse(), u.nm)
+    np.testing.assert_array_equal(sparse.to_numpy().magnitude(), dense.numpy())

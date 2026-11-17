@@ -22,7 +22,7 @@ __all__ = ["QuantityType", "SupportsToNumpy", "quantity_type"]
 
 
 class SupportsToNumpy[B](Protocol):
-    """A value whose ``to_numpy()`` gives ``B``, such as every quantity.
+    """A value whose ``to_numpy()`` gives ``B``, such as every quantity class.
 
     ``def batched[B](value: SupportsToNumpy[B]) -> B`` returns
     ``Energy[npt.NDArray[np.float64], S]`` for an ``Energy[float, S]``. Every
