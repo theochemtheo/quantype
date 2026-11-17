@@ -4,6 +4,7 @@ from typing import assert_type
 
 import labquantities.numpy as qnp
 import numpy as np
+import numpy.typing as npt
 from labquantities import (
     InverseTime,
     Length,
@@ -49,6 +50,9 @@ assert_type(1.0 / (2 * u.fs), InverseTime[float])
 assert_type(1.0 / (length * pressure), PerSurfaceTension[float])
 assert_type(u.angstrom(np.float64(2)), Length[np.float64])
 assert_type((300 * u.K).mean(), Temperature[float])
+assert_type(length.to_numpy(), Length[npt.NDArray[np.float64]])
+assert_type(product.to_numpy(), LengthTime[npt.NDArray[np.float64]])
+assert_type(qnp.stack([length, length]), Length[npt.NDArray[np.float64]])
 
 length_si = Length[float, SI](2, u.nm)
 pressure_si = Pressure[float, SI](3, u.pascal)

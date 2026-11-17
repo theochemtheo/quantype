@@ -7,6 +7,7 @@
 ^quantype\.core\.Constant\.__type_params__$
 ^quantype\._internal\._unit\.Unit\.__type_params__$
 ^quantype\._internal\._kind_types\.(Div|Mul|Pow)\.__type_params__$
+^quantype\.typing\.SupportsToNumpy\.__type_params__$
 
 # A type alias has no runtime tuple base class (stubtest treats it as a class).
 ^quantype\._internal\._registry\.Dimensions$

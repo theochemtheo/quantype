@@ -1,10 +1,12 @@
 # Quantity type annotations
 
-Public imports: `from quantype.typing import QuantityType, quantity_type`.
-These handwritten helpers let annotation-driven readers discover a named
+Public imports:
+`from quantype.typing import QuantityType, SupportsToNumpy, quantity_type`.
+`quantity_type` lets annotation-driven readers discover a named
 quantity's [kind](../explanation/glossary.md#kind "A nominal physical meaning, not just a dimension vector.")
-class, storage target, and unit system at runtime. They do not replace generated
-static overloads or infer physical meaning for a raw model.
+class, storage target, and unit system at runtime. `SupportsToNumpy` lets a
+type checker map a quantity type to its NumPy form. Neither replaces generated
+static overloads or infers physical meaning for a raw model.
 
 ## quantity_type
 
@@ -56,6 +58,43 @@ the selected storage and its system, for example
 `Energy[npt.NDArray[np.float64], SI]`. See
 [validation](../how-to/validate-data.md) and
 [NPZ target types](serialization.md#npz-api-and-schema).
+
+## SupportsToNumpy
+
+`SupportsToNumpy[B]` is a protocol for values whose `to_numpy()` returns `B`.
+Every quantity class has `to_numpy()`, so a function generic over `B` maps any
+quantity type to its float64 NumPy form without a table of kinds:
+
+```python
+from typing import assert_type
+
+import numpy as np
+import numpy.typing as npt
+
+from quantype import Energy, Force
+from quantype.systems import SI
+from quantype.typing import SupportsToNumpy
+
+type Array = npt.NDArray[np.float64]
+
+
+def batched[B](value: SupportsToNumpy[B] | None) -> B:
+    assert value is not None
+    return value.to_numpy()
+
+
+energy = Energy.from_value(1.5, SI)
+forces = Force.from_value(np.zeros(3), SI)
+assert_type(batched(energy), Energy[Array, SI])
+assert_type(batched(forces), Force[Array, SI])
+```
+
+mypy, Pyright, Pyrefly, and ty all solve `B`, including through `| None`.
+ty solves it because each class declares `to_numpy` without type parameters,
+overloads, or a typed `self`
+([ADR-015](https://github.com/theochemtheo/quantype/blob/main/docs/decisions/ADR-015-storage-forms-are-plain-methods.md)).
+[Numerical operations](numerical-operations.md#quantity-methods-views-and-storage) describes what
+`to_numpy()` does at runtime.
 
 ## Runtime discovery versus static checking
 

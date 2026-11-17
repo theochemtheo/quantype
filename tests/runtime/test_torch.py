@@ -6,6 +6,7 @@ from typing import Any, cast
 import pytest
 
 pytest.importorskip("torch")
+import numpy as np
 import torch
 
 import quantype.numpy as qnp
@@ -278,3 +279,22 @@ def test_plain_tensors_need_units_to_meet_quantities() -> None:
     assert isinstance(plain / lengths, PerLength)
     with pytest.raises(TypeError, match=r"torch\.__setitem__ does not know the units"):
         plain[0] = lengths
+
+
+def test_to_numpy_copies_a_cpu_tensor_into_float64() -> None:
+    raw = torch.tensor([1.0, 2.0], dtype=torch.float32)
+    lengths = Length[torch.Tensor](raw, u.nm)
+    converted = lengths.to_numpy()
+    assert isinstance(converted, Length)
+    assert converted.unit is u.nm
+    stored = converted.magnitude()
+    assert stored.dtype == np.float64
+    raw[0] = 5.0
+    np.testing.assert_array_equal(stored, [1.0, 2.0])
+
+
+def test_to_numpy_refuses_a_tensor_that_requires_gradients() -> None:
+    tracked = Length[torch.Tensor](torch.ones(2, requires_grad=True), u.nm)
+    with pytest.raises(ValueError, match="detach first"):
+        tracked.to_numpy()
+    assert tracked.apply(lambda raw: raw.detach()).to_numpy().magnitude().shape == (2,)

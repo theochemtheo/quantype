@@ -73,6 +73,7 @@ nav = [
       { "Spelling" = "decisions/ADR-012-american-spelling-except-catalogue.md" },
       { "Atomistic mass storage" = "decisions/ADR-013-atomistic-stores-mass-in-daltons.md" },
       { "Opt-in systems" = "decisions/ADR-014-opt-in-unit-system.md" },
+      { "Storage forms" = "decisions/ADR-015-storage-forms-are-plain-methods.md" },
     ] },
   ] },
 ]
@@ -132,7 +133,7 @@ markdown_description = "Development documentation for main, not the latest PyPI 
   { "reference/testing.md" = "assert_allclose signature, tolerances, system adoption, diagnostics, and host comparison." },
   { "reference/serialization.md" = "JSON/Pydantic and pickle-free binary input/output contracts." },
   { "reference/autodiff.md" = "JAX/Torch derivative signatures, kinds, storage, and restrictions." },
-  { "reference/type-annotations.md" = "Inspect quantity annotations using quantity_type." },
+  { "reference/type-annotations.md" = "Inspect quantity annotations using quantity_type, and map quantity types to NumPy forms with SupportsToNumpy." },
   { "reference/catalogue.md" = "Generated built-in kinds, units, relations, and system storage." },
 ]
 "Contributor guidance" = [

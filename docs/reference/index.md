@@ -13,7 +13,7 @@ and generated stub refinements; the built-in catalogue comes from its renderer.
 | [Testing](testing.md) | `quantype.testing.assert_allclose`, tolerances, system adoption, and host comparison |
 | [Serialization](serialization.md) | JSON, Pydantic, NPZ/NPY, explicit custom-unit decoding |
 | [Autodiff](autodiff.md) | `ujax`, `utorch`, derivative kinds, storage, and transformation restrictions |
-| [Quantity annotations](type-annotations.md) | `quantype.typing.quantity_type` |
+| [Quantity annotations](type-annotations.md) | `quantype.typing.quantity_type`, `quantype.typing.SupportsToNumpy` |
 | [Built-in catalogue](catalogue.md) | Generated kinds, units, declared relations, and each system's storage units |
 
 JAX and Torch require their respective extras; the

@@ -44,6 +44,7 @@ from quantype._internal._semantics import (
 )
 from quantype._internal._storage import (
     backend_name,
+    is_float64_array,
     is_floating,
     keep_storage,
     real_operand,
@@ -84,6 +85,9 @@ __all__ = [
 if TYPE_CHECKING:
     from collections.abc import Callable, Iterator
     from types import GenericAlias
+
+    import numpy as np
+    import numpy.typing as npt
 
 
 def result_kind(op: str, left: Semantic, right: Semantic) -> Semantic:
@@ -1173,6 +1177,33 @@ class Quantity[K, V, S: AnySystem]:
         raw: Any = self._value
         number = float(raw.item() if hasattr(raw, "item") else raw)
         return cast("Quantity[K, float, S]", self._with(number))
+
+    def to_numpy(self) -> Quantity[K, npt.NDArray[np.float64], S]:
+        """The quantity with float64 NumPy storage, keeping kind, unit and system.
+
+        Float64 NumPy storage is returned as the same array; other storage is
+        copied. A Torch tensor must be on the CPU and detached first, and a
+        traced JAX array cannot leave its trace.
+        """
+        import numpy as np
+
+        raw: Any = self._value
+        if is_float64_array(raw):
+            return cast("Quantity[K, npt.NDArray[np.float64], S]", self._with(raw))
+        if type(raw).__module__.startswith("torch"):
+            if raw.requires_grad:
+                raise ValueError(
+                    "to_numpy() would drop the autograd graph; detach first with "
+                    "q.apply(lambda raw: raw.detach())"
+                )
+            if raw.device.type != "cpu":
+                raise ValueError(
+                    f"to_numpy() needs a CPU tensor, not one on {raw.device}; "
+                    "move it first with q.apply(lambda raw: raw.cpu())"
+                )
+            raw = raw.numpy()
+        array = np.array(raw, dtype=np.float64)
+        return cast("Quantity[K, npt.NDArray[np.float64], S]", self._with(array))
 
     def argmin(self, axis: int | None = None) -> Any:
         """The index of the smallest value, as a plain integer or array."""

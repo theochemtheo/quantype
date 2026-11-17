@@ -272,3 +272,17 @@ def test_jax_differentiates_only_functions_returning_quantities() -> None:
     grad: Any = ujax.grad
     with pytest.raises(TypeError, match="must return a Quantity"):
         grad(raw)(Length[jax.Array]([1.0], u.nm))
+
+
+def test_jax_to_numpy_copies_concrete_arrays_and_refuses_traced_ones() -> None:
+    lengths = Length[jax.Array]([1.0, 2.0], u.nm)
+    converted = lengths.to_numpy()
+    assert type(converted.magnitude()) is np.ndarray
+    assert converted.magnitude().dtype == np.float64
+
+    def traced(x: Length[jax.Array]) -> Length[jax.Array]:
+        x.to_numpy()
+        return x
+
+    with pytest.raises(jax.errors.TracerArrayConversionError):
+        _jax.jit(traced)(lengths)

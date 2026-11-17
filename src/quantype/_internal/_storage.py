@@ -72,6 +72,15 @@ def is_floating(value: Any) -> bool:
     return bool(value.dtype.kind == "f")
 
 
+def is_float64_array(value: Any) -> bool:
+    """Whether storage is a NumPy array with float64 dtype, not a scalar."""
+    import numpy as np
+
+    # Narrowing Any to ndarray leaves its dtype Unknown in strict Pyright.
+    array_type: type[Any] = np.ndarray
+    return isinstance(value, array_type) and bool(value.dtype == np.float64)
+
+
 def validate_floating_storage(value: Any) -> None:
     """Inspect existing storage without converting, detaching, or moving it."""
     if not is_floating(value):
