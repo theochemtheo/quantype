@@ -5,7 +5,7 @@
 # ruff: noqa: A001
 # pyright: reportPrivateUsage=false
 from collections.abc import Sequence
-from typing import Any, Literal, overload
+from typing import Any, Literal, Protocol, overload
 
 import numpy as np
 import numpy.typing as npt
@@ -156,6 +156,7 @@ from quantype.products import (
     VolumeSquared,
 )
 from quantype.systems import AnySystem, NoSystem
+from quantype.typing import SupportsToNumpy
 
 __all__ = [
     "abs",
@@ -227,6 +228,12 @@ __all__ = [
     "where",
     "zeros_like",
 ]
+
+class _FloatToNumpy[B](SupportsToNumpy[B], Protocol):
+    def magnitude(self, unit: None = None) -> float: ...
+
+class _ArrayStorage(Protocol):
+    def magnitude(self, unit: None = None) -> _Numerical: ...
 
 @overload
 def sin[V, S: AnySystem](x: Angle[V, S], /) -> Dimensionless[V, S]: ...
@@ -9111,9 +9118,9 @@ def cross[K, L, V, S: AnySystem](
 @overload
 def cross[A: _Numerical](a: A, b: A, /, axis: int = ...) -> A: ...
 @overload
-def stack[Q: _BaseQuantity[Any, Any, Any]](
-    arrays: Sequence[Q], axis: int = ...
-) -> Q: ...
+def stack[B](arrays: Sequence[_FloatToNumpy[B]], axis: int = ...) -> B: ...
+@overload
+def stack[Q: _ArrayStorage](arrays: Sequence[Q], axis: int = ...) -> Q: ...
 @overload
 def stack[A: _Numerical](arrays: Sequence[A], axis: int = ...) -> A: ...
 @overload

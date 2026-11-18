@@ -50,7 +50,7 @@ assert_type(qnp.sqrt(Area[float, SI](4, u.angstrom_squared)), Length[float, SI])
 
 | Signature | Result / restriction |
 | --- | --- |
-| `stack(arrays, axis=0)`, `concatenate(arrays, axis=0)` | Nonempty sequence of one kind and compatible systems; aligns units |
+| `stack(arrays, axis=0)`, `concatenate(arrays, axis=0)` | Nonempty sequence of one kind and compatible systems; aligns units. `stack` of `float` storage gives `npt.NDArray[np.float64]` storage |
 | `reshape(x, shape)`, `transpose(x, axes=None)`, `squeeze(x, axis=None)`, `expand_dims(x, axis)` | Same kind and system; backend reshaping conventions |
 | `zeros_like(x)` | Same kind, system, and shape |
 | `sum(x, axis=None, *, keepdims=False)`, `mean(...)`, `max(...)`, `min(...)` | Same kind; absolute-temperature sums rejected |
@@ -97,6 +97,11 @@ kind as described above. A NumPy array reduced or indexed to one element stays
 a zero-dimensional array, not a NumPy scalar. `.item()` returns a quantity with
 Python `float` storage. Basic NumPy indexing shares memory; integer/boolean
 array indexing copies. `.copy()` makes an independent numerical copy.
+
+`.to_numpy()` returns a quantity with float64 NumPy array storage: the same
+array when the storage already is one, and a copy otherwise. It raises
+`ValueError` for a Torch tensor that requires gradients or is not on the CPU.
+JAX raises inside a trace.
 
 ### flatten
 

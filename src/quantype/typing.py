@@ -1,20 +1,36 @@
-"""Quantity annotations read at runtime: kind class, storage type, unit system.
+"""Typing helpers: quantity annotations read at runtime, and storage protocols.
 
 ``quantity_type(Force[npt.NDArray[np.float64], SI])`` gives the class
 ``Force``, the storage ``npt.NDArray[np.float64]``, and the system ``SI``.
 Readers and validators use it to turn an annotation into a target type.
+
+``SupportsToNumpy[B]`` reads a quantity type's NumPy form ``B`` in a type
+checker, so ``Force[float, SI]`` maps to ``Force[npt.NDArray[np.float64], SI]``
+without a table of kinds.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Annotated, Any, TypeGuard, get_args, get_origin
+from typing import Annotated, Any, Protocol, TypeGuard, get_args, get_origin
 
 from quantype._internal._construction import StorageAlias
 from quantype._internal._systems import AnySystem, NoSystem
 from quantype.core import Quantity
 
-__all__ = ["QuantityType", "quantity_type"]
+__all__ = ["QuantityType", "SupportsToNumpy", "quantity_type"]
+
+
+class SupportsToNumpy[B](Protocol):
+    """A value whose ``to_numpy()`` gives ``B``, such as every quantity class.
+
+    ``def batched[B](value: SupportsToNumpy[B]) -> B`` returns
+    ``Energy[npt.NDArray[np.float64], S]`` for an ``Energy[float, S]``. Every
+    supported checker solves ``B``, including ty, because each quantity class
+    declares ``to_numpy`` without type parameters, overloads or a typed ``self``.
+    """
+
+    def to_numpy(self) -> B: ...
 
 
 @dataclass(frozen=True)

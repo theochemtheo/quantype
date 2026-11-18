@@ -110,6 +110,7 @@ def pair_class(pair: Pair, table: Table) -> str:
             scaled[1:] if method == "__rmatmul__" else scaled, overrides=True
         )
     text += f"    @override\n    def item(self) -> {name}[float, S]: ...\n"
+    text += f"    @override\n    def to_numpy(self) -> {name}[npt.NDArray[np.float64], S]: ...\n"
     text += overloads(
         scaling(
             "__rtruediv__",

@@ -137,6 +137,8 @@ assert on_cpu.dtype == torch.float64
 For a GPU already available to your application, use
 `q.apply(lambda raw: raw.to("cuda"))`; no GPU is needed above. To detach use
 `q.apply(lambda raw: raw.detach())`. For host extraction from Torch, explicitly
-use `q.magnitude(unit).detach().cpu().numpy()`; this loses graph connectivity.
+use `q.magnitude(unit).detach().cpu().numpy()`, or
+`q.apply(lambda raw: raw.detach().cpu()).to_numpy()` to keep the unit; either
+loses graph connectivity.
 See [serialization](serialize.md) for persistence and
 [test quantities](test-quantities.md) for comparisons without dropping units.

@@ -402,6 +402,7 @@ def quantity_methods(name: str, catalogue: Catalogue, table: Table) -> str:
     text += f"    @override\n    def std(self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False) -> {spread}[V, S]: ...\n"
     text += f"    @override\n    def var(self, axis: int | None = None, *, ddof: int = 0, keepdims: bool = False) -> {power_type(spread, 2, catalogue, table)}: ...\n"
     text += f"    @override\n    def item(self) -> {name}[float, S]: ...\n"
+    text += f"    @override\n    def to_numpy(self) -> {name}[npt.NDArray[np.float64], S]: ...\n"
     # Absolute temperatures scale and multiply, but a sum of them is meaningless.
     if name != "Temperature":
         text += f"    @override\n    def sum(self, axis: int | tuple[int, ...] | None = None, *, keepdims: bool = False) -> {name}[V, S]: ...\n"
@@ -601,6 +602,7 @@ def structural_quantity_stub() -> str:
         overrides=True,
     )
     text += "    @override\n    def item(self) -> Quantity[K, float, S]: ...\n"
+    text += "    @override\n    def to_numpy(self) -> Quantity[K, npt.NDArray[np.float64], S]: ...\n"
     return text
 
 
@@ -1134,9 +1136,9 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         + "# NumPy's names, including builtin ones.\n# ruff: noqa: A001\n"
         + "# pyright: reportPrivateUsage=false\n"
     )
-    text += "from collections.abc import Sequence\nfrom typing import Any, Literal, overload\n"
+    text += "from collections.abc import Sequence\nfrom typing import Any, Literal, Protocol, overload\n"
     text += "import numpy as np\nimport numpy.typing as npt\nfrom quantype.core import Quantity as _BaseQuantity, _Numerical\n"
-    text += "from quantype.systems import AnySystem, NoSystem\n"
+    text += "from quantype.systems import AnySystem, NoSystem\nfrom quantype.typing import SupportsToNumpy\n"
     text += (
         f"from {package}._generated import (" + ", ".join(catalogue.quantities) + ")\n"
     )
@@ -1162,6 +1164,12 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         + ")\n"
     )
     text += f"__all__ = {sorted(NUMPY_FUNCTIONS)!r}\n\n"
+    # A stack of float storage is an array, a type only each class's to_numpy
+    # names.
+    text += "class _FloatToNumpy[B](SupportsToNumpy[B], Protocol):\n"
+    text += "    def magnitude(self, unit: None = None) -> float: ...\n\n"
+    text += "class _ArrayStorage(Protocol):\n"
+    text += "    def magnitude(self, unit: None = None) -> _Numerical: ...\n\n"
     structural = "_StructuralQuantity[Any, Any, Any, Any]"
     quantity = "_BaseQuantity[Any, Any, Any]"
     for name, source, target in NUMPY_UNARY:
@@ -1266,9 +1274,19 @@ def numpy_stub(catalogue: Catalogue, package: str, table: Table) -> str:
         indent="",
     )
     for name in ("stack", "concatenate"):
+        joined = (
+            [
+                "def stack[B](arrays: Sequence[_FloatToNumpy[B]], axis: int = ...) -> B: ...",
+                "def stack[Q: _ArrayStorage](arrays: Sequence[Q], axis: int = ...) -> Q: ...",
+            ]
+            if name == "stack"
+            else [
+                f"def {name}[Q: {quantity}](arrays: Sequence[Q], axis: int = ...) -> Q: ..."
+            ]
+        )
         text += overloads(
             [
-                f"def {name}[Q: {quantity}](arrays: Sequence[Q], axis: int = ...) -> Q: ...",
+                *joined,
                 f"def {name}[A: _Numerical](arrays: Sequence[A], axis: int = ...) -> A: ...",
             ],
             indent="",
