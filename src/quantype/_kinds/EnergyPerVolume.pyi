@@ -3,6 +3,7 @@
 # pyright: reportOverlappingOverload=false
 # mypy: disable-error-code=override
 # pyright: reportIncompatibleMethodOverride=false
+# ty: ignore[incompatible-method-override]
 # pyright: reportPrivateUsage=false
 from collections.abc import Callable
 from typing import Any,Literal,Protocol,overload as _o,override as _v

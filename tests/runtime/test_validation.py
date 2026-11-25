@@ -126,7 +126,7 @@ def test_pydantic_roundtrip() -> None:
 
 
 def test_schema_and_bare_annotation() -> None:
-    adapter: TypeAdapter[Any] = TypeAdapter(Length)
+    adapter: TypeAdapter[Any] = TypeAdapter(Length)  # ty: ignore[missing-type-argument]  # pyright: ignore[reportUnknownArgumentType]
     assert adapter.validate_python("5 angstrom").magnitude(u.angstrom) == 5
     schema = Simulation.model_json_schema()["properties"]["cutoff"]["anyOf"][0]
     assert set(schema["required"]) == {"magnitude", "unit"}  # the field names the kind

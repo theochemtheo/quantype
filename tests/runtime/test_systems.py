@@ -182,7 +182,7 @@ def test_base_units_must_match_their_axis() -> None:
 
         class Mixed(UnitSystem, name="mixed"):  # pyright: ignore[reportUnusedClass]
             length = u.nm
-            energy = wrong
+            energy = wrong  # ty: ignore[unsound-assignment]
             time = u.fs
 
 
@@ -355,7 +355,7 @@ def test_base_units_must_be_units() -> None:
     ):
 
         class Numbers(UnitSystem, name="numbers"):  # pyright: ignore[reportUnusedClass]
-            length = wrong
+            length = wrong  # ty: ignore[unsound-assignment]
             energy = u.eV
             time = u.fs
 

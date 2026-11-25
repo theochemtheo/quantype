@@ -3,6 +3,7 @@
 # pyright: reportOverlappingOverload=false
 # mypy: disable-error-code=override
 # pyright: reportIncompatibleMethodOverride=false
+# ty: ignore[incompatible-method-override]
 # pyright: reportPrivateUsage=false
 from typing import Literal,overload as _o,override as _v
 from quantype._constants.Action import _ActionConstant
@@ -147,7 +148,7 @@ class _AccelerationConstant(Constant[AccelerationKind]):
  # pyrefly: ignore[bad-override]
  def __rtruediv__(self,other:_Scalar,/)->_PerAccelerationConstant:...
  @_o
- def __rtruediv__[L,W,T:AnySystem](self,other:_Operand[L,W,T],/)->Quantity[Div[L,AccelerationKind],W,T]:...  # ty: ignore[invalid-method-override]
+ def __rtruediv__[L,W,T:AnySystem](self,other:_Operand[L,W,T],/)->Quantity[Div[L,AccelerationKind],W,T]:...
  @_o
  @_v
  def __pow__(self,exponent:Literal[1],/)->_AccelerationConstant:...

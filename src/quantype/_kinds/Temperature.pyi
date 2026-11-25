@@ -3,6 +3,7 @@
 # pyright: reportOverlappingOverload=false
 # mypy: disable-error-code=override
 # pyright: reportIncompatibleMethodOverride=false
+# ty: ignore[incompatible-method-override]
 # pyright: reportPrivateUsage=false
 from collections.abc import Callable
 from typing import Any,Literal,Never,Protocol,overload as _o,override as _v
@@ -186,10 +187,10 @@ class Temperature(Quantity[TemperatureKind,V,S]):
  def __sub__[T:AnySystem](self:Temperature[V,NoSystem],other:Temperature[V,T]|Temperature[float,T],/,)->TemperatureDifference[V,T]:...
  @_v
  # pyrefly: ignore[bad-override]
- def __radd__(self,other:Never,/)->Never:...  # ty: ignore[invalid-method-override]
+ def __radd__(self,other:Never,/)->Never:...
  @_v
  # pyrefly: ignore[bad-override]
- def __rsub__(self,other:Never,/)->Never:...  # ty: ignore[invalid-method-override]
+ def __rsub__(self,other:Never,/)->Never:...
  @_v
  def __neg__(self)->Temperature[V,S]:...
  @_v
