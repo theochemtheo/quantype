@@ -400,7 +400,7 @@ class Quantity[K, V, S: AnySystem]:
             _STRUCTURAL_CLASSES[cls.__dict__["_catalogue_dimensionless"]] = cls
         if cls.__dict__.get("_kind"):
             if "_semantic" not in cls.__dict__:
-                cls._semantic = KINDS[cls._kind]
+                cls._semantic = KINDS[cls._kind]  # pyrefly: ignore[instance-var-assign]
             _CLASSES[cast("Kind", cls._semantic)] = cls
 
     @classmethod

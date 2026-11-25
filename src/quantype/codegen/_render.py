@@ -46,6 +46,8 @@ QUANTITY_OVERRIDES = (
     "# mypy: disable-error-code=override\n"
     "# pyright: reportIncompatibleMethodOverride=false\n"
 )
+# ty reports the ignore as unused in product modules, whose overrides it accepts.
+NAMED_OVERRIDES = QUANTITY_OVERRIDES + "# ty: ignore[incompatible-method-override]\n"
 
 
 def overloads(
@@ -240,17 +242,11 @@ def scaling(method: str, name: str, result: Callable[[str], str]) -> list[str]:
 def suppressed_override(block: str) -> str:
     """Suppress an overloaded override that refines a base return type.
 
-    pyrefly reports it at the first signature, which a wrapped signature leaves
-    no room to annotate, so it goes on the line above; ty at the last.
+    Pyrefly reports it at the first signature, which a wrapped signature leaves
+    no room to annotate, so the comment goes on the line above.
     """
     first = block.index("    def ")
-    text = block[:first] + "    # pyrefly: ignore[bad-override]\n" + block[first:]
-    last = text.rindex(": ...")
-    return (
-        text[:last]
-        + ": ...  # ty: ignore[invalid-method-override]"
-        + text[last + len(": ...") :]
-    )
+    return block[:first] + "    # pyrefly: ignore[bad-override]\n" + block[first:]
 
 
 def method_overloads(method: str, signatures: list[str], receiver: str) -> str:
@@ -289,8 +285,8 @@ def additive_stubs(name: str) -> str:
         else:
             # No int is a Never, so sum() of absolute temperatures and 0 - T are
             # type errors, as they are runtime errors. Narrowing the inherited
-            # parameter is deliberate, and Pyrefly and ty report it.
-            text += f"    @override\n    # pyrefly: ignore[bad-override]\n    def {method}(self, other: Never, /) -> Never: ...  # ty: ignore[invalid-method-override]\n"
+            # parameter is deliberate, and Pyrefly reports it.
+            text += f"    @override\n    # pyrefly: ignore[bad-override]\n    def {method}(self, other: Never, /) -> Never: ...\n"
     return text
 
 
@@ -741,7 +737,7 @@ def kind_module(name: str, catalogue: Catalogue, package: str, table: Table) -> 
     text = (
         HEADER
         + OVERLAPS
-        + QUANTITY_OVERRIDES
+        + NAMED_OVERRIDES
         + "# pyright: reportPrivateUsage=false\n"
         + PROTOCOL_MEMBERS
     )
@@ -784,7 +780,7 @@ def constant_module(name: str, catalogue: Catalogue, package: str, table: Table)
     text = (
         HEADER
         + OVERLAPS
-        + QUANTITY_OVERRIDES
+        + NAMED_OVERRIDES
         + "# pyright: reportPrivateUsage=false\n"
         + PROTOCOL_MEMBERS
     )

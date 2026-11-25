@@ -387,8 +387,8 @@ whole-quantity pattern.
 ## Supported checkers
 
 The default system parameter uses PEP 696. Stubs declare it with
-`typing_extensions.TypeVar` and are tested on Python 3.12 with mypy 2.3.1,
-Pyright 1.1.414, Pyrefly 1.3.2, and ty 0.0.84. Older checkers without PEP 696
+`typing_extensions.TypeVar` and are tested on Python 3.12 with mypy 2.4.1,
+Pyright 1.1.414, Pyrefly 1.5.0, and ty 0.0.110. Older checkers without PEP 696
 support may not interpret `Length[float]` as `Length[float, NoSystem]`.
 Runtime enforcement does not depend on a checker or plugin. See
 [troubleshooting](../troubleshooting.md) for common system errors.
